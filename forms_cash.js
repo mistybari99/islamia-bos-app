@@ -30,7 +30,7 @@ addDefs([
 ]);
 
 /* ============ 10-3 · Digital payment reconciliation register ============ */
-const SHOWROOMS = [['s1', L('ইসলামিয়া মেইন', 'Islamia Main')], ['s2', L('২য় শাখা', '2nd branch')], ['s3', L('মিষ্টি বাড়ি', 'Mishti Bari')], ['s4', L('আল-কেকিজ', 'Al-Cakes')], ['other', L('অন্য', 'Other')]];
+const SHOWROOMS = [['s1', L('ইসলামিয়া মিষ্টি ঘর — মেইন', 'ISLAMIYA MISTY GHAR — Main')], ['s2', L('ইসলামিয়া মিষ্টি ঘর — ২য় শাখা', 'ISLAMIYA MISTY GHAR — 2nd Branch')], ['s3', L('মিষ্টি বাড়ি', 'MISTY BARI')], ['s4', L('AL-CAKIZ', 'AL-CAKIZ')], ['other', L('অন্য', 'Other')]];
 const recCols = (nameCol, aLabel, cLabel, chgLabel, pre) => [nameCol,
   M('a', aLabel), M('b', L('স্টেটমেন্টে (B)', 'On the statement (B)')), M('chg', chgLabel), M('c', cLabel),
   CALC('d1', L('পার্থক্য: A − B', 'Difference: A − B'), 'money', { show: (x) => has(x.row.a) && has(x.row.b) }),
@@ -53,7 +53,7 @@ B.forms['10-3'] = {
       CK('st_courier', L('কুরিয়ার', 'Courier')), CK('st_foodapp', L('ফুড অ্যাপ', 'Food app')), CK('st_other', L('অন্য', 'Other')), T('st_other_name', L('অন্য — কোনটি', 'Other — which'), { show: (x) => !!x.d.st_other }),
       D('st_date', L('সংগ্রহের তারিখ', 'Collection date')), ST('st_by', L('সংগ্রহকারী (Collected by)', 'Collected by')),
       CK('no_statement', L('কোনো স্টেটমেন্ট পাওয়া যায়নি → রিকনসিলিয়েশন আটক', 'No statement could be obtained → reconciliation on hold'), { req: false })] },
-    { title: L('শোরুম', 'Showrooms'), fields: [
+    { title: L('শোরুম', 'Showroom'), fields: [
       TABLE('showroom', null, recCols(SEL('who', L('শোরুম', 'Showroom'), SHOWROOMS, { wide: true }), L('শোরুমের কাগজে (A)', 'On the showroom paper (A)'), L('ব্যাংকে জমা (C)', 'Deposited in the bank (C)'), L('কেটে রাখা চার্জ', 'Charge deducted')), { min: 4 }),
       CALC('sh_a', L('মোট — শোরুমের কাগজে (A)', 'Total — showroom paper (A)'), 'money'), CALC('sh_b', L('মোট — স্টেটমেন্টে (B)', 'Total — statement (B)'), 'money'),
       CALC('sh_chg', L('মোট — কেটে রাখা চার্জ', 'Total — charge deducted'), 'money'), CALC('sh_c', L('মোট — ব্যাংকে জমা (C)', 'Total — deposited (C)'), 'money'),
@@ -194,10 +194,10 @@ B.forms['14-2'] = {
       NOTE(L('যিনি ভাজেন তিনি মাপবেন না। খামির, তেল ও রস মাপা হবে দাগ-কাটা ডিপস্টিক বা পাল্লায়, তালিকা দেখে কেজি বা লিটারে। মালামাল ইস্যু স্লিপ ছাড়া কাউন্টারে কোনো মালামাল প্রাপ্ত হবে না — মিষ্টি কারখানার রসও নয়। অবিক্রিত (Unsold) জিলাপি বন্ধের সময় একবার ওজন করে সিদ্ধান্ত লিখতে হবে।',
         'Whoever fries does not measure. Dough, oil and syrup are measured with a marked dipstick or scale, from the list, in kg or litres. No goods are received at the counter without an issue slip, syrup from the sweet factory included. Unsold jalebi is weighed once at closing and a decision written.'), 'warn'),
       TABLE('meas', null, [TM('t_open', L('খোলায় — সময়', 'Opening — time')), N('open', L('খোলায় — পরিমাপ', 'Opening — amount'), { req: true }), TM('t_close', L('বন্ধে — সময়', 'Closing — time')), N('close', L('বন্ধে — পরিমাপ', 'Closing — amount'), { req: true }),
-        CH('unit', L('একক', 'Unit'), [['kg', L('কেজি', 'kg')], ['l', L('লিটার', 'litre')]])],
+        CH('unit', L('একক', 'Unit'), [['kg', L('কেজি', 'KG')], ['l', L('লিটার', 'Litre')]])],
         { rows: [L('খামির', 'Dough'), L('তেল', 'Oil'), L('রস', 'Syrup')] }),
       ST('measured_by', L('পরিমাপকারী (Measured by) — স্বাক্ষর', 'Measured by — signature'), { req: true }),
-      CH('scale', L('পাল্লা — জানা ওজনের বস্তু দিয়ে পরীক্ষা (খোলায়)', 'Scale — tested with a known weight (at opening)'), [['ok', L('ঠিক', 'Correct')], ['bad', L('গরমিল', 'Off')]], { req: true }),
+      CH('scale', L('পাল্লা — জানা ওজনের বস্তু দিয়ে পরীক্ষা (খোলায়)', 'Scale — tested with a known weight (at opening)'), [['ok', L('ঠিক', 'OK')], ['bad', L('গরমিল', 'Off')]], { req: true }),
       NOTE(L('গরমিল হলে পাল্লা ব্যবহার বন্ধ, কাজের তালিকায় যোগ করুন।', 'If it is off, stop using the scale and add it to the work list.'), 'warn', { show: (x) => x.d.scale === 'bad' }),
       CK('scale_worklist', L('কাজের তালিকায় যোগ', 'Added to the work list'), { show: (x) => x.d.scale === 'bad' }),
       CH('oil_changed', L('তেল বদল', 'Oil change'), YN),
@@ -265,10 +265,10 @@ B.forms['14-2'] = {
       if (df === 0) v.c10_state = L('মিল আছে ✓', 'Matches ✓');
       else { const okP = pct !== null && c5 > 0 && Math.abs(df) / c5 * 100 <= pct, okK = mxk !== null && Math.abs(df) <= mxk;
         if (pct === null && mxk === null) needs.push('jalebi_tol_pct', 'jalebi_tol_kg');
-        if (okP || okK) { v.c10_state = L('সীমার ভেতরে', 'Inside the limit'); flags.push(flag('jalebi_diff_small', 'yellow', 'জিলাপির প্রত্যাশিত ও প্রকৃতে ছোট পার্থক্য (সীমার ভেতরে)', 'Small expected-vs-actual jalebi gap (inside the limit)', Math.abs(df), { unit: 'qty' })); }
+        if (okP || okK) { v.c10_state = L('সীমার ভেতরে', 'Within the limit'); flags.push(flag('jalebi_diff_small', 'yellow', 'জিলাপির প্রত্যাশিত ও প্রকৃতে ছোট পার্থক্য (সীমার ভেতরে)', 'Small expected-vs-actual jalebi gap (inside the limit)', Math.abs(df), { unit: 'qty' })); }
         else { v.c10_state = pct === null && mxk === null ? NEED : L('সীমার বাইরে', 'Outside the limit'); v.diff_out = true; flags.push(flag('jalebi_diff', 'red', 'জিলাপির প্রত্যাশিত ও প্রকৃতের পার্থক্য সীমার বাইরে', 'Expected-vs-actual jalebi gap outside the limit', Math.abs(df), { unit: 'qty' })); } }
     }
-    const un = (o) => (o.unit === 'l' ? L('লিটার', 'litres') : L('কেজি', 'kg')); const qt = (n, o) => L(fm(n) + ' ' + un(o).bn, fm(n) + ' ' + un(o).en);
+    const un = (o) => (o.unit === 'l' ? L('লিটার', 'Litre') : L('কেজি', 'KG')); const qt = (n, o) => L(fm(n) + ' ' + un(o).bn, fm(n) + ' ' + un(o).en);
     const c11 = has(oil.open) && has(oil.close) ? num(d.tot_oil) + num(oil.open) - num(oil.close) : null; v.c11 = c11 === null ? '—' : qt(c11, oil);
     v.c11k = c11 !== null && c9 !== null && c9 > 0 ? L(fm(c11 / c9), fm(c11 / c9)) : '—';
     const c12 = has(syr.open) && has(syr.close) ? num(d.tot_syrup) + num(syr.open) - num(syr.close) : null; v.c12 = c12 === null ? '—' : qt(c12, syr);
@@ -294,7 +294,7 @@ const MONTHS = ['জানুয়ারি:January', 'ফেব্রুয়
 B.forms['18-1'] = {
   title: L('মার্কেটিং ব্যয় রেজিস্টার', 'Marketing expense register'),
   head: [SEL('month', L('মাস', 'Month'), MONTHS),
-    CH('brand', L('ব্র্যান্ড', 'Brand'), [['imh', L('ইসলামিয়া মিষ্টি ঘর', 'Islamia Mishti Ghor')], ['mb', L('মিষ্টি বাড়ি', 'Mishti Bari')], ['ak', L('আল-কেকিজ', 'Al-Cakes')], ['other', L('অন্য', 'Other')], ['all', L('সব', 'All')]]),
+    CH('brand', L('ব্র্যান্ড', 'Brand'), [['imh', L('ইসলামিয়া মিষ্টি ঘর', 'ISLAMIYA MISTY GHAR')], ['mb', L('মিষ্টি বাড়ি', 'MISTY BARI')], ['ak', L('AL-CAKIZ', 'AL-CAKIZ')], ['other', L('অন্য', 'Other')], ['all', L('সব', 'All')]]),
     T('brand_other', L('অন্য ব্র্যান্ড', 'Other brand'), { show: (x) => x.d.brand === 'other' })],
   sections: [
     { title: L('নিয়ম', 'Rule'), fields: [
@@ -326,7 +326,7 @@ B.forms['18-1'] = {
       if (!has(r.head) || !has(r.amt) || num(r.amt) <= 0) return { state: '—' };
       const lim = sv(x, 'mkt_limit_' + r.head); cum[r.head] = (cum[r.head] || 0) + num(r.amt);
       if (lim === null) { needs.push('mkt_limit_' + r.head); noLim += num(r.amt); return { state: NEED }; }
-      if (cum[r.head] > lim) { anyOver = true; over.add(r.head); excess += Math.min(num(r.amt), cum[r.head] - lim); if (!has(r.approved_by)) noAppr++; return { state: L('সীমার বাইরে', 'Over the limit') }; }
+      if (cum[r.head] > lim) { anyOver = true; over.add(r.head); excess += Math.min(num(r.amt), cum[r.head] - lim); if (!has(r.approved_by)) noAppr++; return { state: L('সীমার বাইরে', 'Outside the limit') }; }
       return { state: L('সীমার ভেতরে ✓', 'Within the limit ✓') };
     });
     v.tot_amt = sum(rows.map((r) => r.amt)); v.tot_nonpay = sum(rows.map((r) => r.nonpay)); v.reg_total = v.tot_amt; v.any_over = anyOver;

@@ -25,7 +25,7 @@ const fridgeCalc = (x, tid, flagPrefix, flags, needs) => {
     let ok = NEED;
     if (has(r.temp)) {
       if (min === null || max === null) needs.push('fridge' + i + '_min', 'fridge' + i + '_max');
-      else { const tt = num(r.temp), good = tt >= min && tt <= max; ok = good ? L('সীমার মধ্যে ✓', 'In range ✓') : L('সীমার বাইরে', 'Out of range');
+      else { const tt = num(r.temp), good = tt >= min && tt <= max; ok = good ? L('সীমার মধ্যে ✓', 'In range ✓') : L('সীমার বাইরে', 'Outside the limit');
         if (!good) flags.push(flag(flagPrefix + i, 'red', 'ফ্রিজ / চিলার ' + i + ' এর তাপমাত্রা সীমার বাইরে', 'Fridge / chiller ' + i + ' temperature out of range', tt, { unit: 'qty' })); }
     }
     return { name: name || L('ফ্রিজ / চিলার ' + i, 'Fridge / chiller ' + i), temp_ok: ok };
@@ -42,7 +42,7 @@ B.forms['05-1'] = {
       CH('safety', L('গ্যাস, বিদ্যুৎ ও আগুনের নিরাপত্তা চেক (Safety Check)', 'Gas, power and fire safety check'), [['ok', L('নিরাপদ', 'Safe')], ['defect', L('ত্রুটি', 'Defect')]], { req: true }),
       T('safety_defect', L('ত্রুটির বিবরণ', 'Defect details'), { show: (x) => x.d.safety === 'defect', req: (x) => x.d.safety === 'defect' }),
       TABLE('machines', L('যন্ত্রপাতি চেক (মিক্সার · চুলা · ওভেন · ফ্রিজ)', 'Equipment check (mixer · stove · oven · fridge)'),
-        [T('name', L('যন্ত্র', 'Equipment'), { req: true, wide: true }), CH('state', L('অবস্থা', 'State'), [['ok', L('ঠিক', 'OK')], ['defect', L('ত্রুটি', 'Defect')]], { req: true })], { min: 3 }),
+        [T('name', L('যন্ত্র', 'Equipment'), { req: true, wide: true }), CH('state', L('অবস্থা', 'Status'), [['ok', L('ঠিক', 'OK')], ['defect', L('ত্রুটি', 'Defect')]], { req: true })], { min: 3 }),
       CK('machines_done', L('যন্ত্রপাতি চেক সম্পন্ন', 'Equipment check done')),
       CALC('scale_info', L('পাল্লা যাচাইয়ের বস্তু ও সীমা (লোকেশন সেটিংস থেকে)', 'Scale check object and limit (from settings)'), 'text'),
       CH('scale', L('পাল্লা — জানা ওজনের বস্তু দিয়ে চেক', 'Scale: checked with a known-weight object'), [['ok', L('ঠিক', 'OK')], ['off', L('গরমিল', 'Off')]], { req: true }),
@@ -165,7 +165,7 @@ B.forms['05-2'] = {
 
 /* ============ 05-3 · Recipe card ============ */
 const FAMILIES = [['chana', L('ছানার মিষ্টি', 'Chhana sweets')], ['fried', L('ভাজা মিষ্টি ও জিলাপি', 'Fried sweets & jalebi')], ['doi', L('দই ও দুগ্ধ', 'Curd & dairy')], ['khoa', L('খোয়া / মাওয়া', 'Khoa / mawa')], ['cake', L('কেক ও বেকারি', 'Cake & bakery')], ['other', L('অন্য', 'Other')]];
-const RUNITS = [['kg', L('কেজি', 'kg')], ['l', L('লিটার', 'litre')], ['pc', L('পিস', 'pc')], ['lb', L('পাউন্ড', 'lb')], ['g', L('গ্রাম', 'gram')]];
+const RUNITS = [['kg', L('কেজি', 'KG')], ['l', L('লিটার', 'Litre')], ['pc', L('পিস', 'Piece')], ['lb', L('পাউন্ড', 'Pound')], ['g', L('গ্রাম', 'gram')]];
 const ingCols = () => [ITEM('item', L('কাঁচামালের নাম ও আইটেম কোড', 'Raw material name & item code'), { wide: true, req: (x) => !has(x.row.name) }),
   T('name', L('নাম (তালিকায় না থাকলে)', 'Name (if not in the list)'), { req: (x) => !has(x.row.item) }), N('qty', L('পরিমাণ', 'Quantity'), { req: true }), SEL('unit', L('একক', 'Unit'), RUNITS, { req: true })];
 B.forms['05-3'] = {
@@ -180,7 +180,7 @@ B.forms['05-3'] = {
       T('batch_unit_other', L('অন্য একক (লিখুন)', 'Other unit (write it)'), { show: (x) => x.d.batch_unit === 'other' })] },
     { title: L('Section A · ধাপ (Step) 1 — বেস তৈরি (ছানা / খোয়া / খামির / ব্যাটার / দুধ জ্বাল)', 'Section A · Step 1: making the base (chhana / khoa / dough / batter / boiled milk)'), fields: [
       TABLE('a', null, ingCols(), { min: 4 }),
-      N('base_qty', L('ধাপ (Step) 1 থেকে প্রাপ্ত বেস', 'Base obtained from Step 1'), { req: true }), CH('base_unit', L('একক', 'Unit'), [['kg', L('কেজি', 'kg')], ['l', L('লিটার', 'litre')]], { req: true })] },
+      N('base_qty', L('ধাপ (Step) 1 থেকে প্রাপ্ত বেস', 'Base obtained from Step 1'), { req: true }), CH('base_unit', L('একক', 'Unit'), [['kg', L('কেজি', 'KG')], ['l', L('লিটার', 'Litre')]], { req: true })] },
     { title: L('Section B · ধাপ (Step) 2 — পণ্য তৈরি', 'Section B · Step 2: making the product'), fields: [TABLE('b', null, ingCols(), { min: 5 })] },
     { title: L('Section C · প্যাকেজিং — পণ্যের উপকরণের সাথে নয়, আলাদা', 'Section C · Packaging: kept apart from the product ingredients'), fields: [TABLE('c', null, ingCols(), { min: 2 })] },
     { title: L('Section D · বানানোর ধাপ (Step)', 'Section D · Method steps'), fields: [
@@ -214,8 +214,8 @@ B.forms['05-4'] = {
     { title: L('তিন ব্যাচের মাপ', 'Three-batch measurements'), fields: [
       NOTE(L('তিনটি আলাদা দিনের তিনটি ব্যাচ মাপতে হবে। প্রতিটি সংখ্যা পাল্লায় মেপে বা গণনা করে, অনুমানে নয়। যিনি মাপবেন, তিনি ওই ব্যাচের কারিগর নন। যে ঘর পণ্যের সাথে খাটে না, সেখানে খালি রাখুন।',
         'Measure three batches on three different days. Every number is weighed or counted, never guessed. The person who measures is not the craftsman of that batch. Leave a box empty if it does not apply to this product.'), 'warn'),
-      CH('in_unit', L('মূল উপকরণের একক', 'Main input unit'), [['kg', L('কেজি', 'kg')], ['l', L('লিটার', 'litre')]], { req: true }),
-      CH('out_unit', L('পণ্যের একক', 'Product unit'), [['kg', L('কেজি', 'kg')], ['pc', L('পিস', 'pc')]], { req: true }),
+      CH('in_unit', L('মূল উপকরণের একক', 'Main input unit'), [['kg', L('কেজি', 'KG')], ['l', L('লিটার', 'Litre')]], { req: true }),
+      CH('out_unit', L('পণ্যের একক', 'Product unit'), [['kg', L('কেজি', 'KG')], ['pc', L('পিস', 'Piece')]], { req: true }),
       TABLE('b', null, [D('date', L('1 · তারিখ', '1 · Date'), { req: true }),
         N('input', L('2 · ব্যবহৃত মূল উপকরণ (Input) — দুধ / ময়দা / অন্য', '2 · Main input used: milk / flour / other'), { req: true }),
         N('base', L('3 · প্রাপ্ত বেস (ছানা / খোয়া / খামির / ব্যাটার)', '3 · Base obtained (chhana / khoa / dough / batter)'), { req: (x) => !x.row.dash }),
@@ -253,7 +253,7 @@ B.forms['05-4'] = {
 };
 
 /* ============ 05-5 · New product decision sheet ============ */
-const BRANDS = [['islamia', L('ইসলামিয়া মিষ্টি ঘর', 'Islamia Misti Ghor')], ['bari', L('মিষ্টি বাড়ি', 'Misti Bari')], ['alcakes', L('আল-কেকিজ', 'Al-Cakes')], ['other', L('অন্য', 'Other')]];
+const BRANDS = [['islamia', L('ইসলামিয়া মিষ্টি ঘর', 'ISLAMIYA MISTY GHAR')], ['bari', L('মিষ্টি বাড়ি', 'MISTY BARI')], ['alcakes', L('AL-CAKIZ', 'AL-CAKIZ')], ['other', L('অন্য', 'Other')]];
 const TRIAL_ROWS = [L('মালামাল ইস্যু স্লিপ — ট্রায়াল', 'Material issue slip: trial'), L('মালামাল ইস্যু স্লিপ — ট্রায়াল', 'Material issue slip: trial'), L('মার্কেটিং ব্যয় রেজিস্টার — স্যাম্পল', 'Marketing expense register: sample'), L('মার্কেটিং ব্যয় রেজিস্টার — স্যাম্পল', 'Marketing expense register: sample')];
 const isoAdd = (iso, n) => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return d.toLocaleDateString('en-CA'); };
 B.forms['05-5'] = {

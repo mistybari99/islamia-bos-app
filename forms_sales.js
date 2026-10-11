@@ -9,7 +9,7 @@ const { T, TA, N, M, TM, D, CK, ST, ITEM, LOC, DEN, CH, SEL, CALC, NOTE, TABLE, 
 B.forms = B.forms || {};
 
 const flag = (code, level, bn, en, amount, o = {}) => ({ code, level, text: L(bn, en), amount, ...o });
-const UNITS = { kg: L('কেজি', 'kg'), pc: L('পিস', 'pc'), lb: L('পাউন্ড', 'lb') };
+const UNITS = { kg: L('কেজি', 'KG'), pc: L('পিস', 'Piece'), lb: L('পাউন্ড', 'Pound') };
 const fm = (n) => Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 });
 const itemOf = (x, code) => (x.env.byCode && x.env.byCode.get(code)) || null;
 const unitOf = (x, code) => { const it = itemOf(x, code); return it ? (UNITS[it.unit] || L(it.unit || '', it.unit || '')) : ''; };
@@ -218,7 +218,7 @@ B.forms['20-4'] = {
       CALC('inv_due', L('এই ইনভয়েসের বাকি', 'Balance of this invoice'), 'money', { big: true }), CALC('all_due', L('মোট বকেয়া (আগের + আজকের)', 'Total outstanding (earlier + today)'), 'money', { big: true })] },
     { title: L('যাচাই ও এন্ট্রি', 'Checks & posting'), show: isInv, fields: [
       M('party_limit', L('পার্টির ক্রেডিট সীমা (পার্টি ও পাইকারি লেজার থেকে)', 'Party credit limit (from the party & wholesale ledger)'), { req: (x) => isInv(x) && x.d.credit_ok === 'inside' }),
-      CH('credit_ok', L('ক্রেডিট সীমা', 'Credit limit'), [['inside', L('সীমার ভেতরে', 'Inside the limit')], ['outside', L('সীমার বাইরে — অনুমোদন', 'Outside — approved')]], { req: isInv }),
+      CH('credit_ok', L('ক্রেডিট সীমা', 'Credit limit'), [['inside', L('সীমার ভেতরে', 'Within the limit')], ['outside', L('সীমার বাইরে — অনুমোদন', 'Outside — approved')]], { req: isInv }),
       ST('approved_by', L('সীমার বাইরে হলে অনুমোদনকারী (Approved by)', 'Approver (if outside the limit)'), { show: (x) => x.d.credit_ok === 'outside', req: (x) => x.d.credit_ok === 'outside' }),
       CK('posted_ledger', L('পার্টি ও পাইকারি লেজারে এন্ট্রি (Posting)', 'Posted in the party & wholesale ledger'), { req: isInv }), T('ledger_line', L('পাতা / লাইন নং', 'Page / line no.')),
       CK('posted_sheet', L('দৈনিক শোরুম শিটে এন্ট্রি (নগদ অংশ)', 'Posted in the daily showroom sheet (cash part)')), T('sheet_no', L('শিট নং', 'Sheet no.'))] },
@@ -294,7 +294,7 @@ B.forms['08-1'] = {
 };
 
 /* ============ 01-1 · Weekly review note ============ */
-const SHOWROOMS = [L('ইসলামিয়া মেইন', 'Islamia Main'), L('২য় শাখা', '2nd branch'), L('মিষ্টি বাড়ি', 'Misti Bari'), L('আল-কেকিজ', 'Al-Cakes'), L('অন্য', 'Other')];
+const SHOWROOMS = [L('ইসলামিয়া মিষ্টি ঘর — মেইন', 'ISLAMIYA MISTY GHAR — Main'), L('ইসলামিয়া মিষ্টি ঘর — ২য় শাখা', 'ISLAMIYA MISTY GHAR — 2nd Branch'), L('মিষ্টি বাড়ি', 'MISTY BARI'), L('AL-CAKIZ', 'AL-CAKIZ'), L('অন্য', 'Other')];
 B.forms['01-1'] = {
   title: L('সাপ্তাহিক রিভিউ নোট', 'Weekly review note'),
   head: [D('week_from', L('সপ্তাহ — থেকে', 'Week — from'), { req: true }), D('week_to', L('সপ্তাহ — পর্যন্ত', 'Week — to'), { req: true })],

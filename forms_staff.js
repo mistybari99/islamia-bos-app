@@ -226,7 +226,7 @@ B.forms['02-5'] = {
       NOTE(L('ছুটি আগে জানাতে হবে — হঠাৎ অনুপস্থিতি ছুটি নয়। অনুমোদন ছাড়া ছুটি অনুপস্থিতি হিসেবে গণ্য হবে। জরুরি অবস্থায় ফোনে জানিয়ে কাজে ফিরে এই ফরম পূরণ করতে হবে।',
         'Leave must be asked for in advance — sudden absence is not leave. Leave without approval counts as absence. In an emergency, inform by phone and fill this form on returning to work.'), 'warn'),
       CH('type', L('ছুটির ধরন (Leave Type)', 'Leave type'), [['swap', L('সাপ্তাহিক বদল', 'Weekly-off swap')], ['annual', L('বার্ষিক (সবেতন)', 'Annual (paid)')], ['unpaid', L('বিনা বেতনের', 'Unpaid')], ['sick', L('অসুস্থতা', 'Sick')], ['emergency', L('জরুরি', 'Emergency')]], { req: true }),
-      D('from', L('শুরুর তারিখ', 'From date'), { req: true }), D('to', L('শেষের তারিখ', 'To date'), { req: true }), CALC('days', L('মোট দিন', 'Total days'), 'num'),
+      D('from', L('শুরুর তারিখ', 'Start date'), { req: true }), D('to', L('শেষের তারিখ', 'End date'), { req: true }), CALC('days', L('মোট দিন', 'Total days'), 'num'),
       TA('reason', L('কারণ', 'Reason'), { req: true }),
       CK('phoned', L('জরুরি অবস্থায় ফোনে জানানো হয়েছিল', 'Informed by phone in the emergency'), { show: (x) => x.d.type === 'emergency' })] },
     { title: L('অনুপস্থিতিতে দায়িত্ব', 'Cover during leave'), fields: [
@@ -313,8 +313,8 @@ B.forms['02-6'] = {
 };
 
 /* ============ 02-7 · Duty & backup card ============ */
-const SLOT_A = [L('ইসলামিয়া মেইন — ম্যানেজার', 'Islamia Main — manager'), L('২য় শাখা — ম্যানেজার', '2nd Branch — manager'), L('মিষ্টি বাড়ি — ম্যানেজার', 'Mishti Bari — manager'), L('আল-কেকিজ — ম্যানেজার', 'Al-Cakes — manager')];
-const SLOT_B = [L('২য় শাখা — ব্যাকআপ', '2nd Branch — backup'), L('মিষ্টি বাড়ি — ব্যাকআপ', 'Mishti Bari — backup'), L('আল-কেকিজ — ব্যাকআপ', 'Al-Cakes — backup'), L('রিজার্ভ — দুই শাখা একসাথে খালি হলে', 'Reserve — when two branches are empty together')];
+const SLOT_A = [L('ইসলামিয়া মিষ্টি ঘর — মেইন — ম্যানেজার', 'ISLAMIYA MISTY GHAR — Main — manager'), L('ইসলামিয়া মিষ্টি ঘর — ২য় শাখা — ম্যানেজার', 'ISLAMIYA MISTY GHAR — 2nd Branch — manager'), L('মিষ্টি বাড়ি — ম্যানেজার', 'MISTY BARI — manager'), L('AL-CAKIZ — ম্যানেজার', 'AL-CAKIZ — manager')];
+const SLOT_B = [L('ইসলামিয়া মিষ্টি ঘর — ২য় শাখা — ব্যাকআপ', 'ISLAMIYA MISTY GHAR — 2nd Branch — backup'), L('মিষ্টি বাড়ি — ব্যাকআপ', 'MISTY BARI — backup'), L('AL-CAKIZ — ব্যাকআপ', 'AL-CAKIZ — backup'), L('রিজার্ভ — দুই শাখা একসাথে খালি হলে', 'Reserve — when two branches are empty together')];
 const SLOT_C = [L('খামির ব্যাকআপ 1', 'Yeast backup 1'), L('খামির ব্যাকআপ 2', 'Yeast backup 2'), L('খামির ব্যাকআপ 3', 'Yeast backup 3')];
 const SLOT_E = [L('গোডাউন — স্টোরকিপার', 'Godown — storekeeper'), L('গোডাউন — ব্যাকআপ', 'Godown — backup'), L('মিষ্টি কারখানার স্টোর — স্টোরকিপার', 'Sweet factory store — storekeeper'), L('মিষ্টি কারখানার স্টোর — ব্যাকআপ', 'Sweet factory store — backup'),
   L('কেক কারখানার স্টোর — স্টোরকিপার', 'Cake factory store — storekeeper'), L('কেক কারখানার স্টোর — ব্যাকআপ', 'Cake factory store — backup')];

@@ -18,7 +18,7 @@ B.SETTING_DEFS.push(
 
 const X = {
   title: L('ব্যবসার হিসাব', 'Business analysis', 'ব্যবসার Analysis'), period: L('সময়কাল', 'Period', 'Period'), days: L('দিন', 'days', 'days'),
-  all: L('সব লোকেশন', 'All locations', 'All Location'), rev: L('বিক্রি (নিট)', 'Sales (net)', 'Sales (Net)'), disc: L('ডিসকাউন্ট', 'Discounts', 'Discount'), voids: L('বাতিল সেল', 'Voided sales', 'Void Sale'),
+  all: L('সব লোকেশন', 'All locations', 'All Location'), rev: L('বিক্রি (নিট)', 'Sales (net)', 'Sales (Net)'), disc: L('ডিসকাউন্ট', 'Discount', 'Discount'), voids: L('বাতিল সেল', 'Voided sales', 'Void Sale'),
   avg: L('দৈনিক গড় বিক্রি', 'Average daily sales', 'Daily গড় Sales'), cogs: L('পণ্যের ক্রয়মূল্য (COGS)', 'Cost of goods (COGS)', 'COGS (ক্রয়মূল্য)'), gp: L('মোট মুনাফা', 'Gross profit', 'Gross Profit'),
   gm: L('গ্রস মার্জিন', 'Gross margin', 'Gross Margin'), mk: L('মার্কআপ', 'Markup', 'Markup'),
   costnote: L('হিসাব হয় আইটেম ধরে করা সেলের উপর, আইটেমের বর্তমান ক্রয়মূল্য দিয়ে। কুইক সেলে আইটেম নেই, তাই তার খরচ ধরা হয় না।', 'Calculated on item-wise sales using each item’s current cost price. Quick sales have no item, so no cost is counted for them.', 'হিসাব item-wise sales এর উপর, item এর current ক্রয়মূল্য দিয়ে। Quick sale এ item নেই, তাই cost ধরা হয় না।'),
@@ -30,7 +30,7 @@ const X = {
   fewdays: L('এখনও যথেষ্ট দিনের সেল নেই (কমপক্ষে ৭ দিন লাগে) — সংখ্যা ভরসাযোগ্য নয়', 'Not enough days of sales yet (at least 7 needed) — treat numbers with care', 'যথেষ্ট দিনের Sales নেই (কমপক্ষে ৭ দিন) — সংখ্যা ভরসাযোগ্য নয়'),
   pickone: L('এই অংশ দেখতে একটি লোকেশন বাছুন', 'Pick one location to see this part', 'এই অংশ দেখতে একটি Location বাছুন'),
   items: L('আইটেম: কোনটা বেশি টাকা আনছে (A/B/C)', 'Items: what brings the money (A/B/C)', 'Items: কোনটা বেশি টাকা আনছে (A/B/C)'), abc: L('A = প্রথম ৮০% বিক্রি, B = পরের ১৫%, C = বাকি (পারেতো নিয়ম)', 'A = first 80% of sales, B = next 15%, C = the rest (Pareto rule)', 'A = প্রথম ৮০%, B = পরের ১৫%, C = বাকি (Pareto)'),
-  unsold: L('এই সময়ে একটিও বিক্রি হয়নি এমন চালু আইটেম', 'Active items with no sale in this period', 'এই সময়ে বিক্রি হয়নি এমন Active item'), qty: L('পরিমাণ', 'Qty', 'Qty'),
+  unsold: L('এই সময়ে একটিও বিক্রি হয়নি এমন চালু আইটেম', 'Active items with no sale in this period', 'এই সময়ে বিক্রি হয়নি এমন Active item'), qty: L('পরিমাণ', 'Quantity', 'Qty'),
   staff: L('স্টাফ সূচক (সহকর্মীদের মধ্যমার সাথে)', 'Staff indicators (vs peer median)', 'Staff Indicators (peer median এর সাথে)'),
   staffnote: L('এগুলো শুধু দেখার সূচক, প্রমাণ নয়। কিছু চোখে পড়লে রেকর্ড মিলিয়ে নিরপেক্ষভাবে দেখুন। তিনজনের কম সহকর্মী থাকলে তুলনা অর্থহীন।', 'These are indicators only, not proof. If something stands out, check the records fairly. With fewer than three peers the comparison means little.', 'এগুলো শুধু Indicator, proof নয়। কিছু চোখে পড়লে records মিলিয়ে দেখুন। তিনজনের কম peer থাকলে তুলনা অর্থহীন।'),
   medhint: L('ছোট ধূসর সংখ্যা = সহকর্মীদের মধ্যমা', 'small grey number = peer median', 'ছোট grey সংখ্যা = peer median'),

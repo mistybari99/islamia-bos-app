@@ -20,6 +20,7 @@ const X = {
   sales: L('আজকের বিক্রি', "Today's sales", 'Today Sales'), count: L('টি সেল', 'sales', 'sales'), yday: L('গতকাল', 'Yesterday', 'Yesterday'), week: L('গত ৭ দিন', 'Last 7 days', 'Last 7 days'),
   due: L('আজ বাকিতে', 'On credit today', 'Today Due (বাকি)'), disc: L('আজ ডিসকাউন্ট', 'Discount today', 'Today Discount'),
   perloc: L('লোকেশন অনুযায়ী', 'By location', 'By Location'), cash: L('নগদ', 'Cash', 'Cash'), mobile: L('মোবাইল', 'Mobile', 'Mobile'), card: L('কার্ড', 'Card', 'Card'), duem: L('বাকি', 'Due', 'Due'),
+  gaps: L('ছাপা নম্বরে ফাঁক (কাগজ বাদ পড়েছে?)', 'Gaps in printed numbers (missing paper?)', 'ছাপা number এ ফাঁক (কাগজ বাদ?)'), gapt: L('নম্বরের ফাঁক-অডিট', 'Number gap audit', 'Number ফাঁক-Audit'), nogap: L('এখন কোনো ফাঁক নেই ✓', 'No gaps right now ✓', 'এখন কোনো ফাঁক নেই ✓'), missing: L('বাদ পড়া নম্বর', 'Missing numbers', 'বাদ পড়া numbers'), gaphint: L('ছাপা নম্বর ধরে: ফাঁক মানে ওই নম্বরের কাগজ এখনও অ্যাপে ওঠেনি বা হারিয়ে গেছে। কাগজের বই খুঁজে দেখুন।', 'By printed number: a gap means that paper was never entered or is lost. Check the paper book.', 'ছাপা number ধরে: ফাঁক মানে ওই কাগজ app এ ওঠেনি বা হারিয়েছে। কাগজের বই খুঁজে দেখুন।'),
   open: L('খুলুন', 'Open', 'Open'), title: L('অনুমোদনের অপেক্ষায়', 'Awaiting approval', 'Approval এর অপেক্ষায়'), none: L('অপেক্ষায় কিছু নেই', 'Nothing waiting', 'অপেক্ষায় কিছু নেই'),
 };
 const T = (k) => lab(X[k]);
@@ -35,7 +36,7 @@ async function render() {
   const td = dhaka(), from = addDays(td, -6);
   await B.loadStatic();
   const q = (x) => x.then((r) => (r && r.error ? { data: null, count: 0 } : r), () => ({ data: null, count: 0 }));
-  const [ex, rel, stf, itm, sub, dr, sales, sheets, ls] = await Promise.all([
+  const [ex, rel, stf, itm, sub, dr, sales, sheets, ls, gaps] = await Promise.all([
     anyApprove ? q(sb.from('exceptions').select('level').eq('status', 'open')) : { data: [] },
     owner ? q(sb.from('release_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')) : { count: 0 },
     owner ? q(sb.from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'pending')) : { count: 0 },
@@ -45,6 +46,7 @@ async function render() {
     canPos ? q(sb.rpc('sales_summary', { p_from: from })) : { data: [] },
     (owner || (perms['14-1'] && perms['14-1'].view)) ? q(sb.from('entries').select('location_id,status').eq('form_code', '14-1').eq('entry_date', td).neq('status', 'draft')) : { data: null },
     owner ? q(sb.from('location_settings').select('location_id,value')) : { data: null },
+    anyApprove ? q(sb.rpc('number_audit_summary')) : { data: null },
   ]);
   const reds = (ex.data || []).filter((x) => x.level === 'red').length, yel = (ex.data || []).filter((x) => x.level === 'yellow').length;
   const mineToApprove = (sub.data || []).filter((e) => owner || (perms[e.form_code] && perms[e.form_code].approve)).length;
@@ -60,6 +62,7 @@ async function render() {
     [reds, 'bad', T('red'), 'exceptions'], [yel, 'warn', T('yellow'), 'exceptions'], [rel.count, 'bad', T('release'), 'releases'], [mineToApprove, 'warn', T('pending'), 'pending'],
     [stf.count, 'warn', T('staff'), 'staff'], [itm.count, 'warn', T('itemreq'), 'itemreq'], [voids, 'warn', T('void'), 'pos'],
     [noSheet.length, 'warn', T('nosheet') + (noSheet.length ? ': ' + noSheet.map((l) => nm(l)).join(', ') : ''), 'form/14-1'],
+    [(gaps.data || []).reduce((s, g) => s + Number(g.missing_count || 0), 0), 'warn', T('gaps'), 'numaudit'],
     [dr.count, 'info', T('drafts'), null], [missingLoc, 'info', T('locset'), 'locset'],
   ].filter((r) => r[0]);
   const row = ([n, tone, label, to]) => `<div class="dash-row ${tone}" ${to ? `data-act="go" data-v="${to}"` : ''}><span class="dot"></span><span class="dl">${esc(label)}</span><b class="dn">${n}</b>${to ? '<span class="dc">›</span>' : ''}</div>`;
@@ -95,6 +98,19 @@ async function viewPending() {
     : `<p class="muted center">${esc(T('none'))}</p>`, true);
 }
 
-window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { pending: viewPending });
+async function viewNumAudit() {
+  shell(T('gapt'), `<p class="muted">${esc(t('loading'))}</p>`, true);
+  await B.loadStatic();
+  const r = await sb.rpc('number_audit_summary'); if (r.error) return fail(r.error);
+  const lc = (id) => nm(B.ENV.locs.find((l) => l.id === id));
+  shell(T('gapt'), `<div class="notice ok">${esc(T('gaphint'))}</div>` + (r.data.length ? r.data.map((g) => `<div class="card item" data-act="na_open" data-f="${esc(g.form_code)}" data-l="${g.location_id}"><div><div class="nm">${esc(g.form_code)} · ${esc(lc(g.location_id))}</div>
+      <div class="muted" style="font-size:.85rem">№ ${g.first_no} – ${g.last_no} · ${g.entered}</div></div><span class="chip warn">${g.missing_count}</span></div>`).join('') : `<div class="dash-ok">${esc(T('nogap'))}</div>`), true);
+}
+Object.assign(A.H, { na_open: async (a) => {
+  const r = await sb.rpc('number_audit', { p_form: a.dataset.f, p_loc: Number(a.dataset.l) }); if (r.error) return fail(r.error);
+  const m = r.data.missing || [];
+  A.openSheet(`<h2>${esc(a.dataset.f)}</h2><div>${esc(T('missing'))}: <b>${r.data.missing_count}</b></div><div class="muted" style="margin:8px 0;word-break:break-word">${m.map((x) => esc(String(x))).join(', ')}${r.data.missing_count > m.length ? ' …' : ''}</div><button class="full" data-act="closesheet">${esc(t('done'))}</button>`);
+} });
+window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { pending: viewPending, numaudit: viewNumAudit });
 B.dash = { render };
 })();

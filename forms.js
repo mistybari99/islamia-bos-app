@@ -7,7 +7,7 @@ const { T, TA, N, M, TM, D, CK, ST, ITEM, LOC, DEN, CH, SEL, CALC, NOTE, TABLE, 
 B.forms = B.forms || {};
 
 const flag = (code, level, bn, en, amount, o = {}) => ({ code, level, text: L(bn, en), amount, ...o });
-const UNITS = { kg: L('কেজি', 'kg'), pc: L('পিস', 'pc'), lb: L('পাউন্ড', 'lb') };
+const UNITS = { kg: L('কেজি', 'KG'), pc: L('পিস', 'Piece'), lb: L('পাউন্ড', 'Pound') };
 const fm = (n) => Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 });
 const itemOf = (x, code) => (x.env.byCode && x.env.byCode.get(code)) || null;
 const unitOf = (x, code) => { const it = itemOf(x, code); return it ? (UNITS[it.unit] || L(it.unit || '', it.unit || '')) : ''; };
@@ -109,7 +109,7 @@ B.forms['03-1'] = {
       CH('outside', L('চাহিদার বাইরের পণ্য?', 'Goods outside the demand?'), YN), T('outside_reason', L('কারণ', 'Reason'), { show: (x) => x.d.outside === 'yes', req: (x) => x.d.outside === 'yes' }),
       CH('cust_order', L('কাস্টমার অর্ডারের পণ্য?', 'Goods for a customer order?'), YN), T('order_no', L('অর্ডার নং', 'Order no.'), { show: (x) => x.d.cust_order === 'yes' }),
       CK('prod_dates', L('প্রতিটি লাইনে উৎপাদন তারিখ লেখা', 'Production date written on every line'), { req: true }), CK('grades', L('গ্রেড (১ম / ২য়) লেখা', 'Grade (1st / 2nd) written'), { req: true })] },
-    { title: L('পণ্যের বিবরণ', 'Items'), fields: [
+    { title: L('পণ্যের বিবরণ', 'Product description'), fields: [
       TABLE('items', null, [ITEM('item', L('আইটেম', 'Item'), { req: true, wide: true }), CALC('unit', L('একক', 'Unit'), 'text'), CH('grade', L('গ্রেড', 'Grade'), GRADES, { req: true }),
         D('prod_date', L('উৎপাদন তারিখ', 'Production date'), { req: true }), CALC('tag', L('ট্যাগ রং (সেটিংস থেকে)', 'Tag colour (from settings)'), 'text'),
         N('demand', L('চাহিদা', 'Demand')), N('sent', L('প্রেরিত পরিমাণ', 'Sent quantity'), { req: true }),
@@ -277,7 +277,7 @@ B.forms['14-1'] = {
       T('own_use', L('বিক্রি ছাড়া ইস্যু — নিজস্ব ব্যবহার ও উপহার: পণ্য · পরিমাণ · মূল্য', 'Non-sale issue — own use & gifts: item · qty · value')), ST('own_use_by', L('গ্রহণকারী', 'Received by')),
       T('staff_credit', L('স্টাফ বাকি', 'Staff credit')), T('staff_adv_page', L('স্টাফ অ্যাডভান্স রেজিস্টারের পাতা নং', 'Staff advance register page')), T('sample', L('ব্যবসার উপহার বা স্যাম্পল', 'Business gift or sample')), ST('sample_by', L('অনুমোদনকারী', 'Approved by'))] },
     { collapsed: true, title: L('ছ · পরদিনের চাহিদা', 'G · Demand for tomorrow'), fields: [
-      TABLE('demand', null, [ITEM('item', L('আইটেম', 'Item'), { wide: true }), N('qty', L('চাহিদা (আজ রাতে)', 'Demand (tonight)')), T('note', L('মন্তব্য', 'Note'))], { min: 5 }),
+      TABLE('demand', null, [ITEM('item', L('আইটেম', 'Item'), { wide: true }), N('qty', L('চাহিদা (আজ রাতে)', 'Demand (tonight)')), T('note', L('মন্তব্য', 'Remark'))], { min: 5 }),
       N('box_bag', L('বক্স / ব্যাগ / প্যাকেট', 'Boxes / bags / packets')), T('direct_buy', L('সরাসরি ক্রয় — পানীয়, পানি, আইসক্রিম, অন্য', 'Direct purchase — drinks, water, ice cream, other')), T('pr_no', L('পারচেজ রিকুইজিশন (PR) নং', 'Purchase Requisition (PR) no.'))] },
     { title: L('জ · ক্লোজিং চেকলিস্ট (১৬ ধাপ, সবগুলো বাধ্যতামূলক)', 'H · Closing checklist (16 steps, all required)'), fields: [
       ...CLOSE_STEPS.map(([id, l]) => CK(id, l, { req: true })),
@@ -300,7 +300,7 @@ B.forms['14-1'] = {
     else if (has(d.imp_cash)) { const df = num(d.imp_cash) + num(d.imp_receipts) - imp; v.imp_text = diffText(df); if (df !== 0) flags.push(flag('open_imprest_diff', 'red', 'ইমপ্রেস্টের নগদ + রসিদ নির্ধারিতের সমান নয়', 'Imprest cash + receipts differ from the fixed amount', df)); }
     // fridges
     const fr = x.rows('fridges'), frOut = FRIDGES.map((i, k) => { const r = fr[k] || {}, min = sv('fridge' + i + '_min'), max = sv('fridge' + i + '_max'), name = x.s['fridge' + i + '_name'];
-      let ok = NEED; if (has(r.temp)) { if (min === null || max === null) { needs.push('fridge' + i + '_min', 'fridge' + i + '_max'); } else { const tt = num(r.temp), good = tt >= min && tt <= max; ok = good ? L('সীমার মধ্যে ✓', 'In range ✓') : L('সীমার বাইরে', 'Out of range'); if (!good) flags.push(flag('temp_out_' + i, 'red', 'ফ্রিজ ' + i + ' এর তাপমাত্রা সীমার বাইরে', 'Fridge ' + i + ' temperature out of range', tt, { unit: 'qty' })); } }
+      let ok = NEED; if (has(r.temp)) { if (min === null || max === null) { needs.push('fridge' + i + '_min', 'fridge' + i + '_max'); } else { const tt = num(r.temp), good = tt >= min && tt <= max; ok = good ? L('সীমার মধ্যে ✓', 'In range ✓') : L('সীমার বাইরে', 'Outside the limit'); if (!good) flags.push(flag('temp_out_' + i, 'red', 'ফ্রিজ ' + i + ' এর তাপমাত্রা সীমার বাইরে', 'Fridge ' + i + ' temperature out of range', tt, { unit: 'qty' })); } }
       return { name: name || L('ইউনিট ' + i, 'Unit ' + i), temp_ok: ok }; });
     // goods receipt
     const rc = x.rows('receipts'), rcOut = rc.map((r) => ({ short: has(r.counted) && has(r.written) ? num(r.written) - num(r.counted) : undefined }));

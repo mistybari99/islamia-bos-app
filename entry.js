@@ -194,9 +194,11 @@ function actionsHTML() {
   return b.length ? `<div class="actionbar">${b.join('')}</div>` : '';
 }
 
+const PAPER_NO = { id: 'paper_no', type: 'text', label: L('ছাপা নম্বর (কাগজের বই)', 'Printed paper no.', 'ছাপা Number (কাগজের বই)'),
+  hint: L('কাগজের ফর্মে ছাপা ক্রমিক নম্বর। একই নম্বর একবারই নেওয়া যায়, আর বাদ পড়া নম্বর ধরা পড়ে।', 'The serial printed on the paper form. A number can be entered once, and missing numbers are audited.', 'কাগজের form এ ছাপা Serial number। একই number একবারই নেওয়া যায়, বাদ পড়া number ধরা পড়ে।') };
 function draw() {
   E.shows = {}; E.rshows = {}; recompute();
-  const spec = E.spec, head = (spec.head || []).map((f) => fieldHTML(f, f.id, 'd', modeEditable(f), wrap(f))).join('');
+  const spec = E.spec, head = [PAPER_NO, ...(spec.head || [])].map((f) => fieldHTML(f, f.id, 'd', modeEditable(f), wrap(f))).join('');
   const serial = E.serial ? `${E.code}-${(ENV.locs.find((l) => l.id === E.loc) || {}).code || E.loc}-${E.serial}` : t('new_entry');
   const wdv = lab(WD[weekday(E.date)]);
   const tag = E.settings['daytag_' + weekday(E.date)];
@@ -396,12 +398,12 @@ async function viewFormList() {
       ${perms.enter && S.formLoc ? `<button class="primary" data-act="newentry" data-v="${code}">＋ ${esc(t('new_entry'))}</button>` : ''}</div>
     ${!locs.length ? `<div class="notice warn">${esc(t('no_location'))}</div>` : ''}<div id="fl_body"><p class="muted">${esc(t('loading'))}</p></div>`, true);
   if (!S.formLoc) return;
-  const r = await sb.from('entries').select('id,serial,entry_date,status,flags,created_staff,checked_staff').eq('form_code', code).eq('location_id', S.formLoc).order('entry_date', { ascending: false }).order('serial', { ascending: false }).limit(60);
+  const r = await sb.from('entries').select('id,serial,entry_date,status,flags,created_staff,checked_staff,paper_no:data->>paper_no').eq('form_code', code).eq('location_id', S.formLoc).order('entry_date', { ascending: false }).order('serial', { ascending: false }).limit(60);
   if (r.error) return fail(r.error);
   const lc = (ENV.locs.find((l) => l.id === S.formLoc) || {}).code || '';
   $('#fl_body').innerHTML = r.data.map((e) => {
     const reds = (e.flags || []).filter((f) => f.level === 'red').length, ys = (e.flags || []).filter((f) => f.level === 'yellow').length;
-    return `<div class="card item" data-act="openentry" data-v="${e.id}"><div><div class="nm">${esc(code)}-${esc(lc)}-${e.serial}</div><div class="muted" style="font-size:.85rem">${esc(e.entry_date)} · ${esc(staffName(e.created_staff))}</div></div>
+    return `<div class="card item" data-act="openentry" data-v="${e.id}"><div><div class="nm">${esc(code)}-${esc(lc)}-${e.serial}</div><div class="muted" style="font-size:.85rem">${esc(e.entry_date)} · ${esc(staffName(e.created_staff))}${e.paper_no ? ' · № ' + esc(e.paper_no) : ''}</div></div>
       <div class="row"><span class="chip ${STATUS_CLS[e.status]}">${esc(t('est_' + e.status))}</span>${reds ? `<span class="chip bad">● ${reds}</span>` : ''}${ys ? `<span class="chip warn">▲ ${ys}</span>` : ''}</div></div>`; }).join('') || `<p class="muted center">${esc(t('no_entries'))}</p>`;
 }
 

@@ -1,10 +1,11 @@
 // UI texts in three modes: bn = Bangla, mix = Bangla with simple English words, en = English.
 window.BOS_T = {
-  app: { bn: "ইসলামিয়া মিষ্টি ঘর", mix: "ইসলামিয়া মিষ্টি ঘর", en: "Islamia Misti Ghor" },
+  app: { bn: "ইসলামিয়া মিষ্টি ঘর", mix: "ইসলামিয়া মিষ্টি ঘর", en: "ইসলামিয়া মিষ্টি ঘর" },
   pos: { bn: "সেল (POS)", mix: "Sale (POS)", en: "Sales (POS)" },
   photo_add: { bn: "ছবি তুলুন", mix: "Photo তুলুন", en: "Take photo" },
   photo_up: { bn: "ছবি পাঠানো হচ্ছে…", mix: "Photo পাঠানো হচ্ছে…", en: "Uploading photo…" },
   biz: { bn: "ব্যবসার হিসাব", mix: "ব্যবসার Analysis", en: "Business analysis" },
+  numaudit: { bn: "নম্বরের ফাঁক-অডিট", mix: "Number ফাঁক-Audit", en: "Number gap audit" },
   lang_bn: { bn: "বাংলা", mix: "বাংলা", en: "বাংলা" },
   lang_mix: { bn: "Bng-Eng", mix: "Bng-Eng", en: "Bng-Eng" },
   lang_en: { bn: "English", mix: "English", en: "English" },

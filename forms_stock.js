@@ -9,7 +9,7 @@ const { T, TA, N, M, TM, D, CK, ST, ITEM, LOC, DEN, CH, SEL, CALC, NOTE, TABLE, 
 B.forms = B.forms || {};
 
 const flag = (code, level, bn, en, amount, o = {}) => ({ code, level, text: L(bn, en), amount, ...o });
-const UNITS = { kg: L('কেজি', 'kg'), pc: L('পিস', 'pc'), lb: L('পাউন্ড', 'lb') };
+const UNITS = { kg: L('কেজি', 'KG'), pc: L('পিস', 'Piece'), lb: L('পাউন্ড', 'Pound') };
 const fm = (n) => Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 });
 const itemOf = (x, code) => (x.env.byCode && x.env.byCode.get(code)) || null;
 const unitOf = (x, code) => { const it = itemOf(x, code); return it ? (UNITS[it.unit] || L(it.unit || '', it.unit || '')) : ''; };
@@ -32,7 +32,7 @@ B.forms['04-1'] = {
   head: [TM('time', L('সময়', 'Time')), T('supplier', L('সাপ্লায়ার', 'Supplier'), { req: true }), T('memo_no', L('তাদের মেমো / চালান নং', 'Their memo / challan no.')),
     CH('paper', L('যে কাগজে ক্রয়', 'Purchase made on'), [['po', L('পারচেজ অর্ডার (PO)', 'Purchase order (PO)')], ['pr', L('জরুরি ক্রয় — পারচেজ রিকুইজিশন (PR)', 'Urgent purchase — purchase requisition (PR)')], ['direct', L('শোরুমে সরাসরি ক্রয়', 'Direct purchase at the showroom')]], { req: true }),
     T('po_no', L('পারচেজ অর্ডার (PO) নং', 'Purchase order (PO) no.'), { show: (x) => x.d.paper === 'po', req: (x) => x.d.paper === 'po' }),
-    T('pr_no', L('পারচেজ রিকুইজিশন (PR) নং', 'Purchase requisition (PR) no.'), { show: (x) => x.d.paper === 'pr', req: (x) => x.d.paper === 'pr' })],
+    T('pr_no', L('পারচেজ রিকুইজিশন (PR) নং', 'Purchase Requisition (PR) no.'), { show: (x) => x.d.paper === 'pr', req: (x) => x.d.paper === 'pr' })],
   sections: [
     { title: L('পারচেজ অর্ডারের অগ্রগতি', 'Purchase order progress'), show: (x) => x.d.paper === 'po', fields: [
       N('po_prev', L('এই পারচেজ অর্ডারে আগে প্রাপ্ত', 'Received earlier on this PO')), N('po_today', L('আজ প্রাপ্ত', 'Received today')), N('po_rest', L('বাকি', 'Remaining')),
@@ -287,7 +287,7 @@ B.forms['06-2'] = {
 /* ============ 06-3 · Purchase order (PO) ============ */
 B.forms['06-3'] = {
   title: L('পারচেজ অর্ডার (PO)', 'Purchase order (PO)'),
-  head: [T('cs_no', L('সংশ্লিষ্ট কোটেশন তুলনা (CS) নং', 'Related quotation comparison (CS) no.')), T('pr_no', L('পারচেজ রিকুইজিশন (PR) নং', 'Purchase requisition (PR) no.')),
+  head: [T('cs_no', L('সংশ্লিষ্ট কোটেশন তুলনা (CS) নং', 'Related quotation comparison (CS) no.')), T('pr_no', L('পারচেজ রিকুইজিশন (PR) নং', 'Purchase Requisition (PR) no.')),
     T('supplier', L('সাপ্লায়ার', 'Supplier'), { req: (x) => !x.d.cancel }), T('phone', L('ফোন', 'Phone')), D('delivery_date', L('ডেলিভারির তারিখ (Delivery Date)', 'Delivery date'), { req: (x) => !x.d.cancel }),
     T('place', L('ডেলিভারির স্থান', 'Delivery place')),
     CH('pay', L('পেমেন্ট', 'Payment'), PAYS, { req: (x) => !x.d.cancel }), T('pay_other', L('অন্য — লিখুন', 'Other — write it'), { show: (x) => x.d.pay === 'other', req: (x) => x.d.pay === 'other' && !x.d.cancel }),
