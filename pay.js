@@ -25,22 +25,23 @@ let wallets = null;
 async function loadWallets() {
   if (wallets) return wallets;
   const r = await sb.from('option_lists').select('value_code,label_bn,label_mix,label_en,sort,active').eq('list_code', 'wallets').order('sort');
-  wallets = !r.error && r.data && r.data.length ? r.data.filter((x) => x.active).map((x) => [x.value_code, { bn: x.label_bn, mix: x.label_mix, en: x.label_en }]) : WALLET_FALLBACK;
+  const act = !r.error && r.data ? r.data.filter((x) => x.active) : [];
+  wallets = act.length ? act.map((x) => [x.value_code, { bn: x.label_bn, mix: x.label_mix, en: x.label_en }]) : WALLET_FALLBACK;
   return wallets;
 }
 
 const pay = {
-  cur: null, loadWallets,
+  cur: null, loadWallets, resetWallets() { wallets = null; },
   // st = { rows, getTotal(), onChange() }
   create(getTotal, onChange) {
     const st = { rows: [{ mode: 'cash', amount: '', wallet: '', ref: '', given: '', auto: true }], getTotal, onChange: onChange || (() => {}) };
     pay.syncAuto(st); return st;
   },
-  paid: (st) => r2(st.rows.reduce((s, r) => s + nnum(r.amount), 0)),
+  paid: (st) => r2(st.rows.reduce((s, r) => s + r2(nnum(r.amount)), 0)),
   due: (st) => r2(st.getTotal() - pay.paid(st)),
   syncAuto(st) { if (st.rows.length === 1 && st.rows[0].auto) st.rows[0].amount = String(r2(st.getTotal())); },
-  list(st) { return st.rows.filter((r) => nnum(r.amount) > 0).map((r) => ({ mode: r.mode, amount: nnum(r.amount), wallet: r.mode === 'mobile' ? r.wallet : undefined, ref: r.mode === 'mobile' && r.ref ? r.ref : undefined,
-    tendered: r.mode === 'cash' && nnum(r.given) > 0 ? nnum(r.given) : undefined })); },
+  list(st) { return st.rows.filter((r) => r2(nnum(r.amount)) > 0).map((r) => ({ mode: r.mode, amount: r2(nnum(r.amount)), wallet: r.mode === 'mobile' ? r.wallet : undefined, ref: r.mode === 'mobile' && r.ref ? r.ref : undefined,
+    tendered: r.mode === 'cash' && nnum(r.given) > 0 ? r2(nnum(r.given)) : undefined })); },
   // returns an error key (string) or null
   check(st) {
     const tot = st.getTotal();
@@ -64,10 +65,10 @@ const pay = {
   },
   sumHTML(st) {
     const tot = st.getTotal(), paid = pay.paid(st), due = r2(tot - paid);
-    const single = st.rows.length === 1 && st.rows[0].mode === 'cash', given = single ? nnum(st.rows[0].given) : 0;
+    const single = st.rows.length === 1 && st.rows[0].mode === 'cash', given = single ? nnum(st.rows[0].given) : 0, cashAmt = single ? r2(nnum(st.rows[0].amount)) : 0;
     return `<div class="row between"><span>${esc(T('paid'))}</span><b>${money(paid)}</b></div>
       <div class="row between"><span>${esc(T('due'))}</span><b style="${due > 0 ? 'color:var(--ruby)' : due < 0 ? 'color:#b3121f' : ''}">${money(Math.max(due, 0))}${due < 0 ? ' ✖' : ''}</b></div>
-      ${given > 0 && given >= tot ? `<div class="notice ok">${esc(T('change'))}: ${money(given - tot)}</div>` : given > 0 ? `<div class="notice bad">− ${money(tot - given)}</div>` : ''}`;
+      ${given > 0 && given >= cashAmt ? `<div class="notice ok">${esc(T('change'))}: ${money(given - cashAmt)}</div>` : given > 0 ? `<div class="notice bad">− ${money(cashAmt - given)}</div>` : ''}`;
   },
   redraw() { const st = pay.cur; const el = $('#pay_box'); if (!st || !el) return; el.outerHTML = pay.html(st); st.onChange(); },
   refreshSum() { const st = pay.cur; const el = $('#pay_sum'); if (st && el) el.innerHTML = pay.sumHTML(st); if (st) st.onChange(); },

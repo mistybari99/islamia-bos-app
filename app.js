@@ -415,6 +415,7 @@ async function viewSettings() {
 }
 async function saveSetting(key) {
   let raw = val('#sv_' + key), v;
+  if (key === 'books_closed_until' && raw !== '') { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw), d = m && new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])); if (!m || d.getUTCFullYear() !== +m[1] || d.getUTCMonth() !== +m[2] - 1 || d.getUTCDate() !== +m[3]) return toast('তারিখ YYYY-MM-DD ফরম্যাটে লিখুন, যেমন 2026-09-30 / Write the date as YYYY-MM-DD, e.g. 2026-09-30'); }
   if (raw === '') v = null; else if (/^-?\d+(\.\d+)?$/.test(raw)) v = Number(raw); else if (raw === 'true' || raw === 'false') v = raw === 'true'; else v = raw;
   const { error } = await sb.from('settings').update({ value: v, updated_at: new Date().toISOString(), updated_by: S.ctx.profile.id }).eq('key', key);
   if (error) return fail(error); toast(t('saved'));

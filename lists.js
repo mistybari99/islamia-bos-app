@@ -43,14 +43,16 @@ async function draw() {
     ${D.err ? '' : `<button class="full" data-act="ls2_new">${esc(T('add'))}</button>`}`, true);
 }
 const rowOf = (c) => D.rows.find((x) => x.value_code === c);
-async function upsert(row) { const { error } = await sb.from('option_lists').upsert(row, { onConflict: 'list_code,value_code' }); if (error) { fail(error); return false; } await B.reloadLists(); return true; }
+async function upsert(row) { const { error } = await sb.from('option_lists').upsert(row, { onConflict: 'list_code,value_code' }); if (error) { fail(error); return false; } await B.reloadLists(); if (B.pay && B.pay.resetWallets) B.pay.resetWallets(); return true; }
 Object.assign(A.H, {
   ls2_pick: (a) => { D.code = a.dataset.v; draw(); },
   ls2_toggle: async (a) => { const x = rowOf(a.dataset.c); if (!x.active && x.label_bn === '—') return toast(T('needbn')); if (await upsert({ ...x, active: !x.active })) draw(); },
   ls2_move: async (a) => {
     const i = D.rows.findIndex((x) => x.value_code === a.dataset.c), j = i + Number(a.dataset.d); if (j < 0 || j >= D.rows.length) return;
-    const A1 = D.rows[i], B1 = D.rows[j]; const s1 = A1.sort, s2 = B1.sort === A1.sort ? B1.sort + (j > i ? 1 : -1) : B1.sort;
-    if ((await upsert({ ...A1, sort: s2 })) && (await upsert({ ...B1, sort: s1 }))) draw();
+    const order = D.rows.slice(); [order[i], order[j]] = [order[j], order[i]];
+    const rows = order.map((r, k) => ({ ...r, sort: k + 1 }));                       // renumber 1..n in one write (no ties, nothing half-done)
+    const { error } = await sb.from('option_lists').upsert(rows, { onConflict: 'list_code,value_code' }); if (error) return fail(error);
+    await B.reloadLists(); if (B.pay && B.pay.resetWallets) B.pay.resetWallets(); draw();
   },
   ls2_save: async (a) => {
     const c = a.dataset.c, x = rowOf(c), def = LISTS[D.code], bn = ($('#l2_bn_' + c).value || '').trim(); if (!bn) return toast(T('needbn'));

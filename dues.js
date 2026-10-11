@@ -19,6 +19,7 @@ const X = {
   ledger: L('হিসাব খাতা', 'Ledger', 'Ledger'), collect: L('বাকি আদায়', 'Collect payment', 'Due আদায়'), balance: L('এখন বাকি', 'Balance now', 'এখন Due'), limit: L('বাকির সীমা (৳)', 'Credit limit (৳)', 'Credit limit (৳)'),
   save: L('সংরক্ষণ', 'Save', 'Save'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), collected: L('আদায় হয়েছে', 'Collected', 'আদায় হয়েছে'), noteph: L('নোট (ঐচ্ছিক)', 'Note (optional)', 'Note (ঐচ্ছিক)'),
   sale: L('বিক্রি', 'Sale', 'Sale'), paid: L('পরিশোধ', 'Paid', 'Paid'), coll: L('আদায়', 'Collection', 'আদায়'), back: L('ফিরুন', 'Back', 'Back'), close: L('বন্ধ', 'Close', 'Close'),
+  voidwhy: L('বাতিলের কারণ লিখুন', 'Reason for reversing', 'Reverse এর কারণ লিখুন'), advance: L('আগাম', 'in credit', 'আগাম'),
   confirm: L('আদায় নিশ্চিত', 'Confirm collection', 'আদায় Confirm'), nolimit: L('(লেখা নেই)', '(not set)', '(লেখা নেই)'), noloc: L('কোনো লোকেশন নেই', 'No location', 'কোনো Location নেই'),
 };
 const T = (k) => lab(X[k]);
@@ -54,25 +55,30 @@ async function openCustomer(id) {
   D.cur = c;
   const r = await sb.rpc('customer_ledger', { p_customer: id }); if (r.error) return fail(r.error);
   const canPay = S.ctx.is_owner || (S.ctx.perms.POS && S.ctx.perms.POS.enter);
-  D.st = B.pay.create(() => Number(c.balance));
+  D.st = B.pay.create(() => Number(c.balance)); D.cid = crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random();     // one id per sheet: a double tap cannot collect twice
+  const locs = S.ctx.is_owner || S.ctx.roles.includes('management') ? B.ENV.locs : B.ENV.locs.filter((l) => S.ctx.locations.includes(l.id));
   openSheet(`<h2>${esc(c.name)} ${c.type === 'wholesale' ? '◆' : ''}</h2><div class="muted">${esc(c.mobile)}</div>
     <div class="row between" style="margin:8px 0"><span>${esc(T('balance'))}</span><b class="mnum">${money(c.balance)}</b></div>
     ${S.ctx.is_owner ? `<div class="row"><div style="flex:1"><label>${esc(T('limit'))}</label><input id="du_lim" inputmode="decimal" value="${c.credit_limit === null ? '' : esc(String(c.credit_limit))}" placeholder="${esc(T('nolimit'))}"></div><button class="primary" data-act="du_limit" style="align-self:flex-end">${esc(T('save'))}</button></div>` : ''}
-    ${canPay && Number(c.balance) > 0 ? `<h3 style="margin-top:12px">${esc(T('collect'))}</h3><div id="du_pay">${B.pay.html(D.st)}</div><div><label>${esc(T('noteph'))}</label><input id="du_note"></div>
+    ${canPay && Number(c.balance) > 0 ? `<h3 style="margin-top:12px">${esc(T('collect'))}</h3>${locs.length > 1 ? `<select id="du_loc">${locs.map((l) => `<option value="${l.id}" ${l.id === D.loc ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>` : ''}<div id="du_pay">${B.pay.html(D.st)}</div><div><label>${esc(T('noteph'))}</label><input id="du_note"></div>
       <button class="primary full" style="margin-top:10px" data-act="du_collect">${esc(T('confirm'))}</button>` : ''}
     <h3 style="margin-top:14px">${esc(T('ledger'))}</h3>
     <div class="stack">${(r.data || []).slice().reverse().map((e) => `<div class="row between perm"><span>${esc(hhmm(e.at))}<br><span class="muted" style="font-size:.8rem">${esc(e.kind === 'sale' ? T('sale') + ' ' + e.ref : e.kind === 'collection' ? T('coll') : T('paid'))}${e.kind !== 'sale' && e.ref ? ' · ' + esc(e.ref) : ''}</span></span>
-      <span style="text-align:right">${Number(e.debit) ? `<b>+${money(e.debit)}</b>` : `<b style="color:var(--ok)">−${money(e.credit)}</b>`}<br><span class="muted" style="font-size:.8rem">${money(e.balance)}</span></span></div>`).join('')}</div>
+      <span style="text-align:right">${Number(e.debit) ? `<b>+${money(e.debit)}</b>` : `<b style="color:var(--ok)">−${money(e.credit)}</b>`}<br><span class="muted" style="font-size:.8rem">${money(e.balance)}</span>${e.kind === 'collection' && e.pid && (S.ctx.is_owner || (S.ctx.perms.POS && S.ctx.perms.POS.approve)) ? `<br><button class="mini" data-act="du_void" data-v="${e.pid}" aria-label="void">✕</button>` : ''}</span></div>`).join('')}</div>
     <button class="full" style="margin-top:10px" data-act="closesheet">${esc(T('close'))}</button>`);
 }
 Object.assign(A.H, {
   du_open: (a) => openCustomer(a.dataset.v),
-  du_limit: async () => { const v = $('#du_lim').value.trim(); const { error } = await sb.from('customers').update({ credit_limit: v === '' ? null : nnum(v) }).eq('id', D.cur.id); if (error) return fail(error); D.cur.credit_limit = v === '' ? null : nnum(v); toast(T('saved')); },
-  du_collect: async () => {
+  du_limit: async () => { const v = norm($('#du_lim').value.trim()); const n = v === '' ? null : Number(v); if (n !== null && (!Number.isFinite(n) || n < 0)) return toast(t('err_price'));
+    const { error } = await sb.from('customers').update({ credit_limit: n }).eq('id', D.cur.id); if (error) return fail(error); D.cur.credit_limit = n; toast(T('saved')); },
+  du_void: (a) => { const why = prompt(T('voidwhy')); if (!why || !why.trim()) return; sb.rpc('void_collection', { p_id: Number(a.dataset.v), p_note: why.trim() }).then(({ error }) => { if (error) return fail(error); closeSheet(); toast(T('saved')); viewDues(); }); },
+  du_collect: async (a) => {
+    if (a && a.disabled) return;
     const pe = B.pay.check(D.st); if (pe) return toast(lab(ERR[pe]));
     const list = B.pay.list(D.st); if (!list.length) return toast(T('collect'));
-    const { data, error } = await sb.rpc('collect_payment', { p_client: crypto.randomUUID ? crypto.randomUUID() : null, p_loc: D.loc, p_customer: D.cur.id, p_payments: list, p_note: ($('#du_note') || {}).value || null });
-    if (error) { const m = /overpaid/.test(error.message || '') ? lab(ERR.overpaid) : null; return m ? toast(m) : fail(error); }
+    if (a) a.disabled = true;
+    const { data, error } = await sb.rpc('collect_payment', { p_client: D.cid, p_loc: Number(($('#du_loc') || {}).value) || D.loc, p_customer: D.cur.id, p_payments: list, p_note: ($('#du_note') || {}).value || null });
+    if (error) { if (a) a.disabled = false; const m = /overpaid/.test(error.message || '') ? lab(ERR.overpaid) : null; return m ? toast(m) : fail(error); }
     closeSheet(); toast(`${T('collected')} · ${money(data.collected)} · ${T('balance')} ${money(data.balance)}`); viewDues();
   },
 });

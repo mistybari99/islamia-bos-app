@@ -192,7 +192,7 @@ function drawCust() {
   el.innerHTML = `<div class="card" style="margin:8px 0"><b>${esc(T('cust'))}${need ? ' *' : ''}</b>${need ? `<div class="muted" style="font-size:.85rem">${esc(T('custReq'))}</div>` : ''}
     <label>${esc(T('mobile'))}</label><input id="cu_mobile" inputmode="tel" value="${esc(c.mobile)}" placeholder="01XXXXXXXXX">
     ${m && f && f.found ? `<div class="notice ok"><b>${esc(f.name)}</b> · ${esc(T('known'))}${Number(f.balance) > 0 ? ` · ${esc(T('owes'))}: ${money(f.balance)}` : ''}${f.credit_limit !== null && f.credit_limit !== undefined ? ` · ${esc(T('limit'))}: ${money(f.credit_limit)}` : ''}</div>`
-      : m && f && !f.found ? `<label>${esc(T('cname'))} — ${esc(T('newc'))}</label><input id="cu_name" value="${esc(c.name)}">` : ''}</div>`;
+      : m ? `<label>${esc(T('cname'))} — ${esc(T('newc'))}</label><input id="cu_name" value="${esc(c.name)}">` : ''}</div>`;
   if (keepFocus === 'cu_mobile') { const i = $('#cu_mobile'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }
 }
 let lookTimer = null;
@@ -248,7 +248,7 @@ async function send(p) {
   if (r.error && NOFN.test(r.error.message || '')) {
     // database not updated yet: only a full single-mode payment can still be recorded the old way
     const pays = p.p_payments || [];
-    if (pays.length === 1 && Number(pays[0].amount) >= Number(p._total) - 0.001 && p.p_sale_type === 'retail') {
+    if (pays.length === 1 && Number(pays[0].amount) >= Number(p._total) - 0.001 && p.p_sale_type === 'retail' && !p.p_customer_mobile && p.p_lines.every((l) => l.item_id || l.amount !== undefined)) {
       r = await sb.rpc('record_sale', { p_client: p.p_client, p_loc: p.p_loc, p_lines: p.p_lines.filter((l) => l.item_id || l.amount), p_discount: p.p_discount, p_mode: pays[0].mode, p_tendered: pays[0].tendered || null,
         p_customer: p.p_customer_name, p_note: p.p_note, p_quick: p.p_quick, p_sold_at: p.p_sold_at });
     } else r = { data: null, error: { message: 'LEGACY: ' + lab(X.needupd) } };
@@ -279,17 +279,19 @@ async function flush() {
   if (flushing || !S.ctx || !navigator.onLine) return;
   const q = queue(); if (!q.length) return;
   flushing = true;
-  const done = new Set(), bad = [];
+  const done = new Set(), bad = [], tried = new Map();
   try {
     for (const p of q) {
       const { error } = await send(p);
       if (!error) { done.add(p.p_client); continue; }
       const m = (error && error.message) || '';
       if (BUSINESS.test(m)) { done.add(p.p_client); bad.push({ ...p, _err: T2(error) || m }); continue; }   // refused by the rules: kept visible, never lost
-      break;                                                                                          // network, session or server trouble: keep and retry later
+      if (isNet(error) || /jwt|token|401|403|permission denied|not authenticated|unauthor/i.test(m)) break;   // network or session trouble: keep and retry later
+      p._tries = (p._tries || 0) + 1;                                                                        // an odd error on one sale must not block the others
+      if (p._tries >= 3) { done.add(p.p_client); bad.push({ ...p, _err: m }); } else tried.set(p.p_client, p);
     }
   } finally {
-    setQueue(queue().filter((x) => !done.has(x.p_client)));
+    setQueue(queue().filter((x) => !done.has(x.p_client)).map((x) => tried.get(x.p_client) || x));
     if (bad.length) { setFailed([...failedQ(), ...bad]); toast(T('failedmsg')); }
     flushing = false;
   }
@@ -377,13 +379,13 @@ Object.assign(A.H, {
       cname = (P.cust.found && P.cust.found.found ? P.cust.found.name : ($('#cu_name') || {}).value || P.cust.name || '').trim();
       if (!cname) return toast(lab(ERRS.customer_name_required));
     }
-    const total = netTotal(), paid = B.pay.paid(P.st), cashRow = P.st.rows.length === 1 && P.st.rows[0].mode === 'cash' ? nnum(P.st.rows[0].given) : 0;
+    const total = netTotal(), paid = B.pay.paid(P.st), single = P.st.rows.length === 1 && P.st.rows[0].mode === 'cash', given = single ? nnum(P.st.rows[0].given) : 0, cashAmt = single ? r2(nnum(P.st.rows[0].amount)) : 0;
     const quickOnly = P.cart.length > 0 && P.cart.every((l) => l.kind === 'quick');
-    return submitSale(build({ lines: linesOf(), disc, payments: B.pay.list(P.st), mobile, cname, type: P.type, note: ($('#cart_note') || {}).value || '', quick: quickOnly, total, paid }), cashRow > total ? cashRow - total : 0);
+    return submitSale(build({ lines: linesOf(), disc, payments: B.pay.list(P.st), mobile, cname, type: P.type, note: ($('#cart_note') || {}).value || '', quick: quickOnly, total, paid }), given > cashAmt ? r2(given - cashAmt) : 0);
   },
   pos_quick: () => quickSheet(),
-  pos_qs_cash: () => { const q = readQuick(); if (!q) return; P.cart.push(q); P.type = 'retail'; P.st = B.pay.create(netTotal);
-    const total = netTotal(); return submitSale(build({ lines: linesOf(), disc: 0, payments: [{ mode: 'cash', amount: total }], type: 'retail', quick: P.cart.every((l) => l.kind === 'quick'), total, paid: total }), 0); },
+  pos_qs_cash: () => { const q = readQuick(); if (!q) return;      // a one-tap cash sale of just this amount; the cart is left alone
+    return submitSale(build({ lines: [{ item_id: null, name: q.name, amount: q.amount }], disc: 0, payments: [{ mode: 'cash', amount: q.amount }], type: 'retail', quick: true, total: q.amount, paid: q.amount }), 0); },
   pos_qs_more: () => { const q = readQuick(); if (!q) return; P.cart.push(q); closeSheet(); refreshSell(); cartSheet(); },
   pos_open: (a) => saleSheet(a.dataset.v),
   pos_share: async () => { const txt = P.shareText || ''; try { if (navigator.share) await navigator.share({ text: txt }); else { await navigator.clipboard.writeText(txt); toast('✓'); } } catch (e) { /* cancelled */ } },
@@ -395,7 +397,7 @@ document.addEventListener('input', (e) => {
   const id = e.target.id;
   if (id === 'pos_q') { P.q = e.target.value; drawItems(true); }
   if (id === 'cart_disc') { B.pay.syncAuto(P.st); const box = $('#cart_pay'); if (box) { const f = document.activeElement; box.innerHTML = B.pay.html(P.st); if (f && f.id === 'cart_disc') f.focus(); } updDue(); }
-  if (id === 'cu_mobile') { P.cust.mobile = e.target.value; P.cust.found = null; lookup(); const el = $('#cart_cust'); const m = normMobile(P.cust.mobile); if (m) drawCust(); }
+  if (id === 'cu_mobile') { P.cust.mobile = e.target.value; P.cust.found = null; P.cust.name = ''; lookup(); const el = $('#cart_cust'); const m = normMobile(P.cust.mobile); if (m) drawCust(); }
   if (id === 'cu_name') P.cust.name = e.target.value;
 });
 document.addEventListener('change', (e) => { if (e.target.id === 'pos_loc') { P.loc = Number(e.target.value); store.set('bos_pos_loc', String(P.loc)); resetCart(); drawPos(); } });
