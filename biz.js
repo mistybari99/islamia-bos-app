@@ -26,7 +26,7 @@ const X = {
   be: L('ব্রেক-ইভেন', 'Break-even', 'Break-even'), beneed: L('মাসিক স্থির খরচ লোকেশন সেটিংসে দিলে এখানে ব্রেক-ইভেন দেখাবে', 'Enter the monthly fixed costs in Location settings to see break-even here', 'Monthly fixed cost Location settings এ দিলে Break-even দেখাবে'),
   bemonth: L('মাসে এত বিক্রি লাগবে', 'Sales needed per month', 'Monthly Sales লাগবে'), beday: L('দিনে গড়ে এত', 'Per day on average', 'Daily গড়ে'), beformula: L('= মাসিক স্থির খরচ ÷ গ্রস মার্জিন (এই সময়ের হার ধরে)', '= monthly fixed costs ÷ gross margin (at this period’s rate)', '= Monthly fixed cost ÷ Gross margin (এই period এর rate)'),
   outlook: L('ক্রয় পরিকল্পনা (আগামী ৭ দিন)', 'Purchase outlook (next 7 days)', 'Purchase Outlook (আগামী ৭ দিন)'), exprev: L('সম্ভাব্য বিক্রি', 'Expected sales', 'Expected Sales'), ratio: L('প্রতি ৳১ বিক্রিতে পণ্যের খরচ', 'Goods cost per ৳1 of sales', '৳১ Sales এ Goods cost'),
-  need: L('সম্ভাব্য ক্রয়ের প্রয়োজন (আনুমানিক)', 'Estimated purchase need', 'Estimated Purchase প্রয়োজন'), needhint: L('গত দিনগুলোর একই বারের গড় ধরে হিসাব। এটা পরিকল্পনার অনুমান, সীমা নয়।', 'Based on the average of the same weekday in past days. A planning estimate, not a limit.', 'Past দিনের একই বারের গড় ধরে। এটা Planning estimate, limit নয়।'),
+  need: L('সম্ভাব্য ক্রয়ের প্রয়োজন (আনুমানিক)', 'Estimated purchase need', 'Estimated Purchase প্রয়োজন'), needhint: L('গত ২৮ দিনের একই বারের গড় (বন্ধ বা বিক্রিহীন দিন ০ ধরে)। কম = শুধু আইটেম-ধরা বিক্রির খরচ, বেশি = কুইক সেলেও একই হার ধরলে। এটা পরিকল্পনার অনুমান, সীমা নয়।', 'Average of the same weekday over the last 28 days (closed or zero-sales days count as 0). Low = only item-wise sales have a known cost, High = if quick sales cost the same ratio. A planning estimate, not a limit.', 'গত ২৮ দিনের একই বারের গড় (বন্ধ দিন ০)। Low = শুধু item-wise sales এর cost, High = Quick sale এও একই ratio ধরলে। এটা Planning estimate, limit নয়।'),
   fewdays: L('এখনও যথেষ্ট দিনের সেল নেই (কমপক্ষে ৭ দিন লাগে) — সংখ্যা ভরসাযোগ্য নয়', 'Not enough days of sales yet (at least 7 needed) — treat numbers with care', 'যথেষ্ট দিনের Sales নেই (কমপক্ষে ৭ দিন) — সংখ্যা ভরসাযোগ্য নয়'),
   pickone: L('এই অংশ দেখতে একটি লোকেশন বাছুন', 'Pick one location to see this part', 'এই অংশ দেখতে একটি Location বাছুন'),
   items: L('আইটেম: কোনটা বেশি টাকা আনছে (A/B/C)', 'Items: what brings the money (A/B/C)', 'Items: কোনটা বেশি টাকা আনছে (A/B/C)'), abc: L('A = প্রথম ৮০% বিক্রি, B = পরের ১৫%, C = বাকি (পারেতো নিয়ম)', 'A = first 80% of sales, B = next 15%, C = the rest (Pareto rule)', 'A = প্রথম ৮০%, B = পরের ১৫%, C = বাকি (Pareto)'),
@@ -37,7 +37,7 @@ const X = {
   s_disc: L('ডিসকাউন্ট %', 'Discount %', 'Discount %'), s_void: L('বাতিল %', 'Void %', 'Void %'), s_ovr: L('দাম বদল %', 'Price change %', 'Price change %'), s_quick: L('কুইক %', 'Quick %', 'Quick %'), s_due: L('বাকি %', 'Due %', 'Due %'), med: L('মধ্যমা', 'median', 'median'),
   setratio: L('কত গুণ হলে চিহ্নিত হবে সেটা লোকেশন সেটিংসে দিন', 'Set the multiple that counts as unusual in Location settings', 'কত গুণে চিহ্নিত হবে Location settings এ দিন'), look: L('দেখার মতো', 'worth a look', 'worth a look'),
   sugg: L('সীমার পরামর্শ (আপনার আগের খরচ থেকে)', 'Limit suggestions (from your own past expenses)', 'Limit Suggestions (আগের খরচ থেকে)'), sgn: L('ভাউচারের লাইন', 'voucher lines', 'voucher lines'), sgd: L('দিনের হিসাব', 'days of data', 'days of data'),
-  sg_single: L('একক খরচের সীমা (৯০% খরচ এর ভেতরে)', 'Single-expense limit (covers 90% of past expenses)', 'Single expense limit (৯০% খরচ এর ভেতরে)'), sg_imp: L('ইমপ্রেস্ট (৯০% দিনে যথেষ্ট)', 'Imprest (enough on 90% of days)', 'Imprest (৯০% দিনে যথেষ্ট)'),
+  sg_single: L('একক খরচের সীমা (৯০% খরচ এর ভেতরে)', 'Single-expense limit (covers 90% of past expenses)', 'Single expense limit (৯০% খরচ এর ভেতরে)'), sg_imp: L('ইমপ্রেস্ট — দিনের মোট খরচ ৯০% দিনে এর ভেতরে থাকে', 'Imprest — the day’s total spend stays within this on 90% of days', 'Imprest — দিনের মোট খরচ ৯০% দিনে এর ভেতরে'), skipped: L('টি লাইন সংখ্যা না হওয়ায় বাদ', 'lines skipped (not a number)', 'lines বাদ (সংখ্যা নয়)'),
   now: L('এখন', 'Now', 'Now'), apply: L('এটা বসান', 'Apply', 'Apply'), applied: L('সেটিংসে বসানো হয়েছে', 'Saved to settings', 'Settings এ বসানো হয়েছে'), noset: L('(সেটিংসে নেই)', '(not set)', '(set করা নেই)'),
   fewsugg: L('নমুনা কম — এখনই বসানো ঠিক হবে না', 'Few samples — not a good basis yet', 'Sample কম — এখনই বসানো ঠিক নয়'), none: L('এখনও তথ্য নেই', 'No data yet', 'এখনও data নেই'), p90: L('৯০% এর ভেতরে', '90th percentile', '90th percentile'),
   sugghint: L('আপনি "বসান" না চাপা পর্যন্ত কিছুই বদলায় না। সীমা পরে যেকোনো সময় লোকেশন সেটিংসে বদলানো যাবে।', 'Nothing changes until you tap Apply. You can change the limit later in Location settings.', 'Apply না চাপলে কিছু বদলায় না। Limit পরে Location settings এ বদলানো যাবে।'),
@@ -57,7 +57,9 @@ async function viewBiz() {
   if (!P.loc && P.locs.length === 1) P.loc = String(P.locs[0].id);
   draw();
 }
+let drawTok = 0;
 async function draw() {
+  const tok = ++drawTok; P.cache = null;
   shell(T('title'), `<div class="row wrap" style="margin-bottom:8px">
       <select id="bz_loc" style="flex:1"><option value="">${esc(T('all'))}</option>${P.locs.map((l) => `<option value="${l.id}" ${String(l.id) === String(P.loc) ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select></div>
     <div class="row wrap" style="margin-bottom:10px"><span class="muted">${esc(T('period'))}:</span>${[7, 14, 30, 90].map((d) => `<button class="tog ${P.days === d ? 'on' : ''}" data-act="bz_days" data-v="${d}">${d} ${esc(T('days'))}</button>`).join('')}</div>
@@ -66,10 +68,11 @@ async function draw() {
   const q = (p) => p.then((r) => r, (e) => ({ data: null, error: e }));
   const [dly, itm, stf] = await Promise.all([
     q(sb.rpc('biz_daily', { p_from: from, p_to: td, p_loc: loc })), q(sb.rpc('biz_items', { p_from: from, p_to: td, p_loc: loc })), q(sb.rpc('biz_staff', { p_from: from, p_to: td, p_loc: loc }))]);
+  if (tok !== drawTok) return;
   if (dly.error) return fail(dly.error);
   const rows = dly.data || [];
   const sum = (k) => rows.reduce((s, r) => s + Number(r[k] || 0), 0);
-  const hasCost = rows.length ? rows[0].cogs !== null : false;
+  const hasCost = !!(S.ctx.is_owner || (S.ctx.perms.ITEM_COST && S.ctx.perms.ITEM_COST.view));
   const rev = sum('revenue'), costed = sum('costed_rev'), cogs = sum('cogs');
   const gp = hasCost ? costed - cogs : null;           // gross profit on the costed part
   const gmRatio = hasCost && costed > 0 ? (costed - cogs) / costed : null;
@@ -88,19 +91,20 @@ async function draw() {
     const [ls, out, sg] = await Promise.all([
       q(sb.from('location_settings').select('key,value').eq('location_id', loc)), hasCost ? q(sb.rpc('biz_outlook', { p_loc: loc, p_ahead: 7, p_lookback: 28 })) : { data: null },
       S.ctx.is_owner ? q(sb.rpc('biz_suggest', { p_loc: loc, p_days: 90 })) : { data: null }]);
+    if (tok !== drawTok) return;
     const st = {}; (ls.data || []).forEach((x) => { st[x.key] = x.value; });
     const fixed = st.fixed_cost_month;
     if (hasCost) {
       h += `<div class="card panel"><h3>${esc(T('be'))}</h3>`;
       if (fixed === null || fixed === undefined || fixed === '') h += `<div class="muted">${esc(T('beneed'))}</div>`;
       else if (!gmRatio || gmRatio <= 0) h += `<div class="notice bad">${esc(T('nocost'))}</div>`;
-      else { const m = num(fixed) / gmRatio; h += `<div class="row between"><span>${esc(T('bemonth'))}</span><b class="mnum">${money(m)}</b></div><div class="row between"><span>${esc(T('beday'))}</span><b>${money(m / 30)}</b></div><div class="muted" style="font-size:.8rem">${esc(T('beformula'))}</div>`; }
+      else { const m = num(fixed) / gmRatio, dim = new Date(Number(td.slice(0, 4)), Number(td.slice(5, 7)), 0).getDate(); h += `<div class="row between"><span>${esc(T('bemonth'))}</span><b class="mnum">${money(m)}</b></div><div class="row between"><span>${esc(T('beday'))} (${dim})</span><b>${money(m / dim)}</b></div><div class="muted" style="font-size:.8rem">${esc(T('beformula'))}</div>`; }
       h += `</div>`;
       const o = out.data;
-      h += `<div class="card panel"><h3>${esc(T('outlook'))}</h3>${o && o.sale_days > 0 ? `
+      h += `<div class="card panel"><h3>${esc(T('outlook'))}</h3>${o && o.trading_days > 0 ? `
         <div class="row between"><span>${esc(T('exprev'))}</span><b>${money(o.expected_revenue)}</b></div>
         <div class="row between"><span>${esc(T('ratio'))}</span><b>${o.cost_ratio === null ? '—' : '৳ ' + Number(o.cost_ratio).toFixed(2)}</b></div>
-        <div class="row between"><span>${esc(T('need'))}</span><b class="mnum">${money(o.est_purchase_need)}</b></div>
+        <div class="row between"><span>${esc(T('need'))}</span><b class="mnum">${o.est_purchase_low === null || o.est_purchase_low === undefined ? '—' : money(o.est_purchase_low) + ' – ' + money(o.est_purchase_high)}</b></div>
         <div class="muted" style="font-size:.8rem">${esc(T('needhint'))}</div>${o.enough ? '' : `<div class="notice warn" style="margin-top:6px">${esc(T('fewdays'))}</div>`}` : `<div class="muted">${esc(T('none'))}</div>`}</div>`;
     }
     if (sg.data) h += sugHTML(sg.data);
@@ -115,10 +119,10 @@ async function draw() {
       ${unsold.length ? `<details style="margin-top:8px"><summary>${esc(T('unsold'))}: <b>${unsold.length}</b></summary><div class="muted" style="font-size:.9rem">${unsold.map((i) => esc(nm(i))).join(' · ')}</div></details>` : ''}</div>`;
   }
   // staff
-  if (!stf.error && stf.data && stf.data.length) {
+  if (loc && !stf.error && stf.data && stf.data.length) {
     const ratio = P.cache && P.cache.st ? num(P.cache.st.anomaly_ratio) : 0;
     const peers = stf.data[0].peers;
-    const flag = (v, m) => ratio > 0 && peers >= 3 && v !== null && Number(m) > 0 && Number(v) >= ratio * Number(m);
+    const flag = (v, m) => ratio > 0 && peers >= 3 && v !== null && v !== undefined && Number(v) > 0 && Number(v) >= ratio * Number(m || 0);
     const cell = (v, m) => `<td class="${flag(v, m) ? 'hot' : ''}">${pct(v)}<small>${pct(m)}</small></td>`;
     h += `<div class="card panel"><h3>${esc(T('staff'))}</h3><div class="notice ok">${esc(T('staffnote'))}</div>
       <div class="scrollx"><table class="bz"><thead><tr><th></th><th>${esc(T('s_disc'))}</th><th>${esc(T('s_void'))}</th><th>${esc(T('s_ovr'))}</th><th>${esc(T('s_quick'))}</th><th>${esc(T('s_due'))}</th></tr></thead><tbody>
@@ -130,12 +134,13 @@ async function draw() {
 
 function sugHTML(s) {
   const e = s.expense || {}, d = s.daily_total || {};
-  const row = (label, sample, val, cur, key) => `<div class="stack" style="margin:8px 0"><div><b>${esc(label)}</b></div>
+  const row = (label, sample, val0, cur, key) => { const val = val0 === null || val0 === undefined ? val0 : Math.ceil(Number(val0)); return `<div class="stack" style="margin:8px 0"><div><b>${esc(label)}</b></div>
     <div class="row between"><span>${esc(T('p90'))}: <b class="mnum">${val === null || val === undefined ? '—' : money(val)}</b></span><span class="muted">${sample}</span></div>
     <div class="row between"><span class="muted">${esc(T('now'))}: ${cur === null || cur === undefined ? esc(T('noset')) : money(cur)}</span>
       ${val ? `<button class="primary" data-act="bz_apply" data-k="${key}" data-v="${Math.ceil(Number(val))}">${esc(T('apply'))}</button>` : ''}</div>
-    ${sample && Number(sample.split(' ')[0]) < 20 ? `<div class="notice warn">${esc(T('fewsugg'))}</div>` : ''}</div>`;
+    ${sample && Number(sample.split(' ')[0]) < 20 ? `<div class="notice warn">${esc(T('fewsugg'))}</div>` : ''}</div>`; };
   return `<div class="card panel"><h3>${esc(T('sugg'))}</h3>
+    ${e.skipped ? `<div class="muted" style="font-size:.8rem">${e.skipped} ${esc(T('skipped'))}</div>` : ''}
     ${row(T('sg_single'), `${e.n || 0} ${T('sgn')}`, e.p90, s.current_expense_max, 'expense_max')}
     ${row(T('sg_imp'), `${d.days || 0} ${T('sgd')}`, d.p90, s.current_imprest, 'imprest')}
     <div class="muted" style="font-size:.8rem">${esc(T('sugghint'))}</div></div>`;
