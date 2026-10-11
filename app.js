@@ -58,6 +58,7 @@ function closeSheet() { const d = $('#sheet'); if (d) d.remove(); }
 const tog = (on, act, attrs = '', label) => `<button class="tog ${on ? 'on' : ''}" data-act="${act}" ${attrs}>${esc(label || (on ? t('on') : t('off')))}</button>`;
 
 const ICON = {
+  biz: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 27h24"/><rect x="6" y="16" width="5" height="8" rx="1"/><rect x="14" y="10" width="5" height="14" rx="1"/><rect x="22" y="4" width="5" height="20" rx="1"/></svg>',
   pos: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="20" height="26" rx="3"/><path d="M10 9h12M10 15h3M16 15h3M22 15h0M10 21h3M16 21h3M22 21h0"/></svg>',
   items: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="16" cy="16" r="4.6" fill="currentColor"/></svg>',
   itemreq: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h20l-5-5M27 21H7l5 5"/></svg>',
@@ -71,7 +72,7 @@ const ICON = {
   locset: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 29s9-8 9-15a9 9 0 0 0-18 0c0 7 9 15 9 15z"/><circle cx="16" cy="14" r="3.2"/></svg>',
   backup: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4v16M9 14l7 7 7-7M5 27h22"/></svg>',
 };
-const TONE = { pos: 't-ruby', items: 't-gold', itemreq: 't-gold', staff: 't-ruby', matrix: 't-ruby', rules: '', settings: 't-ink', logs: 't-ink', backup: 't-ink', exceptions: 't-ruby', releases: 't-gold', locset: 't-ink' };
+const TONE = { biz: 't-gold', pos: 't-ruby', items: 't-gold', itemreq: 't-gold', staff: 't-ruby', matrix: 't-ruby', rules: '', settings: 't-ink', logs: 't-ink', backup: 't-ink', exceptions: 't-ruby', releases: 't-gold', locset: 't-ink' };
 const MARK = '<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#14173a"/><circle cx="32" cy="29" r="16.5" fill="none" stroke="#f2a900" stroke-width="3"/><circle cx="32" cy="29" r="8.8" fill="#f2a900"/><path d="M12 51h40" stroke="#f7eedc" stroke-width="3.2" stroke-linecap="round"/></svg>';
 
 // ---------- auth ----------
@@ -182,6 +183,7 @@ async function viewHome() {
   if (forms.error) return fail(forms.error);
   const tiles = [];
   if (owner || (perms.POS && (perms.POS.enter || perms.POS.view))) tiles.push(['pos', t('pos'), '']);
+  if (owner || (perms.POS && perms.POS.approve)) tiles.push(['biz', t('biz'), '']);
   if (perms.ITEMS && perms.ITEMS.view) tiles.push(['items', t('items'), '']);
   if (perms.ITEMS && (perms.ITEMS.enter || perms.ITEMS.approve)) tiles.push(['itemreq', t('item_req'), itemPending.count ? `<span class="badge">${itemPending.count}</span>` : '']);
   if (anyApprove) tiles.push(['exceptions', t('exceptions'), exOpen.count ? `<span class="badge">${exOpen.count}</span>` : '']);

@@ -206,3 +206,14 @@ button.mini { min-height: 36px; min-width: 36px; padding: 0; border-radius: 18px
 .photos img { width: 84px; height: 84px; object-fit: cover; border-radius: 12px; border: 1.5px solid var(--gold); background: #f3e9d6; display: block; }
 .photos .ph .mini { position: absolute; top: -8px; right: -8px; width: 26px; height: 26px; padding: 0; border-radius: 50%; }
 .phadd { display: inline-flex; align-items: center; gap: 6px; min-height: 48px; padding: 0 16px; border-radius: 14px; border: 1.5px dashed var(--gold); color: var(--ruby); font-weight: 600; cursor: pointer; }
+
+/* ---------- business analysis ---------- */
+.bz-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+.bz-cards .card { margin: 0; }
+.mnum { font: 700 1.6rem/1.15 var(--serif); color: var(--ruby); font-variant-numeric: lining-nums tabular-nums; }
+.scrollx { overflow-x: auto; margin: 6px -4px; }
+table.bz { border-collapse: collapse; width: 100%; font-size: .9rem; }
+table.bz th, table.bz td { padding: 6px 8px; border-bottom: 1px dashed var(--line); text-align: right; white-space: nowrap; vertical-align: top; }
+table.bz th:first-child { text-align: left; font-weight: 700; } table.bz thead th { color: var(--ruby); font-size: .8rem; }
+table.bz small { display: block; color: var(--muted); font-size: .72rem; font-weight: 400; }
+table.bz td.hot { background: var(--warn-bg); color: var(--warn); font-weight: 700; border-radius: 6px; }

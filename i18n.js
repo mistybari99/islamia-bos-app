@@ -4,6 +4,7 @@ window.BOS_T = {
   pos: { bn: "সেল (POS)", mix: "Sale (POS)", en: "Sales (POS)" },
   photo_add: { bn: "ছবি তুলুন", mix: "Photo তুলুন", en: "Take photo" },
   photo_up: { bn: "ছবি পাঠানো হচ্ছে…", mix: "Photo পাঠানো হচ্ছে…", en: "Uploading photo…" },
+  biz: { bn: "ব্যবসার হিসাব", mix: "ব্যবসার Analysis", en: "Business analysis" },
   lang_bn: { bn: "বাংলা", mix: "বাংলা", en: "বাংলা" },
   lang_mix: { bn: "Bng-Eng", mix: "Bng-Eng", en: "Bng-Eng" },
   lang_en: { bn: "English", mix: "English", en: "English" },
