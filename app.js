@@ -58,6 +58,7 @@ function closeSheet() { const d = $('#sheet'); if (d) d.remove(); }
 const tog = (on, act, attrs = '', label) => `<button class="tog ${on ? 'on' : ''}" data-act="${act}" ${attrs}>${esc(label || (on ? t('on') : t('off')))}</button>`;
 
 const ICON = {
+  pos: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="20" height="26" rx="3"/><path d="M10 9h12M10 15h3M16 15h3M22 15h0M10 21h3M16 21h3M22 21h0"/></svg>',
   items: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="16" cy="16" r="4.6" fill="currentColor"/></svg>',
   itemreq: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h20l-5-5M27 21H7l5 5"/></svg>',
   staff: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="11" r="5"/><circle cx="23" cy="13" r="3.4"/><path d="M3 27c0-5 4-8 9-8s9 3 9 8M21 20c4 0 8 2 8 7"/></svg>',
@@ -70,7 +71,7 @@ const ICON = {
   locset: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 29s9-8 9-15a9 9 0 0 0-18 0c0 7 9 15 9 15z"/><circle cx="16" cy="14" r="3.2"/></svg>',
   backup: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4v16M9 14l7 7 7-7M5 27h22"/></svg>',
 };
-const TONE = { items: 't-gold', itemreq: 't-gold', staff: 't-ruby', matrix: 't-ruby', rules: '', settings: 't-ink', logs: 't-ink', backup: 't-ink', exceptions: 't-ruby', releases: 't-gold', locset: 't-ink' };
+const TONE = { pos: 't-ruby', items: 't-gold', itemreq: 't-gold', staff: 't-ruby', matrix: 't-ruby', rules: '', settings: 't-ink', logs: 't-ink', backup: 't-ink', exceptions: 't-ruby', releases: 't-gold', locset: 't-ink' };
 const MARK = '<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#14173a"/><circle cx="32" cy="29" r="16.5" fill="none" stroke="#f2a900" stroke-width="3"/><circle cx="32" cy="29" r="8.8" fill="#f2a900"/><path d="M12 51h40" stroke="#f7eedc" stroke-width="3.2" stroke-linecap="round"/></svg>';
 
 // ---------- auth ----------
@@ -180,6 +181,7 @@ async function viewHome() {
   ]);
   if (forms.error) return fail(forms.error);
   const tiles = [];
+  if (owner || (perms.POS && (perms.POS.enter || perms.POS.view))) tiles.push(['pos', t('pos'), '']);
   if (perms.ITEMS && perms.ITEMS.view) tiles.push(['items', t('items'), '']);
   if (perms.ITEMS && (perms.ITEMS.enter || perms.ITEMS.approve)) tiles.push(['itemreq', t('item_req'), itemPending.count ? `<span class="badge">${itemPending.count}</span>` : '']);
   if (anyApprove) tiles.push(['exceptions', t('exceptions'), exOpen.count ? `<span class="badge">${exOpen.count}</span>` : '']);
@@ -188,17 +190,18 @@ async function viewHome() {
     tiles.push(['staff', t('staff'), pend.count ? `<span class="badge">${pend.count}</span>` : '']);
     tiles.push(['matrix', t('matrix'), ''], ['rules', t('rules'), ''], ['locset', t('locset'), ''], ['settings', t('settings'), ''], ['logs', t('logs'), ''], ['backup', t('backup'), '']);
   }
-  const mine = forms.data.filter((f) => f.area !== 'master' && perms[f.code] && perms[f.code].view);
+  const mine = forms.data.filter((f) => f.area !== 'master' && f.code !== 'POS' && perms[f.code] && perms[f.code].view);
   const byArea = AREAS.map((a) => [a, mine.filter((f) => f.area === a)]).filter(([, l]) => l.length);
-  $('#home').innerHTML = `<div class="grid">${tiles.map(([go_, label, badge]) =>
+  $('#home').innerHTML = `<div id="dash"></div><div class="grid">${tiles.map(([go_, label, badge]) =>
       `<button class="tile ${TONE[go_] || ''}" data-act="go" data-v="${go_}">${ICON[go_] || ''}<span>${esc(label)}</span>${badge}</button>`).join('')}</div>
     <div class="orn">${esc(t('forms_title'))}</div>
     ${byArea.length ? byArea.map(([a, l]) => `<div class="card panel"><h3>${esc(t('area_' + a))}</h3>${l.map((f) => {
-      const pr = perms[f.code], live = window.BOS && window.BOS.forms && window.BOS.forms[f.code];
+      const pr = perms[f.code], live = f.code === '0-1' ? owner : (window.BOS && window.BOS.forms && window.BOS.forms[f.code]);
       return `<div class="perm"><div class="row between" ${live ? `data-act="openform" data-v="${f.code}" style="cursor:pointer;min-height:44px"` : 'style="opacity:.6"'}><span><b>${esc(f.code)}</b> · ${esc(nm(f))}</span><span class="row">${
         live ? '' : `<span class="chip">${esc(t('soon'))}</span>`}${pr.enter ? `<span class="chip ok">${esc(t('can_enter'))}</span>` : `<span class="chip">${esc(t('can_view'))}</span>`}${
         pr.approve ? `<span class="chip warn">${esc(t('can_approve'))}</span>` : ''}</span></div></div>`; }).join('')}</div>`).join('')
       : `<p class="muted">${esc(t('no_forms'))}</p>`}`;
+  if (window.BOS && window.BOS.dash) window.BOS.dash.render().catch(() => {});
 }
 
 // ---------- items ----------

@@ -21,7 +21,7 @@ B.num = num; B.has = has; B.sum = sum;
 // ---------- field builders (used by forms.js) ----------
 const fld = (type) => (id, label, o = {}) => ({ id, type, label, ...o });
 B.f = { T: fld('text'), TA: fld('textarea'), N: fld('number'), M: fld('money'), TM: fld('time'), D: fld('date'), CK: fld('ck'), ST: fld('staff'),
-  ITEM: fld('item'), LOC: fld('loc'), DEN: fld('denoms'),
+  ITEM: fld('item'), LOC: fld('loc'), DEN: fld('denoms'), PHOTO: fld('photo'),
   CH: (id, label, options, o = {}) => ({ id, type: 'choice', label, options, ...o }),
   SEL: (id, label, options, o = {}) => ({ id, type: 'select', label, options, ...o }),
   CALC: (id, label, fm, o = {}) => ({ id, type: 'calc', label, fmt: fm || 'num', ...o }),
@@ -96,7 +96,7 @@ const FIELD_ID = (() => { let n = 0; return () => 'x' + (n++); })();
 
 function ctxFor() {
   return { d: E.data, c: E.check, s: E.settings, env: ENV, v: (E.calc && E.calc.v) || {}, cf: !!E.formRow.count_first, num, has, sum, den: (k) => denTotal(getp(E.data, k)), denC: (k) => denTotal(getp(E.check, k)),
-    rows: (id) => E.data[id] || [], rowsC: (id) => E.check[id] || [], me: S.ctx.profile.staff_id, date: E.date, loc: E.loc, wd: weekday(E.date),
+    rows: (id) => (E.data[id] || []).map((r) => r || {}), rowsC: (id) => (E.check[id] || []).map((r) => r || {}), me: S.ctx.profile.staff_id, date: E.date, loc: E.loc, wd: weekday(E.date),
     L, lab, money, needs: [] };
 }
 function recompute() {
@@ -126,6 +126,9 @@ function inputHTML(fd, path, w, ed) {
     case 'item': { const it = ENV.byCode && ENV.byCode.get(val); return `<input ${a} data-item="1" list="dl_items" placeholder="${esc(t('item_pick'))}" value="${esc(it ? it.code + ' · ' + nm(it) : (val || ''))}" autocomplete="off">`; }
     case 'denoms': return `<div class="den">${DENOMS.map((d) => `<label><span>${d}</span><input data-w="${w}" data-p="${esc(path)}.n${d}" data-num="1" inputmode="numeric" ${ed ? '' : 'disabled'} value="${esc(getp(w === 'c' ? E.check : E.data, path + '.n' + d))}"></label>`).join('')}
       <label><span>${esc(t('coins'))} ৳</span><input data-w="${w}" data-p="${esc(path)}.coin" data-num="1" inputmode="decimal" ${ed ? '' : 'disabled'} value="${esc(getp(w === 'c' ? E.check : E.data, path + '.coin'))}"></label></div>`;
+    case 'photo': { const arr = Array.isArray(val) ? val : [];
+      return `<div class="photos">${arr.map((p, i) => `<span class="ph"><img data-path="${esc(p)}" alt="" data-act="photo_view" data-src="${esc(p)}">${ed ? `<button type="button" class="mini" data-act="photo_del" data-w="${w}" data-p="${esc(path)}" data-i="${i}" aria-label="${esc(t('delete_row'))}">✕</button>` : ''}</span>`).join('')}
+        ${ed ? `<label class="phadd">📷 ${esc(t('photo_add'))}<input type="file" accept="image/*" capture="environment" hidden data-photo="1" data-w="${w}" data-p="${esc(path)}"></label>` : (arr.length ? '' : '<span class="muted">—</span>')}</div>`; }
     default: return '';
   }
 }
@@ -207,7 +210,7 @@ function draw() {
       ${head ? `<div class="stack" style="margin-top:10px">${head}</div>` : ''}</div>
     <div id="flagsbox">${flagsHTML()}</div>
     ${spec.sections.map(sectionHTML).join('')}</div>${actionsHTML()}`, 'form/' + E.code);
-  refresh();
+  refresh(); hydratePhotos();
 }
 
 function fmtCalc(val, fm) {
@@ -232,8 +235,34 @@ function refresh() {
 
 // ---------- editing events ----------
 const norm = (s) => String(s).replace(/[০-৯]/g, (d) => '০১২৩৪৫৬৭৮৯'.indexOf(d));
+// ---------- photos (Supabase Storage bucket "photos") ----------
+function shrink(file, max = 1280, q = 0.72) {
+  return new Promise((res, rej) => { const img = new Image(), u = URL.createObjectURL(file);
+    img.onload = () => { const k = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u); c.toBlob((b) => (b ? res(b) : rej(new Error('image'))), 'image/jpeg', q); };
+    img.onerror = () => rej(new Error('image')); img.src = u; });
+}
+const rid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+async function addPhoto(el) {
+  const f = el.files && el.files[0]; if (!f) return;
+  toast(t('photo_up'));
+  try {
+    const blob = await shrink(f), path = `${E.code}/${E.loc}/${rid()}.jpg`;
+    const up = await sb.storage.from('photos').upload(path, blob, { contentType: 'image/jpeg' }); if (up.error) throw up.error;
+    const o = el.dataset.w === 'c' ? E.check : E.data, cur = getp(o, el.dataset.p); setp(o, el.dataset.p, [...(Array.isArray(cur) ? cur : []), path]);
+    touch(); const sc = window.scrollY; draw(); window.scrollTo(0, sc);
+  } catch (e) { fail(e); }
+}
+async function hydratePhotos() {
+  const imgs = [...document.querySelectorAll('img[data-path]')]; if (!imgs.length) return;
+  const paths = [...new Set(imgs.map((i) => i.dataset.path))];
+  const r = await sb.storage.from('photos').createSignedUrls(paths, 3600); if (r.error || !r.data) return;
+  const m = new Map(r.data.map((x) => [x.path, x.signedUrl]));
+  imgs.forEach((i) => { const u = m.get(i.dataset.path); if (u) i.src = u; });
+}
 function onEdit(e) {
   if (!E) return; const el = e.target; if (!el.dataset || !el.dataset.p || !el.dataset.w) return;
+  if (el.dataset.photo) { if (e.type === 'change') addPhoto(el); return; }
   if (el.dataset.item) { if (e.type !== 'change') return; const code = el.value.split(' · ')[0].trim(); const it = ENV.byCode.get(code); setp(el.dataset.w === 'c' ? E.check : E.data, el.dataset.p, it ? code : ''); el.value = it ? it.code + ' · ' + nm(it) : ''; touch(); refresh(); return; }
   let v = el.type === 'checkbox' ? el.checked : el.value;
   if (el.dataset.num) { v = norm(v); if (v !== el.value) el.value = v; }
@@ -247,12 +276,12 @@ document.addEventListener('toggle', (e) => { if (E && e.target.dataset && e.targ
 // ---------- validation ----------
 function missingRequired() {
   const x = ctxFor(), miss = [];
-  const check = (f, obj, path, ctx) => {
+  const check = (f, obj, path, ctx, pre = '') => {
     if (f.type === 'note' || f.type === 'calc') return;
     const vis = (!f.show || f.show(ctx)); if (!vis) return;
     const req = typeof f.req === 'function' ? f.req(ctx) : f.req; if (!req) return;
     const v = getp(obj, path);
-    if (!has(v) || (f.type === 'denoms' && denTotal(v) === 0)) miss.push(lab(f.label));
+    if (!has(v) || (f.type === 'denoms' && denTotal(v) === 0)) miss.push(pre + lab(f.label));
   };
   E.spec.head && E.spec.head.forEach((f) => check(f, E.data, f.id, x));
   E.spec.sections.forEach((sec) => {
@@ -265,7 +294,7 @@ function missingRequired() {
           const row = (E.data[f.id] || [])[i] || {}, rowC = (E.check[f.id] || [])[i] || {};
           const any = Object.values(row).some(has) || Object.values(rowC).some(has);
           if (!any && !f.rows) continue;
-          f.cols.forEach((c) => { const isC = c.who === 'checker'; if ((E.mode === 'check') !== isC) return; check(c, isC ? E.check : E.data, `${f.id}.${i}.${c.id}`, { ...x, row, rowC }); });
+          f.cols.forEach((c) => { const isC = c.who === 'checker'; if ((E.mode === 'check') !== isC) return; check(c, isC ? E.check : E.data, `${f.id}.${i}.${c.id}`, { ...x, row, rowC }, (f.rows ? lab(f.rows[i]) : String(i + 1)) + ' · '); });
         }
       } else if ((E.mode === 'check') === ((f.who || sec.who) === 'checker')) check(f, f.who === 'checker' || sec.who === 'checker' ? E.check : E.data, f.id, x);
     });
@@ -358,6 +387,7 @@ async function reloadEntry(id) {
 // ---------- form list ----------
 async function viewFormList() {
   const code = location.hash.replace(/^#\/?/, '').split('/')[1];
+  if (code === '0-1') return (location.hash = '#/locset');
   const spec = B.forms[code]; if (!spec) return location.hash = '#/home';
   await ensureLoaded();
   const perms = S.ctx.perms[code] || {}, locs = myLocs();
@@ -382,13 +412,13 @@ async function viewExceptions() {
 }
 async function drawExceptions(st) {
   const r = await sb.from('exceptions').select('*').eq('status', st).order('created_at', { ascending: false }).limit(100); if (r.error) return fail(r.error);
-  const ids = [...new Set(r.data.map((x) => x.entry_id))]; const en = ids.length ? await sb.from('entries').select('id,serial,form_code,location_id').in('id', ids) : { data: [] };
+  const ids = [...new Set(r.data.map((x) => x.entry_id).filter(Boolean))]; const en = ids.length ? await sb.from('entries').select('id,serial,form_code,location_id').in('id', ids) : { data: [] };
   const em = new Map((en.data || []).map((x) => [x.id, x]));
   $('#ex_body').innerHTML = r.data.map((x) => { const e = em.get(x.entry_id) || {};
     return `<div class="card stack"><div class="row between"><span class="chip ${x.level === 'red' ? 'bad' : 'warn'}">${x.level === 'red' ? '●' : '▲'} ${esc(x.level)}</span><span class="muted" style="font-size:.82rem">${esc(x.entry_date)} · ${esc(locName(x.location_id))}</span></div>
       <div><b>${esc(lab(x.text) || x.flag_code)}</b>${x.amount !== null ? ' · ' + esc(money(x.amount)) : ''}</div>
-      <div class="muted" style="font-size:.85rem">${esc(x.form_code)}-${esc((ENV.locs.find((l) => l.id === e.location_id) || {}).code || '')}-${e.serial || ''}</div>
-      ${x.status === 'open' ? `<div class="row"><button class="full" data-act="openentry" data-v="${x.entry_id}">${esc(t('open_entry'))}</button><button class="primary full" data-act="ex_resolve" data-v="${x.id}">${esc(t('resolve'))}</button></div>`
+      <div class="muted" style="font-size:.85rem">${x.entry_id ? `${esc(x.form_code)}-${esc((ENV.locs.find((l) => l.id === e.location_id) || {}).code || '')}-${e.serial || ''}` : esc(x.form_code)}</div>
+      ${x.status === 'open' ? `<div class="row">${x.entry_id ? `<button class="full" data-act="openentry" data-v="${x.entry_id}">${esc(t('open_entry'))}</button>` : `<button class="full" data-act="go" data-v="pos">POS</button>`}<button class="primary full" data-act="ex_resolve" data-v="${x.id}">${esc(t('resolve'))}</button></div>`
         : `<div class="muted" style="font-size:.85rem">${esc(staffName(x.resolved_staff))} · ${esc(x.resolved_note || '')}</div>`}</div>`; }).join('') || `<p class="muted center">${esc(t('ex_none'))}</p>`;
 }
 document.addEventListener('change', (e) => { if (e.target.id === 'ex_st') drawExceptions(e.target.value); if (e.target.id === 'fl_loc') { S.formLoc = Number(e.target.value); viewFormList(); } if (e.target.id === 'ls_loc') { S.lsLoc = Number(e.target.value); viewLocSet(); } });
@@ -435,6 +465,8 @@ Object.assign(A.H, {
   pick: (a) => { setp(a.dataset.w === 'c' ? E.check : E.data, a.dataset.p, getp(a.dataset.w === 'c' ? E.check : E.data, a.dataset.p) === a.dataset.v ? '' : a.dataset.v); touch(); const sc = window.scrollY; draw(); window.scrollTo(0, sc); },
   addrow: (a) => { const k = a.dataset.t; E.data[k] = E.data[k] || []; E.data[k].push({}); touch(); const sc = window.scrollY; draw(); window.scrollTo(0, sc); },
   delrow: (a) => { const k = a.dataset.t, i = Number(a.dataset.i); (E.data[k] || []).splice(i, 1); touch(); const sc = window.scrollY; draw(); window.scrollTo(0, sc); },
+  photo_del: (a) => { const o = a.dataset.w === 'c' ? E.check : E.data, cur = [...(getp(o, a.dataset.p) || [])]; cur.splice(Number(a.dataset.i), 1); setp(o, a.dataset.p, cur.length ? cur : undefined); touch(); const sc = window.scrollY; draw(); window.scrollTo(0, sc); },
+  photo_view: async (a) => { const r = await sb.storage.from('photos').createSignedUrl(a.dataset.src, 3600); if (r.data) openSheet(`<img src="${esc(r.data.signedUrl)}" alt="" style="width:100%;border-radius:12px"><button class="full" style="margin-top:10px" data-act="closesheet">${esc(t('done'))}</button>`); },
   e_save: () => saveDraft(),
   e_submit: submit,
   e_approve: () => decide(true),
