@@ -26,7 +26,7 @@ const X = {
   discount: L('ডিসকাউন্ট (৳)', 'Discount (৳)', 'Discount (৳)'), discL: L('ডিসকাউন্ট', 'Discount', 'Discount'), discTakes: L('কাটা হবে', 'Takes off', 'কাটা হবে'), print: L('রসিদ প্রিন্ট', 'Print receipt', 'Receipt Print'), note: L('নোট (ঐচ্ছিক)', 'Note (optional)', 'Note (ঐচ্ছিক)'),
   confirm: L('সেল সম্পন্ন', 'Complete sale', 'Complete Sale'), empty: L('কার্ট খালি — আইটেম ট্যাপ করুন', 'Cart is empty — tap an item', 'Cart খালি — Item ট্যাপ করুন'),
   amount: L('টাকার পরিমাণ', 'Amount', 'Amount'), what: L('কী বিক্রি (ঐচ্ছিক)', 'What was sold (optional)', 'কী বিক্রি (ঐচ্ছিক)'), all: L('সব', 'All', 'All'), freq: L('বেশি বিক্রি', 'Frequent', 'Frequent'),
-  search: L('আইটেম খুঁজুন', 'Search item', 'Item খুঁজুন'), qty: L('পরিমাণ', 'Quantity', 'Quantity'), add: L('কার্টে দিন', 'Add to cart', 'Add to Cart'),
+  scan: L('বারকোড স্ক্যান', 'Scan barcode', 'Barcode স্ক্যান'), search: L('আইটেম খুঁজুন', 'Search item', 'Item খুঁজুন'), qty: L('পরিমাণ', 'Quantity', 'Quantity'), add: L('কার্টে দিন', 'Add to cart', 'Add to Cart'),
   receipt: L('রসিদ', 'Receipt', 'Receipt'), done: L('সেল হয়েছে', 'Sale done', 'Sale হয়েছে'), queued: L('নেট নেই — সেল জমা আছে, নেট এলে পাঠানো হবে', 'No network — sale saved, will be sent when online', 'Net নেই — Sale জমা আছে, Online হলে যাবে'),
   pending: L('পাঠানো বাকি', 'waiting to send', 'পাঠানো বাকি'), void: L('বাতিল', 'Void', 'Void'), voided: L('বাতিল হয়েছে', 'Voided', 'Voided'), voidwhy: L('বাতিলের কারণ (লিখতেই হবে)', 'Reason for voiding (required)', 'Void এর কারণ (লিখতেই হবে)'),
   day: L('আজকের মোট', "Today's total", 'Today মোট'), count: L('টি সেল', 'sales', 'sales'), nodata: L('এখনও কোনো সেল নেই', 'No sales yet', 'এখনও কোনো sale নেই'),
@@ -55,6 +55,7 @@ const ERRS = {
   discount_mode_off: L('এই ধরনের ডিসকাউন্ট বন্ধ আছে (নিয়ম)', 'This kind of discount is switched off (rule)', 'এই ধরনের Discount বন্ধ (নিয়ম)'),
   unlisted_blocked: L('তালিকায় নেই এমন আইটেম বিক্রি বন্ধ আছে (নিয়ম)', 'Selling an item that is not in the list is switched off (rule)', 'List এ নেই এমন item বিক্রি বন্ধ (নিয়ম)'), paper_no_required: L('কাগজের ছাপা নম্বর লাগবে', 'The printed paper number is required', 'কাগজের ছাপা number লাগবে'),
   period_closed: L('এই তারিখের হিসাব বন্ধ — শুধু মালিক বদলাতে পারবেন', 'This date is closed — only the owner can change it', 'এই date এর হিসাব বন্ধ — শুধু Owner বদলাতে পারবেন'),
+  insufficient_stock: L('মজুতে এত নেই — বিক্রি করা গেল না', 'Not enough stock on hand — the sale was not made', 'Stock-এ এত নেই — বিক্রি হয়নি'),
   wallet_needed: L('মোবাইল পেমেন্টে বিকাশ/নগদ ইত্যাদি বাছুন', 'Choose bKash / Nagad etc. for a mobile payment', 'Mobile payment এ bKash/Nagad বাছুন'), name_required: L('আইটেমের নাম লিখুন', 'Enter the item name', 'Item এর নাম লিখুন'),
 };
 const T2 = (e) => { const m = (e && e.message) || String(e || ''); for (const k of Object.keys(ERRS)) if (m.includes(k)) return lab(ERRS[k]); return null; };
@@ -68,7 +69,7 @@ const queue = () => jget(QK(), []);
 const setQueue = (q) => store.set(QK(), JSON.stringify(q));
 const failedQ = () => jget(XK(), []);
 const setFailed = (q) => store.set(XK(), JSON.stringify(q));
-const BUSINESS = /^(no_lines|bad_mode|bad_qty|bad_price|bad_amount|bad_discount|bad_discount_kind|discount_mode_off|no_price|item_not_found|due_needs_customer|not allowed|customer_required|customer_name_required|bad_mobile|overpaid|over_credit_limit|override_needs_approval|discount_needs_approval|customer_inactive|bad_sale_type|bad_payments|name_required|period_closed|unlisted_blocked|paper_no_required)/;
+const BUSINESS = /^(no_lines|bad_mode|bad_qty|bad_price|bad_amount|bad_discount|bad_discount_kind|discount_mode_off|no_price|item_not_found|due_needs_customer|not allowed|customer_required|customer_name_required|bad_mobile|overpaid|over_credit_limit|override_needs_approval|discount_needs_approval|customer_inactive|bad_sale_type|bad_payments|name_required|period_closed|unlisted_blocked|paper_no_required|insufficient_stock)/;
 const freq = () => jget(FKEY, {});
 const bump = (id) => { const f = freq(); f[id] = (f[id] || 0) + 1; store.set(FKEY, JSON.stringify(f)); };
 const perms = () => S.ctx.perms.POS || {};
@@ -85,7 +86,7 @@ const netTotal = () => Math.max(0, r2(cartSub() - discVal()));
 
 async function load() {
   await B.loadStatic();
-  const it = await sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,unit,sell_price,is_active').eq('is_active', true).order('code');
+  const it = await sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,unit,sell_price,is_active,barcode').eq('is_active', true).order('code');
   if (it.error) throw it.error;
   P.items = it.data.filter((i) => i.sell_price !== null);
   const all = B.ENV.locs;
@@ -122,7 +123,7 @@ function drawSell(can) {
   const cn = (c) => lab(CATS[c]) || (P.items.find((i) => i.category === c) || {}).category_bn || c;
   const canNew = S.ctx.is_owner || (S.ctx.perms.ITEMS && S.ctx.perms.ITEMS.enter);
   $('#pos_body').innerHTML = `
-    <div class="row"><input id="pos_q" placeholder="${esc(T('search'))}" value="${esc(P.q)}" style="flex:1"><button class="primary" data-act="pos_quick" ${can ? '' : 'disabled'}>⚡ ${esc(T('quick'))}</button></div>
+    <div class="row"><input id="pos_q" placeholder="${esc(T('search'))}" value="${esc(P.q)}" style="flex:1"><button data-act="pos_scan" aria-label="${esc(T('scan'))}" ${can ? '' : 'disabled'}>▮▮</button><button class="primary" data-act="pos_quick" ${can ? '' : 'disabled'}>⚡ ${esc(T('quick'))}</button></div>
     <div class="row wrap" style="margin:10px 0" id="pos_cats">${[['', T('all')], ['_f', T('freq')], ...cats.map((c) => [c, cn(c)])].map(([c, l]) =>
       `<button class="tog ${P.cat === c ? 'on' : ''}" data-act="pos_cat" data-v="${esc(c)}">${esc(l)}</button>`).join('')}</div>
     <div class="row wrap" style="margin-bottom:10px"><button class="tog" data-act="pos_other" ${can ? '' : 'disabled'}>${esc(T('other'))}</button>${canNew ? `<button class="tog" data-act="pos_newitem">${esc(T('newitem'))}</button>` : ''}</div>
@@ -148,6 +149,12 @@ function drawBar(can) {
     <button class="primary" data-act="pos_cart" ${n && can ? '' : 'disabled'}>${esc(T('pay'))} →</button>`;
 }
 function refreshSell() { if (P.tab !== 'sell' || !$('#pos_items')) return; drawItems(true); drawBar(true); }
+// scan (camera or device) or a typed code + Enter in the search box: add the item whose items.barcode matches
+function scanAdd(code) {
+  const i = B.barcode && B.barcode.find(code, P.items);
+  if (!i) return toast(code + ' · ' + lab(L('এই বারকোডের কোনো পণ্য নেই', 'No product has this barcode', 'এই barcode-এর কোনো product নেই')));
+  bump(i.id); if (i.unit === 'pc') addItem(i.id, 1); else qtySheet(i.id);
+}
 function addItem(id, qty) {
   const i = itemById(id); if (!i) return;
   const ex = P.cart.find((l) => l.kind === 'item' && l.item_id === id);
@@ -403,6 +410,7 @@ Object.assign(A.H, {
     const quickOnly = P.cart.length > 0 && P.cart.every((l) => l.kind === 'quick');
     return submitSale(build({ lines: linesOf(), disc, payments: B.pay.list(P.st), mobile, cname, type: P.type, note: ($('#cart_note') || {}).value || '', quick: quickOnly, total, paid, dk, dinput: dk === 'percent' ? discIn() : disc }), given > cashAmt ? r2(given - cashAmt) : 0);
   },
+  pos_scan: async () => { if (!B.barcode) return; const code = await B.barcode.scan(); if (code) scanAdd(code); },
   pos_quick: () => quickSheet(),
   pos_qs_cash: () => { const q = readQuick(); if (!q) return;      // a one-tap cash sale of just this amount; the cart is left alone
     return submitSale(build({ lines: [{ item_id: null, name: q.name, amount: q.amount }], disc: 0, payments: [{ mode: 'cash', amount: q.amount }], type: 'retail', quick: true, total: q.amount, paid: q.amount }), 0); },
@@ -420,6 +428,10 @@ document.addEventListener('input', (e) => {
   if (id === 'cart_disc') discChanged();
   if (id === 'cu_mobile') { P.cust.mobile = e.target.value; P.cust.found = null; P.cust.name = ''; lookup(); const el = $('#cart_cust'); const m = normMobile(P.cust.mobile); if (m) drawCust(); }
   if (id === 'cu_name') P.cust.name = e.target.value;
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' || e.target.id !== 'pos_q' || !P.q.trim() || B.rule('barcode_device_on', false) !== true) return;   // a hardware scanner types the code and presses Enter
+  const i = B.barcode && B.barcode.find(P.q, P.items); if (!i) return; e.preventDefault(); P.q = ''; e.target.value = ''; drawItems(true); scanAdd(i.barcode);
 });
 document.addEventListener('change', (e) => { if (e.target.id === 'pos_loc') { P.loc = Number(e.target.value); store.set('bos_pos_loc', String(P.loc)); resetCart(); drawPos(); } });
 

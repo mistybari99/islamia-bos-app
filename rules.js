@@ -106,7 +106,7 @@ async function viewEmergency() {
 
 // ---------- emergency: the staff side ----------
 // error text from the server -> which grant would allow it
-const ERRGRANT = { discount_needs_approval: 'discount_over_limit', override_needs_approval: 'price_override', over_credit_limit: 'credit_over_limit', customer_required: 'sale_without_customer', period_closed: 'closed_period_edit' };
+const ERRGRANT = { discount_needs_approval: 'discount_over_limit', override_needs_approval: 'price_override', over_credit_limit: 'credit_over_limit', customer_required: 'sale_without_customer', period_closed: 'closed_period_edit', insufficient_stock: 'sell_below_zero' };
 const em = {
   grantFor: (msg) => { for (const k of Object.keys(ERRGRANT)) if (String(msg || '').includes(k)) return ERRGRANT[k]; return null; },
   allowed(code) { const d = B.grantDefs()[code]; if (!d || !d.emergency_rule) return false; return B.rule('em_enabled', true) === true && B.rule(d.emergency_rule, false) === true; },

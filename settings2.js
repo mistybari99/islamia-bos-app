@@ -196,6 +196,7 @@ async function loadUnits() {
 
 // ---------- unit conversions ----------
 async function pgUnits() {
+  const pre = location.hash.replace(/^#\/?/, '').split('/')[2]; if (pre) Z.uScope = pre;   // #/settings2/units/<item id> opens that item's conversions
   await Promise.all([loadItems(), loadUnits()]);
   const r = await sb.from('unit_conversions').select('*').order('id');
   if (r.error) return frame('c_units', `<div class="notice bad">${esc(T('sql'))}</div>`);

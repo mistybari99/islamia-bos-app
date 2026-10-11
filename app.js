@@ -167,6 +167,7 @@ function route() {
      settings: viewSettings, logs: viewLogs, backup: viewBackup, itemreq: viewItemReq };
   const extra = window.BOS_PAGES || {};
   if ((page === 'exceptions' || page === 'releases' || page === 'locset') && !S.ctx.is_owner && !(page === 'exceptions' && Object.values(S.ctx.perms).some((p) => p.approve))) return viewHome();
+  if (page === 'items' && extra.items) return extra.items();           // products v2 (items2.js) takes over #/items; the old screen stays as the fallback
   (local[page] || extra[page] || viewHome)();
 }
 window.addEventListener('hashchange', route);
@@ -301,8 +302,8 @@ async function viewItemReq() {
   if (ch.error) return fail(ch.error);
   const canDecide = S.ctx.is_owner || (S.ctx.perms.ITEMS && S.ctx.perms.ITEMS.approve);
   const label = { name_bn: t('name_bn'), name_en: t('name_en'), name_mix: t('name_mix'), category: t('category'), unit: t('unit'),
-    sell_price: t('sell_price'), cost_price: t('cost_price'), is_active: t('active'), category_bn: null };
-  const showVal = (k, v) => (v === null || v === undefined ? '—' : k === 'is_active' ? (v ? t('yes') : t('no')) : v);
+    sell_price: t('sell_price'), cost_price: t('cost_price'), is_active: t('active'), category_bn: null, ...(window.BOS_ITEM_LABELS ? window.BOS_ITEM_LABELS() : {}) };
+  const showVal = (k, v) => (v === null || v === undefined ? '—' : typeof v === 'boolean' ? (v ? t('yes') : t('no')) : k === 'images' ? (Array.isArray(v) ? v.length : v) : Array.isArray(v) ? (v.join(', ') || '—') : v);
   const body = ch.data.map((c) => {
     const it = c.item_id ? S.items.find((i) => i.id === c.item_id) : null;
     const rows = Object.entries(c.patch).filter(([k]) => label[k]).map(([k, v]) => {

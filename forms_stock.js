@@ -5,7 +5,7 @@
 (() => {
 'use strict';
 const B = window.BOS, L = B.L, YN = B.YN, num = B.num, has = B.has, sum = B.sum;
-const { T, TA, N, M, TM, D, CK, ST, ITEM, LOC, DEN, CH, SEL, CALC, NOTE, TABLE, PHOTO } = B.f;
+const { T, TA, N, M, TM, D, CK, ST, ITEM, LOC, DEN, CH, SEL, CALC, NOTE, TABLE, PHOTO, SUP } = B.f;
 B.forms = B.forms || {};
 
 const flag = (code, level, bn, en, amount, o = {}) => ({ code, level, text: L(bn, en), amount, ...o });
@@ -29,7 +29,7 @@ const OWNER_NOTE = L('মালিকের ব্যক্তিগত টা�
 const QUALITY = [['accept', L('গ্রহণ', 'Accept')], ['reduced', L('দর কমিয়ে গ্রহণ', 'Accept at a lower rate')], ['hold', L('আটক', 'Hold')], ['return', L('ফেরত', 'Return')]];
 B.forms['04-1'] = {
   title: L('মালামাল গ্রহণ রসিদ (GRN)', 'Goods received note (GRN)'),
-  head: [TM('time', L('সময়', 'Time')), T('supplier', L('সাপ্লায়ার', 'Supplier'), { req: true }), T('memo_no', L('তাদের মেমো / চালান নং', 'Their memo / challan no.')),
+  head: [TM('time', L('সময়', 'Time')), SUP('supplier', L('সাপ্লায়ার', 'Supplier'), { req: true }), T('memo_no', L('তাদের মেমো / চালান নং', 'Their memo / challan no.')),
     CH('paper', L('যে কাগজে ক্রয়', 'Purchase made on'), [['po', L('পারচেজ অর্ডার (PO)', 'Purchase order (PO)')], ['pr', L('জরুরি ক্রয় — পারচেজ রিকুইজিশন (PR)', 'Urgent purchase — purchase requisition (PR)')], ['direct', L('শোরুমে সরাসরি ক্রয়', 'Direct purchase at the showroom')]], { req: true }),
     T('po_no', L('পারচেজ অর্ডার (PO) নং', 'Purchase order (PO) no.'), { show: (x) => x.d.paper === 'po', req: (x) => x.d.paper === 'po' }),
     T('pr_no', L('পারচেজ রিকুইজিশন (PR) নং', 'Purchase Requisition (PR) no.'), { show: (x) => x.d.paper === 'pr', req: (x) => x.d.paper === 'pr' })],
@@ -251,12 +251,12 @@ B.forms['06-2'] = {
     { title: L('দর পাশাপাশি', 'Quotes side by side'), fields: [
       NOTE(L('দর নেওয়া হবে ক্রয়ের আগে — পরে নয়। একটিমাত্র দর নিয়ে ক্রয় হলে লিখিত কারণ লাগবে।', 'Take quotes before buying, not after. Buying on a single quote needs a written reason.'), 'warn'),
       CALC('limit_text', L('কোটেশন তুলনার সীমা (লোকেশন সেটিংস)', 'Quotation comparison limit (location settings)'), 'text'),
-      TABLE('quotes', null, [T('supplier', L('সাপ্লায়ারের নাম (Supplier)', 'Supplier name'), { req: true, wide: true }), M('rate', L('দর ৳ (প্রতি একক)', 'Rate ৳ (per unit)'), { req: true }),
+      TABLE('quotes', null, [SUP('supplier', L('সাপ্লায়ারের নাম (Supplier)', 'Supplier name'), { req: true, wide: true }), M('rate', L('দর ৳ (প্রতি একক)', 'Rate ৳ (per unit)'), { req: true }),
         CALC('total', L('মোট ৳', 'Total ৳'), 'money', { show: (x) => has(x.row.rate) && num(x.d.qty) > 0 }), T('delivery', L('সরবরাহের সময়', 'Delivery time')), N('credit', L('বাকির সময় (দিন)', 'Credit period (days)')),
         T('quality', L('মান / আগের অভিজ্ঞতা', 'Quality / earlier experience'), { wide: true })], { min: 3 }),
       CALC('lowest', L('সবচেয়ে কম দর ৳', 'Lowest rate ৳'), 'text')] },
     { title: L('নির্বাচিত সাপ্লায়ার', 'Selected supplier'), fields: [
-      T('sel_supplier', L('নির্বাচিত সাপ্লায়ার (Selected)', 'Selected supplier'), { req: true }), M('sel_rate', L('দর ৳', 'Rate ৳'), { req: true }),
+      SUP('sel_supplier', L('নির্বাচিত সাপ্লায়ার (Selected)', 'Selected supplier'), { req: true }), M('sel_rate', L('দর ৳', 'Rate ৳'), { req: true }),
       NOTE(L('বেশি দরের সাপ্লায়ার নির্বাচন করলে কারণ লিখতেই হবে।', 'If you pick a supplier with a higher rate, a reason is a must.'), 'warn', { show: (x) => x.v.not_lowest }),
       TA('reason', L('কারণ', 'Reason'), { show: (x) => x.v.not_lowest, req: (x) => x.v.not_lowest }),
       CH('single', L('একটিমাত্র দর নেওয়া হয়েছে?', 'Only one quote taken?'), [['no', L('না', 'No')], ['yes', L('হ্যাঁ', 'Yes')]], { req: true }),
@@ -288,7 +288,7 @@ B.forms['06-2'] = {
 B.forms['06-3'] = {
   title: L('পারচেজ অর্ডার (PO)', 'Purchase order (PO)'),
   head: [T('cs_no', L('সংশ্লিষ্ট কোটেশন তুলনা (CS) নং', 'Related quotation comparison (CS) no.')), T('pr_no', L('পারচেজ রিকুইজিশন (PR) নং', 'Purchase Requisition (PR) no.')),
-    T('supplier', L('সাপ্লায়ার', 'Supplier'), { req: (x) => !x.d.cancel }), T('phone', L('ফোন', 'Phone')), D('delivery_date', L('ডেলিভারির তারিখ (Delivery Date)', 'Delivery date'), { req: (x) => !x.d.cancel }),
+    SUP('supplier', L('সাপ্লায়ার', 'Supplier'), { req: (x) => !x.d.cancel }), T('phone', L('ফোন', 'Phone')), D('delivery_date', L('ডেলিভারির তারিখ (Delivery Date)', 'Delivery date'), { req: (x) => !x.d.cancel }),
     T('place', L('ডেলিভারির স্থান', 'Delivery place')),
     CH('pay', L('পেমেন্ট', 'Payment'), PAYS, { req: (x) => !x.d.cancel }), T('pay_other', L('অন্য — লিখুন', 'Other — write it'), { show: (x) => x.d.pay === 'other', req: (x) => x.d.pay === 'other' && !x.d.cancel }),
     N('credit_days', L('বাকির সময় (দিন)', 'Credit period (days)'), { show: (x) => x.d.pay === 'credit', req: (x) => x.d.pay === 'credit' && !x.d.cancel })],
@@ -331,7 +331,7 @@ B.forms['06-3'] = {
 const BILLPAYS = [['cash', L('নগদ', 'Cash')], ['bank', L('ব্যাংক', 'Bank')], ['cheque', L('চেক', 'Cheque')], ['mobile', L('মোবাইল', 'Mobile')], ['owner', L('মালিকের ব্যক্তিগত', "Owner's personal money")], ['other', L('অন্য', 'Other')]];
 B.forms['06-4'] = {
   title: L('বিল যাচাই ও পেমেন্ট অনুরোধ', 'Bill check & payment request'),
-  head: [T('supplier', L('সাপ্লায়ার', 'Supplier'), { req: true }), T('bill_no', L('সাপ্লায়ারের বিল নং', "Supplier's bill no."), { req: true }), D('bill_date', L('বিলের তারিখ', 'Bill date'), { req: true }), M('bill_amount', L('বিলের অঙ্ক ৳', 'Bill amount ৳'), { req: true })],
+  head: [SUP('supplier', L('সাপ্লায়ার', 'Supplier'), { req: true }), T('bill_no', L('সাপ্লায়ারের বিল নং', "Supplier's bill no."), { req: true }), D('bill_date', L('বিলের তারিখ', 'Bill date'), { req: true }), M('bill_amount', L('বিলের অঙ্ক ৳', 'Bill amount ৳'), { req: true })],
   sections: [
     { title: L('তিন কাগজ মিলিয়ে দেখা', 'Three papers matched'), fields: [
       NOTE(L('তিন কাগজ মিলতেই হবে — পারচেজ অর্ডার · মালামাল গ্রহণ রসিদ · সাপ্লায়ারের বিল। একটিতেও গরমিল থাকলে পেমেন্ট আটকে থাকবে।', 'The three papers must match: purchase order, goods received note, supplier bill. If any one differs, payment stays held.'), 'warn'),
@@ -383,7 +383,7 @@ B.forms['06-4'] = {
 /* ============ 06-5 · Supplier ledger (one page per supplier) ============ */
 B.forms['06-5'] = {
   title: L('সাপ্লায়ার লেজার', 'Supplier ledger'),
-  head: [T('page_no', L('পাতা নং', 'Page no.')), ST('keeper', L('হিসাবরক্ষক (Ledger Keeper)', 'Ledger keeper')), T('supplier', L('সাপ্লায়ারের নাম', 'Supplier name'), { req: true }), T('items', L('সরবরাহের আইটেম (Items Supplied)', 'Items supplied')),
+  head: [T('page_no', L('পাতা নং', 'Page no.')), ST('keeper', L('হিসাবরক্ষক (Ledger Keeper)', 'Ledger keeper')), SUP('supplier', L('সাপ্লায়ারের নাম', 'Supplier name'), { req: true }), T('items', L('সরবরাহের আইটেম (Items Supplied)', 'Items supplied')),
     CH('kind', L('ধরন', 'Type'), [['supplier', L('সাপ্লায়ার', 'Supplier')], ['outside', L('বাইরের সোর্সিং', 'Outside sourcing')], ['other', L('অন্য', 'Other')]]),
     T('kind_other', L('অন্য — লিখুন', 'Other — write it'), { show: (x) => x.d.kind === 'other' }),
     T('phone', L('ফোন', 'Phone')), T('address', L('ঠিকানা', 'Address')), N('credit_days', L('বাকির সময় (দিন)', 'Credit period (days)')),

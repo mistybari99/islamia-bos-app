@@ -10,6 +10,9 @@ const norm = (v) => String(v ?? '').replace(/[০-৯]/g, (d) => '০১২৩�
 const LISTS = {
   expense_heads: { title: L('খরচের খাত (ব্যয় ভাউচার)', 'Expense heads (expense voucher)', 'খরচের খাত (Expense voucher)'), extra: [] },
   marketing_heads: { title: L('মার্কেটিং খাত ও মাসিক সীমা', 'Marketing heads and monthly limit', 'Marketing খাত ও মাসিক limit'), extra: [{ key: 'limit_month', label: L('মাসের সীমা (৳)', 'Monthly limit (৳)', 'মাসের Limit (৳)'), kind: 'number' }] },
+  item_categories: { title: L('পণ্যের ক্যাটাগরি', 'Product categories', 'Product Category'), extra: [] },
+  item_subcategories: { title: L('পণ্যের সাব-ক্যাটাগরি', 'Product sub-categories', 'Product Sub-category'), extra: [] },
+  units: { title: L('একক (কেজি, পিস, বক্স…)', 'Units (kg, piece, box…)', 'Unit (kg, piece, box…)'), extra: [] },
   wallets: { title: L('মোবাইল পেমেন্ট মাধ্যম (বিকাশ, নগদ…)', 'Mobile payment services (bKash, Nagad…)', 'Mobile payment মাধ্যম (bKash, Nagad…)'), extra: [] },
 };
 const X = {

@@ -44,7 +44,7 @@ B.num = num; B.has = has; B.sum = sum;
 // ---------- field builders (used by forms.js) ----------
 const fld = (type) => (id, label, o = {}) => ({ id, type, label, ...o });
 B.f = { T: fld('text'), TA: fld('textarea'), N: fld('number'), M: fld('money'), TM: fld('time'), D: fld('date'), CK: fld('ck'), ST: fld('staff'),
-  ITEM: fld('item'), LOC: fld('loc'), DEN: fld('denoms'), PHOTO: fld('photo'),
+  ITEM: fld('item'), LOC: fld('loc'), DEN: fld('denoms'), PHOTO: fld('photo'), SUP: fld('supplier'),
   CH: (id, label, options, o = {}) => ({ id, type: 'choice', label, options, ...o }),
   SEL: (id, label, options, o = {}) => ({ id, type: 'select', label, options, ...o }),
   CALC: (id, label, fm, o = {}) => ({ id, type: 'calc', label, fmt: fm || 'num', ...o }),
@@ -89,14 +89,22 @@ B.SETTING_DEFS = [
 B.GROUPS = { A: L('টাকা ও সীমা', 'Cash & limits'), B: L('সময় ও জায়গা', 'Time & place'), C: L('পণ্য ও সংরক্ষণ', 'Products & storage'), F: L('ক্রয় ও কাউন্ট', 'Purchase & count') };
 
 // ---------- environment (settings, items, staff, locations) ----------
-const ENV = { staff: null, items: null, locs: null, byLoc: {}, lists: null, rules: null, grantDefs: null };
+const ENV = { staff: null, items: null, locs: null, byLoc: {}, lists: null, rules: null, grantDefs: null, sup: null, supManage: false };
 async function loadStatic() {
   if (!ENV.staff) { const r = await sb.rpc('staff_directory'); ENV.staff = r.data || []; }
   if (!ENV.items) { const r = await sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,sell_price,is_active').order('code'); ENV.items = r.data || []; ENV.byCode = new Map(ENV.items.map((i) => [i.code, i])); }
   if (!ENV.locs) { const r = await sb.from('locations').select('*').order('sort'); ENV.locs = r.data || []; }
   if (!ENV.lists) await loadLists();
   if (!ENV.rules) await loadRules();
+  if (!ENV.sup) await loadSuppliers();
 }
+// supplier picker (forms): active suppliers by name only (supplier_pick); unknown function or no table = empty list, free text still works
+async function loadSuppliers() {
+  ENV.sup = []; ENV.supManage = false;
+  try { const r = await sb.rpc('supplier_pick'); ENV.sup = !r.error && Array.isArray(r.data) ? r.data : []; } catch (e) { /* free text only */ }
+  try { const g = await sb.rpc('has_grant', { p_code: 'supplier_manage' }); ENV.supManage = !!(S.ctx.is_owner || (g && !g.error && g.data === true)); } catch (e) { ENV.supManage = !!S.ctx.is_owner; }
+}
+B.reloadSuppliers = async () => { ENV.sup = null; await loadSuppliers(); };
 // business rules (Rules page): the server enforces them; the app reads them only to guide the screen
 async function loadRules() {
   const [r, g] = await Promise.all([sb.from('rules').select('*').order('sort'), sb.from('grant_defs').select('*').order('sort')]);
@@ -153,6 +161,9 @@ const curVal = (fd, path, w) => getp(w === 'c' ? E.check : E.data, path);
 const optsOf = (fd) => (typeof fd.options === 'function' ? fd.options() : fd.options);
 function optsHTML(options, cur, code) { if (cur && code && !options.some((o) => o[0] === cur)) { const old = ((ENV.lists && ENV.lists[code]) || []).find((x) => x.value_code === cur); if (old) options = [...options, [old.value_code, rowL(old)]]; } return options.map(([v, l]) => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(lab(l))}</option>`).join(''); }
 
+const SUPX = { ph: L('সাপ্লায়ার বাছুন বা লিখুন', 'Pick or type a supplier', 'Supplier বাছুন বা লিখুন'), add: L('নতুন সাপ্লায়ার', 'New supplier', 'নতুন Supplier'),
+  listed: L('তালিকার সাপ্লায়ার ✓', 'Listed supplier ✓', 'তালিকার Supplier ✓'), free: L('তালিকায় নেই — লেখা নামই থাকবে', 'Not in the list — the typed name is kept', 'তালিকায় নেই — typed নামই থাকবে'),
+  title: L('নতুন সাপ্লায়ার', 'New supplier', 'নতুন Supplier'), name: L('নাম', 'Name', 'নাম'), mobile: L('মোবাইল (ঐচ্ছিক)', 'Mobile (optional)', 'Mobile (ঐচ্ছিক)'), save: L('সংরক্ষণ', 'Save', 'Save'), need: L('নাম লিখুন', 'Enter the name', 'নাম লিখুন') };
 function inputHTML(fd, path, w, ed) {
   const val = curVal(fd, path, w), a = `data-w="${w}" data-p="${esc(path)}" ${ed ? '' : 'disabled'}`;
   switch (fd.type) {
@@ -167,6 +178,8 @@ function inputHTML(fd, path, w, ed) {
     case 'staff': return `<select ${a}><option value=""></option>${ENV.staff.map((s) => `<option value="${esc(s.staff_id)}" ${s.staff_id === val ? 'selected' : ''}>${esc(s.full_name || s.staff_id)} · ${esc(s.staff_id)}</option>`).join('')}</select>`;
     case 'loc': return `<select ${a}><option value=""></option>${ENV.locs.map((l) => `<option value="${l.id}" ${String(l.id) === String(val) ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}<option value="other" ${val === 'other' ? 'selected' : ''}>${esc(t('other'))}</option></select>`;
     case 'item': { const it = ENV.byCode && ENV.byCode.get(val); return `<input ${a} data-item="1" list="dl_items" placeholder="${esc(t('item_pick'))}" value="${esc(it ? it.code + ' · ' + nm(it) : (val || ''))}" autocomplete="off">`; }
+    case 'supplier': { const sid = getp(w === 'c' ? E.check : E.data, path + '_id'); const known = sid && ENV.sup.some((x) => x.id === sid);
+      return `<div class="supwrap"><input ${a} data-sup="1" list="dl_sup" placeholder="${esc(lab(SUPX.ph))}" value="${esc(val)}" autocomplete="off">${ed && ENV.supManage ? `<button type="button" class="mini supnew" data-act="sup_new" data-w="${w}" data-p="${esc(path)}" aria-label="${esc(lab(SUPX.add))}">＋</button>` : ''}</div><div class="hint">${val ? esc(lab(known ? SUPX.listed : SUPX.free)) : ''}</div>`; }
     case 'denoms': return `<div class="den">${DENOMS.map((d) => `<label><span>${d}</span><input data-w="${w}" data-p="${esc(path)}.n${d}" data-num="1" inputmode="numeric" ${ed ? '' : 'disabled'} value="${esc(getp(w === 'c' ? E.check : E.data, path + '.n' + d))}"></label>`).join('')}
       <label><span>${esc(t('coins'))} ৳</span><input data-w="${w}" data-p="${esc(path)}.coin" data-num="1" inputmode="decimal" ${ed ? '' : 'disabled'} value="${esc(getp(w === 'c' ? E.check : E.data, path + '.coin'))}"></label></div>`;
     case 'photo': { const arr = Array.isArray(val) ? val : [];
@@ -246,7 +259,7 @@ function draw() {
   const serial = E.serial ? `${E.code}-${(ENV.locs.find((l) => l.id === E.loc) || {}).code || E.loc}-${E.serial}` : t('new_entry');
   const wdv = lab(WD[weekday(E.date)]);
   const tag = E.settings['daytag_' + weekday(E.date)];
-  shell(lab(spec.title), `<datalist id="dl_items">${ENV.items.filter((i) => i.is_active).map((i) => `<option value="${esc(i.code)} · ${esc(nm(i))}"></option>`).join('')}</datalist>
+  shell(lab(spec.title), `<datalist id="dl_sup">${(ENV.sup || []).map((x) => `<option value="${esc(x.name)}"></option>`).join('')}</datalist><datalist id="dl_items">${ENV.items.filter((i) => i.is_active).map((i) => `<option value="${esc(i.code)} · ${esc(nm(i))}"></option>`).join('')}</datalist>
     <div class="entry" id="entry">
     <div class="card panel"><div class="row between"><b class="serial">${esc(serial)}</b><span class="chip ${STATUS_CLS[E.status]}">${esc(t('est_' + E.status))}</span></div>
       <div class="row wrap" style="margin-top:6px"><span class="chip">${esc(locName(E.loc))}</span>
@@ -309,6 +322,8 @@ async function hydratePhotos() {
 function onEdit(e) {
   if (!E) return; const el = e.target; if (!el.dataset || !el.dataset.p || !el.dataset.w) return;
   if (el.dataset.photo) { if (e.type === 'change') addPhoto(el); return; }
+  if (el.dataset.sup) { const o = el.dataset.w === 'c' ? E.check : E.data, name = el.value.trim(), m = ENV.sup.find((x) => x.name.trim().toLowerCase() === name.toLowerCase());
+    setp(o, el.dataset.p, el.value); setp(o, el.dataset.p + '_id', m ? m.id : ''); touch(); refresh(); if (e.type === 'change') { const h = el.closest('.fld') && el.closest('.fld').querySelector('.hint'); if (h) h.textContent = name ? lab(m ? SUPX.listed : SUPX.free) : ''; } return; }
   if (el.dataset.item) { if (e.type !== 'change') return; const code = el.value.split(' · ')[0].trim(); const it = ENV.byCode.get(code); setp(el.dataset.w === 'c' ? E.check : E.data, el.dataset.p, it ? code : ''); el.value = it ? it.code + ' · ' + nm(it) : ''; touch(); refresh(); return; }
   let v = el.type === 'checkbox' ? el.checked : el.value;
   if (el.dataset.num) { v = norm(v); if (v !== el.value) el.value = v; }
@@ -462,7 +477,7 @@ async function drawExceptions(st) {
   const em = new Map((en.data || []).map((x) => [x.id, x]));
   $('#ex_body').innerHTML = r.data.map((x) => { const e = em.get(x.entry_id) || {};
     return `<div class="card stack"><div class="row between"><span class="chip ${x.level === 'red' ? 'bad' : 'warn'}">${x.level === 'red' ? '●' : '▲'} ${esc(x.level)}</span><span class="muted" style="font-size:.82rem">${esc(x.entry_date)} · ${esc(locName(x.location_id))}</span></div>
-      <div><b>${esc(lab(x.text) || x.flag_code)}</b>${x.amount !== null ? ' · ' + esc(money(x.amount)) : ''}</div>
+      <div>${window.BOS.flagChip ? window.BOS.flagChip(x.flag_code) : ''}<b>${esc(lab(x.text) || x.flag_code)}</b>${x.amount !== null ? ' · ' + esc(money(x.amount)) : ''}</div>
       <div class="muted" style="font-size:.85rem">${x.entry_id ? `${esc(x.form_code)}-${esc((ENV.locs.find((l) => l.id === e.location_id) || {}).code || '')}-${e.serial || ''}` : esc(x.form_code)}</div>
       ${x.status === 'open' ? `<div class="row">${x.entry_id ? `<button class="full" data-act="openentry" data-v="${x.entry_id}">${esc(t('open_entry'))}</button>` : `<button class="full" data-act="go" data-v="pos">POS</button>`}<button class="primary full" data-act="ex_resolve" data-v="${x.id}">${esc(t('resolve'))}</button></div>`
         : `<div class="muted" style="font-size:.85rem">${esc(staffName(x.resolved_staff))} · ${esc(x.resolved_note || '')}</div>`}</div>`; }).join('') || `<p class="muted center">${esc(t('ex_none'))}</p>`;
@@ -530,6 +545,12 @@ async function saveLocSetting(key) {
 
 // ---------- handlers ----------
 Object.assign(A.H, {
+  sup_new: (a) => { E.supT = { w: a.dataset.w, p: a.dataset.p }; openSheet(`<h2>${esc(lab(SUPX.title))}</h2><div class="stack"><div><label>${esc(lab(SUPX.name))}</label><input id="sn_name" autocomplete="off"></div><div><label>${esc(lab(SUPX.mobile))}</label><input id="sn_mob" inputmode="tel"></div>
+    <div class="row"><button class="full" data-act="closesheet">${esc(t('cancel'))}</button><button class="primary full" data-act="sup_save">${esc(lab(SUPX.save))}</button></div></div>`); },
+  sup_save: async () => { const name = ($('#sn_name').value || '').trim(), mob = ($('#sn_mob').value || '').trim(); if (!name) return toast(lab(SUPX.need));
+    const patch = { name }; if (mob) patch.mobile = mob; const r = await sb.rpc('save_supplier', { p_id: null, p_patch: patch }); if (r.error) return fail(r.error);
+    ENV.sup = (ENV.sup || []).concat([{ id: r.data, name, type_code: null }]); const T0 = E.supT; if (T0) { const o = T0.w === 'c' ? E.check : E.data; setp(o, T0.p, name); setp(o, T0.p + '_id', r.data); touch(); }
+    closeSheet(); const sc = window.scrollY; draw(); window.scrollTo(0, sc); },
   openform: (a) => { location.hash = '#/form/' + a.dataset.v; },
   newentry: (a) => { location.hash = '#/entry/new/' + a.dataset.v + '/' + S.formLoc; },
   openentry: (a) => { location.hash = '#/entry/' + a.dataset.v; },
