@@ -21,6 +21,7 @@ const X = {
   due: L('আজ বাকিতে', 'On credit today', 'Today Due (বাকি)'), disc: L('আজ ডিসকাউন্ট', 'Discount today', 'Today Discount'),
   perloc: L('লোকেশন অনুযায়ী', 'By location', 'By Location'), cash: L('নগদ', 'Cash', 'Cash'), mobile: L('মোবাইল', 'Mobile', 'Mobile'), card: L('কার্ড', 'Card', 'Card'), duem: L('বাকি', 'Due', 'Due'),
   gaps: L('ছাপা নম্বরে ফাঁক (কাগজ বাদ পড়েছে?)', 'Gaps in printed numbers (missing paper?)', 'ছাপা number এ ফাঁক (কাগজ বাদ?)'), gapt: L('নম্বরের ফাঁক-অডিট', 'Number gap audit', 'Number ফাঁক-Audit'), nogap: L('এখন কোনো ফাঁক নেই ✓', 'No gaps right now ✓', 'এখন কোনো ফাঁক নেই ✓'), missing: L('বাদ পড়া নম্বর', 'Missing numbers', 'বাদ পড়া numbers'), gaphint: L('ছাপা নম্বর ধরে: ফাঁক মানে ওই নম্বরের কাগজ এখনও অ্যাপে ওঠেনি বা হারিয়ে গেছে। কাগজের বই খুঁজে দেখুন।', 'By printed number: a gap means that paper was never entered or is lost. Check the paper book.', 'ছাপা number ধরে: ফাঁক মানে ওই কাগজ app এ ওঠেনি বা হারিয়েছে। কাগজের বই খুঁজে দেখুন।'),
+  duetotal: L('গ্রাহকদের কাছে মোট বাকি', 'Total owed by customers', 'Customer দের কাছে মোট Due'),
   open: L('খুলুন', 'Open', 'Open'), title: L('অনুমোদনের অপেক্ষায়', 'Awaiting approval', 'Approval এর অপেক্ষায়'), none: L('অপেক্ষায় কিছু নেই', 'Nothing waiting', 'অপেক্ষায় কিছু নেই'),
 };
 const T = (k) => lab(X[k]);
@@ -36,7 +37,7 @@ async function render() {
   const td = dhaka(), from = addDays(td, -6);
   await B.loadStatic();
   const q = (x) => x.then((r) => (r && r.error ? { data: null, count: 0 } : r), () => ({ data: null, count: 0 }));
-  const [ex, rel, stf, itm, sub, dr, sales, sheets, ls, gaps] = await Promise.all([
+  const [ex, rel, stf, itm, sub, dr, sales, sheets, ls, gaps, pays, dues] = await Promise.all([
     anyApprove ? q(sb.from('exceptions').select('level').eq('status', 'open')) : { data: [] },
     owner ? q(sb.from('release_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')) : { count: 0 },
     owner ? q(sb.from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'pending')) : { count: 0 },
@@ -47,10 +48,12 @@ async function render() {
     (owner || (perms['14-1'] && perms['14-1'].view)) ? q(sb.from('entries').select('location_id,status').eq('form_code', '14-1').eq('entry_date', td).neq('status', 'draft')) : { data: null },
     owner ? q(sb.from('location_settings').select('location_id,value')) : { data: null },
     anyApprove ? q(sb.rpc('number_audit_summary')) : { data: null },
+    canPos ? q(sb.rpc('payments_summary', { p_from: td })) : { data: null },
+    canPos ? q(sb.rpc('customer_dues')) : { data: null },
   ]);
   const reds = (ex.data || []).filter((x) => x.level === 'red').length, yel = (ex.data || []).filter((x) => x.level === 'yellow').length;
   const mineToApprove = (sub.data || []).filter((e) => owner || (perms[e.form_code] && perms[e.form_code].approve)).length;
-  const sd = (sales.data || []).map((r) => ({ ...r, total: Number(r.total || 0), discount: Number(r.discount || 0), n: Number(r.n || 0) }));
+  const sd = (sales.data || []).map((r) => ({ ...r, total: Number(r.total || 0), discount: Number(r.discount || 0), n: Number(r.n || 0), due: Number(r.due || 0) }));
   const sToday = sd.filter((s) => s.sale_date === td && s.status === 'done'), voids = sd.filter((s) => s.sale_date === td && s.status === 'void').reduce((a, r) => a + r.n, 0);
   const sum = (a, k = 'total') => a.reduce((s, x) => s + Number(x[k] || 0), 0);
   const cnt = (a) => a.reduce((s, x) => s + x.n, 0);
@@ -71,11 +74,13 @@ async function render() {
     const y = sum(sd.filter((s) => s.sale_date === addDays(td, -1) && s.status === 'done'));
     const days = Array.from({ length: 7 }, (_, i) => addDays(td, i - 6)).map((d) => [d, sum(sd.filter((s) => s.sale_date === d && s.status === 'done'))]);
     const mx = Math.max(1, ...days.map((d) => d[1]));
-    const mode = (m) => sum(sToday.filter((s) => s.pay_mode === m));
+    const payMode = (m) => (pays.data || []).filter((x) => x.mode === m && x.pay_date === td).reduce((s, x) => s + Number(x.total), 0);
+    const dueToday = sum(sToday, 'due'), dueAll = (dues.data || []).reduce((s, c) => s + Number(c.balance || 0), 0);
     html += `<div class="card panel dash"><h3>${esc(T('numbers'))}</h3>
       <div class="plate"><div class="pl-k">${esc(T('sales'))}</div><div class="pl-v"><span class="cur">৳</span>${fmt(sum(sToday))}</div>
         <div class="pl-s">${cnt(sToday)} ${esc(T('count'))} · ${esc(T('yday'))} ${money(y)}</div></div>
-      <div class="row wrap" style="margin:8px 0">${['cash', 'mobile', 'card', 'due'].map((m) => `<span class="chip">${esc(T(m === 'due' ? 'duem' : m))} ${money(mode(m))}</span>`).join('')}</div>
+      <div class="row wrap" style="margin:8px 0">${['cash', 'mobile', 'card'].map((m) => `<span class="chip">${esc(T(m))} ${money(payMode(m))}</span>`).join('')}<span class="chip warn">${esc(T('duem'))} ${money(dueToday)}</span></div>
+      ${dueAll > 0 ? `<div class="row between" data-act="go" data-v="dues" style="cursor:pointer"><span>${esc(T('duetotal'))}</span><b>${money(dueAll)} ›</b></div>` : ''}
       ${sum(sToday, 'discount') ? `<div class="muted">${esc(T('disc'))}: ${money(sum(sToday, 'discount'))}</div>` : ''}
       ${locs.length > 1 ? `<div class="muted" style="margin-top:8px">${esc(T('perloc'))}</div>${locs.map((l) => `<div class="row between"><span>${esc(nm(l))}</span><b>${money(sum(sToday.filter((s) => s.location_id === l.id)))}</b></div>`).join('')}` : ''}
       <div class="muted" style="margin-top:10px">${esc(T('week'))}</div>

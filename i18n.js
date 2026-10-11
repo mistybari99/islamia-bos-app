@@ -6,6 +6,7 @@ window.BOS_T = {
   photo_up: { bn: "ছবি পাঠানো হচ্ছে…", mix: "Photo পাঠানো হচ্ছে…", en: "Uploading photo…" },
   biz: { bn: "ব্যবসার হিসাব", mix: "ব্যবসার Analysis", en: "Business analysis" },
   numaudit: { bn: "নম্বরের ফাঁক-অডিট", mix: "Number ফাঁক-Audit", en: "Number gap audit" },
+  dues: { bn: "বাকি ও গ্রাহক", mix: "Due ও Customer", en: "Dues & customers" },
   lang_bn: { bn: "বাংলা", mix: "বাংলা", en: "বাংলা" },
   lang_mix: { bn: "Bng-Eng", mix: "Bng-Eng", en: "Bng-Eng" },
   lang_en: { bn: "English", mix: "English", en: "English" },

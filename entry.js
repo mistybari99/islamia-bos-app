@@ -8,7 +8,29 @@ const $ = (s, el = document) => el.querySelector(s);
 
 // ---------- language helpers ----------
 const MIXWORDS = [["রিকনসিলিয়েশন","Reconciliation"],["ইনভয়েস","Invoice"],["রেজিস্টার","Register"],["লেজার","Ledger"],["ভাউচার","Voucher"],["স্লিপ","Slip"],["কার্ড","Card"],["শিট","Sheet"],["ফরম","Form"],["রিপোর্ট","Report"],["ক্যাশ","Cash"],["স্টক","Stock"],["স্টোর","Store"],["ডিসকাউন্ট","Discount"],["রিটার্ন","Return"],["অর্ডার","Order"],["পেমেন্ট","Payment"],["ডিজিটাল","Digital"],["বাজেট","Budget"],["হ্যান্ডওভার","Handover"],["ট্রান্সফার","Transfer"],["চালান","Challan"],["শোরুম","Showroom"],["ডেলিভারি","Delivery"],["অনলাইন","Online"],["সাপ্লায়ার","Supplier"],["পারচেজ","Purchase"],["প্রোডাক্ট","Product"],["কারখানা","Factory"],["অ্যাডভান্স","Advance"],["স্টাফ","Staff"],["ডিউটি","Duty"],["লোকেশন","Location"],["সেটিংস","Settings"],["নোট","Note"],["পার্টি","Party"],["কাউন্টার","Counter"],["রেকর্ড","Record"],["কাউন্ট","Count"],["শিফট","Shift"],["রসিদ","Receipt"],["ইস্যু","Issue"],["মালামাল","Goods"],["অনুমোদনকারী","Approver"],["অনুমোদন","Approval"],["ব্যয়","Expense"],["যাচাই","Check"],["তাপমাত্রা","Temperature"],["সীমা","Limit"],["পার্থক্য","Difference"],["গণনা","Count"],["নগদ","Cash"],["মোট","Total"],["ইমপ্রেস্ট","Imprest"],["টাকা","Taka"],["পরিমাণ","Quantity"],["একক","Unit"],["গ্রেড","Grade"],["সময়","Time"],["তারিখ","Date"],["স্বাক্ষর","Signature"],["চাহিদা","Demand"],["সাক্ষী","Witness"],["কম / বেশি","Short / Over"]];
-const toMix = (bn) => { let o = bn; for (const [b, e] of [...MIXWORDS].sort((a, z) => z[0].length - a[0].length)) o = o.split(b).join(e); return o; };
+// Bng-Eng: swap a Bangla word for its everyday English word only at a word edge. If a Bangla ending follows (কাউন্টের),
+// join it with a hyphen as an independent letter (Count-এর) so nothing renders as a broken mark. Unknown endings leave the Bangla word alone.
+const SUFFIX = { 'ের': '-এর', 'র': '-র', 'কে': '-কে', 'তে': '-তে', 'এ': '-এ', 'ে': '-এ', 'য়ে': '-এ', 'য়ের': '-এর', 'গুলো': '-গুলো', 'গুলি': '-গুলি', 'টি': '-টি', 'টা': '-টা', 'ও': '-ও' };
+const BNL = /[\u0980-\u09FF]/;
+const MIXSORTED = [...MIXWORDS].sort((a, z) => z[0].length - a[0].length);
+const toMix = (bn) => {
+  let out = '', i = 0;
+  while (i < bn.length) {
+    let hit = null;
+    if (!i || !BNL.test(bn[i - 1])) {
+      for (const [b, e] of MIXSORTED) {
+        if (!bn.startsWith(b, i)) continue;
+        let j = i + b.length, k = j;
+        while (k < bn.length && BNL.test(bn[k])) k++;
+        const suf = bn.slice(j, k);
+        if (!suf) { hit = [e, j]; break; }
+        if (SUFFIX[suf]) { hit = [e + SUFFIX[suf], k]; break; }
+      }
+    }
+    if (hit) { out += hit[0]; i = hit[1]; } else { out += bn[i]; i++; }
+  }
+  return out;
+};
 const lab = (x) => !x ? '' : typeof x === 'string' ? x : S.lang === 'en' ? (x.en || x.bn) : S.lang === 'mix' ? (x.mix || toMix(x.bn || '')) : (x.bn || x.en);
 const L = (bn, en, mix) => ({ bn, en, mix });
 B.L = L; B.lab = lab;
