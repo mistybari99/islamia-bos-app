@@ -27,7 +27,7 @@ B.forms['10-2'] = {
   head: [TM('time', L('সময়', 'Time')), T('sheet_no', L('দৈনিক শোরুম শিট নং', 'Daily showroom sheet no.'))],
   sections: [
     { title: L('খরচের তালিকা (ইমপ্রেস্ট থেকে)', 'Expenses (from the imprest)'), fields: [
-      TABLE('lines', null, [SEL('head', L('খরচের খাত', 'Expense head'), HEADS, { req: true, wide: true }), T('to', L('কার কাছে / কী বাবদ', 'Paid to / for'), { wide: true }),
+      TABLE('lines', null, [SEL('head', L('খরচের খাত', 'Expense head'), B.opts('expense_heads', HEADS), { req: true, wide: true, list: 'expense_heads' }), T('to', L('কার কাছে / কী বাবদ', 'Paid to / for'), { wide: true }),
         CH('receipt', L('রসিদ সংযুক্ত', 'Receipt attached'), YN, { req: true }), M('amount', L('টাকা', 'Amount'), { req: true })], { min: 3 }),
       CALC('total', L('মোট', 'Total'), 'money', { big: true })] },
     { title: L('সীমা ও রসিদ', 'Limit & receipts'), fields: [

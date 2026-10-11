@@ -88,12 +88,22 @@ B.SETTING_DEFS = [
 B.GROUPS = { A: L('টাকা ও সীমা', 'Cash & limits'), B: L('সময় ও জায়গা', 'Time & place'), C: L('পণ্য ও সংরক্ষণ', 'Products & storage'), F: L('ক্রয় ও কাউন্ট', 'Purchase & count') };
 
 // ---------- environment (settings, items, staff, locations) ----------
-const ENV = { staff: null, items: null, locs: null, byLoc: {} };
+const ENV = { staff: null, items: null, locs: null, byLoc: {}, lists: null };
 async function loadStatic() {
   if (!ENV.staff) { const r = await sb.rpc('staff_directory'); ENV.staff = r.data || []; }
   if (!ENV.items) { const r = await sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,sell_price,is_active').order('code'); ENV.items = r.data || []; ENV.byCode = new Map(ENV.items.map((i) => [i.code, i])); }
   if (!ENV.locs) { const r = await sb.from('locations').select('*').order('sort'); ENV.locs = r.data || []; }
+  if (!ENV.lists) await loadLists();
 }
+// editable option lists (expense heads, marketing heads, wallets ...): the owner edits them, forms read them; the code keeps a fallback
+async function loadLists() {
+  const r = await sb.from('option_lists').select('*').order('sort');
+  ENV.lists = {}; (r.error ? [] : r.data || []).forEach((x) => { (ENV.lists[x.list_code] = ENV.lists[x.list_code] || []).push(x); });
+}
+const rowL = (r) => ({ bn: r.label_bn, mix: r.label_mix || undefined, en: r.label_en || undefined });
+B.opts = (code, fallback) => () => { const rows = ENV.lists && ENV.lists[code]; return rows && rows.length ? rows.filter((r) => r.active).map((r) => [r.value_code, rowL(r)]) : fallback; };
+B.optExtra = (code, value) => { const r = ((ENV.lists && ENV.lists[code]) || []).find((x) => x.value_code === value); return r ? r.extra || {} : null; };
+B.reloadLists = async () => { ENV.lists = null; await loadLists(); };
 async function locSettings(loc, fresh) {
   if (!fresh && ENV.byLoc[loc]) return ENV.byLoc[loc];
   const r = await sb.from('location_settings').select('key,value').eq('location_id', loc);
@@ -130,7 +140,8 @@ function flagsOf(src) { return E.calc.flags.filter((f) => (src === 'check' ? f.s
 // ---------- rendering ----------
 const modeEditable = (fd) => (E.mode === 'edit' && (fd.who || 'maker') === 'maker') || (E.mode === 'check' && fd.who === 'checker');
 const curVal = (fd, path, w) => getp(w === 'c' ? E.check : E.data, path);
-function optsHTML(options, cur) { return options.map(([v, l]) => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(lab(l))}</option>`).join(''); }
+const optsOf = (fd) => (typeof fd.options === 'function' ? fd.options() : fd.options);
+function optsHTML(options, cur, code) { if (cur && code && !options.some((o) => o[0] === cur)) { const old = ((ENV.lists && ENV.lists[code]) || []).find((x) => x.value_code === cur); if (old) options = [...options, [old.value_code, rowL(old)]]; } return options.map(([v, l]) => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(lab(l))}</option>`).join(''); }
 
 function inputHTML(fd, path, w, ed) {
   const val = curVal(fd, path, w), a = `data-w="${w}" data-p="${esc(path)}" ${ed ? '' : 'disabled'}`;
@@ -141,8 +152,8 @@ function inputHTML(fd, path, w, ed) {
     case 'time': return `<input type="time" ${a} value="${esc(val)}">`;
     case 'date': return `<input type="date" ${a} value="${esc(val)}">`;
     case 'ck': return `<label class="ckrow"><input type="checkbox" ${a} ${val ? 'checked' : ''}><span>${esc(lab(fd.label))}${fd.req ? ' <b class="req">*</b>' : ''}</span></label>`;
-    case 'choice': return `<div class="row wrap">${fd.options.map(([v, l]) => `<button type="button" class="tog ${val === v ? 'on' : ''}" ${ed ? '' : 'disabled'} data-act="pick" ${a} data-v="${esc(v)}">${esc(lab(l))}</button>`).join('')}</div>`;
-    case 'select': return `<select ${a}><option value=""></option>${optsHTML(fd.options, val)}</select>`;
+    case 'choice': return `<div class="row wrap">${optsOf(fd).map(([v, l]) => `<button type="button" class="tog ${val === v ? 'on' : ''}" ${ed ? '' : 'disabled'} data-act="pick" ${a} data-v="${esc(v)}">${esc(lab(l))}</button>`).join('')}</div>`;
+    case 'select': return `<select ${a}><option value=""></option>${optsHTML(optsOf(fd), val, fd.list)}</select>`;
     case 'staff': return `<select ${a}><option value=""></option>${ENV.staff.map((s) => `<option value="${esc(s.staff_id)}" ${s.staff_id === val ? 'selected' : ''}>${esc(s.full_name || s.staff_id)} · ${esc(s.staff_id)}</option>`).join('')}</select>`;
     case 'loc': return `<select ${a}><option value=""></option>${ENV.locs.map((l) => `<option value="${l.id}" ${String(l.id) === String(val) ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}<option value="other" ${val === 'other' ? 'selected' : ''}>${esc(t('other'))}</option></select>`;
     case 'item': { const it = ENV.byCode && ENV.byCode.get(val); return `<input ${a} data-item="1" list="dl_items" placeholder="${esc(t('item_pick'))}" value="${esc(it ? it.code + ' · ' + nm(it) : (val || ''))}" autocomplete="off">`; }
@@ -463,16 +474,41 @@ async function viewReleases() {
 }
 
 // ---------- location settings (owner) ----------
+// repeated settings are shown as ONE compact table instead of a long repeated list
+const FAMILIES = {
+  fridge: { title: L('ফ্রিজ / চিলার — নাম ও তাপমাত্রার সীমা', 'Fridges / chillers — name and temperature limits', 'Fridge / Chiller — নাম ও Temperature limit'), group: 'C', rows: [1, 2, 3], re: /^fridge(\d)_(name|min|max)$/,
+    cols: [['name', L('নাম', 'Name'), 'text'], ['min', L('সর্বনিম্ন °C', 'Min °C'), 'number'], ['max', L('সর্বোচ্চ °C', 'Max °C'), 'number']], key: (i, c) => 'fridge' + i + '_' + c, rowLabel: (i) => L('ফ্রিজ / চিলার ' + i, 'Fridge / chiller ' + i) },
+  daytag: { title: L('বারের ট্যাগ (দিনের রং)', 'Day tags (colour of the day)', 'বারের Tag (দিনের রং)'), group: 'C', rows: [0, 1, 2, 3, 4, 5, 6], re: /^daytag_(\d)$/,
+    cols: [['', L('ট্যাগ / রং', 'Tag / colour'), 'text']], key: (i) => 'daytag_' + i, rowLabel: (i) => L(['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'][i], ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][i]) },
+};
+const famOf = (key) => Object.keys(FAMILIES).find((f) => FAMILIES[f].re.test(key));
+function famHTML(f, m) {
+  const F = FAMILIES[f];
+  return `<div class="card stack"><b>${esc(lab(F.title))}</b>${F.rows.map((i) => `<div class="perm"><div><b>${esc(lab(F.rowLabel(i)))}</b></div><div class="row wrap">${F.cols.map(([c, l, kind]) => {
+      const key = F.key(i, c), v = m[key];
+      return `<div style="flex:1;min-width:110px"><label>${esc(lab(l))}</label><input id="lv_${key}" ${kind === 'number' ? 'inputmode="decimal"' : ''} value="${esc(v === null || v === undefined ? '' : v)}"></div>`; }).join('')}</div></div>`).join('')}
+    <button class="primary full" data-act="ls_savefam" data-v="${f}">${esc(t('save'))}</button></div>`;
+}
 async function viewLocSet() {
   await ensureLoaded();
   const locs = ENV.locs; if (!S.lsLoc) S.lsLoc = locs[0].id;
   shell(t('locset'), `<div class="notice warn">${esc(t('locset_hint'))}</div><select id="ls_loc">${locs.map((l) => `<option value="${l.id}" ${l.id === S.lsLoc ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select><div id="ls_body"><p class="muted">${esc(t('loading'))}</p></div>`, true);
   const m = await locSettings(S.lsLoc, true);
-  $('#ls_body').innerHTML = Object.keys(B.GROUPS).map((g) => `<h2>${esc(lab(B.GROUPS[g]))}</h2>` + B.SETTING_DEFS.filter((d) => d.group === g).map((d) => {
+  $('#ls_body').innerHTML = Object.keys(B.GROUPS).map((g) => `<h2>${esc(lab(B.GROUPS[g]))}</h2>` + Object.keys(FAMILIES).filter((f) => FAMILIES[f].group === g).map((f) => famHTML(f, m)).join('') + B.SETTING_DEFS.filter((d) => d.group === g && !d.hidden && !famOf(d.key)).map((d) => {
     const v = m[d.key];
     return `<div class="card stack"><div class="row between"><b>${esc(lab(d.label))}</b>${v === null || v === undefined ? `<span class="chip warn">${esc(t('need_data'))}</span>` : ''}</div>
       <div class="row"><input id="lv_${d.key}" ${d.kind === 'time' ? 'type="time"' : d.kind === 'number' ? 'inputmode="decimal"' : ''} value="${esc(v === null || v === undefined ? '' : v)}">${d.unit ? `<span class="muted">${esc(d.unit)}</span>` : ''}
       <button class="primary" data-act="ls_save" data-v="${d.key}">${esc(t('save'))}</button></div></div>`; }).join('')).join('');
+}
+async function saveFamily(f) {
+  const F = FAMILIES[f], rows = [];
+  for (const i of F.rows) for (const [c, , kind] of F.cols) {
+    const key = F.key(i, c), raw = norm(($('#lv_' + key).value || '').trim()); let v = null;
+    if (raw !== '') { if (kind === 'number') { v = Number(raw); if (!Number.isFinite(v)) return toast(t('err_price')); } else v = raw; }
+    rows.push({ location_id: S.lsLoc, key, value: v, updated_by: S.ctx.profile.id, updated_at: new Date().toISOString() });
+  }
+  const { error } = await sb.from('location_settings').upsert(rows, { onConflict: 'location_id,key' });
+  if (error) return fail(error); delete ENV.byLoc[S.lsLoc]; toast(t('saved')); viewLocSet();
 }
 async function saveLocSetting(key) {
   const d = B.SETTING_DEFS.find((x) => x.key === key); let raw = norm(($('#lv_' + key).value || '').trim()), v = null;
@@ -503,6 +539,7 @@ Object.assign(A.H, {
   ex_resolve: (a) => askNote(t('resolve'), async (n) => { const { error } = await sb.rpc('resolve_exception', { p_id: Number(a.dataset.v), p_note: n }); if (error) return fail(error); toast(t('saved')); drawExceptions($('#ex_st').value); }),
   rl_decide: async (a) => { const id = Number(a.dataset.v), ok = a.dataset.ok === '1'; const { error } = await sb.rpc('decide_release', { p_id: id, p_approve: ok, p_note: ($('#rn_' + id).value || '').trim() || null }); if (error) return fail(error); toast(t('saved')); viewReleases(); },
   ls_save: (a) => saveLocSetting(a.dataset.v),
+  ls_savefam: (a) => saveFamily(a.dataset.v),
 });
 window.BOS_PAGES = { form: viewFormList, entry: viewEntry, exceptions: viewExceptions, releases: viewReleases, locset: viewLocSet };
 B.ENV = ENV; B.loadStatic = loadStatic;

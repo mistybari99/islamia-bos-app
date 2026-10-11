@@ -39,6 +39,7 @@ function fail(e) {
   console.error(e);
   const m = (e && e.message) || '';
   if (/at least one active owner/.test(m)) return toast('কমপক্ষে একজন সক্রিয় মালিক থাকতে হবে / At least one active owner is required');
+  if (/period_closed/.test(m)) return toast('এই তারিখের হিসাব বন্ধ — শুধু মালিক বদলাতে পারবেন / This date is closed — only the owner can change it');
   if (/entries_paper_no_uq/.test(m)) return toast('এই ছাপা নম্বর আগেই নেওয়া হয়েছে / This printed number was already entered');
   if (/permission|row-level|denied/i.test(m)) return toast(t('err_perm'));
   toast(t('err_generic') + (m ? ' · ' + m.slice(0, 80) : ''));
@@ -63,6 +64,7 @@ function closeSheet() { const d = $('#sheet'); if (d) d.remove(); }
 const tog = (on, act, attrs = '', label) => `<button class="tog ${on ? 'on' : ''}" data-act="${act}" ${attrs}>${esc(label || (on ? t('on') : t('off')))}</button>`;
 
 const ICON = {
+  lists: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M11 8h16M11 16h16M11 24h16"/><path d="M4.5 8h2M4.5 16h2M4.5 24h2" stroke-width="3.4"/></svg>',
   dues: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="11" r="5"/><path d="M6 27c1-6 5-9 10-9s9 3 10 9"/><path d="M22 6h5M24.5 3.5v5" stroke-width="2"/></svg>',
   numaudit: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h6M20 8h6M6 16h4M14 16h4M22 16h4M6 24h6M20 24h6"/></svg>',
   biz: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 27h24"/><rect x="6" y="16" width="5" height="8" rx="1"/><rect x="14" y="10" width="5" height="14" rx="1"/><rect x="22" y="4" width="5" height="20" rx="1"/></svg>',
@@ -79,7 +81,7 @@ const ICON = {
   locset: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 29s9-8 9-15a9 9 0 0 0-18 0c0 7 9 15 9 15z"/><circle cx="16" cy="14" r="3.2"/></svg>',
   backup: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4v16M9 14l7 7 7-7M5 27h22"/></svg>',
 };
-const TONE = { dues: 't-gold', numaudit: 't-ink', biz: 't-gold', pos: 't-ruby', items: 't-gold', itemreq: 't-gold', staff: 't-ruby', matrix: 't-ruby', rules: '', settings: 't-ink', logs: 't-ink', backup: 't-ink', exceptions: 't-ruby', releases: 't-gold', locset: 't-ink' };
+const TONE = { lists: 't-ink', dues: 't-gold', numaudit: 't-ink', biz: 't-gold', pos: 't-ruby', items: 't-gold', itemreq: 't-gold', staff: 't-ruby', matrix: 't-ruby', rules: '', settings: 't-ink', logs: 't-ink', backup: 't-ink', exceptions: 't-ruby', releases: 't-gold', locset: 't-ink' };
 const MARK = '<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#14173a"/><circle cx="32" cy="29" r="16.5" fill="none" stroke="#f2a900" stroke-width="3"/><circle cx="32" cy="29" r="8.8" fill="#f2a900"/><path d="M12 51h40" stroke="#f7eedc" stroke-width="3.2" stroke-linecap="round"/></svg>';
 
 // ---------- auth ----------
@@ -148,7 +150,7 @@ async function start() {
 }
 
 // ---------- routing ----------
-const OWNER_ONLY = new Set(['staff', 'matrix', 'rules', 'settings', 'logs', 'backup', 'releases', 'locset']);
+const OWNER_ONLY = new Set(['lists', 'staff', 'matrix', 'rules', 'settings', 'logs', 'backup', 'releases', 'locset']);
 function go(p) { location.hash = '#/' + p; }
 function route() {
   if (!S.ctx) return viewAuth();
@@ -197,7 +199,7 @@ async function viewHome() {
   if (owner) {
     tiles.push(['releases', t('releases'), relPend.count ? `<span class="badge">${relPend.count}</span>` : '']);
     tiles.push(['staff', t('staff'), pend.count ? `<span class="badge">${pend.count}</span>` : '']);
-    tiles.push(['matrix', t('matrix'), ''], ['rules', t('rules'), ''], ['locset', t('locset'), ''], ['settings', t('settings'), ''], ['logs', t('logs'), ''], ['backup', t('backup'), '']);
+    tiles.push(['lists', t('lists'), ''], ['matrix', t('matrix'), ''], ['rules', t('rules'), ''], ['locset', t('locset'), ''], ['settings', t('settings'), ''], ['logs', t('logs'), ''], ['backup', t('backup'), '']);
   }
   const mine = forms.data.filter((f) => f.area !== 'master' && f.code !== 'POS' && perms[f.code] && perms[f.code].view);
   const byArea = AREAS.map((a) => [a, mine.filter((f) => f.area === a)]).filter(([, l]) => l.length);

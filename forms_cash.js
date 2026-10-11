@@ -301,7 +301,7 @@ B.forms['18-1'] = {
       NOTE(L('প্রতিটি মার্কেটিং খরচ কাজের আগেই এই রেজিস্টারে, অনুমোদনসহ। বিক্রির ড্রয়ার থেকে টাকা নয়। কর্মী নিজের টাকায় বুস্ট করে পরে ফেরত চাইলে — আগে অনুমোদন না থাকলে ফেরত নয়।', 'Every marketing expense goes into this register before the work, with approval. No money from the sales drawer. If a staff member boosts with their own money and asks for a refund later, there is no refund without prior approval.'), 'warn'),
       NOTE(L('স্যাম্পলের মালামাল ইস্যু হয় মালামাল ইস্যু স্লিপে।', 'Sample goods are issued on the goods issue slip.'), 'ok')] },
     { title: L('খরচের লাইন', 'Expense lines'), fields: [
-      TABLE('lines', null, [D('date', L('তারিখ', 'Date')), SEL('head', L('খাত নং', 'Head no.'), MKT_HEADS, { req: true, wide: true }), T('campaign', L('পণ্য বা ক্যাম্পেইন', 'Product or campaign'), { wide: true }), T('period', L('মেয়াদ · স্থান', 'Period · place')),
+      TABLE('lines', null, [D('date', L('তারিখ', 'Date')), SEL('head', L('খাত', 'Head'), B.opts('marketing_heads', MKT_HEADS), { req: true, wide: true, list: 'marketing_heads' }), T('campaign', L('পণ্য বা ক্যাম্পেইন', 'Product or campaign'), { wide: true }), T('period', L('মেয়াদ · স্থান', 'Period · place')),
         SEL('source', L('টাকার উৎস', 'Source of money'), MKT_SRC), M('amt', L('টাকা ৳', 'Amount ৳'), { req: (x) => !has(x.row.nonpay) }), M('nonpay', L('টাকা প্রদান ছাড়া — মূল্য ৳', 'Without payment — value ৳')),
         T('receipt', L('রসিদ / ইনভয়েস নং', 'Receipt / invoice no.')), T('ledger', L('লেজারের লাইন নং', 'Ledger line no.')), T('result', L('ফল: মেসেজ · অর্ডার', 'Result: messages · orders'), { wide: true }),
         ST('approved_by', L('অনুমোদনকারী', 'Approved by')), TM('approve_time', L('মেসেজে অনুমোদন হলে সময়', 'Time, if approved by message'), { show: (x) => has(x.row.approved_by) }),
@@ -324,14 +324,14 @@ B.forms['18-1'] = {
     const cum = {}, over = new Set(); let anyOver = false, excess = 0, noAppr = 0, noLim = 0;
     const out = rows.map((r) => {
       if (!has(r.head) || !has(r.amt) || num(r.amt) <= 0) return { state: '—' };
-      const lim = sv(x, 'mkt_limit_' + r.head); cum[r.head] = (cum[r.head] || 0) + num(r.amt);
+      const ex = B.optExtra('marketing_heads', r.head), exl = ex && ex.limit_month !== undefined && ex.limit_month !== null && ex.limit_month !== '' ? Number(ex.limit_month) : null, lim = exl !== null && Number.isFinite(exl) ? exl : sv(x, 'mkt_limit_' + r.head); cum[r.head] = (cum[r.head] || 0) + num(r.amt);
       if (lim === null) { needs.push('mkt_limit_' + r.head); noLim += num(r.amt); return { state: NEED }; }
       if (cum[r.head] > lim) { anyOver = true; over.add(r.head); excess += Math.min(num(r.amt), cum[r.head] - lim); if (!has(r.approved_by)) noAppr++; return { state: L('সীমার বাইরে', 'Outside the limit') }; }
       return { state: L('সীমার ভেতরে ✓', 'Within the limit ✓') };
     });
     v.tot_amt = sum(rows.map((r) => r.amt)); v.tot_nonpay = sum(rows.map((r) => r.nonpay)); v.reg_total = v.tot_amt; v.any_over = anyOver;
     v.limit_text = needs.length ? NEED : anyOver ? L('বাইরে', 'Outside') : rows.some((r) => has(r.amt)) ? L('ভেতরে ✓', 'Inside ✓') : '—';
-    if (noLim > 0) flags.push(flag('mkt_limit_missing', 'red', 'মার্কেটিং খাতের সীমা সেটিংসে নেই', 'Marketing head limit missing in settings', noLim));
+    if (noLim > 0) flags.push(flag('mkt_limit_missing', 'red', 'মার্কেটিং খাতের মাসিক সীমা তালিকায় নেই', 'Marketing head monthly limit is not set in the list', noLim));
     if (anyOver) flags.push(flag('mkt_over_limit', 'yellow', 'মার্কেটিং খরচ খাতের সীমার বাইরে', 'Marketing spend over the head limit', excess));
     if (noAppr) flags.push(flag('mkt_approval_missing', 'red', 'সীমার বাইরের মার্কেটিং খরচে অনুমোদনকারী নেই', 'No approver on over-limit marketing spend', excess));
     const dl = has(x.d.ledger_total) ? r2(v.reg_total - num(x.d.ledger_total)) : null, ds = has(x.d.stmt_total) ? r2(v.reg_total - num(x.d.stmt_total)) : null;
@@ -426,4 +426,5 @@ B.forms['20-6'] = {
     return { v, flags, needs };
   },
 };
+B.SETTING_DEFS.forEach((d) => { if (/^mkt_limit_/.test(d.key)) { d.hidden = true; d.label = L('মার্কেটিং খাতের মাসিক সীমা (তালিকা পাতায় দিন)', 'Marketing head monthly limit (set it on the Lists page)'); } });
 })();
