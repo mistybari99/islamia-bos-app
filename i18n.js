@@ -1,8 +1,8 @@
 // UI texts in three modes: bn = Bangla, mix = Bangla with simple English words, en = English.
 window.BOS_T = {
   app: { bn: "ইসলামিয়া মিষ্টি ঘর", mix: "ইসলামিয়া মিষ্টি ঘর", en: "Islamia Misti Ghor" },
-  lang_bn: { bn: "বাংলা", mix: "Banglish", en: "বাংলা" },
-  lang_mix: { bn: "Banglish", mix: "Banglish", en: "Banglish" },
+  lang_bn: { bn: "বাংলা", mix: "বাংলা", en: "বাংলা" },
+  lang_mix: { bn: "Bng-Eng", mix: "Bng-Eng", en: "Bng-Eng" },
   lang_en: { bn: "English", mix: "English", en: "English" },
   login_sub: { bn: "স্টাফ আইডি আর পিন দিয়ে ঢুকুন", mix: "Staff ID আর PIN দিয়ে ঢুকুন", en: "Sign in with your staff ID and PIN" },
   login: { bn: "লগইন", mix: "Login", en: "Log in" },
@@ -65,7 +65,7 @@ window.BOS_T = {
   edit_item: { bn: "আইটেম বদলান", mix: "Item Edit করুন", en: "Edit item" },
   name_bn: { bn: "নাম (বাংলা)", mix: "Name (বাংলা)", en: "Name (Bangla)" },
   name_en: { bn: "নাম (English)", mix: "Name (English)", en: "Name (English)" },
-  name_mix: { bn: "নাম (Banglish, ঐচ্ছিক)", mix: "Name (Banglish, optional)", en: "Name (Banglish, optional)" },
+  name_mix: { bn: "নাম (ঐচ্ছিক)", mix: "Name (optional)", en: "Name (optional)" },
   category: { bn: "ধরন", mix: "Category", en: "Category" },
   unit: { bn: "একক", mix: "Unit", en: "Unit" },
   sell_price: { bn: "বিক্রয়মূল্য ৳", mix: "Sell Price ৳", en: "Selling price ৳" },
