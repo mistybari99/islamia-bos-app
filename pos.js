@@ -52,6 +52,7 @@ const ERRS = {
   overpaid: L('পরিশোধ মোটের বেশি হতে পারে না', 'Paid cannot be more than the total', 'Paid মোটের বেশি হতে পারে না'), over_credit_limit: L('এই গ্রাহকের বাকির সীমা পার হচ্ছে — ম্যানেজার লাগবে', 'This customer’s credit limit would be exceeded — a manager is needed', 'এই Customer এর Credit limit পার হচ্ছে — Manager লাগবে'),
   override_needs_approval: L('দাম বদলাতে ম্যানেজার লাগবে', 'Only a manager can change a price', 'Price বদলাতে Manager লাগবে'), discount_needs_approval: L('ডিসকাউন্ট সীমার উপরে — ম্যানেজার লাগবে', 'The discount is above the limit — a manager is needed', 'Discount limit এর উপরে — Manager লাগবে'),
   customer_inactive: L('এই গ্রাহক বন্ধ করা আছে', 'This customer is switched off', 'এই Customer বন্ধ করা আছে'), bad_discount: L('ডিসকাউন্ট মোটের বেশি হতে পারে না', 'Discount cannot exceed the total', 'Discount মোটের বেশি হতে পারে না'),
+  unlisted_blocked: L('তালিকায় নেই এমন আইটেম বিক্রি বন্ধ আছে (নিয়ম)', 'Selling an item that is not in the list is switched off (rule)', 'List এ নেই এমন item বিক্রি বন্ধ (নিয়ম)'), paper_no_required: L('কাগজের ছাপা নম্বর লাগবে', 'The printed paper number is required', 'কাগজের ছাপা number লাগবে'),
   period_closed: L('এই তারিখের হিসাব বন্ধ — শুধু মালিক বদলাতে পারবেন', 'This date is closed — only the owner can change it', 'এই date এর হিসাব বন্ধ — শুধু Owner বদলাতে পারবেন'),
   wallet_needed: L('মোবাইল পেমেন্টে বিকাশ/নগদ ইত্যাদি বাছুন', 'Choose bKash / Nagad etc. for a mobile payment', 'Mobile payment এ bKash/Nagad বাছুন'), name_required: L('আইটেমের নাম লিখুন', 'Enter the item name', 'Item এর নাম লিখুন'),
 };
@@ -66,7 +67,7 @@ const queue = () => jget(QK(), []);
 const setQueue = (q) => store.set(QK(), JSON.stringify(q));
 const failedQ = () => jget(XK(), []);
 const setFailed = (q) => store.set(XK(), JSON.stringify(q));
-const BUSINESS = /^(no_lines|bad_mode|bad_qty|bad_price|bad_amount|bad_discount|no_price|item_not_found|due_needs_customer|not allowed|customer_required|customer_name_required|bad_mobile|overpaid|over_credit_limit|override_needs_approval|discount_needs_approval|customer_inactive|bad_sale_type|bad_payments|name_required|period_closed)/;
+const BUSINESS = /^(no_lines|bad_mode|bad_qty|bad_price|bad_amount|bad_discount|no_price|item_not_found|due_needs_customer|not allowed|customer_required|customer_name_required|bad_mobile|overpaid|over_credit_limit|override_needs_approval|discount_needs_approval|customer_inactive|bad_sale_type|bad_payments|name_required|period_closed|unlisted_blocked|paper_no_required)/;
 const freq = () => jget(FKEY, {});
 const bump = (id) => { const f = freq(); f[id] = (f[id] || 0) + 1; store.set(FKEY, JSON.stringify(f)); };
 const perms = () => S.ctx.perms.POS || {};
@@ -182,7 +183,7 @@ function cartSheet() {
 }
 function drawPay() { const el = $('#cart_pay'); if (el) el.innerHTML = B.pay.html(P.st); }
 function updDue() { const tt = $('#cart_total'); if (tt) tt.textContent = money(netTotal()); drawCust(); }
-function needCust() { return P.type === 'wholesale' || (P.st && B.pay.due(P.st) > 0); }
+function needCust() { return (P.type === 'wholesale' && B.rule('pos_customer_on_wholesale', true) === true) || (P.st && B.pay.due(P.st) > 0 && B.rule('pos_customer_on_due', true) === true) || (discVal() > 0 && B.rule('pos_customer_on_discount', false) === true); }
 function drawCust() {
   const el = $('#cart_cust'); if (!el) return;
   const need = needCust(), c = P.cust;
@@ -263,7 +264,8 @@ async function submitSale(p, change) {
     if (error) {
       if (isNet(error)) { setQueue([...queue(), p]); closeSheet(); resetCart(); toast(T('queued')); return afterSale(); }
       if (btn) btn.disabled = false;
-      const m = T2(error); if (m) return toast(m);
+      const m = T2(error);
+      if (m) { const g = B.emergency && B.emergency.grantFor(error.message); if (g) return B.emergency.offer({ grant: g, loc: P.loc, context: { total: p._total, discount: p.p_discount }, message: m }); return toast(m); }
       if (/^LEGACY: /.test(error.message || '')) return toast(error.message.slice(8));
       return fail(error);
     }

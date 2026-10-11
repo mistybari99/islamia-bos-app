@@ -22,6 +22,7 @@ const X = {
   perloc: L('লোকেশন অনুযায়ী', 'By location', 'By Location'), cash: L('নগদ', 'Cash', 'Cash'), mobile: L('মোবাইল', 'Mobile', 'Mobile'), card: L('কার্ড', 'Card', 'Card'), duem: L('বাকি', 'Due', 'Due'),
   gaps: L('ছাপা নম্বরে ফাঁক (কাগজ বাদ পড়েছে?)', 'Gaps in printed numbers (missing paper?)', 'ছাপা number এ ফাঁক (কাগজ বাদ?)'), gapt: L('নম্বরের ফাঁক-অডিট', 'Number gap audit', 'Number ফাঁক-Audit'), nogap: L('এখন কোনো ফাঁক নেই ✓', 'No gaps right now ✓', 'এখন কোনো ফাঁক নেই ✓'), missing: L('বাদ পড়া নম্বর', 'Missing numbers', 'বাদ পড়া numbers'), gaphint: L('ছাপা নম্বর ধরে: ফাঁক মানে ওই নম্বরের কাগজ এখনও অ্যাপে ওঠেনি বা হারিয়ে গেছে। কাগজের বই খুঁজে দেখুন।', 'By printed number: a gap means that paper was never entered or is lost. Check the paper book.', 'ছাপা number ধরে: ফাঁক মানে ওই কাগজ app এ ওঠেনি বা হারিয়েছে। কাগজের বই খুঁজে দেখুন।'),
   duetotal: L('গ্রাহকদের কাছে মোট বাকি', 'Total owed by customers', 'Customer দের কাছে মোট Due'),
+  emreq: L('জরুরি অনুরোধ অপেক্ষায়', 'Emergency requests waiting', 'জরুরি Request অপেক্ষায়'), emok: L('আপনার জরুরি অনুরোধ অনুমোদিত — আবার চেষ্টা করুন', 'Your emergency request is approved — try again', 'আপনার জরুরি request অনুমোদিত — আবার চেষ্টা করুন'),
   open: L('খুলুন', 'Open', 'Open'), title: L('অনুমোদনের অপেক্ষায়', 'Awaiting approval', 'Approval এর অপেক্ষায়'), none: L('অপেক্ষায় কিছু নেই', 'Nothing waiting', 'অপেক্ষায় কিছু নেই'),
 };
 const T = (k) => lab(X[k]);
@@ -37,7 +38,7 @@ async function render() {
   const td = dhaka(), from = addDays(td, -6);
   await B.loadStatic();
   const q = (x) => x.then((r) => (r && r.error ? { data: null, count: 0 } : r), () => ({ data: null, count: 0 }));
-  const [ex, rel, stf, itm, sub, dr, sales, sheets, ls, gaps, pays, dues] = await Promise.all([
+  const [ex, rel, stf, itm, sub, dr, sales, sheets, ls, gaps, pays, dues, emp, mine] = await Promise.all([
     anyApprove ? q(sb.from('exceptions').select('level').eq('status', 'open')) : { data: [] },
     owner ? q(sb.from('release_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')) : { count: 0 },
     owner ? q(sb.from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'pending')) : { count: 0 },
@@ -50,6 +51,8 @@ async function render() {
     anyApprove ? q(sb.rpc('number_audit_summary')) : { data: null },
     canPos ? q(sb.rpc('payments_summary', { p_from: td })) : { data: null },
     canPos ? q(sb.rpc('customer_dues')) : { data: null },
+    owner ? q(sb.from('emergency_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')) : { count: 0 },
+    q(sb.rpc('my_emergency')),
   ]);
   const reds = (ex.data || []).filter((x) => x.level === 'red').length, yel = (ex.data || []).filter((x) => x.level === 'yellow').length;
   const mineToApprove = (sub.data || []).filter((e) => owner || (perms[e.form_code] && perms[e.form_code].approve)).length;
@@ -66,6 +69,8 @@ async function render() {
     [stf.count, 'warn', T('staff'), 'staff'], [itm.count, 'warn', T('itemreq'), 'itemreq'], [voids, 'warn', T('void'), 'pos'],
     [noSheet.length, 'warn', T('nosheet') + (noSheet.length ? ': ' + noSheet.map((l) => nm(l)).join(', ') : ''), 'form/14-1'],
     [(gaps.data || []).reduce((s, g) => s + Number(g.missing_count || 0), 0), 'warn', T('gaps'), 'numaudit'],
+    [emp.count, 'bad', T('emreq'), 'emergency'],
+    [(mine.data || []).filter((x) => x.status === 'approved').length, 'info', T('emok'), null],
     [dr.count, 'info', T('drafts'), null], [missingLoc, 'info', T('locset'), 'locset'],
   ].filter((r) => r[0]);
   const row = ([n, tone, label, to]) => `<div class="dash-row ${tone}" ${to ? `data-act="go" data-v="${to}"` : ''}><span class="dot"></span><span class="dl">${esc(label)}</span><b class="dn">${n}</b>${to ? '<span class="dc">›</span>' : ''}</div>`;

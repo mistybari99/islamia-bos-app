@@ -39,7 +39,7 @@ function fail(e) {
   console.error(e);
   const m = (e && e.message) || '';
   if (/at least one active owner/.test(m)) return toast('কমপক্ষে একজন সক্রিয় মালিক থাকতে হবে / At least one active owner is required');
-  if (/period_closed/.test(m)) return toast('এই তারিখের হিসাব বন্ধ — শুধু মালিক বদলাতে পারবেন / This date is closed — only the owner can change it');
+  if (/period_closed/.test(m)) { const msg = 'এই তারিখের হিসাব বন্ধ — অনুমতি লাগবে / This date is closed — permission needed'; if (window.BOS && window.BOS.emergency) return window.BOS.emergency.offer({ grant: 'closed_period_edit', loc: null, context: {}, message: msg }); return toast(msg); }
   if (/entries_paper_no_uq/.test(m)) return toast('এই ছাপা নম্বর আগেই নেওয়া হয়েছে / This printed number was already entered');
   if (/permission|row-level|denied/i.test(m)) return toast(t('err_perm'));
   toast(t('err_generic') + (m ? ' · ' + m.slice(0, 80) : ''));
@@ -64,6 +64,8 @@ function closeSheet() { const d = $('#sheet'); if (d) d.remove(); }
 const tog = (on, act, attrs = '', label) => `<button class="tog ${on ? 'on' : ''}" data-act="${act}" ${attrs}>${esc(label || (on ? t('on') : t('off')))}</button>`;
 
 const ICON = {
+  rulehub: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3l11 4v8c0 7-5 12-11 14C10 27 5 22 5 15V7z"/><path d="M11 15l4 4 7-8"/></svg>',
+  emergency: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="16" r="12"/><path d="M16 9v8M16 22v1"/></svg>',
   lists: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M11 8h16M11 16h16M11 24h16"/><path d="M4.5 8h2M4.5 16h2M4.5 24h2" stroke-width="3.4"/></svg>',
   dues: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="11" r="5"/><path d="M6 27c1-6 5-9 10-9s9 3 10 9"/><path d="M22 6h5M24.5 3.5v5" stroke-width="2"/></svg>',
   numaudit: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h6M20 8h6M6 16h4M14 16h4M22 16h4M6 24h6M20 24h6"/></svg>',
@@ -81,7 +83,7 @@ const ICON = {
   locset: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 29s9-8 9-15a9 9 0 0 0-18 0c0 7 9 15 9 15z"/><circle cx="16" cy="14" r="3.2"/></svg>',
   backup: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4v16M9 14l7 7 7-7M5 27h22"/></svg>',
 };
-const TONE = { lists: 't-ink', dues: 't-gold', numaudit: 't-ink', biz: 't-gold', pos: 't-ruby', items: 't-gold', itemreq: 't-gold', staff: 't-ruby', matrix: 't-ruby', rules: '', settings: 't-ink', logs: 't-ink', backup: 't-ink', exceptions: 't-ruby', releases: 't-gold', locset: 't-ink' };
+const TONE = { rulehub: 't-ink', emergency: 't-ruby', lists: 't-ink', dues: 't-gold', numaudit: 't-ink', biz: 't-gold', pos: 't-ruby', items: 't-gold', itemreq: 't-gold', staff: 't-ruby', matrix: 't-ruby', rules: '', settings: 't-ink', logs: 't-ink', backup: 't-ink', exceptions: 't-ruby', releases: 't-gold', locset: 't-ink' };
 const MARK = '<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#14173a"/><circle cx="32" cy="29" r="16.5" fill="none" stroke="#f2a900" stroke-width="3"/><circle cx="32" cy="29" r="8.8" fill="#f2a900"/><path d="M12 51h40" stroke="#f7eedc" stroke-width="3.2" stroke-linecap="round"/></svg>';
 
 // ---------- auth ----------
@@ -150,7 +152,7 @@ async function start() {
 }
 
 // ---------- routing ----------
-const OWNER_ONLY = new Set(['lists', 'staff', 'matrix', 'rules', 'settings', 'logs', 'backup', 'releases', 'locset']);
+const OWNER_ONLY = new Set(['rulehub', 'emergency', 'lists', 'staff', 'matrix', 'rules', 'settings', 'logs', 'backup', 'releases', 'locset']);
 function go(p) { location.hash = '#/' + p; }
 function route() {
   if (!S.ctx) return viewAuth();
@@ -182,12 +184,13 @@ async function viewHome() {
     <button class="full" style="margin-top:18px" data-act="logout">${esc(t('logout'))}</button>`);
   const canDecide = owner || (perms.ITEMS && perms.ITEMS.approve);
   const anyApprove = owner || Object.values(perms).some((p) => p.approve);
-  const [forms, pend, itemPending, exOpen, relPend] = await Promise.all([
+  const [forms, pend, itemPending, exOpen, relPend, emPend] = await Promise.all([
     sb.from('forms').select('code,area,name_bn,name_mix,name_en,sort,enabled').order('sort'),
     owner ? sb.from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'pending') : Promise.resolve({ count: 0 }),
     canDecide ? sb.from('item_changes').select('id', { count: 'exact', head: true }).eq('status', 'pending') : Promise.resolve({ count: 0 }),
     anyApprove ? sb.from('exceptions').select('id', { count: 'exact', head: true }).eq('status', 'open') : Promise.resolve({ count: 0 }),
     owner ? sb.from('release_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending') : Promise.resolve({ count: 0 }),
+    owner ? sb.from('emergency_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending').then((r) => r, () => ({ count: 0 })) : Promise.resolve({ count: 0 }),
   ]);
   if (forms.error) return fail(forms.error);
   const tiles = [];
@@ -197,9 +200,8 @@ async function viewHome() {
   if (perms.ITEMS && (perms.ITEMS.enter || perms.ITEMS.approve)) tiles.push(['itemreq', t('item_req'), itemPending.count ? `<span class="badge">${itemPending.count}</span>` : '']);
   if (anyApprove) tiles.push(['exceptions', t('exceptions'), exOpen.count ? `<span class="badge">${exOpen.count}</span>` : ''], ['numaudit', t('numaudit'), '']);
   if (owner) {
-    tiles.push(['releases', t('releases'), relPend.count ? `<span class="badge">${relPend.count}</span>` : '']);
-    tiles.push(['staff', t('staff'), pend.count ? `<span class="badge">${pend.count}</span>` : '']);
-    tiles.push(['lists', t('lists'), ''], ['matrix', t('matrix'), ''], ['rules', t('rules'), ''], ['locset', t('locset'), ''], ['settings', t('settings'), ''], ['logs', t('logs'), ''], ['backup', t('backup'), '']);
+    tiles.push(['emergency', t('emergency'), emPend.count ? `<span class="badge">${emPend.count}</span>` : ''], ['releases', t('releases'), relPend.count ? `<span class="badge">${relPend.count}</span>` : '']);
+    tiles.push(['staff', t('staff'), pend.count ? `<span class="badge">${pend.count}</span>` : ''], ['rulehub', t('rulehub'), '']);
   }
   const mine = forms.data.filter((f) => f.area !== 'master' && f.code !== 'POS' && perms[f.code] && perms[f.code].view);
   const byArea = AREAS.map((a) => [a, mine.filter((f) => f.area === a)]).filter(([, l]) => l.length);

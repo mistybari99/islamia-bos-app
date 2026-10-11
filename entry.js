@@ -89,13 +89,22 @@ B.SETTING_DEFS = [
 B.GROUPS = { A: L('টাকা ও সীমা', 'Cash & limits'), B: L('সময় ও জায়গা', 'Time & place'), C: L('পণ্য ও সংরক্ষণ', 'Products & storage'), F: L('ক্রয় ও কাউন্ট', 'Purchase & count') };
 
 // ---------- environment (settings, items, staff, locations) ----------
-const ENV = { staff: null, items: null, locs: null, byLoc: {}, lists: null };
+const ENV = { staff: null, items: null, locs: null, byLoc: {}, lists: null, rules: null, grantDefs: null };
 async function loadStatic() {
   if (!ENV.staff) { const r = await sb.rpc('staff_directory'); ENV.staff = r.data || []; }
   if (!ENV.items) { const r = await sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,sell_price,is_active').order('code'); ENV.items = r.data || []; ENV.byCode = new Map(ENV.items.map((i) => [i.code, i])); }
   if (!ENV.locs) { const r = await sb.from('locations').select('*').order('sort'); ENV.locs = r.data || []; }
   if (!ENV.lists) await loadLists();
+  if (!ENV.rules) await loadRules();
 }
+// business rules (Rules page): the server enforces them; the app reads them only to guide the screen
+async function loadRules() {
+  const [r, g] = await Promise.all([sb.from('rules').select('*').order('sort'), sb.from('grant_defs').select('*').order('sort')]);
+  ENV.rules = {}; (r.error ? [] : r.data || []).forEach((x) => { ENV.rules[x.key] = x; }); ENV.grantDefs = {}; (g.error ? [] : g.data || []).forEach((x) => { ENV.grantDefs[x.grant_code] = x; });
+}
+B.rule = (key, fallback) => { const r = ENV.rules && ENV.rules[key]; if (!r) return fallback; const v = r.value !== null && r.value !== undefined ? r.value : r.default_value; return v === null || v === undefined ? fallback : v; };
+B.reloadRules = async () => { ENV.rules = null; await loadRules(); };
+B.grantDefs = () => ENV.grantDefs || {};
 // editable option lists (expense heads, marketing heads, wallets ...): the owner edits them, forms read them; the code keeps a fallback
 async function loadLists() {
   const r = await sb.from('option_lists').select('*').order('sort');
@@ -429,7 +438,7 @@ async function viewFormList() {
   const perms = S.ctx.perms[code] || {}, locs = myLocs();
   if (!S.formLoc || !locs.find((l) => l.id === S.formLoc)) S.formLoc = (locs[0] || {}).id;
   shell(lab(spec.title), `<div class="row"><select id="fl_loc">${locs.map((l) => `<option value="${l.id}" ${l.id === S.formLoc ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>
-      ${perms.enter && S.formLoc ? `<button class="primary" data-act="newentry" data-v="${code}">＋ ${esc(t('new_entry'))}</button>` : ''}</div>
+      ${perms.enter && S.formLoc ? `<button class="primary" data-act="newentry" data-v="${code}">＋ ${esc(t('new_entry'))}</button>` : S.formLoc && !perms.enter ? `<button data-act="em_form" data-v="${code}">${esc(t('em_access'))}</button>` : ''}</div>
     ${!locs.length ? `<div class="notice warn">${esc(t('no_location'))}</div>` : ''}<div id="fl_body"><p class="muted">${esc(t('loading'))}</p></div>`, true);
   if (!S.formLoc) return;
   const r = await sb.from('entries').select('id,serial,entry_date,status,flags,created_staff,checked_staff,paper_no:data->>paper_no').eq('form_code', code).eq('location_id', S.formLoc).order('entry_date', { ascending: false }).order('serial', { ascending: false }).limit(60);
