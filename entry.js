@@ -240,6 +240,7 @@ function actionsHTML() {
 const PAPER_NO = { id: 'paper_no', type: 'text', label: L('ছাপা নম্বর (কাগজের বই)', 'Printed paper no.', 'ছাপা Number (কাগজের বই)'),
   hint: L('কাগজের ফর্মে ছাপা ক্রমিক নম্বর। একই নম্বর একবারই নেওয়া যায়, আর বাদ পড়া নম্বর ধরা পড়ে।', 'The serial printed on the paper form. A number can be entered once, and missing numbers are audited.', 'কাগজের form এ ছাপা Serial number। একই number একবারই নেওয়া যায়, বাদ পড়া number ধরা পড়ে।') };
 function draw() {
+  B.curDate = E.date;
   E.shows = {}; E.rshows = {}; recompute();
   const spec = E.spec, head = [PAPER_NO, ...(spec.head || [])].map((f) => fieldHTML(f, f.id, 'd', modeEditable(f), wrap(f))).join('');
   const serial = E.serial ? `${E.code}-${(ENV.locs.find((l) => l.id === E.loc) || {}).code || E.loc}-${E.serial}` : t('new_entry');

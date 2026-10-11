@@ -39,7 +39,7 @@ function fail(e) {
   console.error(e);
   const m = (e && e.message) || '';
   if (/at least one active owner/.test(m)) return toast('কমপক্ষে একজন সক্রিয় মালিক থাকতে হবে / At least one active owner is required');
-  if (/period_closed/.test(m)) { const msg = 'এই তারিখের হিসাব বন্ধ — অনুমতি লাগবে / This date is closed — permission needed'; if (window.BOS && window.BOS.emergency) return window.BOS.emergency.offer({ grant: 'closed_period_edit', loc: null, context: {}, message: msg }); return toast(msg); }
+  if (/period_closed/.test(m)) { const msg = 'এই তারিখের হিসাব বন্ধ — অনুমতি লাগবে / This date is closed — permission needed'; if (window.BOS && window.BOS.emergency) return window.BOS.emergency.offer({ grant: 'closed_period_edit', loc: null, context: { date: window.BOS.curDate || new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' }) }, message: msg }); return toast(msg); }
   if (/entries_paper_no_uq/.test(m)) return toast('এই ছাপা নম্বর আগেই নেওয়া হয়েছে / This printed number was already entered');
   if (/permission|row-level|denied/i.test(m)) return toast(t('err_perm'));
   toast(t('err_generic') + (m ? ' · ' + m.slice(0, 80) : ''));

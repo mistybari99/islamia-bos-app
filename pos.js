@@ -265,7 +265,7 @@ async function submitSale(p, change) {
       if (isNet(error)) { setQueue([...queue(), p]); closeSheet(); resetCart(); toast(T('queued')); return afterSale(); }
       if (btn) btn.disabled = false;
       const m = T2(error);
-      if (m) { const g = B.emergency && B.emergency.grantFor(error.message); if (g) return B.emergency.offer({ grant: g, loc: P.loc, context: { total: p._total, discount: p.p_discount }, message: m }); return toast(m); }
+      if (m) { const g = B.emergency && B.emergency.grantFor(error.message); if (g) return B.emergency.offer({ grant: g, loc: P.loc, context: g === 'discount_over_limit' ? { amount: p.p_discount, total: p._total } : g === 'credit_over_limit' ? { amount: Math.max(0, Math.round((p._total - p._paid) * 100) / 100), total: p._total } : { total: p._total }, message: m }); return toast(m); }
       if (/^LEGACY: /.test(error.message || '')) return toast(error.message.slice(8));
       return fail(error);
     }
