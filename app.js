@@ -49,9 +49,11 @@ function langBar() {
     `<button data-act="lang" data-v="${l}" class="${S.lang === l ? 'on' : ''}">${esc(T['lang_' + l][l])}</button>`).join('') + '</div>';
 }
 function shell(title, body, back) {
+  const nav = window.BOS_NAV && S.ctx && S.ctx.profile && S.ctx.profile.status === 'active';   // drawer UI only for signed-in, approved users
   const lead = back ? `<button data-act="go" data-v="${typeof back === 'string' ? back : 'home'}" aria-label="${esc(t('back'))}">←</button>` : '<img class="brand" src="mark.svg" alt="">';
   const h1 = title === t('app') ? `<span class="bn">${esc(BRAND.bn)}</span><span class="lat">${esc(BRAND.en)}</span>` : esc(title);
-  $('#app').innerHTML = `<header class="top">${lead}<h1 class="${title === t('app') ? 'brandh' : ''}">${h1}</h1>${langBar()}</header>${body}`;
+  $('#app').innerHTML = `<header class="top">${nav ? window.BOS_NAV.menuBtn() : ''}${lead}<h1 class="${title === t('app') ? 'brandh' : ''}">${h1}</h1>${nav ? window.BOS_NAV.headExtra() : langBar()}</header>${body}`;
+  if (window.BOS_NAV) window.BOS_NAV.sync(!!nav);
 }
 function openSheet(html) {
   closeSheet();
@@ -168,7 +170,7 @@ function route() {
   (local[page] || extra[page] || viewHome)();
 }
 window.addEventListener('hashchange', route);
-window.BOS_APP = { sb, S, t, esc, toast, fail, shell, openSheet, closeSheet, nm, fmt, store, H: null };
+window.BOS_APP = { sb, S, t, esc, toast, fail, shell, openSheet, closeSheet, nm, fmt, store, ICON, langBar, go, H: null };
 
 function viewPending() {
   shell(t('app'), `<div class="card stack center"><h2>${esc(t('pending_title'))}</h2>
@@ -179,6 +181,7 @@ function viewPending() {
 
 // ---------- home ----------
 async function viewHome() {
+  if (window.BOS_NAV && window.BOS_NAV.home) return window.BOS_NAV.home();   // Home v2 (nav.js); the code below is the legacy fallback
   const p = S.ctx.profile, perms = S.ctx.perms || {}, owner = S.ctx.is_owner;
   shell(t('app'), `<div class="banner"><div class="roundel"><img src="mark.svg" alt=""></div><div><div class="bn-t">${esc(t('hello'))}, <b>${esc(p.full_name || p.staff_id)}</b></div><div class="bn-s"><span class="since">Since 1988</span> <span class="sid">${esc(p.staff_id)}</span></div></div></div><div id="home"><p class="muted">${esc(t('loading'))}</p></div>
     <button class="full" style="margin-top:18px" data-act="logout">${esc(t('logout'))}</button>`);

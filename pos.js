@@ -23,7 +23,7 @@ const UNITS = { kg: L('কেজি', 'KG', 'KG'), pc: L('পিস', 'Piece', '
 const X = {
   title: L('সেল (POS)', 'Sales (POS)', 'Sale (POS)'), sell: L('বিক্রি', 'Sell', 'Sell'), today: L('আজকের সেল', "Today's sales", 'Today সেল'),
   quick: L('কুইক সেল', 'Quick sale', 'Quick Sale'), cart: L('কার্ট', 'Cart', 'Cart'), pay: L('পেমেন্ট', 'Pay', 'Pay'), total: L('মোট', 'Total', 'Total'),
-  discount: L('ডিসকাউন্ট (৳)', 'Discount (৳)', 'Discount (৳)'), note: L('নোট (ঐচ্ছিক)', 'Note (optional)', 'Note (ঐচ্ছিক)'),
+  discount: L('ডিসকাউন্ট (৳)', 'Discount (৳)', 'Discount (৳)'), discL: L('ডিসকাউন্ট', 'Discount', 'Discount'), discTakes: L('কাটা হবে', 'Takes off', 'কাটা হবে'), print: L('রসিদ প্রিন্ট', 'Print receipt', 'Receipt Print'), note: L('নোট (ঐচ্ছিক)', 'Note (optional)', 'Note (ঐচ্ছিক)'),
   confirm: L('সেল সম্পন্ন', 'Complete sale', 'Complete Sale'), empty: L('কার্ট খালি — আইটেম ট্যাপ করুন', 'Cart is empty — tap an item', 'Cart খালি — Item ট্যাপ করুন'),
   amount: L('টাকার পরিমাণ', 'Amount', 'Amount'), what: L('কী বিক্রি (ঐচ্ছিক)', 'What was sold (optional)', 'কী বিক্রি (ঐচ্ছিক)'), all: L('সব', 'All', 'All'), freq: L('বেশি বিক্রি', 'Frequent', 'Frequent'),
   search: L('আইটেম খুঁজুন', 'Search item', 'Item খুঁজুন'), qty: L('পরিমাণ', 'Quantity', 'Quantity'), add: L('কার্টে দিন', 'Add to cart', 'Add to Cart'),
@@ -51,7 +51,8 @@ const ERRS = {
   customer_required: X.custReq, customer_name_required: L('নতুন গ্রাহকের নাম লিখুন', 'Enter the new customer’s name', 'নতুন Customer এর নাম লিখুন'), bad_mobile: L('মোবাইল নম্বর সঠিক নয় (01XXXXXXXXX)', 'The mobile number is not valid (01XXXXXXXXX)', 'Mobile number ঠিক নয় (01XXXXXXXXX)'),
   overpaid: L('পরিশোধ মোটের বেশি হতে পারে না', 'Paid cannot be more than the total', 'Paid মোটের বেশি হতে পারে না'), over_credit_limit: L('এই গ্রাহকের বাকির সীমা পার হচ্ছে — ম্যানেজার লাগবে', 'This customer’s credit limit would be exceeded — a manager is needed', 'এই Customer এর Credit limit পার হচ্ছে — Manager লাগবে'),
   override_needs_approval: L('দাম বদলাতে ম্যানেজার লাগবে', 'Only a manager can change a price', 'Price বদলাতে Manager লাগবে'), discount_needs_approval: L('ডিসকাউন্ট সীমার উপরে — ম্যানেজার লাগবে', 'The discount is above the limit — a manager is needed', 'Discount limit এর উপরে — Manager লাগবে'),
-  customer_inactive: L('এই গ্রাহক বন্ধ করা আছে', 'This customer is switched off', 'এই Customer বন্ধ করা আছে'), bad_discount: L('ডিসকাউন্ট মোটের বেশি হতে পারে না', 'Discount cannot exceed the total', 'Discount মোটের বেশি হতে পারে না'),
+  customer_inactive: L('এই গ্রাহক বন্ধ করা আছে', 'This customer is switched off', 'এই Customer বন্ধ করা আছে'), bad_discount: L('ডিসকাউন্ট মোটের বেশি হতে পারে না (শতাংশ ১০০ এর বেশি নয়)', 'Discount cannot exceed the total (percent at most 100)', 'Discount মোটের বেশি হতে পারে না (percent 100 এর বেশি নয়)'),
+  discount_mode_off: L('এই ধরনের ডিসকাউন্ট বন্ধ আছে (নিয়ম)', 'This kind of discount is switched off (rule)', 'এই ধরনের Discount বন্ধ (নিয়ম)'),
   unlisted_blocked: L('তালিকায় নেই এমন আইটেম বিক্রি বন্ধ আছে (নিয়ম)', 'Selling an item that is not in the list is switched off (rule)', 'List এ নেই এমন item বিক্রি বন্ধ (নিয়ম)'), paper_no_required: L('কাগজের ছাপা নম্বর লাগবে', 'The printed paper number is required', 'কাগজের ছাপা number লাগবে'),
   period_closed: L('এই তারিখের হিসাব বন্ধ — শুধু মালিক বদলাতে পারবেন', 'This date is closed — only the owner can change it', 'এই date এর হিসাব বন্ধ — শুধু Owner বদলাতে পারবেন'),
   wallet_needed: L('মোবাইল পেমেন্টে বিকাশ/নগদ ইত্যাদি বাছুন', 'Choose bKash / Nagad etc. for a mobile payment', 'Mobile payment এ bKash/Nagad বাছুন'), name_required: L('আইটেমের নাম লিখুন', 'Enter the item name', 'Item এর নাম লিখুন'),
@@ -59,7 +60,7 @@ const ERRS = {
 const T2 = (e) => { const m = (e && e.message) || String(e || ''); for (const k of Object.keys(ERRS)) if (m.includes(k)) return lab(ERRS[k]); return null; };
 
 // ---------- state ----------
-const P = { loc: null, cat: '', q: '', items: [], locs: [], cart: [], type: 'retail', tab: 'sell', day: [], busy: false, st: null, cust: { mobile: '', name: '', found: null, show: false } };
+const P = { loc: null, cat: '', q: '', items: [], locs: [], cart: [], type: 'retail', tab: 'sell', day: [], busy: false, dk: 'amount', st: null, cust: { mobile: '', name: '', found: null, show: false } };
 const uidK = () => (S.ctx && S.ctx.profile ? S.ctx.profile.id : 'anon');
 const QK = () => 'bos_pos_queue_' + uidK(), XK = () => 'bos_pos_failed_' + uidK(), FKEY = 'bos_pos_freq';
 const jget = (k, d) => { try { return JSON.parse(store.get(k)) || d; } catch (e) { return d; } };
@@ -67,7 +68,7 @@ const queue = () => jget(QK(), []);
 const setQueue = (q) => store.set(QK(), JSON.stringify(q));
 const failedQ = () => jget(XK(), []);
 const setFailed = (q) => store.set(XK(), JSON.stringify(q));
-const BUSINESS = /^(no_lines|bad_mode|bad_qty|bad_price|bad_amount|bad_discount|no_price|item_not_found|due_needs_customer|not allowed|customer_required|customer_name_required|bad_mobile|overpaid|over_credit_limit|override_needs_approval|discount_needs_approval|customer_inactive|bad_sale_type|bad_payments|name_required|period_closed|unlisted_blocked|paper_no_required)/;
+const BUSINESS = /^(no_lines|bad_mode|bad_qty|bad_price|bad_amount|bad_discount|bad_discount_kind|discount_mode_off|no_price|item_not_found|due_needs_customer|not allowed|customer_required|customer_name_required|bad_mobile|overpaid|over_credit_limit|override_needs_approval|discount_needs_approval|customer_inactive|bad_sale_type|bad_payments|name_required|period_closed|unlisted_blocked|paper_no_required)/;
 const freq = () => jget(FKEY, {});
 const bump = (id) => { const f = freq(); f[id] = (f[id] || 0) + 1; store.set(FKEY, JSON.stringify(f)); };
 const perms = () => S.ctx.perms.POS || {};
@@ -77,7 +78,9 @@ const itemById = (id) => P.items.find((i) => i.id === id);
 const lineAmt = (l) => (l.kind === 'quick' ? r2(l.amount) : r2(l.qty * l.price));
 const cartSub = () => r2(P.cart.reduce((s, l) => s + lineAmt(l), 0));
 const isNet = (e) => !navigator.onLine || /fetch|network|load failed|timeout/i.test((e && e.message) || '');
-const discVal = () => Math.max(0, nnum(($('#cart_disc') || {}).value || 0));
+const dmodes = () => ({ a: B.rule('discount_mode_amount_on', true) !== false, p: B.rule('discount_mode_percent_on', true) !== false });   // rules: which discount kinds may be typed
+const discIn = () => Math.max(0, nnum(($('#cart_disc') || {}).value || 0));                                                          // what was typed (৳ or %)
+const discVal = () => { const v = discIn(); return P.dk === 'percent' ? r2(cartSub() * Math.min(v, 100) / 100) : v; };               // the amount that comes off
 const netTotal = () => Math.max(0, r2(cartSub() - discVal()));
 
 async function load() {
@@ -171,18 +174,27 @@ function otherSheet() {
 
 // ---------- cart / pay ----------
 function cartSheet() {
+  const dm = dmodes(); P.dk = dm.a ? 'amount' : dm.p ? 'percent' : null;
   P.st = B.pay.create(netTotal, updDue);
   openSheet(`<h2>${esc(T('cart'))}</h2><div id="cart_lines" class="stack"></div>
     <div class="row wrap" style="margin:8px 0"><button class="tog ${P.type === 'retail' ? 'on' : ''}" data-act="pos_type" data-v="retail">${esc(T('retail'))}</button><button class="tog ${P.type === 'wholesale' ? 'on' : ''}" data-act="pos_type" data-v="wholesale">${esc(T('wholesale'))}</button></div>
-    <div class="row"><div style="flex:1"><label>${esc(T('discount'))}</label><input id="cart_disc" inputmode="decimal"></div></div>
+    ${dm.a || dm.p ? `<div class="row" style="align-items:flex-end"><div style="flex:1"><label id="cart_disc_l"></label><input id="cart_disc" inputmode="decimal"></div>${dm.a && dm.p ? `<div class="row" id="cart_dk" role="group" style="gap:6px"><button class="tog" data-act="pos_dk" data-v="amount" aria-label="${esc(T('discL'))} ৳">৳</button><button class="tog" data-act="pos_dk" data-v="percent" aria-label="${esc(T('discL'))} %">%</button></div>` : ''}</div>
+    <div class="muted" id="cart_disc_calc" style="font-size:.9rem;min-height:1.4em"></div>` : ''}
     <div class="row between" style="margin:10px 0"><span>${esc(T('total'))}</span><b style="font-size:1.4rem" id="cart_total"></b></div>
     <div id="cart_pay"></div><div id="cart_cust"></div>
     <div style="margin-top:8px"><label>${esc(T('note'))}</label><input id="cart_note"></div>
     <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('back'))}</button><button class="primary full" id="cart_ok" data-act="pos_confirm">${esc(T('confirm'))}</button></div>`);
-  drawCartLines(); drawPay(); drawCust();
+  drawCartLines(); drawPay(); drawCust(); drawDisc();
 }
+function drawDisc() {
+  const l = $('#cart_disc_l'); if (!l) return; const pct = P.dk === 'percent';
+  l.textContent = T('discL') + (pct ? ' (%)' : ' (৳)');
+  document.querySelectorAll('#cart_dk .tog').forEach((b) => b.classList.toggle('on', b.dataset.v === P.dk));
+  const c = $('#cart_disc_calc'); if (c) c.textContent = pct && discIn() > 0 ? `${T('discTakes')}: ${money(discVal())}` : '';
+}
+function discChanged() { B.pay.syncAuto(P.st); const box = $('#cart_pay'); if (box) { const f = document.activeElement; box.innerHTML = B.pay.html(P.st); if (f && f.id === 'cart_disc') f.focus(); } updDue(); }
 function drawPay() { const el = $('#cart_pay'); if (el) el.innerHTML = B.pay.html(P.st); }
-function updDue() { const tt = $('#cart_total'); if (tt) tt.textContent = money(netTotal()); drawCust(); }
+function updDue() { const tt = $('#cart_total'); if (tt) tt.textContent = money(netTotal()); drawCust(); drawDisc(); }
 function needCust() { return (P.type === 'wholesale' && B.rule('pos_customer_on_wholesale', true) === true) || (P.st && B.pay.due(P.st) > 0 && B.rule('pos_customer_on_due', true) === true) || (discVal() > 0 && B.rule('pos_customer_on_discount', false) === true); }
 function drawCust() {
   const el = $('#cart_cust'); if (!el) return;
@@ -240,12 +252,15 @@ function linesOf() {
 }
 function build(o) {
   return { p_client: uid(), p_loc: P.loc, p_lines: o.lines, p_discount: o.disc || 0, p_payments: o.payments, p_customer_mobile: o.mobile || null, p_customer_name: o.cname || null,
-    p_sale_type: o.type || 'retail', p_note: o.note || null, p_quick: !!o.quick, p_sold_at: new Date().toISOString(), _t: Date.now(), _total: o.total, _paid: o.paid };
+    p_sale_type: o.type || 'retail', p_note: o.note || null, p_quick: !!o.quick, p_sold_at: new Date().toISOString(),
+    ...(o.dk && o.disc > 0 ? { p_discount_kind: o.dk, p_discount_input: o.dinput } : {}),   // new optional pair; the legacy p_discount (the amount) is always sent, old queued sales have no pair and replay as before
+    _t: Date.now(), _total: o.total, _paid: o.paid };
 }
 const clean = (p) => { const { _t, _total, _paid, ...r } = p; return r; };
 const NOFN = /record_sale2|Could not find the function|PGRST202|schema cache/i;
 async function send(p) {
   let r = await sb.rpc('record_sale2', clean(p));
+  if (r.error && NOFN.test(r.error.message || '') && 'p_discount_kind' in p) { const { p_discount_kind, p_discount_input, ...old } = clean(p); r = await sb.rpc('record_sale2', old); }   // database without the new pair: same sale, old shape
   if (r.error && NOFN.test(r.error.message || '')) {
     // database not updated yet: only a full single-mode payment can still be recorded the old way
     const pays = p.p_payments || [];
@@ -271,6 +286,7 @@ async function submitSale(p, change) {
     }
     closeSheet(); resetCart();
     toast(`${T('done')} · ${T('receipt')} ${data.receipt} · ${money(data.total)}${change > 0 ? ' · ' + lab(L('ফেরত', 'Change', 'Change')) + ' ' + money(change) : ''}${data.due > 0 ? ' · ' + T('dueword') + ' ' + money(data.due) : ''}`);
+    if (B.invoice && B.invoice.offer) B.invoice.offer(data.id, p.p_loc);
     afterSale();
   } finally { P.busy = false; }
 }
@@ -346,6 +362,7 @@ async function saleSheet(id) {
       <div class="muted">${esc(T('by'))}: ${esc(s.created_staff || '')}${cu.data ? ' · ' + esc(cu.data.name) + ' ' + esc(cu.data.mobile) : s.customer ? ' · ' + esc(s.customer) : ''}${s.note ? ' · ' + esc(s.note) : ''}</div>
       ${s.status === 'void' ? `<div class="notice bad">${esc(T('voided'))}: ${esc(s.void_note || '')} (${esc(s.void_staff || '')})</div>` : ''}
       <button class="full" data-act="pos_share">${esc(T('share'))}</button>
+      ${B.invoice && B.invoice.printSaleId ? `<button class="full" data-act="pos_print" data-v="${s.id}">${esc(T('print'))}</button>` : ''}
       ${canVoid ? `<label>${esc(T('voidwhy'))}</label><input id="void_note"><button class="danger full" data-act="pos_void" data-v="${s.id}">${esc(T('void'))}</button>` : ''}
       <button class="full" data-act="closesheet">${esc(T('close'))}</button></div>`);
 }
@@ -364,6 +381,7 @@ Object.assign(A.H, {
   pos_newitem: () => { location.hash = '#/items'; setTimeout(() => { if (A.H.itemnew) A.H.itemnew(); }, 700); },
   pos_cart: () => cartSheet(),
   pos_type: (a) => { P.type = a.dataset.v; [...document.querySelectorAll('[data-act=pos_type]')].forEach((b) => b.classList.toggle('on', b.dataset.v === P.type)); drawCust(); },
+  pos_dk: (a) => { if (P.dk === a.dataset.v) return; P.dk = a.dataset.v; const i = $('#cart_disc'); if (i) i.value = ''; discChanged(); },
   pos_cust_show: () => { P.cust.show = true; drawCust(); },
   pos_step: (a) => { const l = P.cart[Number(a.dataset.k)], st = stepOf(l.kind === 'item' ? itemById(l.item_id).unit : 'pc'), n = Math.round((l.qty + Number(a.dataset.d) * st) * 1000) / 1000;
     if (n <= 0) P.cart.splice(Number(a.dataset.k), 1); else l.qty = n; afterCartChange(); },
@@ -371,8 +389,8 @@ Object.assign(A.H, {
   pos_qedit: (a) => { const l = P.cart[Number(a.dataset.k)]; const v = prompt(T('qty'), l.qty); if (v === null) return; const n = nnum(v); if (n > 0) { l.qty = n; afterCartChange(); } },
   pos_price: (a) => { const l = P.cart[Number(a.dataset.k)]; const v = prompt(T('priceov'), l.price); if (v === null) return; const n = nnum(v); if (n >= 0 && v.trim() !== '') { l.price = n; l.ov = n !== Number(itemById(l.item_id).sell_price); afterCartChange(); } },
   pos_confirm: () => {
-    const disc = discVal(), sub = cartSub();
-    if (disc > sub) return toast(lab(ERRS.bad_discount));
+    const disc = discVal(), sub = cartSub(), dk = P.dk;
+    if (disc > sub || (dk === 'percent' && discIn() > 100)) return toast(lab(ERRS.bad_discount));
     const pe = B.pay.check(P.st); if (pe) return toast(lab(ERRS[pe]));
     let mobile = null, cname = null;
     if (needCust() || P.cust.mobile) {
@@ -383,7 +401,7 @@ Object.assign(A.H, {
     }
     const total = netTotal(), paid = B.pay.paid(P.st), single = P.st.rows.length === 1 && P.st.rows[0].mode === 'cash', given = single ? nnum(P.st.rows[0].given) : 0, cashAmt = single ? r2(nnum(P.st.rows[0].amount)) : 0;
     const quickOnly = P.cart.length > 0 && P.cart.every((l) => l.kind === 'quick');
-    return submitSale(build({ lines: linesOf(), disc, payments: B.pay.list(P.st), mobile, cname, type: P.type, note: ($('#cart_note') || {}).value || '', quick: quickOnly, total, paid }), given > cashAmt ? r2(given - cashAmt) : 0);
+    return submitSale(build({ lines: linesOf(), disc, payments: B.pay.list(P.st), mobile, cname, type: P.type, note: ($('#cart_note') || {}).value || '', quick: quickOnly, total, paid, dk, dinput: dk === 'percent' ? discIn() : disc }), given > cashAmt ? r2(given - cashAmt) : 0);
   },
   pos_quick: () => quickSheet(),
   pos_qs_cash: () => { const q = readQuick(); if (!q) return;      // a one-tap cash sale of just this amount; the cart is left alone
@@ -391,6 +409,7 @@ Object.assign(A.H, {
   pos_qs_more: () => { const q = readQuick(); if (!q) return; P.cart.push(q); closeSheet(); refreshSell(); cartSheet(); },
   pos_open: (a) => saleSheet(a.dataset.v),
   pos_share: async () => { const txt = P.shareText || ''; try { if (navigator.share) await navigator.share({ text: txt }); else { await navigator.clipboard.writeText(txt); toast('✓'); } } catch (e) { /* cancelled */ } },
+  pos_print: (a) => B.invoice.printSaleId(a.dataset.v, P.loc),
   pos_discard: (a) => { setFailed(failedQ().filter((x) => x.p_client !== a.dataset.v)); drawToday(); },
   pos_void: async (a) => { const n = ($('#void_note').value || '').trim(); if (!n) return toast(T('needNote'));
     const { error } = await sb.rpc('void_sale', { p_id: a.dataset.v, p_note: n }); if (error) return fail(error); closeSheet(); toast(T('voided')); drawToday(); },
@@ -398,7 +417,7 @@ Object.assign(A.H, {
 document.addEventListener('input', (e) => {
   const id = e.target.id;
   if (id === 'pos_q') { P.q = e.target.value; drawItems(true); }
-  if (id === 'cart_disc') { B.pay.syncAuto(P.st); const box = $('#cart_pay'); if (box) { const f = document.activeElement; box.innerHTML = B.pay.html(P.st); if (f && f.id === 'cart_disc') f.focus(); } updDue(); }
+  if (id === 'cart_disc') discChanged();
   if (id === 'cu_mobile') { P.cust.mobile = e.target.value; P.cust.found = null; P.cust.name = ''; lookup(); const el = $('#cart_cust'); const m = normMobile(P.cust.mobile); if (m) drawCust(); }
   if (id === 'cu_name') P.cust.name = e.target.value;
 });
