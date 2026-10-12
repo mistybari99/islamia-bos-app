@@ -89,7 +89,7 @@ function draw() {
   const cnt = (s) => D.locs.filter((l) => s === 'all' || l.status === s).length;
   shell(T('title'), `<div class="row between"><b>${D.locs.length}</b><button class="primary" data-act="lo_wiz">${esc(T('add'))}</button></div>
     <input id="lo_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" value="${esc(D.q)}">
-    <div class="row wrap" id="lo_chips">${['all', ...STATUSES].map((s) => `<button class="tog ${D.f === s ? 'on' : ''}" data-act="lo_filter" data-v="${s}">${esc(T(s))} ${cnt(s)}</button>`).join('')}</div>
+    <div class="row wrap" id="lo_chips" data-ctl="select">${['all', ...STATUSES].map((s) => `<button class="tog ${D.f === s ? 'on' : ''}" data-act="lo_filter" data-v="${s}">${esc(T(s))} ${cnt(s)}</button>`).join('')}</div>
     <div id="lo_list">${rows.length ? rows.map(card).join('') : `<p class="muted">${esc(T('noLoc'))}</p>`}</div>`, 'control');
 }
 function card(l) {

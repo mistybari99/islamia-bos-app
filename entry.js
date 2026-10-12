@@ -175,7 +175,7 @@ function inputHTML(fd, path, w, ed) {
     case 'time': return `<input type="time" ${a} value="${esc(val)}">`;
     case 'date': return `<input type="date" ${a} value="${esc(val)}">`;
     case 'ck': return `<label class="ckrow"><input type="checkbox" ${a} ${val ? 'checked' : ''}><span>${esc(lab(fd.label))}${fd.req ? ' <b class="req">*</b>' : ''}</span></label>`;
-    case 'choice': return `<div class="row wrap">${optsOf(fd).map(([v, l]) => `<button type="button" class="tog ${val === v ? 'on' : ''}" ${ed ? '' : 'disabled'} data-act="pick" ${a} data-v="${esc(v)}">${esc(lab(l))}</button>`).join('')}</div>`;
+    case 'choice': return `<div class="row wrap" data-ch="1" data-cur="${esc(val == null ? '' : val)}" ${fd.req ? 'data-req="1"' : ''}>${optsOf(fd).map(([v, l]) => `<button type="button" class="tog ${val === v ? 'on' : ''}" ${ed ? '' : 'disabled'} data-act="pick" ${a} data-v="${esc(v)}">${esc(lab(l))}</button>`).join('')}</div>`;
     case 'select': return `<select ${a}><option value=""></option>${optsHTML(optsOf(fd), val, fd.list)}</select>`;
     case 'staff': return `<select ${a}><option value=""></option>${ENV.staff.map((s) => `<option value="${esc(s.staff_id)}" ${s.staff_id === val ? 'selected' : ''}>${esc(s.full_name || s.staff_id)} · ${esc(s.staff_id)}</option>`).join('')}</select>`;
     case 'loc': return `<select ${a}><option value=""></option>${ENV.locs.map((l) => `<option value="${l.id}" ${String(l.id) === String(val) ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}<option value="other" ${val === 'other' ? 'selected' : ''}>${esc(t('other'))}</option></select>`;

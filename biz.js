@@ -63,7 +63,7 @@ async function draw() {
   const tok = ++drawTok; P.cache = null;
   shell(T('title'), `<div class="row wrap" style="margin-bottom:8px">
       <select id="bz_loc" style="flex:1"><option value="">${esc(T('all'))}</option>${P.locs.map((l) => `<option value="${l.id}" ${String(l.id) === String(P.loc) ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select></div>
-    <div class="row wrap" style="margin-bottom:10px"><span class="muted">${esc(T('period'))}:</span>${[7, 14, 30, 90].map((d) => `<button class="tog ${P.days === d ? 'on' : ''}" data-act="bz_days" data-v="${d}">${d} ${esc(T('days'))}</button>`).join('')}<button class="tog ${P.days === 'fy' ? 'on' : ''}" data-act="bz_days" data-v="fy">${esc(T('fy'))}</button></div>
+    <div class="row wrap" style="margin-bottom:10px" data-ctl="select"><span class="muted">${esc(T('period'))}:</span>${[7, 14, 30, 90].map((d) => `<button class="tog ${P.days === d ? 'on' : ''}" data-act="bz_days" data-v="${d}">${d} ${esc(T('days'))}</button>`).join('')}<button class="tog ${P.days === 'fy' ? 'on' : ''}" data-act="bz_days" data-v="fy">${esc(T('fy'))}</button></div>
     <div id="bz_body"><p class="muted">${esc(t('loading'))}</p></div>`, true);
   const td = dhaka(), from = P.days === 'fy' ? (B.fyStart ? B.fyStart(td) : td.slice(0, 4) + '-01-01') : addDays(td, -(P.days - 1)), loc = P.loc ? Number(P.loc) : null;
   const q = (p) => p.then((r) => r, (e) => ({ data: null, error: e }));

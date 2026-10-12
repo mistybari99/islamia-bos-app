@@ -128,7 +128,7 @@ function drawSell(can) {
   const canNew = S.ctx.is_owner || (S.ctx.perms.ITEMS && S.ctx.perms.ITEMS.enter);
   $('#pos_body').innerHTML = `
     <div class="row"><input id="pos_q" placeholder="${esc(T('search'))}" value="${esc(P.q)}" style="flex:1"><button data-act="pos_scan" aria-label="${esc(T('scan'))}" ${can ? '' : 'disabled'}>▮▮</button><button class="primary" data-act="pos_quick" ${can ? '' : 'disabled'}>⚡ ${esc(T('quick'))}</button></div>
-    <div class="row wrap" style="margin:10px 0" id="pos_cats">${[['', T('all')], ['_f', T('freq')], ...cats.map((c) => [c, cn(c)])].map(([c, l]) =>
+    <div class="row wrap" style="margin:10px 0" id="pos_cats" data-ctl="select" data-title="${esc(lab(L('ক্যাটাগরি', 'Category', 'Category')))}">${[['', T('all')], ['_f', T('freq')], ...cats.map((c) => [c, cn(c)])].map(([c, l]) =>
       `<button class="tog ${P.cat === c ? 'on' : ''}" data-act="pos_cat" data-v="${esc(c)}">${esc(l)}</button>`).join('')}</div>
     <div class="row wrap" style="margin-bottom:10px"><button class="tog" data-act="pos_other" ${can ? '' : 'disabled'}>${esc(T('other'))}</button>${canNew ? `<button class="tog" data-act="pos_newitem">${esc(T('newitem'))}</button>` : ''}</div>
     <div class="pos-grid" id="pos_items"></div><div style="height:96px"></div>

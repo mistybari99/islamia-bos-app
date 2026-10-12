@@ -146,7 +146,7 @@ function draw() {
     </div>
     <div class="row wrap" style="gap:6px"><button data-act="db_q" data-v="today">${esc(T('today'))}</button><button data-act="db_q" data-v="7">${esc(T('d7'))}</button><button data-act="db_q" data-v="month">${esc(T('month'))}</button>
       <button id="db_menu" data-act="db_menu" aria-label="${esc(T('menu'))}" style="margin-inline-start:auto;min-width:48px">${DOTS}</button></div>
-    <div class="row wrap" role="group" style="gap:6px">${['', 'cash', 'bank', 'mobile'].map((m) => `<button class="tog ${D.mode === m ? 'on' : ''}" data-act="db_mode" data-v="${m}" aria-pressed="${D.mode === m}">${esc(m ? T(m) : T('all'))}</button>`).join('')}</div>
+    <div class="row wrap" role="group" style="gap:6px" data-ctl="select">${['', 'cash', 'bank', 'mobile'].map((m) => `<button class="tog ${D.mode === m ? 'on' : ''}" data-act="db_mode" data-v="${m}" aria-pressed="${D.mode === m}">${esc(m ? T(m) : T('all'))}</button>`).join('')}</div>
   </div>`;
   let body = '';
   if (D.err) body = errBox(D.err);

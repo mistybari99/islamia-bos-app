@@ -104,7 +104,7 @@ function drawBoard() {
     <div class="row wrap" id="ro_sum">${MODES.map((m) => `<span class="chip ${TONE[m]}" data-mode="${m}">${esc(T(m))} ${cellCount(m)}</span>`).join('')}</div>
     <div class="row"><input id="ro_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" value="${esc(D.q)}"><button class="primary" data-act="ro_bulk">${esc(T('bulk'))}</button></div>
     <div class="row wrap"><select id="ro_loc"><option value="all">${esc(T('allplaces'))}</option>${D.locs.map((l) => `<option value="${l.id}" ${String(l.id) === String(D.loc) ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select></div>
-    <div class="row wrap" id="ro_chips">${['all', ...MODES].map((m) => `<button class="tog ${D.fm === m ? 'on' : ''}" data-act="ro_filter" data-v="${m}">${esc(T(m))}</button>`).join('')}</div>
+    <div class="row wrap" id="ro_chips" data-ctl="select">${['all', ...MODES].map((m) => `<button class="tog ${D.fm === m ? 'on' : ''}" data-act="ro_filter" data-v="${m}">${esc(T(m))}</button>`).join('')}</div>
     <div id="ro_list">${rows.length ? rows.map(card).join('') : `<p class="muted">${esc(T('nof'))}</p>`}</div>
     ${isOwner() ? `<h2>${esc(T('sw_title'))}</h2><div class="stack" id="ro_sw">${sw('rollout_enforce', T('sw_enforce'))}${sw('entered_later_on', T('sw_later'))}${sw('change_requests_on', T('sw_change'))}${sw('owner_self_approve', T('sw_self'))}</div>` : ''}`, 'control');
 }

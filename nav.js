@@ -11,6 +11,7 @@ const BRAND = { bn: 'ইসলামিয়া মিষ্টি ঘর', en:
 
 // ---------- labels (3 modes) ----------
 const X = {
+  sell: L('বিক্রি', 'Sell', 'Sell · বিক্রি'), theme: L('থিম', 'Theme', 'Theme'), th_dark: L('প্রিমিয়াম ডার্ক', 'Premium Dark', 'Premium Dark'), th_light: L('প্রিমিয়াম লাইট', 'Premium Light', 'Premium Light'), th_classic: L('ক্লাসিক', 'Classic', 'Classic'),
   menu: L('মেনু', 'Menu', 'Menu'), me: L('আমি', 'Me', 'Me'), search: L('মেনু খুঁজুন…', 'Search menu…', 'Menu খুঁজুন…'), close: L('বন্ধ করুন', 'Close', 'Close'),
   nores: L('কিছু পাওয়া যায়নি', 'Nothing found', 'কিছু পাওয়া যায়নি'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), soon: L('শীঘ্রই আসছে', 'Coming soon', 'Coming soon'),
   online: L('অনলাইন', 'Online', 'Online'), offline: L('অফলাইন', 'Offline', 'Offline'), pin: L('প্রিয়তে রাখুন', 'Pin to favourites', 'Favourite-এ রাখুন'), unpin: L('প্রিয় থেকে সরান', 'Unpin', 'Favourite থেকে সরান'),
@@ -56,7 +57,9 @@ const IC = {
   starF: sv('<path d="M16 3.5l3.9 8 8.8 1.2-6.4 6.2 1.6 8.8L16 23.4 8.1 27.7l1.6-8.8L3.3 12.7l8.8-1.2z" fill="currentColor"/>'),
   x: sv('<path d="M8 8l16 16M24 8L8 24"/>'), cv: sv('<path d="M12 6l10 10-10 10"/>'), plus: sv('<path d="M16 6v20M6 16h20"/>'),
 };
-const ico = (k) => (A.ICON && A.ICON[k]) || IC[k] || IC.doc;
+const skin = () => document.documentElement.hasAttribute('data-skin');   // Premium themes: 3D glass icons (icons3d.js); Classic keeps the old icons
+const ico = (k, i3, size) => { if (skin() && B.icon) { const s3 = B.icon(i3 || k, size || 22); if (s3) return s3; } return (A.ICON && A.ICON[k]) || IC[k] || IC.doc; };
+const ic3 = (k, size) => (skin() && B.icon && B.icon(k, size || 22)) || IC[k] || '';   // fixed shell icons (home / menu / me ...)
 
 // ---------- permission helpers ----------
 const ctx = () => S.ctx, perms = () => (S.ctx && S.ctx.perms) || {};
@@ -265,19 +268,29 @@ function mount() {
   if (!document.body.dataset.ui && store.get('bos_ui') !== 'off') document.body.dataset.ui = 'calm';
 }
 const groupOpen = () => { if (!openGroups) { openGroups = jget('bos_navg_' + uid(), null); if (!openGroups) openGroups = { dash: true }; } return openGroups; };
+// ---------- theme control (Premium Dark / Premium Light / Classic): compact dropdown in the drawer footer and the Me sheet ----------
+const themeSel = (id) => { const TH = window.BOS_THEME; if (!TH) return ''; const cur = TH.get();
+  return `<div class="th-row"><label for="${id}">${esc(T('theme'))}</label><select id="${id}" data-theme-pick aria-label="${esc(T('theme'))}">${[['dark', 'th_dark'], ['light', 'th_light'], ['classic', 'th_classic']].map(([v, k]) => `<option value="${v}" ${cur === v ? 'selected' : ''}>${esc(T(k))}</option>`).join('')}</select></div>`; };
+document.addEventListener('change', (ev) => {
+  const t0 = ev.target; if (!t0 || !t0.matches || !t0.matches('[data-theme-pick]') || !window.BOS_THEME) return;
+  window.BOS_THEME.set(t0.value); sig = '';
+  try { renderDrawer(); syncBnav(); } catch (e) { /* shell not ready */ }
+  window.dispatchEvent(new HashChangeEvent('hashchange'));   // redraw the current screen with the new icon set
+  document.querySelectorAll('[data-theme-pick]').forEach((x) => { x.value = window.BOS_THEME.get(); });
+});
 function renderDrawer() {
   if (!el.drawer || !S.ctx) return;
   dr_shell();
   dr_body();
 }
 function dr_shell() {
-  const s = S.lang + '|' + uid(); if (s === sig && el.drawer.firstChild) return; sig = s;
+  const s = S.lang + '|' + uid() + '|' + (window.BOS_THEME ? window.BOS_THEME.get() : ''); if (s === sig && el.drawer.firstChild) return; sig = s;
   el.drawer.setAttribute('aria-label', T('menu'));
   el.drawer.innerHTML = `<div class="dr-head"><img src="mark.svg" alt=""><div class="nm"><b>${esc(BRAND.bn)}</b><i>${esc(BRAND.en)}</i></div>
       <button class="hbtn" style="min-height:48px;min-width:48px;border:0;background:transparent;color:var(--ink)" data-act="nav_close" aria-label="${esc(T('close'))}">${IC.x.replace('<svg', '<svg width="22" height="22"')}</button></div>
     <div class="dr-search"><input id="nav_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" aria-label="${esc(T('search'))}" value="${esc(q)}"></div>
     <div class="dr-body" id="nav_body"></div>
-    <div class="dr-foot"><div id="nav_locbox"></div><div class="me-lang">${A.langBar()}</div><div class="row"><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net"></span><span id="nav_nett">${esc(navigator.onLine === false ? T('offline') : T('online'))}</span></span>
+    <div class="dr-foot"><div id="nav_locbox"></div><div class="me-lang">${A.langBar()}</div>${themeSel('nav_theme')}<div class="row"><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net"></span><span id="nav_nett">${esc(navigator.onLine === false ? T('offline') : T('online'))}</span></span>
       <button class="lo" data-act="logout">${esc(T('logout'))}</button></div></div>`;
 }
 const crumbOf = (e) => B.ia.groupLabel(e.g) + ' › ' + e.label;
@@ -287,7 +300,7 @@ function dr_body() {
   const all = entries(), mode = npMode(), cur = keyOfHash(), cn = CNT || {}, og = groupOpen(), ql = q.trim().toLowerCase();
   const row = (e, sub, cls = 'dr-it') => {
     const on = e.key === cur, pin = isPinned(e.key), c = e.cnt && cn[e.cnt];
-    return `<div class="dr-i ${on ? 'on' : ''}"><button class="rb ${cls}" data-act="nav_go" data-v="${esc(e.route)}" ${on ? 'aria-current="page"' : ''}>${ico(e.icon)}<span class="lb">${esc(e.label)}${sub ? `<small class="muted" style="display:block;font-weight:400">${esc(B.ia.groupLabel(e.g))}</small>` : ''}</span>${c ? `<span class="ct">${c}</span><span class="dot ${e.tone || 'warn'}"></span>` : ''}</button>
+    return `<div class="dr-i ${on ? 'on' : ''}"><button class="rb ${cls}" data-act="nav_go" data-v="${esc(e.route)}" ${on ? 'aria-current="page"' : ''}>${ico(e.icon, e.rec && e.rec.i3)}<span class="lb">${esc(e.label)}${sub ? `<small class="muted" style="display:block;font-weight:400">${esc(B.ia.groupLabel(e.g))}</small>` : ''}</span>${c ? `<span class="ct">${c}</span><span class="dot ${e.tone || 'warn'}"></span>` : ''}</button>
       <button class="st" data-act="nav_pin" data-v="${esc(e.key)}" aria-pressed="${pin}" aria-label="${esc(pin ? T('unpin') : T('pin'))}">${pin ? IC.starF : IC.star}</button></div>`;
   };
   const lockRow = (label) => `<div class="dr-i lock">${IC.lock}<span>${esc(label)}</span></div>`;
@@ -306,7 +319,7 @@ function dr_body() {
     const cuH = stale ? [] : SR.cust.map((c) => `<div class="dr-i"><button class="rb dr-it" data-act="nav_go" data-v="dues">${ico('dues')}<span class="lb">${esc(c.name || '')}${c.mobile ? ' · ' + esc(c.mobile) : ''}<small class="muted" style="display:block;font-weight:400">${esc(B.ia.groupLabel('cust'))}</small></span></button></div>`);
     const sec = (title, arr) => (arr.length ? `<div class="hsec">${esc(title)}<small>${arr.length}</small></div>${arr.join('')}` : '');
     const loc = hit.map((e) => row(e, true));
-    const doR = doH.map((e) => `<div class="dr-i"><button class="rb dr-it" data-act="nav_go" data-v="${esc(e.route)}" data-do="1">${ico(e.icon)}<span class="lb">${esc(e.label)}</span></button></div>`);
+    const doR = doH.map((e) => `<div class="dr-i"><button class="rb dr-it" data-act="nav_go" data-v="${esc(e.route)}" data-do="1">${ico(e.icon, e.rec && e.rec.i3)}<span class="lb">${esc(e.label)}</span></button></div>`);
     const setR = setH.map((e) => row(e, true));
     const offl = navigator.onLine === false ? `<p class="muted center pad" data-state="offline">${esc(T('find_off'))}</p>` : '';
     body.innerHTML = (v2() ? sec(T('s_do'), doR) : '') + (loc.length || itH.length || cuH.length || setR.length ? sec(T('s_screens'), loc) + sec(T('s_set'), setR) + sec(T('s_items'), itH) + sec(T('s_cust'), cuH) : '') + (v2() ? offl : '')
@@ -325,7 +338,7 @@ function dr_body() {
     const open = !!og[g] || okL.some((e) => e.key === cur), attn = okL.some((e) => e.cnt && cn[e.cnt]);
     // lock mode: ONE summary line per category (at most 8 lines in the whole drawer)
     const locks = mode === 'lock' && bad.length && lockLines++ < 8 ? [lockRow(T('noperm') + ' (' + bad.length + ')')] : [];
-    return `<div class="dr-grp"><button class="rb dr-g" data-act="nav_grp" data-v="${g}" aria-expanded="${open}"><span class="gl">${esc(B.ia.groupLabel(g))}${attn ? '<span class="dot warn"></span>' : ''}${!okL.length ? IC.lock.replace('<svg', '<svg width="16" height="16"') : ''}</span>${IC.cv.replace('<svg', '<svg class="cv"')}</button>
+    return `<div class="dr-grp"><button class="rb dr-g" data-act="nav_grp" data-v="${g}" aria-expanded="${open}"><span class="gl">${skin() ? ico('doc', 'g:' + g, 20) : ''}${esc(B.ia.groupLabel(g))}${attn ? '<span class="dot warn"></span>' : ''}${!okL.length ? IC.lock.replace('<svg', '<svg width="16" height="16"') : ''}</span>${IC.cv.replace('<svg', '<svg class="cv"')}</button>
       <div class="dr-list" ${open ? '' : 'hidden'}>${okL.map((e) => row(e)).join('')}${okL.length ? `<div class="dr-i"><button class="rb dr-rc" data-act="go_group" data-v="${g}" data-grp="${g}" style="opacity:.8"><span class="lb"><small>${esc(T('all_in'))} ›</small></span></button></div>` : ''}${locks.join('')}</div></div>`;
   }).join('');
 }
@@ -383,18 +396,20 @@ function syncBnav() {
   el.bnav.setAttribute('aria-label', T('menu'));
   if (v2()) {
     const cur2 = drawerOpen ? 'menu' : page === 'home' ? 'home' : keyOfHash();
-    const sl = B.ia.slots(cx()).map((x) => x.kind === 'home' ? `<button data-act="go" data-v="home" ${cur2 === 'home' ? 'aria-current="page"' : ''}>${IC.home}<span>${esc(t('home'))}</span></button>`
-      : x.kind === 'menu' ? `<button data-act="nav_open" ${cur2 === 'menu' ? 'aria-current="page"' : ''}>${IC.menu}<span>${esc(T('menu'))}</span></button>`
-      : x.kind === 'me' ? `<button data-act="nav_me">${IC.me}<span>${esc(T('me'))}</span></button>`
-      : `<button data-act="go" data-v="${esc(x.route)}" data-slot="${esc(x.route)}" ${cur2 === 'r:' + x.route || location.hash === '#/' + x.route ? 'aria-current="page"' : ''}>${ico(x.icon)}<span>${esc(x.label)}</span></button>`).join('');
-    el.bnav.setAttribute('aria-label', T('menu')); el.bnav.innerHTML = sl; return;
+    const slB = (x) => x.kind === 'home' ? `<button data-act="go" data-v="home" ${cur2 === 'home' ? 'aria-current="page"' : ''}>${ic3('home')}<span>${esc(t('home'))}</span></button>`
+      : x.kind === 'menu' ? `<button data-act="nav_open" ${cur2 === 'menu' ? 'aria-current="page"' : ''}>${ic3('menu')}<span>${esc(T('menu'))}</span></button>`
+      : x.kind === 'me' ? `<button data-act="nav_me">${ic3('me')}<span>${esc(T('me'))}</span></button>`
+      : `<button data-act="go" data-v="${esc(x.route)}" data-slot="${esc(x.route)}" ${cur2 === 'r:' + x.route || location.hash === '#/' + x.route ? 'aria-current="page"' : ''}>${ico(x.icon, x.i3)}<span>${esc(x.label)}</span></button>`;
+    const bs = B.ia.barSlots(cx());   // [2 slots] [Sell orb in the centre when the person may sell] [2 slots]
+    const sellB = bs.centre ? `<button class="sell" data-act="go" data-v="pos" data-slot="pos" aria-label="${esc(T('sell'))}" ${location.hash === '#/pos' ? 'aria-current="page"' : ''}><span class="orb">${ic3('sell', 28) || ico('pos')}</span><span class="sl">${esc(T('sell'))}</span></button>` : '';
+    el.bnav.setAttribute('aria-label', T('menu')); el.bnav.innerHTML = bs.left.map(slB).join('') + sellB + bs.right.map(slB).join(''); return;
   }
-  const sc = B.ia.bottom(cx()).map((r) => b('go', ico(r.icon), B.ia.label(r), 'r:' + r.route, `data-v="${esc(r.route)}"`)).join('');   // best other shortcut for this role (priority in ia.js)
-  el.bnav.innerHTML = b('go', IC.home, t('home'), 'home', 'data-v="home"') + posBtn + sc + b('nav_open', IC.menu, T('menu'), 'menu') + b('nav_me', IC.me, T('me'), 'me');
+  const sc = B.ia.bottom(cx()).map((r) => b('go', ico(r.icon, r.i3), B.ia.label(r), 'r:' + r.route, `data-v="${esc(r.route)}"`)).join('');   // best other shortcut for this role (priority in ia.js)
+  el.bnav.innerHTML = b('go', ic3('home'), t('home'), 'home', 'data-v="home"') + posBtn + sc + b('nav_open', ic3('menu'), T('menu'), 'menu') + b('nav_me', ic3('me'), T('me'), 'me');
 }
 
 // ---------- header bits (called from shell) ----------
-function menuBtn() { return `<button class="hbtn" data-act="nav_open" aria-label="${esc(T('menu'))}" aria-haspopup="dialog">${IC.menu}</button>`; }
+function menuBtn() { return `<button class="hbtn" data-act="nav_open" aria-label="${esc(T('menu'))}" aria-haspopup="dialog">${ic3('menu', 24)}</button>`; }
 function headExtra() {
   const k = keyOfHash(), e = k !== 'r:home' ? byKey(k) : null;
   if (!e || !e.ok) return '';
@@ -451,7 +466,7 @@ function drawPicker(v) {
 function meSheet() {
   const p = S.ctx.profile;
   openSheet(`<h2>${esc(p.full_name || p.staff_id)} <span class="muted">· ${esc(p.staff_id)}</span></h2>
-    <div class="me-lang" style="margin:10px 0">${A.langBar()}</div>
+    <div class="me-lang" style="margin:10px 0">${A.langBar()}</div>${themeSel('me_theme')}
     <div class="stack"><button class="full" data-act="nav_reset">${esc(T('reset'))}</button>
     <button class="full" data-act="logout">${esc(T('logout'))}</button><button class="full" data-act="closesheet">${esc(T('done'))}</button></div>`);
 }
@@ -498,8 +513,8 @@ async function home() {
   const attn = ap || own || ctlOk() ? `<div class="hsec">${esc(T('attn'))}${hot.length ? `<small>${hot.reduce((s, r) => s + r[1], 0)}</small>` : ''}${V2 ? `<button class="mini" data-act="hv_refresh" aria-label="${esc(T('refresh'))}">↻</button>` : ''}</div>
     <div class="card" style="padding:4px 12px">${hot.length ? hot.map((r) => `<button class="hrow mk ${r[2]}" data-act="go" data-v="${r[4]}"><span>${esc(r[3])}</span><span class="n">${r[1]}</span><span class="cv">›</span></button>`).join('')
       : `<div class="dash-ok">${esc(V2 ? T('all_clear') : T('attn_ok'))}</div>`}${V2 && rows.filter((r) => r[1]).length > 5 ? `<button class="hrow" data-act="go" data-v="${own || ctlOk() ? 'control' : 'pending'}"><span>${esc(T('see_all'))}</span><span class="cv">›</span></button>` : ''}</div>` : (V2 && hot.length ? `<div class="hsec">${esc(T('attn'))}<small>${hot.reduce((s, r) => s + r[1], 0)}</small></div><div class="card" style="padding:4px 12px">${hot.map((r) => `<button class="hrow mk ${r[2]}" data-act="go" data-v="${r[4]}"><span>${esc(r[3])}</span><span class="n">${r[1]}</span><span class="cv">›</span></button>`).join('')}</div>` : '');
-  const posBtn = P('POS', 'enter') ? `<button class="primary hbig" data-act="go" data-v="pos">${esc(t('pos'))}</button>` : '';
-  $('#hv_main').innerHTML = `${V2 ? '' : posBtn}${attn}${V2 ? '<div id="hv_sheets"></div><div id="hv_qa"></div><div class="hsec">' + esc(T('fav')) + '</div><div id="hv_fav"></div><div id="hv_recent"></div>' : ''}
+  const posBtn = P('POS', 'enter') ? `<button class="primary hbig sellbig" data-act="go" data-v="pos" data-sell="1">${ic3('sell', 34)}<span class="sb-t"><b>${esc(T('sell'))}</b><small>${esc(t('pos'))}</small></span></button>` : '';
+  $('#hv_main').innerHTML = `${posBtn}${attn}${V2 ? '<div id="hv_sheets"></div><div id="hv_qa"></div><div class="hsec">' + esc(T('fav')) + '</div><div id="hv_fav"></div><div id="hv_recent"></div>' : ''}
     <div class="seg" role="group" aria-label="${esc(T('biz') + ' / ' + T('acc'))}"><button data-act="hv_mode" data-v="biz" aria-pressed="${HS.mode === 'biz'}">${esc(T('biz'))}</button><button data-act="hv_mode" data-v="acc" aria-pressed="${HS.mode === 'acc'}">${esc(T('acc'))}</button></div>
     <div class="ptabs" role="tablist" id="hv_pt"></div><div id="hv_stats"></div>
     ${V2 ? '' : '<div id="hv_sheets"></div><div class="hsec">' + esc(T('fav')) + '</div><div id="hv_fav"></div>'}
@@ -586,7 +601,7 @@ function tileDefs() {
 }
 function tile(e, o = {}) {
   const pin = isPinned(e.key), c = e.cnt && CNT && CNT[e.cnt];
-  return `<div class="qt"><button class="qm" data-act="go" data-v="${esc(e.route)}">${ico(e.icon)}<span class="lb">${esc(o.label || e.label)}</span>${c ? `<span class="dot ${e.tone || 'warn'}"></span>` : ''}</button>
+  return `<div class="qt"><button class="qm" data-act="go" data-v="${esc(e.route)}">${ico(e.icon, e.rec && e.rec.i3)}<span class="lb">${esc(o.label || e.label)}</span>${c ? `<span class="dot ${e.tone || 'warn'}"></span>` : ''}</button>
     <button class="st" data-act="nav_pin" data-v="${esc(e.key)}" aria-pressed="${pin}" aria-label="${esc(pin ? T('unpin') : T('pin'))}">${pin ? IC.starF : IC.star}</button></div>`;
 }
 function drawTiles() {
@@ -624,21 +639,21 @@ function drawMods() {
     const e = byKey('r:' + k); if (!e) return '';
     if (!e.ok) return mode === 'lock' && lockable.has(k) ? `<div class="lockcard">${IC.lock}<span>${esc(e.label)} · ${esc(T('noperm'))}</span></div>` : '';
     const c = e.cnt && cn[e.cnt];
-    return `<button class="tile" data-act="go" data-v="${esc(e.route)}">${ico(e.icon)}<span>${esc(e.label)}</span>${c ? `<span class="badge">${c}</span>` : ''}</button>`;
+    return `<button class="tile" data-act="go" data-v="${esc(e.route)}">${ico(e.icon, e.rec && e.rec.i3)}<span>${esc(e.label)}</span>${c ? `<span class="badge">${c}</span>` : ''}</button>`;
   }).join('');
 }
 function drawCtl() {
   const box = $('#hv_ctl'); if (!box) return;
   const e = byKey('r:control'); if (!e || !e.ok) { box.innerHTML = ''; return; }
   const c = (CNT && CNT.ctl) || 0;
-  box.innerHTML = `<button class="tile t-ink" data-act="go" data-v="control" style="width:100%;margin-top:12px;min-height:76px;flex-direction:row;align-items:center;justify-content:flex-start">${ico('control')}<span style="flex:1;text-align:start"><b>${esc(T('ctl'))}</b><br><small>${esc(T('ctl_d'))}</small></span>${c ? `<span class="badge">${c}</span>` : ''}</button>`;
+  box.innerHTML = `<button class="tile t-ink" data-act="go" data-v="control" style="width:100%;margin-top:12px;min-height:76px;flex-direction:row;align-items:center;justify-content:flex-start">${ico('control', 'sliders', 30)}<span style="flex:1;text-align:start"><b>${esc(T('ctl'))}</b><br><small>${esc(T('ctl_d'))}</small></span>${c ? `<span class="badge">${c}</span>` : ''}</button>`;
 }
 function drawRecent() {
   const box = $('#hv_recent'), qa = $('#hv_qa'); if (!box || !v2()) return;   // switch OFF = the old Home
   const rc = B.ia.recent(uid()).map((r) => byKey('r:' + r)).filter((e) => e && e.ok && e.live);
   box.innerHTML = `<div class="hsec">${esc(T('recent'))}</div>` + (rc.length ? `<div class="row wrap">${rc.map((e) => `<button class="tog" data-act="go" data-v="${esc(e.route)}">${esc(e.label)}</button>`).join('')}</div>` : `<p class="muted" style="margin:0 0 10px">${esc(T('recent_empty'))}</p>`);
   const acts = B.ia.quickActions(cx());
-  if (qa) qa.innerHTML = acts.length ? `<div class="hsec">${esc(T('qa'))}</div><div class="qgrid" id="hv_qgrid">${acts.map((a) => `<div class="qt"><button class="qm" data-act="go" data-v="${esc(a.route)}" data-quick="${esc(a.route)}">${ico(a.icon)}<span class="lb">${esc(a.label)}</span></button></div>`).join('')}</div>` : '';
+  if (qa) qa.innerHTML = acts.length ? `<div class="hsec">${esc(T('qa'))}</div><div class="qgrid" id="hv_qgrid">${acts.map((a) => `<div class="qt"><button class="qm" data-act="go" data-v="${esc(a.route)}" data-quick="${esc(a.route)}">${ico(a.icon, a.i3)}<span class="lb">${esc(a.label)}</span></button></div>`).join('')}</div>` : '';
 }
 function drawCats() {
   const box = $('#hv_cats'); if (!box) return;
@@ -646,7 +661,7 @@ function drawCats() {
   box.innerHTML = GROUPS.filter((g) => g !== 'dash').map((g) => {
     const l = all.filter((e) => e.g === g); if (!l.length) return '';
     const n = l.reduce((s2, e) => s2 + (e.cnt && cn[e.cnt] && e.cnt !== 'ctl' ? cn[e.cnt] : 0), 0);
-    return `<button class="tile" data-act="go_group" data-v="${g}" data-cat="${g}">${ico(l[0].icon)}<span>${esc(B.ia.groupLabel(g))}</span>${n ? `<span class="badge">${n}</span>` : ''}</button>`;
+    return `<button class="tile" data-act="go_group" data-v="${g}" data-cat="${g}">${ico(l[0].icon, 'g:' + g)}<span>${esc(B.ia.groupLabel(g))}</span>${n ? `<span class="badge">${n}</span>` : ''}</button>`;
   }).join('');
 }
 function drawForms() {

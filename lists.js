@@ -95,7 +95,7 @@ async function draw() {
   let body;
   if (D.view === 'other') body = drawOther(); else if (D.view === 'requests') body = drawRequests(); else body = drawOptions(d, own);
   shell(T('title'), `<div class="notice ok">${esc(T('hint'))}</div>${D.noP15 ? `<div class="notice bad">${esc(T('noP15'))}</div>` : ''}
-    <div class="row wrap" style="margin-bottom:10px">${chips}${own && Object.values(D.defs).some((x) => x.hidden) ? `<button class="mini" data-act="ls2_showhid">${esc(T('showHidden'))}${D.showHidden ? ' ✓' : ''}</button>` : ''}</div>
+    <div class="row wrap" style="margin-bottom:10px" data-ctl="select">${chips}${own && Object.values(D.defs).some((x) => x.hidden) ? `<button class="mini" data-act="ls2_showhid">${esc(T('showHidden'))}${D.showHidden ? ' ✓' : ''}</button>` : ''}</div>
     ${D.err ? `<div class="notice bad">${esc(T('missing'))}</div>` : ''}${head}${body}`, true);
 }
 function drawOptions(d, own) {

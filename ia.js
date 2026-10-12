@@ -110,10 +110,17 @@ const IA = [
 
 // Control Center extras (owner only): screens that sit next to the 12 built-in tiles
 [['bulkitems', 'lists'], ['itemmap', 'lists'], ['itemimport', 'lists'], ['itemtypes', 'lists'], ['settings2', 'rules'], ['invoice', 'rules'], ['rulehub', 'rules'], ['changes', 'places']].forEach(([r, g]) => { const x = IA.find((y) => y.route === r); if (x) x.cc = g; });
+// 3D icon key per screen (icons3d.js). The old r.icon stays for the Classic theme; i3 is used by the Premium themes. Unknown routes fall back to icon, then doc.
+const I3 = { items: 'bag', 'items/new': 'plus', lists: 'list', 'settings2/units': 'scale', itemimport: 'download', itemmap: 'link', bulkitems: 'bag', itemtypes: 'tag', stock: 'box', assets: 'tool', purchase: 'cart', 'purchase/new': 'plus',
+  'purchase/return': 'swap', payables: 'money', recipes: 'chef', pos: 'pos', salereturn: 'swap', dues: 'dues', invoice: 'print', daybook: 'book', ledgerlinks: 'link', exceptions: 'warn', pending: 'stamp', itemreq: 'swap', releases: 'unlock',
+  emergency: 'alert', changes: 'edit', numaudit: 'hash', outbox: 'upload', reports: 'chart', biz: 'pie', brandpnl: 'pie', discounts: 'tag', staff: 'users', matrix: 'matrix', salary: 'money', locations: 'pin', locset: 'pinset', locsheet: 'pinset',
+  rollout: 'sliders', control: 'sliders', rulehub: 'shield', rules: 'rules', settings: 'gear', settings2: 'sliders', logs: 'history', backup: 'download', home: 'home' };
+IA.forEach((r) => { r.i3 = I3[r.route] || (r.route.startsWith('settings2/') ? 'gear' : r.icon); });
 const byRoute = new Map(IA.map((r) => [r.route, r]));
 
 // ---------- Increment A: verbs (the "Do" part of search), quick actions per persona, bottom slots per persona. flow stays null (guided flows come later). ----------
 // form codes used below were checked against the forms table (schema.sql seed): 03-1 04-1 04-2 04-3 05-1 06-1 10-1 10-2 10-3 11-1 14-1 (05-3 / 05-4 / 06-2 / 06-3 exist too, form pages for them are reached from the category page, no verb bound).
+const FORM_I3 = { cashcount: 'money', stockcount: 'box', grn: 'download', issue: 'upload', expense: 'money', transfer: 'truck', daily: 'factory', reqmat: 'chef', handover: 'swap', digital: 'money', hubcash: 'money' };
 const FORM = (code) => (c) => c.P(code, 'enter') && c.formLive(code);
 const V = (route, verbs, aliases) => { const r = IA.find((x) => x.route === route); if (r) { r.verbs = verbs; r.aliases = aliases || []; } };
 V('pos', ['sell', 'sale', 'pos', 'বিক্রি', 'বিক্রয়', 'সেল'], ['cashier']); V('dues', ['collect', 'due', 'baki', 'বাকি', 'আদায়'], ['credit']);
@@ -128,8 +135,8 @@ const DOF = [
   ['daily', 'form/05-1', ['দৈনিক উৎপাদন শিট', 'Daily production sheet', 'Daily sheet'], ['daily sheet', '05-1', 'উৎপাদন']], ['reqmat', 'form/06-1', ['কাঁচামাল চাওয়া', 'Request material', 'Material request'], ['request material', '06-1']],
   ['handover', 'form/11-1', ['হস্তান্তর', 'Handover', 'Handover'], ['handover', '11-1', 'হস্তান্তর']], ['digital', 'form/10-3', ['ডিজিটাল মেলানো', 'Digital reconcile', 'Digital reconcile'], ['reconcile', '10-3', 'digital']],
   ['hubcash', 'form/10-1', ['হাব ক্যাশ', 'Hub cash', 'Hub cash'], ['hub cash', '10-1']],
-].map(([id, route, label, verbs]) => ({ id, route, label, verbs, aliases: [], icon: 'doc', ok: FORM(route.slice(5)), form: route.slice(5) }));
-const doRecs = () => IA.filter((r) => r.verbs.length && r.status === 'live').map((r) => ({ id: r.id, route: r.route, label: r.label, verbs: r.verbs, aliases: r.aliases, icon: r.icon, ok: r.ok, rec: r })).concat(DOF);
+].map(([id, route, label, verbs]) => ({ id, route, label, verbs, aliases: [], icon: 'doc', i3: FORM_I3[id] || 'doc', ok: FORM(route.slice(5)), form: route.slice(5) }));
+const doRecs = () => IA.filter((r) => r.verbs.length && r.status === 'live').map((r) => ({ id: r.id, route: r.route, label: r.label, verbs: r.verbs, aliases: r.aliases, icon: r.icon, i3: r.i3, ok: r.ok, rec: r })).concat(DOF);
 const doLabel = (d) => (d.rec ? labelOf(d.rec) : lab(L(d.label[0], d.label[1], d.label[2])));
 // persona from what the person may do (no new permission logic: the same P / GF / canPos checks)
 function persona(c) {
@@ -143,7 +150,7 @@ function persona(c) {
 }
 // quick actions (2.5) and bottom slots (3.1) by persona; ids are DO ids / record routes. Unavailable ones are skipped and the next candidate fills in.
 const QUICK_BY = {
-  owner: ['control', 'biz', 'dues', 'items', 'reports', 'pending'], manager: ['pos', 'cashcount', 'grn', 'stockcount', 'expense', 'stock'], cashier: ['pos', 'dues', 'salereturn', 'cashcount', 'outbox'],
+  owner: ['pos', 'control', 'biz', 'dues', 'items', 'reports'], manager: ['pos', 'cashcount', 'grn', 'stockcount', 'expense', 'stock'], cashier: ['pos', 'dues', 'salereturn', 'cashcount', 'outbox'],
   store: ['grn', 'issue', 'transfer', 'stockcount', 'stock'], factory: ['daily', 'recipes', 'reqmat', 'transfer', 'handover'], accountant: ['daybook', 'payables', 'purchase', 'digital', 'reports', 'salary'], hub: ['hubcash', 'payables', 'daybook', 'transfer', 'dues'],
 };
 const SLOTS_BY = {
@@ -151,9 +158,9 @@ const SLOTS_BY = {
   factory: ['home', 'daily', 'recipes', 'menu'], accountant: ['home', 'daybook', 'payables', 'menu'], hub: ['home', 'hubcash', 'payables', 'menu'],
 };
 const slotTarget = (id, c) => {   // id -> {route,label,icon} when this person may open it
-  if (id === 'ctl') { const r = byRoute.get('control'); if (r && visible(r, c)) return { route: 'control', label: labelOf(r), icon: r.icon }; const p = byRoute.get('pending'); return p && visible(p, c) ? { route: 'pending', label: labelOf(p), icon: p.icon } : null; }
-  const d = doRecs().find((x) => x.id === id) || (byRoute.get(id) ? { id, route: id, rec: byRoute.get(id), icon: byRoute.get(id).icon, ok: byRoute.get(id).ok } : null); if (!d) return null; let ok = false; try { ok = !!d.ok(c); } catch (e) { ok = false; }
-  return ok ? { route: d.route, label: doLabel(d), icon: d.icon } : null;
+  if (id === 'ctl') { const r = byRoute.get('control'); if (r && visible(r, c)) return { route: 'control', label: labelOf(r), icon: r.icon, i3: r.i3 }; const p = byRoute.get('pending'); return p && visible(p, c) ? { route: 'pending', label: labelOf(p), icon: p.icon, i3: p.i3 } : null; }
+  const d = doRecs().find((x) => x.id === id) || (byRoute.get(id) ? { id, route: id, rec: byRoute.get(id), icon: byRoute.get(id).icon, i3: byRoute.get(id).i3, ok: byRoute.get(id).ok } : null); if (!d) return null; let ok = false; try { ok = !!d.ok(c); } catch (e) { ok = false; }
+  return ok ? { route: d.route, label: doLabel(d), icon: d.icon, i3: d.i3 || (d.rec && d.rec.i3) } : null;
 };
 function quickActions(c) {
   const out = [], seen = new Set();
@@ -168,6 +175,15 @@ function slots(c) {   // exactly 4 entries: {kind:'home'|'menu'|'me'} or {route,
   }
   const spare = quickActions(c).filter((x) => !used.has(x.route)), fall = [{ kind: 'home' }, { kind: 'menu' }, { kind: 'me' }];
   return res.map((x) => x || spare.shift() || fall.find((f) => !res.some((y) => y && y.kind === f.kind)) || { kind: 'menu' }).slice(0, 4);
+}
+// bottom bar for the Premium layout: [2 slots] [centre Sell orb] [2 slots] when the person may sell; otherwise the plain 4 slots. Sell is never repeated in the side slots.
+function barSlots(c) {
+  const all = slots(c), sell = slotTarget('pos', c);
+  if (!sell) return { left: all.slice(0, 2), centre: null, right: all.slice(2, 4) };
+  const rest = all.filter((x) => x.route !== 'pos'), used = new Set(rest.map((x) => x.route || x.kind));
+  const spare = quickActions(c).filter((x) => x.route !== 'pos' && !used.has(x.route)), fall = [{ kind: 'home' }, { kind: 'menu' }, { kind: 'me' }];
+  while (rest.length < 4) rest.push(spare.shift() || fall.find((f) => !rest.some((y) => y.kind === f.kind)) || { kind: 'menu' });
+  return { left: rest.slice(0, 2), centre: sell, right: rest.slice(2, 4) };
 }
 function searchSections(q, c) {
   const w = norm(q); if (w.length < 2) return { do: [], go: [], settings: [] };
@@ -244,5 +260,5 @@ function state(kind, msg, retry) {
 
 B.IA = IA;
 B.ui = Object.assign(B.ui || {}, { state });
-B.ia = { persona, quickActions, slots, searchSections, doRecs, QUICK_BY, SLOTS_BY, DOF, GROUPS, GID, AREA_G, byRoute: (r) => byRoute.get(r) || null, resolve, label: labelOf, groupLabel, groupOf, visible, search, score, recent, pushRecent, bottom, homeKeys, topUp, modules, HOME_LABEL, state };
+B.ia = { persona, quickActions, slots, barSlots, searchSections, doRecs, QUICK_BY, SLOTS_BY, DOF, GROUPS, GID, AREA_G, byRoute: (r) => byRoute.get(r) || null, resolve, label: labelOf, groupLabel, groupOf, visible, search, score, recent, pushRecent, bottom, homeKeys, topUp, modules, HOME_LABEL, state };
 })();
