@@ -35,6 +35,8 @@ const X = {
   reset: L('প্রিয় ও ব্যবহারের হিসাব মুছুন', 'Clear my favourites & usage', 'Favourite ও Usage মুছুন'), logout: L('লগআউট', 'Log out', 'Logout'), roles: L('ভূমিকা', 'Roles', 'Role'),
   modules: L('সব মডিউল', 'All modules', 'সব Module'),
   em: L('জরুরি অনুরোধ', 'Emergency requests', 'জরুরি Request'), addprod: L('নতুন পণ্য যোগ', 'Add product', 'নতুন Product যোগ'), unitconv: L('একক রূপান্তর', 'Unit conversions', 'Unit conversion'),
+  ctl: L('কন্ট্রোল সেন্টার', 'Control Center', 'Control Center'), ctl_d: L('লোকেশন, সীমা, তালিকা ও সেটিংস এক জায়গায়', 'Places, limits, lists and settings in one place', 'Location, limit, list ও settings এক জায়গায়'), locs: L('লোকেশন', 'Locations', 'Location'),
+  n_loc: L('নতুন লোকেশনের সেটআপ বাকি', 'New places still being set up', 'নতুন Location-এর setup বাকি'), n_sd: L('সেটিংস শিটের খসড়া অনুমোদনের অপেক্ষায়', 'Settings sheet drafts waiting', 'Settings sheet draft approval-এর অপেক্ষায়'), n_wst: L('নষ্টের অনুমোদন বাকি', 'Wastage approvals waiting', 'Wastage approval বাকি'),
   set2: L('সেটিংস (সব অপশন)', 'Settings (all options)', 'Settings (সব Option)'), inv: L('ইনভয়েস ও প্রিন্ট', 'Invoice & print', 'Invoice ও Print'),
 };
 const T = (k) => lab(X[k]);
@@ -61,6 +63,7 @@ const uid = () => (S.ctx && S.ctx.profile && S.ctx.profile.id) || 'anon';
 const npMode = () => { let m = 'lock'; try { m = B.rule('ui_noperm_mode', 'lock'); } catch (e) { /* rules not loaded yet */ } return m === 'hide' ? 'hide' : 'lock'; };
 
 // ---------- registry: routes + forms ----------
+const ctlOk = () => isOwner() || GF.head_management === true || GF.location_manage === true || GF.settings_approve === true || GF.list_manage === true;
 let GF = {};   // grants that open the day book / salary report for non-owners (server still decides on every call)
 const GROUPS = ['dash', 'acc', 'item', 'cust', 'sale', 'purch', 'supp', 'ops', 'people', 'reports', 'settings'];
 const locOk = () => isOwner() || (S.ctx.roles || []).includes('management') || (S.ctx.locations || []).length > 0;   // stock / purchase pages: the server decides the rest
@@ -74,7 +77,7 @@ const ROUTES = [
   { k: 'items', g: 'item', lb: () => t('items'), ok: () => P('ITEMS', 'view') },
   { k: 'items/new', g: 'item', lb: () => T('addprod'), ic: 'plus', ok: () => P('ITEMS', 'enter') },
   { k: 'itemreq', g: 'item', lb: () => t('item_req'), ok: () => P('ITEMS', 'enter') || P('ITEMS', 'approve'), cnt: 'itm', tone: 'info' },
-  { k: 'lists', g: 'item', lb: () => t('lists'), ok: () => isOwner() },
+  { k: 'lists', g: 'item', lb: () => t('lists'), ok: () => isOwner() || GF.list_manage === true, cnt: 'lq', tone: 'info' },
   { k: 'settings2/units', g: 'item', lb: () => T('unitconv'), ok: () => isOwner() },
   { k: 'itemimport', g: 'item', lb: () => lab(L('আইটেম মাস্টার ইমপোর্ট', 'Item master import', 'Item master import')), ic: 'doc', ok: () => isOwner() },
   { k: 'itemmap', g: 'item', lb: () => lab(L('পুরনো আইটেম মেলানো', 'Old items to master codes', 'পুরনো Item মেলানো')), ic: 'doc', ok: () => isOwner() || GF.item_create === true },
@@ -101,7 +104,12 @@ const ROUTES = [
   { k: 'settings', g: 'settings', lb: () => t('settings'), ok: () => isOwner() },
   { k: 'settings2', g: 'settings', lb: () => T('set2'), ok: () => isOwner() },
   { k: 'invoice', g: 'settings', lb: () => T('inv'), ok: () => isOwner() },
-  { k: 'locset', g: 'settings', lb: () => t('locset'), ok: () => isOwner() },
+  { k: 'locset', g: 'settings', lb: () => t('locset'), ok: () => isOwner() || GF.settings_approve === true || GF.head_management === true },
+  { k: 'control', g: 'settings', lb: () => T('ctl'), ic: 'control', ok: () => ctlOk(), cnt: 'ctl', tone: 'info' },
+  { k: 'rollout', g: 'settings', lb: () => lab(L('কাগজ / পাশাপাশি / অ্যাপ', 'Paper / Parallel / App', 'Paper / Parallel / App')), ic: 'control', ok: () => isOwner() || GF.rollout_manage === true },
+  { k: 'changes', g: 'ops', lb: () => lab(L('বদলের অনুরোধ', 'Change requests', 'Change request')), ic: 'doc', ok: () => isOwner() || GF.change_approve === true, cnt: 'chg', tone: 'info' },
+  { k: 'outbox', g: 'ops', lb: () => lab(L('ফোনে জমা (পাঠানো হয়নি)', 'Not sent yet', 'Phone-এ জমা (Not sent yet)')), ic: 'doc', ok: () => true, cnt: 'obx', tone: 'warn' },
+  { k: 'locations', g: 'settings', lb: () => T('locs'), ic: 'locations', ok: () => isOwner() || GF.location_manage === true || GF.head_management === true, cnt: 'loc', tone: 'info' },
   { k: 'backup', g: 'settings', lb: () => t('backup'), ok: () => isOwner() },
 ];
 let FORMS = null;   // rows of the forms table, fetched once
@@ -179,17 +187,25 @@ async function counts(force) {
   const head = (tb, st) => q(sb.from(tb).select('id', { count: 'exact', head: true }).eq('status', st));
   const [ex, rel, em, stf, itm] = await Promise.all([ap ? head('exceptions', 'open') : 0, own ? head('release_requests', 'pending') : 0, own ? head('emergency_requests', 'pending') : 0,
     own ? head('profiles', 'pending') : 0, canDecide ? head('item_changes', 'pending') : 0]);
-  CNT = { ex, rel, em, stf, itm }; cntAt = Date.now(); return CNT;
+  let lq = 0;      // list requests + Other entries waiting (owner and list managers; the server returns 0 for everybody else)
+  if (own) { try { const r = await sb.rpc('list_queue_counts'); if (r && !r.error && r.data) lq = (Number(r.data.requests) || 0) + (Number(r.data.other) || 0); } catch (e) { /* phase15 not installed */ } }
+  let loc = 0, sd = 0, wst = 0;   // phase16 control_counts: places being set up, settings drafts, wastage approvals (the server returns only what the caller may decide)
+  if (own || ctlOk()) { try { const r = await sb.rpc('control_counts'); if (r && !r.error && r.data) { loc = Number(r.data.location_setup) || 0; sd = Number(r.data.settings_drafts) || 0; wst = Number(r.data.wastage) || 0; if (!own) lq = Number(r.data.lists) || 0; } } catch (e) { /* phase16 not installed */ } }
+  let chg = 0;      // phase17: change requests the caller may decide (0 for everybody else / when not installed)
+  if (own || GF.change_approve) { try { const r = await sb.rpc('entry_change_counts'); if (r && !r.error && r.data) chg = Number(r.data.pending) || 0; } catch (e) { /* phase17 not installed */ } }
+  const obx = (B.outbox && B.outbox.count) ? B.outbox.count() : 0;      // forms waiting on this phone (offline queue)
+  CNT = { ex, rel, em, stf, itm, lq, loc, sd, wst, chg, obx, ctl: (own ? ex + rel + em + stf + itm + lq + wst : 0) + loc + sd + (own ? 0 : lq) }; cntAt = Date.now(); return CNT;
 }
 async function loadGrantFlags() {
-  if (!S.ctx || isOwner() || !locOk()) return;
-  const locs = (S.ctx.locations || []).length ? S.ctx.locations : [null];
-  for (const code of ['view_daybook', 'salary_view', 'item_create']) {
+  if (!S.ctx || isOwner()) return;
+  const locs = (S.ctx.locations || []).length ? [null, ...S.ctx.locations] : [null];
+  const codes = locOk() ? ['view_daybook', 'salary_view', 'item_create', 'head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'] : ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'];
+  await Promise.all(codes.map(async (code) => {
     let ok = false;
     for (const l of locs) { try { const r = await sb.rpc('has_grant', { p_code: code, p_loc: l }); if (r && !r.error && r.data === true) { ok = true; break; } } catch (e) { /* not granted */ } }
     GF[code] = ok;
-  }
-  try { if ($('#hv_tiles')) drawTiles(); if (drawerOpen) dr_body(); } catch (e) { /* screens not drawn yet */ }
+  }));
+  try { if ($('#hv_tiles')) drawTiles(); if ($('#hv_ctl')) drawCtl(); if (drawerOpen) dr_body(); } catch (e) { /* screens not drawn yet */ }
 }
 let staticP = null;
 function ensureStatic() {
@@ -386,8 +402,13 @@ async function home() {
   if (ap) rows.push(['ex', cn.ex, 'bad', t('exceptions'), 'exceptions']);
   if (own) rows.push(['rel', cn.rel, 'warn', t('releases'), 'releases'], ['stf', cn.stf, 'info', t('staff'), 'staff']);
   if (P('ITEMS', 'approve')) rows.push(['itm', cn.itm, 'info', t('item_req'), 'itemreq']);
-  const hot = rows.filter((r) => r[1]).slice(0, 5);
-  const attn = ap || own ? `<div class="hsec">${esc(T('attn'))}${hot.length ? `<small>${hot.reduce((s, r) => s + r[1], 0)}</small>` : ''}</div>
+  if (own || GF.list_manage) rows.push(['lq', cn.lq, 'info', t('lists'), 'lists']);
+  if (own || ctlOk()) rows.push(['loc', cn.loc, 'info', T('n_loc'), 'locations'], ['sd', cn.sd, 'info', T('n_sd'), 'locset']);
+  if (own) rows.push(['wst', cn.wst, 'warn', T('n_wst'), 'stock']);
+  if (own || GF.change_approve) rows.push(['chg', cn.chg, 'info', lab(L('বদলের অনুরোধ', 'Change requests', 'Change request')), 'changes']);
+  rows.push(['obx', cn.obx, 'warn', lab(L('ফোনে জমা (পাঠানো হয়নি)', 'Not sent yet', 'Phone-এ জমা')), 'outbox']);
+  const hot = rows.filter((r) => r[1]).slice(0, 8);
+  const attn = ap || own || ctlOk() ? `<div class="hsec">${esc(T('attn'))}${hot.length ? `<small>${hot.reduce((s, r) => s + r[1], 0)}</small>` : ''}</div>
     <div class="card" style="padding:4px 12px">${hot.length ? hot.map((r) => `<button class="hrow mk ${r[2]}" data-act="go" data-v="${r[4]}"><span>${esc(r[3])}</span><span class="n">${r[1]}</span><span class="cv">›</span></button>`).join('')
       : `<div class="dash-ok">${esc(T('attn_ok'))}</div>`}</div>` : '';
   const posBtn = P('POS', 'enter') ? `<button class="primary hbig" data-act="go" data-v="pos">${esc(t('pos'))}</button>` : '';
@@ -396,10 +417,10 @@ async function home() {
     <div class="ptabs" role="tablist" id="hv_pt"></div><div id="hv_stats"></div>
     <div class="hsec">${esc(T('fav'))}</div><div id="hv_fav"></div>
     <div class="hsec" id="hv_th"></div><div class="qgrid" id="hv_tiles"></div>
-    <div class="hsec">${esc(T('modules'))}</div><div class="grid" id="hv_mods"></div>
+    <div class="hsec">${esc(T('modules'))}</div><div class="grid" id="hv_mods"></div><div id="hv_ctl"></div>
     <details class="acc" id="hv_forms"><summary>${esc(T('forms'))}</summary><div class="accb" id="hv_formsb"></div></details>
     ${ap || canPos() ? `<details class="acc" id="hv_dt"><summary>${esc(T('detail'))}</summary><div class="accb"><div id="dash"></div></div></details>` : ''}`;
-  drawPeriod(); drawTiles(); drawFav(); drawMods(); drawForms();
+  drawPeriod(); drawTiles(); drawFav(); drawMods(); drawCtl(); drawForms();
   const dt = $('#hv_dt'); if (dt) dt.addEventListener('toggle', () => { if (dt.open && B.dash) B.dash.render().catch(() => {}); });
   loadStats();
 }
@@ -482,6 +503,12 @@ function drawMods() {
     return `<button class="tile" data-act="go" data-v="${esc(e.route)}">${ico(e.icon)}<span>${esc(e.label)}</span>${c ? `<span class="badge">${c}</span>` : ''}</button>`;
   }).join('');
 }
+function drawCtl() {
+  const box = $('#hv_ctl'); if (!box) return;
+  const e = byKey('r:control'); if (!e || !e.ok) { box.innerHTML = ''; return; }
+  const c = (CNT && CNT.ctl) || 0;
+  box.innerHTML = `<button class="tile t-ink" data-act="go" data-v="control" style="width:100%;margin-top:12px;min-height:76px;flex-direction:row;align-items:center;justify-content:flex-start">${ico('control')}<span style="flex:1;text-align:start"><b>${esc(T('ctl'))}</b><br><small>${esc(T('ctl_d'))}</small></span>${c ? `<span class="badge">${c}</span>` : ''}</button>`;
+}
 function drawForms() {
   const box = $('#hv_formsb'); if (!box) return;
   const mine = (FORMS || []).filter((f) => f.area !== 'master' && f.code !== 'POS' && P(f.code, 'view') && !isOwnerFormHidden(f));
@@ -515,5 +542,5 @@ Object.assign(H, {
 const prevLang = H.lang;
 H.lang = (a) => { sig = ''; return prevLang(a); };
 
-window.BOS_NAV = { menuBtn, headExtra, sync, home, open: openDrawer, close: closeDrawer, pins, usage, togglePin, entries: () => entries().filter((e) => e.live), syncFavs };
+window.BOS_NAV = { grantFlags: () => GF, ctlOk, menuBtn, headExtra, sync, home, open: openDrawer, close: closeDrawer, pins, usage, togglePin, entries: () => entries().filter((e) => e.live), syncFavs };
 })();

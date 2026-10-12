@@ -156,10 +156,11 @@ function recompute() {
 function flagsOf(src) { return E.calc.flags.filter((f) => (src === 'check' ? f.src === 'check' : f.src !== 'check')); }
 
 // ---------- rendering ----------
-const modeEditable = (fd) => (E.mode === 'edit' && (fd.who || 'maker') === 'maker') || (E.mode === 'check' && fd.who === 'checker');
+const isEd = () => E.mode === 'edit' || E.mode === 'change';    // 'change' = a locked entry opened to ask for a change (W5)
+const modeEditable = (fd) => (isEd() && (fd.who || 'maker') === 'maker') || (E.mode === 'check' && fd.who === 'checker');
 const curVal = (fd, path, w) => getp(w === 'c' ? E.check : E.data, path);
 const optsOf = (fd) => (typeof fd.options === 'function' ? fd.options() : fd.options);
-function optsHTML(options, cur, code) { if (cur && code && !options.some((o) => o[0] === cur)) { const old = ((ENV.lists && ENV.lists[code]) || []).find((x) => x.value_code === cur); if (old) options = [...options, [old.value_code, rowL(old)]]; } return options.map(([v, l]) => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(lab(l))}</option>`).join(''); }
+function optsHTML(options, cur, code) { if (cur && String(cur).startsWith('other:') && !options.some((o) => o[0] === cur)) options = [...options, [cur, { bn: 'অন্যান্য: ' + String(cur).slice(6), en: 'Other: ' + String(cur).slice(6) }]]; if (cur && code && !options.some((o) => o[0] === cur)) { const old = ((ENV.lists && ENV.lists[code]) || []).find((x) => x.value_code === cur); if (old) options = [...options, [old.value_code, rowL(old)]]; } return options.map(([v, l]) => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(lab(l))}</option>`).join(''); }
 
 const SUPX = { ph: L('সাপ্লায়ার বাছুন বা লিখুন', 'Pick or type a supplier', 'Supplier বাছুন বা লিখুন'), add: L('নতুন সাপ্লায়ার', 'New supplier', 'নতুন Supplier'),
   listed: L('তালিকার সাপ্লায়ার ✓', 'Listed supplier ✓', 'তালিকার Supplier ✓'), free: L('তালিকায় নেই — লেখা নামই থাকবে', 'Not in the list — the typed name is kept', 'তালিকায় নেই — typed নামই থাকবে'),
@@ -203,7 +204,7 @@ function wrap(fd, ed) { const id = FIELD_ID(); if (fd.show) E.shows[id] = fd.sho
 function tableHTML(fd, wrapAttrs) {
   const w = (fd.cols.some((c) => c.who === 'checker') && !fd.cols.some((c) => !c.who || c.who === 'maker')) ? 'c' : 'd';
   const n = fd.rows ? fd.rows.length : Math.max((E.data[fd.id] || []).length, fd.min || 1, (E.check[fd.id] || []).length);
-  const canEditStruct = E.mode === 'edit' && !fd.rows;
+  const canEditStruct = isEd() && !fd.rows;
   let h = `<div class="tbl" ${wrapAttrs}>${fd.label ? `<label>${esc(lab(fd.label))}</label>` : ''}`;
   for (let i = 0; i < n; i++) {
     h += `<div class="rowcard"><div class="rc-h"><b>${fd.rows ? esc(lab(fd.rows[i])) : (i + 1)}</b>${canEditStruct && n > (fd.min || 1) ? `<button type="button" class="mini" data-act="delrow" data-t="${fd.id}" data-i="${i}" aria-label="${esc(t('delete_row'))}">✕</button>` : ''}</div><div class="rc-g">`;
@@ -244,6 +245,7 @@ function flagsHTML() {
 const STATUS_CLS = { draft: '', submitted: 'warn', approved: 'ok', rejected: 'bad' };
 function actionsHTML() {
   const b = []; const canMaker = E.mode === 'edit', st = E.status;
+  if (E.mode === 'change') return `<div class="actionbar"><button data-act="e_chg_cancel">${esc(t('cancel'))}</button><button class="primary" data-act="e_chg_send">${esc(lab(X17.chg_send))}</button></div>`;
   if (canMaker) b.push(`<button data-act="e_save">${esc(t('save_draft'))}</button><button class="primary" data-act="e_submit">${esc(t('submit'))}</button>`);
   if (E.mode === 'check') b.push(`<button class="danger" data-act="e_reject">${esc(t('reject'))}</button><button class="primary" data-act="e_approve">${esc(t('approve'))}</button>`);
   if (E.id && st !== 'draft' && (E.created_by === S.ctx.profile.id || S.ctx.is_owner) && !(st === 'approved' && !S.ctx.is_owner)) b.push(`<button data-act="e_reopen">${esc(t('reopen'))}</button>`);
@@ -252,20 +254,158 @@ function actionsHTML() {
 
 const PAPER_NO = { id: 'paper_no', type: 'text', label: L('ছাপা নম্বর (কাগজের বই)', 'Printed paper no.', 'ছাপা Number (কাগজের বই)'),
   hint: L('কাগজের ফর্মে ছাপা ক্রমিক নম্বর। একই নম্বর একবারই নেওয়া যায়, আর বাদ পড়া নম্বর ধরা পড়ে।', 'The serial printed on the paper form. A number can be entered once, and missing numbers are audited.', 'কাগজের form এ ছাপা Serial number। একই number একবারই নেওয়া যায়, বাদ পড়া number ধরা পড়ে।') };
+
+// ---------- W5: entered later from paper · rollout chips · change requests · form offline queue (supabase/phase17.sql) ----------
+const X17 = {
+  later_on: L('কাগজ থেকে পরে তোলা হচ্ছে', 'Entered later from paper', 'কাগজ থেকে পরে তোলা (Entered later)'),
+  later_ps: L('কাগজের ছাপা নম্বর (আবশ্যক)', 'Paper serial (required)', 'কাগজের ছাপা Number (আবশ্যক)'),
+  later_at: L('কাগজে লেখার আসল তারিখ ও সময় (আবশ্যক)', 'Original date and time on the paper (required)', 'কাগজে লেখার আসল Date ও Time (আবশ্যক)'),
+  later_hint: L('বাইরে কাজ করে কাগজে লিখেছিলেন? এখানে তুলুন — কাগজের নম্বর অ্যাপের নম্বর থেকে আলাদা, আর অনুমোদনে যাবে।', 'Worked outside and filled the paper? Enter it here — the paper number is separate from the app number and it goes to approval.', 'বাইরে কাজ করে paper-এ লিখেছিলেন? এখানে তুলুন — paper number app number থেকে আলাদা, approval-এ যাবে।'),
+  chip_later: L('পরে তোলা (কাগজ)', 'Entered later (paper)', 'পরে তোলা (Paper)'), chip_notsent: L('এখনও পাঠানো হয়নি', 'Not sent yet', 'এখনও পাঠানো হয়নি'),
+  chip_paper: L('কাগজ', 'Paper', 'Paper'), chip_parallel: L('পাশাপাশি', 'Parallel', 'Parallel'), chip_rev: L('সংস্করণ', 'Rev', 'Rev'), chip_chg: L('বদলের অনুরোধ অপেক্ষায়', 'Change requested', 'Change request অপেক্ষায়'),
+  banner_parallel: L('এই মাসে কাগজই আসল রেকর্ড — অ্যাপের এন্ট্রি পাশাপাশি মিলিয়ে দেখার জন্য', 'Paper is the record this month — the app entry runs beside it', 'এই মাসে paper-ই record — app entry পাশাপাশি'),
+  banner_paper: L('এই ফর্ম এখানে কাগজে চলছে — নতুন এন্ট্রি শুধু “কাগজ থেকে পরে তোলা” হিসেবে', 'This form is on paper here — new entries only as “entered later from paper”', 'এই form এখানে paper-এ — নতুন entry শুধু “paper থেকে পরে তোলা”'),
+  need_later: L('কাগজের নম্বর ও আসল সময় দিন', 'Enter the paper serial and the original time', 'Paper number ও আসল time দিন'),
+  queued: L('নেট নেই — এই ফোনে রাখা আছে (এখনও পাঠানো হয়নি), নেট এলে নিজে থেকে যাবে', 'No network — kept on this phone (Not sent yet), it will be sent automatically', 'Net নেই — এই phone-এ আছে (Not sent yet), net এলে নিজে যাবে'),
+  queue_fail_t: L('ফোনে রাখা গেল না', 'Could not keep it on this phone', 'Phone-এ রাখা গেল না'),
+  queue_fail: L('নেট নেই আর ফোনের মেমরিতেও লেখা গেল না (জায়গা নেই বা প্রাইভেট মোড)। এন্ট্রি এই পাতায় আছে — পাতা বন্ধ করবেন না; নেট এলে আবার “সংরক্ষণ” চাপুন, না হলে সংখ্যাগুলো কাগজে লিখে রাখুন।', 'No network, and this phone would not store it either (storage full or private mode). The entry is still on this page — do not close it; press Save again when you are online, or write the figures down on paper.', 'Net নেই, phone-এও save করা গেল না (storage full বা private mode)। Entry এই page-এ আছে — page বন্ধ করবেন না; online হলে আবার Save চাপুন, না হলে কাগজে লিখে রাখুন।'),
+  queued_submit: L('জমা দেওয়ার অনুরোধ ফোনে রাখা আছে — নেট এলে যাবে', 'Submit kept on this phone — it goes when you are online', 'Submit phone-এ আছে — online হলে যাবে'),
+  sent_ok: L('পাঠানো হয়েছে', 'Sent', 'পাঠানো হয়েছে'),
+  menu_title: L('এই এন্ট্রি', 'This entry', 'এই Entry'), m_chg: L('বদলের অনুরোধ', 'Request change', 'Change request'), m_rev: L('সংস্করণের ইতিহাস', 'Revision history', 'Revision history'), m_reopen: L('আবার খুলুন (মালিক)', 'Reopen (owner)', 'আবার খুলুন (Owner)'), m_outbox: L('ফোনে জমা (পাঠানো হয়নি)', 'Waiting on this phone', 'Phone-এ জমা'),
+  chg_send: L('বদলের অনুরোধ পাঠান', 'Send change request', 'Change request পাঠান'), chg_why: L('কেন বদলাতে চান?', 'Why do you want the change?', 'কেন বদলাতে চান?'), chg_sent: L('অনুরোধ পাঠানো হয়েছে — অনুমোদন পেলে নতুন সংস্করণ হবে', 'Request sent — approval makes a new revision', 'Request গেছে — approve হলে নতুন revision'),
+  chg_hint: L('অনুমোদিত এন্ট্রি বদলানো যায় না। যা বদলাতে চান লিখুন, তারপর অনুরোধ পাঠান; মালিক বা অনুমতিপ্রাপ্ত কেউ অনুমোদন করলে পুরনোটা সংস্করণ হিসেবে থাকবে।', 'An approved entry cannot be edited. Change what is wrong, then send the request; when the owner or a delegate approves, the old version stays as a revision.', 'Approved entry বদলানো যায় না। যা বদলাতে চান লিখুন, request পাঠান; approve হলে পুরনোটা revision হিসেবে থাকবে।'),
+  e_rollout_paper: L('এই ফর্ম এখানে কাগজে চলছে — “কাগজ থেকে পরে তোলা” দিয়ে তুলুন', 'This form is on paper here — use “entered later from paper”', 'এই form এখানে paper-এ — “paper থেকে পরে তোলা” দিয়ে তুলুন'),
+  e_paper_serial_in_use: L('এই কাগজের নম্বর আগেই নেওয়া হয়েছে', 'This paper serial was already entered', 'এই paper number আগেই নেওয়া হয়েছে'), e_paper_serial_required: L('কাগজের নম্বর লাগবে', 'The paper serial is required', 'Paper number লাগবে'),
+  e_paper_time_required: L('আসল সময় লাগবে', 'The original time is required', 'আসল time লাগবে'), e_paper_time_future: L('আসল সময় ভবিষ্যতের হতে পারে না', 'The original time cannot be in the future', 'আসল time future-এর হতে পারে না'),
+  e_entered_later_off: L('“পরে তোলা” এখন বন্ধ আছে', '“Entered later” is switched off', '“পরে তোলা” এখন off'), e_change_pending: L('এই এন্ট্রির একটি অনুরোধ আগেই অপেক্ষায় আছে', 'A change request is already waiting for this entry', 'এই entry-র একটি request আগেই আছে'),
+  e_change_requests_off: L('বদলের অনুরোধ এখন বন্ধ আছে', 'Change requests are switched off', 'Change request এখন off'), e_stale_request: L('এন্ট্রি এর মধ্যে বদলে গেছে — নতুন অনুরোধ করুন', 'The entry changed meanwhile — ask again', 'Entry বদলে গেছে — নতুন request করুন'),
+  e_self_approval: L('নিজের অনুরোধ নিজে অনুমোদন করা যায় না', 'You cannot approve your own request', 'নিজের request নিজে approve করা যায় না'), e_not_locked: L('অনুমোদিত এন্ট্রির জন্য শুধু', 'Only for approved entries', 'শুধু approved entry-র জন্য'),
+  e_entered_later_too_old: L('কাগজের তারিখ সীমার চেয়ে পুরনো — শুধু মালিক তুলতে পারবেন', 'The paper date is older than the limit - only the owner may enter it', 'Paper-এর date limit-এর চেয়ে পুরনো — শুধু owner তুলতে পারবেন'),
+  e_client_id_mismatch: L('এই পাঠানোর আইডি অন্য ফর্মের', 'That send id belongs to another form', 'এই send id অন্য form-এর'),
+  e_client_id_in_use: L('এই পাঠানোর আইডি অন্যের', 'That send id belongs to someone else', 'এই send id অন্যের'),
+};
+const t17 = (k) => lab(X17[k]);
+const err17 = (e) => { const m = String((e && e.message) || ''); const k = Object.keys(X17).filter((x) => x.startsWith('e_')).find((x) => m.includes(x.slice(2))); return k ? t17(k) : null; };
+const fail17 = (e) => { const m = err17(e); if (m) return toast(m); return fail(e); };
+B.X17 = X17;
+// Bangladesh time (no daylight saving): the original paper time is typed as Dhaka local time
+const dhakaNow = () => new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Dhaka' }).replace(' ', 'T').slice(0, 16);
+const toDhaka = (iso) => (iso ? new Date(iso).toLocaleString('sv-SE', { timeZone: 'Asia/Dhaka' }).replace(' ', 'T').slice(0, 16) : '');
+const laterOn = () => B.rule('entered_later_on', true) !== false;
+const metaOf = () => {
+  const m = {};
+  if (E.cid && !E.id) m.client_id = E.cid;
+  if (E.later) { m.entered_later = true; m.paper_serial = String(E.ps || '').trim(); m.paper_at = E.pat ? E.pat + ':00+06:00' : ''; }
+  else if (E.hadLater) m.entered_later = false;
+  return Object.keys(m).length ? m : null;
+};
+const laterOk = () => !E.later || (String(E.ps || '').trim() && E.pat);
+
+// --- the form offline queue (rule 12): a record that cannot be sent waits here, shows Not sent yet, is retried on 'online' and at start. Discard is local only.
+const uidQ = () => (S.ctx && S.ctx.profile ? S.ctx.profile.id : 'anon');
+const QK = () => 'bos_eq_' + uidQ();
+const qlist = () => { try { const v = JSON.parse(store.get(QK()) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; } };
+const qsave = (a) => { try { const v = JSON.stringify(a); localStorage.setItem(QK(), v); return localStorage.getItem(QK()) === v; } catch (e) { return false; } };   // true only when it was written AND read back
+const isAuth = (m) => /jwt|token|401|not authenticated|unauthor|expired/i.test(String(m || ''));
+const qfind = (k) => qlist().find((x) => x.k === k);
+const qput = (it) => { const a = qlist().filter((x) => x.k !== it.k); a.push(it); const ok = qsave(a); if (ok) notifyQ(); return ok; };
+const qdel = (k) => { qsave(qlist().filter((x) => x.k !== k)); notifyQ(); };
+const qkey = () => (E.id ? 'e:' + E.id : 'c:' + E.cid);
+const isNet = (e) => !navigator.onLine || (!!e && !e.code && /fetch|network|load failed|timeout|offline/i.test(e.message || ''));
+const subs = new Set(); const notifyQ = () => { subs.forEach((f) => { try { f(); } catch (e) { /* ignore */ } }); };
+async function callSave(args, meta) {
+  const go = (a) => sb.rpc('save_entry', a).then((r) => r, (e) => ({ data: null, error: e || { message: 'Failed to fetch' } }));
+  let r = await go(meta ? { ...args, p_meta: meta } : args);
+  if (r.error && meta && !meta.entered_later && /Could not find the function|PGRST202/.test((r.error.message || '') + (r.error.code || ''))) r = await go(args);   // phase17 not installed: plain save
+  return r;
+}
+async function callSubmit(id) { return sb.rpc('submit_entry', { p_id: id }).then((r) => r, (e) => ({ data: null, error: e || { message: 'Failed to fetch' } })); }
+function queueEntry(args, meta, submit) {
+  const k = qkey(), prev = qfind(k);
+  const ok = qput({ k, kind: 'entry', cid: E.cid || null, id: E.id || null, code: E.code, loc: E.loc, date: E.date, args, meta, submit: !!submit, at: (prev && prev.at) || new Date().toISOString(), state: 'wait', msg: '', ps: E.later ? E.ps : '' });
+  E.queued = ok; return ok;
+}
+function queueSubmit(id) { const ok = qput({ k: 'e:' + id, kind: 'submit', id, code: E.code, loc: E.loc, date: E.date, submit: true, at: new Date().toISOString(), state: 'wait', msg: '' }); E.queued = ok; return ok; }
+const queueFailSheet = () => openSheet(`<h2>${esc(t17('queue_fail_t'))}</h2><div class="notice bad">${esc(t17('queue_fail'))}</div><button class="full" style="margin-top:12px" data-act="closesheet">${esc(t('done'))}</button>`);
+let flushing = false;
+async function sendItem(it) {
+  let id = it.id;
+  if (it.kind === 'entry') {
+    const r = await callSave({ ...it.args, p_id: id || null }, it.meta);
+    if (r.error) { if (isNet(r.error) || isAuth(r.error.message)) return 'net'; qput({ ...it, state: 'refused', msg: String(r.error.message || r.error) }); return 'refused'; }      // lost network or an expired login: keep waiting, never mark refused
+    id = r.data && r.data.id; it = { ...it, id, serial: r.data && r.data.serial, meta: it.meta && it.meta.client_id ? { ...it.meta } : it.meta };
+    if (!it.submit) { qdel(it.k); afterSent(it, false); return 'done'; }
+    qput({ ...it, k: 'e:' + id, kind: 'submit' }); if (it.k !== 'e:' + id) qdel(it.k); it = { ...it, k: 'e:' + id, kind: 'submit' };
+  }
+  const r2 = await callSubmit(id);
+  if (r2.error) {
+    const m = String(r2.error.message || '');
+    if (isNet(r2.error) || isAuth(m)) return 'net';
+    if (/locked/.test(m)) { const g = await sb.from('entries').select('status').eq('id', id).maybeSingle(); if (g && g.data && g.data.status !== 'draft') { qdel(it.k); afterSent(it, true); return 'done'; } }
+    qput({ ...it, state: 'refused', msg: m }); return 'refused';
+  }
+  qdel(it.k); afterSent(it, true); return 'done';
+}
+function afterSent(it, submitted) {
+  try { const tmp = JSON.parse(store.get('bos_tmp_' + it.code + '_' + it.loc) || 'null'); if (tmp && tmp.cid && tmp.cid === it.cid) store.set('bos_tmp_' + it.code + '_' + it.loc, ''); } catch (e) { /* ignore */ }
+  if (!E || !/^#\/entry/.test(location.hash)) return;
+  const same = (it.cid && E.cid === it.cid && !E.id) || (it.id && E.id === it.id);
+  if (!same) return;
+  if (!E.id) { E.id = it.id; E.serial = it.serial; history.replaceState(null, '', '#/entry/' + E.id); }
+  E.queued = false; E.dirty = false;
+  if (submitted) reloadEntry(E.id); else draw();
+}
+async function flushOutbox() {
+  if (flushing || !S.ctx || !navigator.onLine) return;
+  const q = qlist().filter((x) => x.state !== 'refused' || isAuth(x.msg)).sort((a, z) => (a.at > z.at ? 1 : -1)); if (!q.length) return;
+  flushing = true; let sent = 0;
+  try { for (const it of q) { const r = await sendItem(it); if (r === 'net') break; if (r === 'done') sent++; } } finally { flushing = false; }
+  if (sent) toast(t17('sent_ok') + ' · ' + sent);
+  notifyQ();
+}
+const othersQ = () => { let n = 0; try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith('bos_eq_') && k !== QK()) { const v = JSON.parse(localStorage.getItem(k) || '[]'); if (Array.isArray(v)) n += v.length; } } } catch (e) { /* ignore */ } return n; };
+B.outbox = { others: othersQ, list: qlist, count: () => qlist().length, flush: flushOutbox, discard: (k) => qdel(k), retry: (k) => { const it = qfind(k); if (it) qput({ ...it, state: 'wait', msg: '' }); return flushOutbox(); }, subscribe: (f) => { subs.add(f); return () => subs.delete(f); } };
+window.addEventListener('online', flushOutbox);
+{ let tries = 0; const iv = setInterval(() => { if (S.ctx) { clearInterval(iv); flushOutbox(); } else if (++tries > 90) clearInterval(iv); }, 1000); }   // at app start, once the person is signed in
+setInterval(flushOutbox, 60000);
+
+function laterHTML() {
+  if (!E.later && !(laterOn() && (E.mode === 'edit' && E.status === 'draft'))) return '';
+  if (E.mode !== 'edit') return `<div class="notice ok" style="margin-top:8px"><b>${esc(t17('chip_later'))}</b> · № ${esc(E.ps || '')} · ${esc((E.pat || '').replace('T', ' '))}</div>`;
+  return `<div class="stack" style="margin-top:10px"><label class="ckrow"><input type="checkbox" id="el_on" ${E.later ? 'checked' : ''}><span>${esc(t17('later_on'))}</span></label>
+    ${E.later ? `<div class="fld"><label>${esc(t17('later_ps'))}</label><input id="el_ps" value="${esc(E.ps || '')}" autocomplete="off" maxlength="40"></div>
+      <div class="fld"><label>${esc(t17('later_at'))}</label><input type="datetime-local" id="el_at" value="${esc(E.pat || '')}" max="${esc(dhakaNow())}"></div>` : `<div class="hint">${esc(t17('later_hint'))}</div>`}</div>`;
+}
+function rolloutHTML() {
+  if (E.rmode === 'parallel') return `<div class="notice warn" style="margin-top:8px">${esc(t17('banner_parallel'))}</div>`;
+  if (E.rmode === 'paper' && E.status === 'draft' && E.mode === 'edit') return `<div class="notice warn" style="margin-top:8px">${esc(t17('banner_paper'))}</div>`;
+  return '';
+}
+async function loadRollout() {
+  E.rmode = 'app';
+  try { const r = await sb.from('form_rollout').select('mode').eq('form_code', E.code).eq('location_id', E.loc).maybeSingle(); if (r && !r.error && r.data && r.data.mode) E.rmode = r.data.mode; } catch (e) { /* phase17 not installed: app */ }
+}
+async function loadPendingChange() {
+  E.chgPending = false;
+  if (!E.id || E.status !== 'approved') return;
+  try { const r = await sb.from('entry_change_requests').select('id').eq('entry_id', E.id).eq('status', 'pending').limit(1); E.chgPending = !!(r && !r.error && r.data && r.data.length); } catch (e) { /* ignore */ }
+}
 function draw() {
   B.curDate = E.date;
   E.shows = {}; E.rshows = {}; recompute();
-  const spec = E.spec, head = [PAPER_NO, ...(spec.head || [])].map((f) => fieldHTML(f, f.id, 'd', modeEditable(f), wrap(f))).join('');
+  const spec = E.spec, head = [E.later ? null : PAPER_NO, ...(spec.head || [])].filter(Boolean).map((f) => fieldHTML(f, f.id, 'd', modeEditable(f), wrap(f))).join('');
   const serial = E.serial ? `${E.code}-${(ENV.locs.find((l) => l.id === E.loc) || {}).code || E.loc}-${E.serial}` : t('new_entry');
   const wdv = lab(WD[weekday(E.date)]);
   const tag = E.settings['daytag_' + weekday(E.date)];
   shell(lab(spec.title), `<datalist id="dl_sup">${(ENV.sup || []).map((x) => `<option value="${esc(x.name)}"></option>`).join('')}</datalist><datalist id="dl_items">${ENV.items.filter((i) => i.is_active).map((i) => `<option value="${esc(i.code)} · ${esc(nm(i))}"></option>`).join('')}</datalist>
     <div class="entry" id="entry">
-    <div class="card panel"><div class="row between"><b class="serial">${esc(serial)}</b><span class="chip ${STATUS_CLS[E.status]}">${esc(t('est_' + E.status))}</span></div>
+    <div class="card panel"><div class="row between"><b class="serial">${esc(serial)}</b><span class="row"><span class="chip ${STATUS_CLS[E.status]}">${esc(t('est_' + E.status))}</span>${E.queued ? `<span class="chip warn" id="e_notsent">${esc(t17('chip_notsent'))}</span>` : ''}${E.id || E.queued ? `<button class="mini" data-act="e_menu" aria-label="More" style="min-width:36px">⋮</button>` : ''}</span></div>
       <div class="row wrap" style="margin-top:6px"><span class="chip">${esc(locName(E.loc))}</span>
-      ${E.mode === 'edit' ? `<input type="date" id="e_date" value="${esc(E.date)}" style="width:auto">` : `<span class="chip">${esc(E.date)}</span>`}
+      ${E.mode === 'edit' && !E.later ? `<input type="date" id="e_date" value="${esc(E.date)}" style="width:auto">` : `<span class="chip">${esc(E.date)}</span>`}
+      ${E.later ? `<span class="chip info" id="e_later_chip">${esc(t17('chip_later'))}</span>` : ''}${E.rmode === 'paper' ? `<span class="chip warn">${esc(t17('chip_paper'))}</span>` : E.rmode === 'parallel' ? `<span class="chip warn">${esc(t17('chip_parallel'))}</span>` : ''}${E.rev > 1 ? `<span class="chip" id="e_rev_chip">${esc(t17('chip_rev'))} ${E.rev}</span>` : ''}${E.chgPending ? `<span class="chip warn">${esc(t17('chip_chg'))}</span>` : ''}
       <span class="chip">${esc(wdv)}</span>${tag ? `<span class="chip warn">${esc(t('tag'))}: ${esc(tag)}</span>` : ''}</div>
       ${E.checked_staff ? `<div class="muted" style="font-size:.85rem;margin-top:6px">${esc(t('checked_by'))}: ${esc(staffName(E.checked_staff))}${E.check_note ? ' · ' + esc(E.check_note) : ''}</div>` : ''}
+      ${rolloutHTML()}${laterHTML()}${E.mode === 'change' ? `<div class="notice warn" style="margin-top:8px">${esc(t17('chg_hint'))}</div>` : ''}
       ${head ? `<div class="stack" style="margin-top:10px">${head}</div>` : ''}</div>
     <div id="flagsbox">${flagsHTML()}</div>
     ${spec.sections.map(sectionHTML).join('')}</div>${actionsHTML()}`, 'form/' + E.code);
@@ -301,7 +441,7 @@ function shrink(file, max = 1280, q = 0.72) {
       c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u); c.toBlob((b) => (b ? res(b) : rej(new Error('image'))), 'image/jpeg', q); };
     img.onerror = () => rej(new Error('image')); img.src = u; });
 }
-const rid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+const rid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = (Math.random() * 16) | 0; return (c === 'x' ? r : (r & 3) | 8).toString(16); }));
 async function addPhoto(el) {
   const f = el.files && el.files[0]; if (!f) return;
   toast(t('photo_up'));
@@ -329,8 +469,13 @@ function onEdit(e) {
   if (el.dataset.num) { v = norm(v); if (v !== el.value) el.value = v; }
   setp(el.dataset.w === 'c' ? E.check : E.data, el.dataset.p, v); touch(); refresh();
 }
-function touch() { E.dirty = true; if (!E.id) store.set('bos_tmp_' + E.code + '_' + E.loc, JSON.stringify({ d: E.data, date: E.date })); }
-document.addEventListener('input', onEdit);
+function touch() { E.dirty = true; if (!E.id) store.set('bos_tmp_' + E.code + '_' + E.loc, JSON.stringify({ d: E.data, date: E.date, cid: E.cid, later: !!E.later, ps: E.ps || '', pat: E.pat || '' })); }
+document.addEventListener('input', (e) => { if (E && e.target.id === 'el_ps') { E.ps = e.target.value; E.data.paper_no = E.ps; touch(); } else onEdit(e); });
+document.addEventListener('change', (e) => {
+  if (!E) return; const id = e.target.id;
+  if (id === 'el_on') { E.later = e.target.checked; if (E.later) { E.pat = E.pat || dhakaNow(); E.date = E.pat.slice(0, 10); E.ps = E.ps || String((E.data || {}).paper_no || ''); E.data.paper_no = E.ps; } touch(); draw(); }
+  else if (id === 'el_at') { E.pat = e.target.value; if (E.pat) E.date = E.pat.slice(0, 10); touch(); draw(); }
+});
 document.addEventListener('change', (e) => { if (e.target.id === 'e_date' && E) { E.date = e.target.value; touch(); draw(); } else onEdit(e); });
 document.addEventListener('toggle', (e) => { if (E && e.target.dataset && e.target.dataset.sec !== undefined) { const i = Number(e.target.dataset.sec); if (e.target.open) E.openSecs.add(i); else E.openSecs.delete(i); } }, true);
 
@@ -366,11 +511,15 @@ function missingRequired() {
 // ---------- save / submit / decide ----------
 async function ensureLoaded() { await loadStatic(); }
 async function saveDraft(note) {
-  const flags = flagsOf('maker');
-  const { data, error } = await sb.rpc('save_entry', { p_id: E.id || null, p_form: E.code, p_loc: E.loc, p_date: E.date, p_data: E.data, p_flags: flags, p_note: note || null });
-  if (error) { if (/note_required/.test(error.message)) { askNote(t('note_overwrite'), (n) => saveDraft(n).then(() => { if (E && E.afterSave) { const f = E.afterSave; E.afterSave = null; f(); } })); return false; } fail(error); return false; }
+  if (!laterOk()) { toast(t17('need_later')); return false; }
+  const flags = flagsOf('maker'), meta = metaOf();
+  const args = { p_id: E.id || null, p_form: E.code, p_loc: E.loc, p_date: E.date, p_data: E.data, p_flags: flags, p_note: note || null };
+  const { data, error } = await callSave(args, meta);
+  if (error && isNet(error)) { if (!queueEntry(args, meta, false)) { E.queued = false; queueFailSheet(); return false; } E.dirty = false; toast(t17('queued')); const sc = window.scrollY; draw(); window.scrollTo(0, sc); return true; }
+  if (error) { if (/note_required/.test(error.message)) { askNote(t('note_overwrite'), (n) => saveDraft(n).then(() => { if (E && E.afterSave) { const f = E.afterSave; E.afterSave = null; f(); } })); return false; } fail17(error); return false; }
+  if (E.queued) { qdel(qkey()); E.queued = false; }
   if (!E.id) { E.id = data.id; E.serial = data.serial; store.set('bos_tmp_' + E.code + '_' + E.loc, ''); history.replaceState(null, '', '#/entry/' + E.id); }
-  E.dirty = false; E.created_by = E.created_by || S.ctx.profile.id; toast(t('saved')); return true;
+  E.dirty = false; E.hadLater = !!E.later; E.created_by = E.created_by || S.ctx.profile.id; toast(t('saved')); return true;
 }
 function askNote(title, cb, required = true) {
   openSheet(`<h2>${esc(title)}</h2><textarea id="note_in" rows="3" placeholder="${esc(t('reason_note'))}"></textarea>
@@ -378,11 +527,13 @@ function askNote(title, cb, required = true) {
   A.noteCb = () => { const v = ($('#note_in').value || '').trim(); if (required && !v) return toast(t('note_needed')); closeSheet(); cb(v); };
 }
 async function submit() {
-  if (E.dirty || !E.id) { const ok = await saveDraft(); if (!ok) { E.afterSave = submit; return; } }
+  if (E.dirty || !E.id || E.queued) { const ok = await saveDraft(); if (!ok) { E.afterSave = submit; return; } }
   const miss = missingRequired();
   if (miss.length) return openSheet(`<h2>${esc(t('missing_title'))}</h2><div class="stack">${miss.map((m) => `<div class="notice bad">${esc(m)}</div>`).join('')}</div><button class="full" style="margin-top:12px" data-act="closesheet">${esc(t('done'))}</button>`);
-  const { error } = await sb.rpc('submit_entry', { p_id: E.id });
-  if (error) { if (/red_blocked/.test(error.message)) return releaseSheet(); return fail(error); }
+  if (E.queued) { const it = qfind(qkey()); if (it && !qput({ ...it, submit: true })) return queueFailSheet(); toast(t17('queued_submit')); return draw(); }
+  const { error } = await callSubmit(E.id);
+  if (error && isNet(error)) { if (!queueSubmit(E.id)) return queueFailSheet(); toast(t17('queued_submit')); return draw(); }
+  if (error) { if (/red_blocked/.test(error.message)) return releaseSheet(); return fail17(error); }
   toast(t('submitted_ok')); await reloadEntry(E.id);
 }
 async function loadReleases() {
@@ -405,7 +556,7 @@ async function decide(approve, note) {
   if (missing.length) return openSheet(`<h2>${esc(t('missing_title'))}</h2><div class="stack">${missing.map((m) => `<div class="notice bad">${esc(m)}</div>`).join('')}</div><button class="full" style="margin-top:12px" data-act="closesheet">${esc(t('done'))}</button>`);
   const cflags = flagsOf('check').map((f) => ({ ...f, src: 'check' }));
   const { error } = await sb.rpc('decide_entry', { p_id: E.id, p_approve: approve, p_note: note || null, p_check: E.check, p_flags: cflags });
-  if (error) return /own entry/.test(error.message) ? toast(t('err_own_entry')) : fail(error);
+  if (error) return /own entry/.test(error.message) ? toast(t('err_own_entry')) : fail17(error);
   toast(approve ? t('approved_ok') : t('rejected_ok')); await reloadEntry(E.id);
 }
 async function reopen(note) {
@@ -425,9 +576,12 @@ async function startNew(code, loc) {
   const spec = B.forms[code]; if (!spec) return location.hash = '#/home';
   const fr = await sb.from('forms').select('*').eq('code', code).single();
   const settings = await locSettings(loc);
-  E = { code, spec, formRow: fr.data, loc, date: today(), status: 'draft', mode: 'edit', data: {}, check: {}, flags: [], settings, serial: null, id: null, dirty: false, created_by: S.ctx.profile.id, openSecs: new Set(), releases: {} };
-  try { const tmp = JSON.parse(store.get('bos_tmp_' + code + '_' + loc) || 'null'); if (tmp && tmp.d && Object.keys(tmp.d).length) { E.data = tmp.d; E.date = tmp.date || E.date; E.dirty = true; toast(t('restored')); } } catch (e) { /* ignore */ }
+  E = { code, spec, formRow: fr.data, loc, date: today(), status: 'draft', mode: 'edit', data: {}, check: {}, flags: [], settings, serial: null, id: null, dirty: false, created_by: S.ctx.profile.id, openSecs: new Set(), releases: {}, cid: rid(), later: false, ps: '', pat: '', rev: 1 };
+  try { const tmp = JSON.parse(store.get('bos_tmp_' + code + '_' + loc) || 'null'); if (tmp && ((tmp.d && Object.keys(tmp.d).length) || tmp.cid)) { E.data = tmp.d || {}; E.date = tmp.date || E.date; E.dirty = true; if (tmp.cid) E.cid = tmp.cid; E.later = !!tmp.later; E.ps = tmp.ps || ''; E.pat = tmp.pat || ''; toast(t('restored')); } } catch (e) { /* ignore */ }
+  E.queued = !!qfind('c:' + E.cid);
+  await loadRollout();
   if (spec.init) spec.init(ctxFor(), E.data);
+  if (E.rmode === 'paper' && laterOn() && !E.later) { E.later = true; E.pat = dhakaNow(); E.date = E.pat.slice(0, 10); }   // Paper here: the only way in is “entered later from paper”
   draw();
 }
 async function reloadEntry(id) {
@@ -441,8 +595,10 @@ async function reloadEntry(id) {
   const mode = e.status === 'draft' && maker && perms.enter ? 'edit' : e.status === 'submitted' && perms.approve ? 'check' : 'view';
   const keep = E && E.id === id ? E.openSecs : new Set();
   E = { id: e.id, code: e.form_code, spec, formRow: fr.data, loc: e.location_id, date: e.entry_date, status: e.status, mode, data: e.data || {}, check: e.check_data || {}, flags: e.flags || [], settings, serial: e.serial, dirty: false,
-    created_by: e.created_by, checked_staff: e.checked_staff, check_note: e.check_note, openSecs: keep, releases: {} };
-  await loadReleases(); draw();
+    created_by: e.created_by, checked_staff: e.checked_staff, check_note: e.check_note, openSecs: keep, releases: {},
+    later: !!e.entered_later, hadLater: !!e.entered_later, ps: e.paper_serial || '', pat: toDhaka(e.paper_at), rev: e.rev_no || 1, cid: e.client_id || null };
+  E.queued = !!qfind('e:' + e.id);
+  await Promise.all([loadReleases(), loadRollout(), loadPendingChange()]); draw();
 }
 
 // ---------- form list ----------
@@ -457,13 +613,16 @@ async function viewFormList() {
       ${perms.enter && S.formLoc ? `<button class="primary" data-act="newentry" data-v="${code}">＋ ${esc(t('new_entry'))}</button>` : S.formLoc && !perms.enter ? `<button data-act="em_form" data-v="${code}">${esc(t('em_access'))}</button>` : ''}</div>
     ${!locs.length ? `<div class="notice warn">${esc(t('no_location'))}</div>` : ''}<div id="fl_body"><p class="muted">${esc(t('loading'))}</p></div>`, true);
   if (!S.formLoc) return;
-  const r = await sb.from('entries').select('id,serial,entry_date,status,flags,created_staff,checked_staff,paper_no:data->>paper_no').eq('form_code', code).eq('location_id', S.formLoc).order('entry_date', { ascending: false }).order('serial', { ascending: false }).limit(60);
+  const q60 = (sel) => sb.from('entries').select(sel).eq('form_code', code).eq('location_id', S.formLoc).order('entry_date', { ascending: false }).order('serial', { ascending: false }).limit(60);
+  const SEL0 = 'id,serial,entry_date,status,flags,created_staff,checked_staff,paper_no:data->>paper_no';
+  let r = await q60(SEL0 + ',entered_later,rev_no'); if (r.error) r = await q60(SEL0);     // phase17 columns missing: the plain list
   if (r.error) return fail(r.error);
+  const waiting = qlist().filter((x) => x.code === code && x.loc === S.formLoc && x.kind === 'entry' && !x.id);
   const lc = (ENV.locs.find((l) => l.id === S.formLoc) || {}).code || '';
-  $('#fl_body').innerHTML = r.data.map((e) => {
+  $('#fl_body').innerHTML = waiting.map((x) => `<div class="card item" data-act="go" data-v="outbox"><div><div class="nm">${esc(code)} · ${esc(x.date || '')}</div><div class="muted" style="font-size:.85rem">${esc(x.ps ? '№ ' + x.ps : '')}</div></div><div class="row"><span class="chip warn">${esc(t17('chip_notsent'))}</span></div></div>`).join('') + r.data.map((e) => {
     const reds = (e.flags || []).filter((f) => f.level === 'red').length, ys = (e.flags || []).filter((f) => f.level === 'yellow').length;
     return `<div class="card item" data-act="openentry" data-v="${e.id}"><div><div class="nm">${esc(code)}-${esc(lc)}-${e.serial}</div><div class="muted" style="font-size:.85rem">${esc(e.entry_date)} · ${esc(staffName(e.created_staff))}${e.paper_no ? ' · № ' + esc(e.paper_no) : ''}</div></div>
-      <div class="row"><span class="chip ${STATUS_CLS[e.status]}">${esc(t('est_' + e.status))}</span>${reds ? `<span class="chip bad">● ${reds}</span>` : ''}${ys ? `<span class="chip warn">▲ ${ys}</span>` : ''}</div></div>`; }).join('') || `<p class="muted center">${esc(t('no_entries'))}</p>`;
+      <div class="row">${e.entered_later ? `<span class="chip info">${esc(t17('chip_later'))}</span>` : ''}${e.rev_no > 1 ? `<span class="chip">${esc(t17('chip_rev'))} ${e.rev_no}</span>` : ''}<span class="chip ${STATUS_CLS[e.status]}">${esc(t('est_' + e.status))}</span>${reds ? `<span class="chip bad">● ${reds}</span>` : ''}${ys ? `<span class="chip warn">▲ ${ys}</span>` : ''}</div></div>`; }).join('') || `<p class="muted center">${esc(t('no_entries'))}</p>`;
 }
 
 // ---------- exceptions ----------
@@ -559,6 +718,27 @@ Object.assign(A.H, {
   delrow: (a) => { const k = a.dataset.t, i = Number(a.dataset.i); (E.data[k] || []).splice(i, 1); touch(); const sc = window.scrollY; draw(); window.scrollTo(0, sc); },
   photo_del: (a) => { const o = a.dataset.w === 'c' ? E.check : E.data, cur = [...(getp(o, a.dataset.p) || [])]; cur.splice(Number(a.dataset.i), 1); setp(o, a.dataset.p, cur.length ? cur : undefined); touch(); const sc = window.scrollY; draw(); window.scrollTo(0, sc); },
   photo_view: async (a) => { const r = await sb.storage.from('photos').createSignedUrl(a.dataset.src, 3600); if (r.data) openSheet(`<img src="${esc(r.data.signedUrl)}" alt="" style="width:100%;border-radius:12px"><button class="full" style="margin-top:10px" data-act="closesheet">${esc(t('done'))}</button>`); },
+  e_menu: () => {
+    const perms = S.ctx.perms[E.code] || {}, canReq = E.status === 'approved' && (perms.enter || S.ctx.is_owner) && !E.chgPending && B.rule('change_requests_on', true) !== false;
+    openSheet(`<h2>${esc(t17('menu_title'))}</h2><div class="stack">
+      ${canReq ? `<button class="full" data-act="e_chg_start">${esc(t17('m_chg'))}</button>` : ''}
+      ${E.id && (E.status === 'approved' || E.rev > 1) ? `<button class="full" data-act="e_rev">${esc(t17('m_rev'))}${E.rev > 1 ? ' · ' + E.rev : ''}</button>` : ''}
+      ${E.id && E.status !== 'draft' && S.ctx.is_owner ? `<button class="full" data-act="e_reopen_m">${esc(t17('m_reopen'))}</button>` : ''}
+      ${B.outbox.count() ? `<button class="full" data-act="e_to_outbox">${esc(t17('m_outbox'))} · ${B.outbox.count()}</button>` : ''}
+      <button class="full" data-act="closesheet">${esc(t('done'))}</button></div>`); },
+  e_chg_start: () => { closeSheet(); E.mode = 'change'; draw(); window.scrollTo(0, 0); },
+  e_chg_cancel: () => reloadEntry(E.id),
+  e_chg_send: () => {
+    const miss = missingRequired();
+    if (miss.length) return openSheet(`<h2>${esc(t('missing_title'))}</h2><div class="stack">${miss.map((m) => `<div class="notice bad">${esc(m)}</div>`).join('')}</div><button class="full" style="margin-top:12px" data-act="closesheet">${esc(t('done'))}</button>`);
+    askNote(t17('chg_why'), async (reason) => {
+      const flags = [...flagsOf('maker'), ...(E.flags || []).filter((f) => f.src === 'check')];
+      const r = await sb.rpc('entry_change_request', { p_entry: E.id, p_reason: reason, p_patch: { data: E.data, flags } });
+      if (r.error) return fail17(r.error);
+      toast(t17('chg_sent')); await reloadEntry(E.id); }); },
+  e_rev: () => { closeSheet(); if (B.showRevisions) B.showRevisions(E.id); },
+  e_reopen_m: () => { closeSheet(); askNote(t('reopen'), (n) => reopen(n)); },
+  e_to_outbox: () => { closeSheet(); location.hash = '#/outbox'; },
   e_save: () => saveDraft(),
   e_submit: submit,
   e_approve: () => decide(true),

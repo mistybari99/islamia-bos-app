@@ -301,7 +301,7 @@ B.forms['18-1'] = {
       NOTE(L('প্রতিটি মার্কেটিং খরচ কাজের আগেই এই রেজিস্টারে, অনুমোদনসহ। বিক্রির ড্রয়ার থেকে টাকা নয়। কর্মী নিজের টাকায় বুস্ট করে পরে ফেরত চাইলে — আগে অনুমোদন না থাকলে ফেরত নয়।', 'Every marketing expense goes into this register before the work, with approval. No money from the sales drawer. If a staff member boosts with their own money and asks for a refund later, there is no refund without prior approval.'), 'warn'),
       NOTE(L('স্যাম্পলের মালামাল ইস্যু হয় মালামাল ইস্যু স্লিপে।', 'Sample goods are issued on the goods issue slip.'), 'ok')] },
     { title: L('খরচের লাইন', 'Expense lines'), fields: [
-      TABLE('lines', null, [D('date', L('তারিখ', 'Date')), SEL('head', L('খাত', 'Head'), B.opts('marketing_heads', MKT_HEADS), { req: true, wide: true, list: 'marketing_heads' }), T('campaign', L('পণ্য বা ক্যাম্পেইন', 'Product or campaign'), { wide: true }), T('period', L('মেয়াদ · স্থান', 'Period · place')),
+      TABLE('lines', null, [D('date', L('তারিখ', 'Date')), SEL('head', L('খাত', 'Head'), B.optsX('marketing_heads', MKT_HEADS), { req: true, wide: true, list: 'marketing_heads' }), T('campaign', L('পণ্য বা ক্যাম্পেইন', 'Product or campaign'), { wide: true }), T('period', L('মেয়াদ · স্থান', 'Period · place')),
         SEL('source', L('টাকার উৎস', 'Source of money'), MKT_SRC), M('amt', L('টাকা ৳', 'Amount ৳'), { req: (x) => !has(x.row.nonpay) }), M('nonpay', L('টাকা প্রদান ছাড়া — মূল্য ৳', 'Without payment — value ৳')),
         T('receipt', L('রসিদ / ইনভয়েস নং', 'Receipt / invoice no.')), T('ledger', L('লেজারের লাইন নং', 'Ledger line no.')), T('result', L('ফল: মেসেজ · অর্ডার', 'Result: messages · orders'), { wide: true }),
         ST('approved_by', L('অনুমোদনকারী', 'Approved by')), TM('approve_time', L('মেসেজে অনুমোদন হলে সময়', 'Time, if approved by message'), { show: (x) => has(x.row.approved_by) }),
@@ -324,9 +324,10 @@ B.forms['18-1'] = {
     const cum = {}, over = new Set(); let anyOver = false, excess = 0, noAppr = 0, noLim = 0;
     const out = rows.map((r) => {
       if (!has(r.head) || !has(r.amt) || num(r.amt) <= 0) return { state: '—' };
-      const ex = B.optExtra('marketing_heads', r.head), exl = ex && ex.limit_month !== undefined && ex.limit_month !== null && ex.limit_month !== '' ? Number(ex.limit_month) : null, lim = exl !== null && Number.isFinite(exl) ? exl : sv(x, 'mkt_limit_' + r.head); cum[r.head] = (cum[r.head] || 0) + num(r.amt);
-      if (lim === null) { needs.push('mkt_limit_' + r.head); noLim += num(r.amt); return { state: NEED }; }
-      if (cum[r.head] > lim) { anyOver = true; over.add(r.head); excess += Math.min(num(r.amt), cum[r.head] - lim); if (!has(r.approved_by)) noAppr++; return { state: L('সীমার বাইরে', 'Outside the limit') }; }
+      const hk = String(r.head).startsWith('other:') ? 'other' : r.head;   // every write-in 'other:<text>' is one Other bucket (no list entry, so no limit of its own)
+      const ex = B.optExtra('marketing_heads', hk), exl = ex && ex.limit_month !== undefined && ex.limit_month !== null && ex.limit_month !== '' ? Number(ex.limit_month) : null, lim = exl !== null && Number.isFinite(exl) ? exl : sv(x, 'mkt_limit_' + hk); cum[hk] = (cum[hk] || 0) + num(r.amt);
+      if (lim === null) { needs.push('mkt_limit_' + hk); noLim += num(r.amt); return { state: NEED }; }
+      if (cum[hk] > lim) { anyOver = true; over.add(hk); excess += Math.min(num(r.amt), cum[hk] - lim); if (!has(r.approved_by)) noAppr++; return { state: L('সীমার বাইরে', 'Outside the limit') }; }
       return { state: L('সীমার ভেতরে ✓', 'Within the limit ✓') };
     });
     v.tot_amt = sum(rows.map((r) => r.amt)); v.tot_nonpay = sum(rows.map((r) => r.nonpay)); v.reg_total = v.tot_amt; v.any_over = anyOver;

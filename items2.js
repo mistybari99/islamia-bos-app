@@ -277,6 +277,7 @@ async function viewForm(id, presetCat) {
     <div class="p2-bar2"><button data-act="go" data-v="items">${esc(T('cancel'))}</button><button class="primary" data-act="p2_save">${esc(T('save'))}</button></div>`, 'items');
   drawImgs();
   if (D.master && !cur && f.category) B.itemMaster.showNext('p_cat', 'im_code_h');
+  wireLists();
 }
 async function drawImgs() {
   const box = $('#p_imgs'); if (!box || !F) return;
@@ -306,6 +307,13 @@ function syncBarcodeHint() {
   return !!dup;
 }
 const same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null) || ((typeof a === 'number' || typeof b === 'number') && Number(a) === Number(b));
+// shared list control: + Add new (follows the list's add rule) and Other on the category / sub-category / unit pickers; the old owner-only boxes stay when the list rules are not installed
+function wireLists() {
+  const lc = B.listctl; if (!lc) return;
+  const on = () => { ['p_cat', 'p_sub', 'p_unit'].forEach((id) => { const code = id === 'p_cat' ? 'item_categories' : id === 'p_sub' ? 'item_subcategories' : 'units'; lc.enhance('#' + id, code, { keepPrev: true, form: 'ITEMS', ctx: () => ({ field: code, item_id: String((F && F.id) || '') }) }); });
+    if (lc.available()) document.querySelectorAll('[data-act=p2_newbox]').forEach((b) => b.remove()); };
+  on(); lc.load().then(() => { if (document.getElementById('p_cat')) on(); }).catch(() => {});
+}
 async function addToList(code, label) {                  // owner adds a category / sub-category to the editable list
   const rows = lists(code), max = ((B.ENV.lists && B.ENV.lists[code]) || []).reduce((m, r) => Math.max(m, r.sort || 0), 0);
   const slug = (label.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '') || 'x') + '_' + Date.now().toString(36).slice(-4);
@@ -324,6 +332,11 @@ async function save() {
   const cost = $('#p_cost') && canCostEnter() ? num($('#p_cost').value) : undefined; if (bad(cost ?? null)) return toast(T('badprice'));
   if (syncBarcodeHint()) return toast(T('dupbc'));
   let cat = $('#p_cat').value, sub = $('#p_sub').value;
+  { // "Other" on category / sub-category / unit: the old value stays; the typed words go into Details (and the owner's Other queue, with this item's id)
+    const labels = { p_cat: 'Category', p_sub: 'Sub-category', p_unit: 'Unit' }, oth = Object.keys(labels).map((id) => [id, $('#' + id) && $('#' + id).dataset.lpOther]).filter((x) => x[1]);
+    if (!cur && oth.some(([id]) => (id === 'p_cat' || id === 'p_unit') && !$('#' + id).value)) return toast(lab(L('"অন্যান্য" দিলে এখন একটি তালিকা-মান বেছে নিন; লেখা মালিকের কাছে গেছে', 'You used "Other": pick a listed value for now - your words went to the owner', '"Other" দিলে এখন একটি list-মান বেছে নিন; লেখা Owner এর কাছে গেছে')));
+    if (oth.length && $('#p_details')) { const add = oth.map(([id, w]) => 'Other ' + labels[id].toLowerCase() + ': ' + w).join('\n'); $('#p_details').value = (($('#p_details').value || '').trim() + '\n' + add).trim(); oth.forEach(([id]) => { $('#' + id).dataset.lpOther = ''; }); }
+  }
   try {
     const nc = ($('#p_cat_new') && !$('#p_cat_new').hidden ? $('#p_cat_new').value.trim() : ''), ns = ($('#p_sub_new') && !$('#p_sub_new').hidden ? $('#p_sub_new').value.trim() : '');
     if (nc) cat = await addToList('item_categories', nc); if (ns) sub = await addToList('item_subcategories', ns);

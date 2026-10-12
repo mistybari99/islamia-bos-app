@@ -71,6 +71,10 @@ const X = {
   ac_person: L('ব্যক্তি', 'Person', 'Person'), ac_role: L('ভূমিকা', 'Role', 'Role'), ac_over: L('কার কী আছে', 'Overview', 'Overview'), ac_give: L('＋ দিন', '＋ Give', '＋ Give'), ac_loc: L('কোন লোকেশনে', 'Which location', 'কোন Location'), ac_until: L('মেয়াদ শেষ (YYYY-MM-DD, ঐচ্ছিক)', 'Valid until (YYYY-MM-DD, optional)', 'Valid until (YYYY-MM-DD, ঐচ্ছিক)'),
   ac_note: L('নোট (ঐচ্ছিক)', 'Note (optional)', 'Note (ঐচ্ছিক)'), ac_forever: L('মেয়াদ নেই', 'no end date', 'no end date'), ac_nobody: L('কেউ নেই', 'nobody', 'কেউ নেই'), ac_hint: L('মালিক সবসময় পারেন। ব্যক্তিকে দিলে লোকেশন ও মেয়াদ ঠিক করা যায়; ভূমিকাকে দিলে সেই ভূমিকার সবাই পায়। আটকে গেলে স্টাফ "জরুরি অনুরোধ" পাঠাতে পারে।', 'The owner always may. A grant to a person can be limited by location and date; a grant to a role covers everyone with that role. A blocked person can send an emergency request.', 'Owner সবসময় পারেন। Person কে দিলে location ও মেয়াদ ঠিক করা যায়; Role কে দিলে সেই role এর সবাই পায়। আটকে গেলে staff "জরুরি request" পাঠাতে পারে।'),
   ac_baddate: L('তারিখ YYYY-MM-DD ফরম্যাটে লিখুন', 'Write the date as YYYY-MM-DD', 'Date YYYY-MM-DD ফরম্যাটে লিখুন'), ac_nopeople: L('তথ্য লাগবে — কোনো সক্রিয় স্টাফ পাওয়া যায়নি', 'Data needed — no active staff found', 'Data লাগবে — কোনো active staff পাওয়া যায়নি'), ac_em: L('জরুরি অনুরোধ দেখুন', 'See emergency requests', 'জরুরি Request দেখুন'),
+  g_location_manage: L('লোকেশন পরিচালনা (সম্পাদনা, নতুন শোরুম, বিরতি/বন্ধ)', 'Manage locations (edit, add, pause / close)', 'Location পরিচালনা (edit, add, pause/close)'),
+  g_head_management: L('হেড ম্যানেজমেন্ট (কন্ট্রোল সেন্টারের অংশ)', 'Head management (part of the Control Center)', 'Head management (Control Center-এর অংশ)'),
+  g_settings_approve: L('সেটিংস শিট (০-১) অনুমোদন', 'Approve the settings sheet (0-1)', 'Settings sheet (0-1) approve'),
+  g_list_manage: L('তালিকা পরিচালনা (অনুরোধ ও “অন্যান্য”)', 'Manage lists (requests and Other)', 'List পরিচালনা (request ও Other)'),
   g_view_cost: L('ক্রয়মূল্য (কস্ট) দেখা', 'See cost', 'Cost দেখা'), g_view_profit: L('লাভ/ক্ষতি দেখা', 'See profit / loss', 'Profit/Loss দেখা'), g_view_reports: L('রিপোর্ট দেখা', 'See reports', 'Report দেখা'),
   g_export_data: L('ডেটা এক্সপোর্ট', 'Export data', 'Data Export'), g_salary_view: L('বেতন দেখা', 'See salaries', 'Salary দেখা'), g_view_daybook: L('দিনের খাতা দেখা', 'See the day book', 'Day book দেখা'), g_supplier_manage: L('সাপ্লায়ার পরিচালনা', 'Manage suppliers', 'Supplier পরিচালনা'), g_settings_invoice: L('ইনভয়েস সেটিংস', 'Invoice settings', 'Invoice settings'),
   // role favourites
@@ -82,7 +86,7 @@ const T = (k) => lab(X[k]);
 const DAYS = { sat: L('শনিবার', 'Saturday', 'Saturday'), sun: L('রবিবার', 'Sunday', 'Sunday'), mon: L('সোমবার', 'Monday', 'Monday'), tue: L('মঙ্গলবার', 'Tuesday', 'Tuesday'), wed: L('বুধবার', 'Wednesday', 'Wednesday'), thu: L('বৃহস্পতিবার', 'Thursday', 'Thursday'), fri: L('শুক্রবার', 'Friday', 'Friday') };
 const MONTHS = [['জানুয়ারি', 'January'], ['ফেব্রুয়ারি', 'February'], ['মার্চ', 'March'], ['এপ্রিল', 'April'], ['মে', 'May'], ['জুন', 'June'], ['জুলাই', 'July'], ['আগস্ট', 'August'], ['সেপ্টেম্বর', 'September'], ['অক্টোবর', 'October'], ['নভেম্বর', 'November'], ['ডিসেম্বর', 'December']];
 const monthName = (m) => (S.lang === 'bn' ? MONTHS[m - 1][0] : MONTHS[m - 1][1]);
-const GRANTS = ['view_cost', 'view_profit', 'view_reports', 'export_data', 'salary_view', 'view_daybook', 'supplier_manage', 'settings_invoice'];
+const GRANTS = ['view_cost', 'view_profit', 'view_reports', 'export_data', 'salary_view', 'view_daybook', 'supplier_manage', 'settings_invoice', 'location_manage', 'head_management', 'settings_approve', 'list_manage'];
 const gLabel = (c) => lab(X['g_' + c]);
 
 // ---------- small helpers ----------
@@ -301,6 +305,7 @@ function supSheet(s) {
     <div><label>${esc(T('su_note'))}</label><input id="su_note" value="${v('note')}"></div>
     <div class="row between"><b>${esc(T('su_active'))}</b>${tg(!s || s.active, 'sheettog', 'id="su_active"')}</div>
     <div class="row"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" data-act="s2_su_save" data-id="${s ? s.id : ''}">${esc(T('save'))}</button></div></div>`);
+  if (B.listctl) B.listctl.enhance('#su_type', 'supplier_types', { keepPrev: true, form: 'SUPPLIER', ctx: () => ({ field: 'supplier_type', supplier_id: String((s && s.id) || '') }), onChange: (v, info) => { if (info && info.other) { const n = document.querySelector('#su_note'); if (n) n.value = ((n.value || '').trim() + ' Other type: ' + info.other).trim(); } } });
 }
 
 // ---------- access manager ----------

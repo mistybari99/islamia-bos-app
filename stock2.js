@@ -389,7 +389,7 @@ async function openAction(kind, preset) {
       <div class="row"><div style="flex:1"><label for="a_qty">${esc(T('qty'))}</label><input id="a_qty" inputmode="decimal"></div><div style="flex:1">${unitSel('a_unit')}</div></div>${note(false)}</div>${foot('s2_go_xfer')}`;
   }
   openSheet(body);
-  if (kind === 'waste') drawPhoto();
+  if (kind === 'waste') { drawPhoto(); wireReason(); }
 }
 const photoFld = () => `<div><label>${esc(T('photo'))}</label><div class="s2-ph" id="a_ph"></div><div class="hint" id="a_ph_h"></div></div>`;
 function drawPhoto() {
@@ -406,6 +406,15 @@ document.addEventListener('change', (e) => { if (e.target.id === 'a_file') pickP
 const gloc = () => Number(($('#a_loc') || {}).value) || actLoc();
 const unitVal = () => (($('#a_unit') || {}).value || null);
 const noteVal = () => ((($('#a_note') || {}).value) || '').trim() || null;
+// shared list control on the wastage / return reason pickers: + Add new follows the list's rule; "Other" stores the reason 'unknown' and the typed words go into the note
+// (and into the Other queue for the owner). If 'unknown' is not an active reason, "Other" is not offered here.
+function wireReason(form) {
+  const lc = B.listctl; if (!lc || !$('#a_reason')) return;
+  const unk = lists('wastage_reasons').some((r) => r.value_code === 'unknown' && r.active);
+  lc.enhance('#a_reason', 'wastage_reasons', unk ? { otherValue: 'unknown', form: form || 'WASTAGE', ctx: () => ({ field: 'wastage_reason', item_id: (($('#a_item') || {}).value || '').slice(0, 40) }) } : { noOther: true, form: form || 'WASTAGE' });
+  if (!unk) { const sel = $('#a_reason'); if (sel && sel.parentNode && !sel.parentNode.querySelector('.s2-nootherhint')) sel.insertAdjacentHTML('afterend', '<div class="hint s2-nootherhint">' + esc(lab(L('"অন্যান্য" এখানে বন্ধ: "কারণ অজানা" চালু নেই', '"Other" is off here: the "unknown" reason is not active', '"Other" এখানে বন্ধ: "unknown" reason চালু নেই'))) + '</div>'); }
+}
+const reasonNote = (n) => n;       // the typed Other words are kept in the owner's Other queue (with the item), the note is sent as typed
 async function goOpen(btn) {
   const items = await trackedItems(), it = readItem(items, 'a_item'); if (!it) return; const q = readQty('a_qty'); if (isNaN(q)) return;
   const c = optNum('a_cost'); if (c !== null && (isNaN(c) || c < 0)) return toast(T('badCost'));
@@ -417,7 +426,7 @@ async function goWaste(btn) {
   const reason = ($('#a_reason') || {}).value; if (!reason) return toast(T('needReason'));
   const lim = B.rule('wastage_photo_above', null), loc = gloc();
   if (lim !== null && lim !== undefined && !unitVal() && q > Number(lim) && !SH.photo) { const h = $('#a_ph_h'); if (h) { h.textContent = T('photoReq'); h.classList.add('s2-need'); } return toast(T('photoReq')); }
-  await submit(btn, () => sb.rpc('stock_wastage', { p_item: it.id, p_loc: loc, p_qty: q, p_reason: reason, p_note: noteVal(), p_photo: SH.photo, p_unit: unitVal(), p_client: SH.client, p_batch: null }),
+  await submit(btn, () => sb.rpc('stock_wastage', { p_item: it.id, p_loc: loc, p_qty: q, p_reason: reason, p_note: reasonNote(noteVal()), p_photo: SH.photo, p_unit: unitVal(), p_client: SH.client, p_batch: null }),
     (d) => { toast(d && d.pending ? T('sentApproval') : T('saved')); if (d && d.pending) loadPendingCount().then(() => { if ($('#s2_main')) draw(); }); else afterWrite(); }, { grant: 'wastage_write_off', loc, context: { item: it.code }, onErr: (e) => { if (/photo_required/.test(e.message || '')) { const h = $('#a_ph_h'); if (h) { h.textContent = T('photoReq'); h.classList.add('s2-need'); } } } });
 }
 async function goCount(btn) {
@@ -481,6 +490,7 @@ function expireSheet(x) {
     <div><label for="a_reason">${esc(T('reason'))}</label><select id="a_reason">${optHTML(reasons, 'expired')}</select></div>${`<div><label for="a_note">${esc(T('note'))}</label><input id="a_note" autocomplete="off"></div>`}${photoFld()}</div>
     <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" data-act="s2_go_expwo" data-i="${D.exp.indexOf(x)}">${esc(T('writeOff'))}</button></div>`);
   drawPhoto();
+  wireReason('EXPIRY');
 }
 function recvSheet(x) {
   sheetStart('recv'); const it = (ITEMS || []).find((y) => y.id === x.item_id), u = unitLabel(baseOf(it));
@@ -518,7 +528,7 @@ Object.assign(H, {
   s2_exph: (a) => { D.expH = Number(a.dataset.v); loadExpiry(); },
   s2_expwo: (a) => { const x = D.exp[Number(a.dataset.i)]; if (x) expireSheet(x); },
   s2_go_expwo: async (a) => { const x = D.exp[Number(a.dataset.i)]; if (!x) return;
-    await submit(a, () => sb.rpc('stock_expire_batch', { p_batch: x.batch_id, p_reason: ($('#a_reason') || {}).value || 'expired', p_note: noteVal(), p_photo: SH.photo }), () => { toast(T('saved')); afterWrite(); }, { grant: 'wastage_write_off', loc: x.location_id, context: { batch: x.batch_id } }); },
+    await submit(a, () => sb.rpc('stock_expire_batch', { p_batch: x.batch_id, p_reason: ($('#a_reason') || {}).value || 'expired', p_note: reasonNote(noteVal()), p_photo: SH.photo }), () => { toast(T('saved')); afterWrite(); }, { grant: 'wastage_write_off', loc: x.location_id, context: { batch: x.batch_id } }); },
   s2_xrecv: (a) => { const x = D.tr[Number(a.dataset.i)]; if (x) recvSheet(x); },
   s2_go_recv: async (a) => { const x = D.tr[Number(a.dataset.i)]; if (!x) return; const v = nnum(($('#r_qty') || {}).value); if (!(v >= 0)) return toast(T('needQty'));
     await submit(a, () => sb.rpc('stock_receive_transfer', { p_id: x.id, p_received_qty: v, p_note: noteVal() }), () => { toast(T('saved')); afterWrite(); }, { grant: 'stock_transfer', loc: x.to_location_id, context: { transfer: x.id } }); },

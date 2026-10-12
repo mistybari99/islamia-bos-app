@@ -5,6 +5,8 @@
 const B = window.BOS, L = B.L, YN = B.YN, num = B.num, has = B.has, sum = B.sum;
 const { T, TA, N, M, TM, D, CK, ST, ITEM, LOC, DEN, CH, SEL, CALC, NOTE, TABLE, PHOTO } = B.f;
 B.forms = B.forms || {};
+// list choices with the shared list control (+ Add new / Other) when listctl.js is loaded and the list rules are installed; the old fixed array stays as the fallback
+B.optsX = B.optsX || ((code, fallback) => () => (B.listctl ? B.listctl.opts(code, fallback) : B.opts(code, fallback))());
 
 const flag = (code, level, bn, en, amount, o = {}) => ({ code, level, text: L(bn, en), amount, ...o });
 const UNITS = { kg: L('কেজি', 'KG'), pc: L('পিস', 'Piece'), lb: L('পাউন্ড', 'Pound') };
@@ -27,7 +29,7 @@ B.forms['10-2'] = {
   head: [TM('time', L('সময়', 'Time')), T('sheet_no', L('দৈনিক শোরুম শিট নং', 'Daily showroom sheet no.'))],
   sections: [
     { title: L('খরচের তালিকা (ইমপ্রেস্ট থেকে)', 'Expenses (from the imprest)'), fields: [
-      TABLE('lines', null, [SEL('head', L('খরচের খাত', 'Expense head'), B.opts('expense_heads', HEADS), { req: true, wide: true, list: 'expense_heads' }), T('to', L('কার কাছে / কী বাবদ', 'Paid to / for'), { wide: true }),
+      TABLE('lines', null, [SEL('head', L('খরচের খাত', 'Expense head'), B.optsX('expense_heads', HEADS), { req: true, wide: true, list: 'expense_heads' }), T('to', L('কার কাছে / কী বাবদ', 'Paid to / for'), { wide: true }),
         CH('receipt', L('রসিদ সংযুক্ত', 'Receipt attached'), YN, { req: true }), M('amount', L('টাকা', 'Amount'), { req: true })], { min: 3 }),
       CALC('total', L('মোট', 'Total'), 'money', { big: true })] },
     { title: L('সীমা ও রসিদ', 'Limit & receipts'), fields: [

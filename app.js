@@ -83,9 +83,11 @@ const ICON = {
   exceptions: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4l13 23H3z"/><path d="M16 13v7M16 24h.01"/></svg>',
   releases: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="14" width="20" height="14" rx="3"/><path d="M10 14V9a6 6 0 0 1 11-3"/></svg>',
   locset: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 29s9-8 9-15a9 9 0 0 0-18 0c0 7 9 15 9 15z"/><circle cx="16" cy="14" r="3.2"/></svg>',
+  locations: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14l12-9 12 9v13H4z"/><path d="M12 27v-8h8v8"/></svg>',
+  control: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><rect x="4" y="4" width="10" height="10" rx="2"/><rect x="18" y="4" width="10" height="10" rx="2"/><rect x="4" y="18" width="10" height="10" rx="2"/><path d="M18 23h10M23 18v10"/></svg>',
   backup: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4v16M9 14l7 7 7-7M5 27h22"/></svg>',
 };
-const TONE = { rulehub: 't-ink', emergency: 't-ruby', lists: 't-ink', dues: 't-gold', numaudit: 't-ink', biz: 't-gold', pos: 't-ruby', items: 't-gold', itemreq: 't-gold', staff: 't-ruby', matrix: 't-ruby', rules: '', settings: 't-ink', logs: 't-ink', backup: 't-ink', exceptions: 't-ruby', releases: 't-gold', locset: 't-ink' };
+const TONE = { rulehub: 't-ink', emergency: 't-ruby', lists: 't-ink', dues: 't-gold', numaudit: 't-ink', biz: 't-gold', pos: 't-ruby', items: 't-gold', itemreq: 't-gold', staff: 't-ruby', matrix: 't-ruby', rules: '', settings: 't-ink', logs: 't-ink', backup: 't-ink', exceptions: 't-ruby', releases: 't-gold', locset: 't-ink', locations: 't-ink', control: 't-ruby' };
 const MARK = '<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#14173a"/><circle cx="32" cy="29" r="16.5" fill="none" stroke="#f2a900" stroke-width="3"/><circle cx="32" cy="29" r="8.8" fill="#f2a900"/><path d="M12 51h40" stroke="#f7eedc" stroke-width="3.2" stroke-linecap="round"/></svg>';
 
 // ---------- auth ----------
@@ -154,24 +156,55 @@ async function start() {
 }
 
 // ---------- routing ----------
-const OWNER_ONLY = new Set(['rulehub', 'emergency', 'lists', 'staff', 'matrix', 'rules', 'settings', 'logs', 'backup', 'releases', 'locset']);
+const OWNER_ONLY = new Set(['rulehub', 'emergency', 'lists', 'staff', 'matrix', 'rules', 'settings', 'logs', 'backup', 'releases', 'locset', 'locsheet', 'locations', 'control']);
+// owner-only screens that a delegated grant also opens (the server still decides on every call; this only stops the page bouncing a grant holder to Home)
+const ROUTE_GRANTS = {
+  lists: ['list_manage'],
+  locset: ['settings_approve', 'head_management', 'location_manage'],
+  locsheet: ['settings_approve', 'head_management', 'location_manage'],
+  locations: ['location_manage', 'head_management'],
+  control: ['head_management', 'location_manage', 'settings_approve', 'list_manage'],
+};
 function go(p) { location.hash = '#/' + p; }
+// does the signed-in person hold any of these grants (role grant, personal grant, emergency window)?  Cached per person for the session.
+async function hasAnyGrant(codes) {
+  if (!S.ctx) return false;
+  if (S.ctx.is_owner) return true;
+  const uidv = S.ctx.profile.id; if (!S.gcache || S.gcache.uid !== uidv) S.gcache = { uid: uidv, v: {} };
+  const locs = (S.ctx.locations || []).length ? [null, ...S.ctx.locations] : [null];
+  for (const c of codes) {
+    const hit = S.gcache.v[c];                       // {ok, at}: a grant is remembered; a clean "no" only for 30 s; an error is never remembered
+    if (hit && (hit.ok || Date.now() - hit.at < 30000)) { if (hit.ok) return true; continue; }
+    let ok = false, failed = false;
+    for (const l of locs) { try { const r = await sb.rpc('has_grant', { p_code: c, p_loc: l }); if (r && !r.error && r.data === true) { ok = true; break; } if (!r || r.error) failed = true; } catch (e) { failed = true; } }
+    if (ok || !failed) S.gcache.v[c] = { ok, at: Date.now() }; else delete S.gcache.v[c];
+    if (ok) return true;
+  }
+  return false;
+}
 function route() {
   if (!S.ctx) return viewAuth();
   const st = S.ctx.profile.status;
   if (st === 'pending') return viewPending();
   if (st === 'disabled') { sb.auth.signOut(); S.ctx = null; return viewAuth('login', t('err_disabled')); }
   const page = (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0];
-  if (OWNER_ONLY.has(page) && !S.ctx.is_owner) return viewHome();
+  if (OWNER_ONLY.has(page) && !S.ctx.is_owner) {
+    const gs = ROUTE_GRANTS[page];
+    if (!gs) return viewHome();
+    return hasAnyGrant(gs).then((ok) => { if ((location.hash.replace(/^#\/?/, '') || 'home').split('/')[0] !== page) return; ok ? dispatch(page) : viewHome(); });
+  }
+  dispatch(page);
+}
+function dispatch(page) {
   const local = { home: viewHome, items: viewItems, staff: viewStaff, matrix: viewMatrix, rules: viewRules,
      settings: viewSettings, logs: viewLogs, backup: viewBackup, itemreq: viewItemReq };
   const extra = window.BOS_PAGES || {};
-  if ((page === 'exceptions' || page === 'releases' || page === 'locset') && !S.ctx.is_owner && !(page === 'exceptions' && Object.values(S.ctx.perms).some((p) => p.approve))) return viewHome();
+  if ((page === 'exceptions' || page === 'releases') && !S.ctx.is_owner && !(page === 'exceptions' && Object.values(S.ctx.perms).some((p) => p.approve))) return viewHome();
   if (page === 'items' && extra.items) return extra.items();           // products v2 (items2.js) takes over #/items; the old screen stays as the fallback
   (local[page] || extra[page] || viewHome)();
 }
 window.addEventListener('hashchange', route);
-window.BOS_APP = { sb, S, t, esc, toast, fail, shell, openSheet, closeSheet, nm, fmt, store, ICON, langBar, go, H: null };
+window.BOS_APP = { hasAnyGrant, sb, S, t, esc, toast, fail, shell, openSheet, closeSheet, nm, fmt, store, ICON, langBar, go, H: null };
 
 function viewPending() {
   shell(t('app'), `<div class="card stack center"><h2>${esc(t('pending_title'))}</h2>
@@ -450,7 +483,8 @@ async function viewLogs() {
 const BACKUP_TABLES = ['profiles', 'roles', 'user_roles', 'locations', 'user_locations', 'forms', 'role_form_perms', 'items', 'item_costs', 'item_changes', 'item_price_history',
   'settings', 'audit_log', 'corrections', 'location_settings', 'entries', 'exceptions', 'release_requests', 'emergency_requests', 'rules', 'rule_grants', 'grant_defs', 'user_grants',
   'option_lists', 'customers', 'suppliers', 'sales', 'sale_payments', 'stock_ledger', 'stock_balance', 'stock_batches', 'stock_transfers', 'stock_wastage', 'purchase_bills', 'purchase_lines',
-  'supplier_payments', 'unit_conversions', 'shelf_life_rules', 'invoice_templates', 'print_profiles', 'report_brand_map', 'role_favourites', 'login_failures', 'login_attempts', 'wastage_requests', 'supplier_refunds', 'sale_returns'];
+  'supplier_payments', 'unit_conversions', 'shelf_life_rules', 'invoice_templates', 'print_profiles', 'report_brand_map', 'role_favourites', 'login_failures', 'login_attempts', 'wastage_requests', 'supplier_refunds', 'sale_returns',
+  'location_setup_steps', 'settings_sheets', 'settings_values', 'list_defs', 'option_requests', 'list_other_entries', 'list_managers', 'item_types', 'item_class_map', 'item_import_batches', 'item_mapping_review', 'item_master_links', 'assets', 'asset_costs', 'form_rollout', 'entry_change_requests', 'entry_revisions'];
 function viewBackup() {
   shell(t('backup'), `<div class="card stack"><p>${esc(t('backup_text'))}</p>
     <button class="primary full" data-act="bk_all">${esc(t('backup_all'))}</button>
