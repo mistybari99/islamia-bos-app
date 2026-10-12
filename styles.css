@@ -308,10 +308,10 @@ body[data-ui="calm"] header.top .hbtn { border: 0; }
 .dr-g .gl { display: flex; align-items: center; gap: 8px; }
 .dr-list { padding-bottom: 6px; } .dr-list[hidden] { display: none; }
 .dr-i { display: flex; align-items: stretch; position: relative; }
-.dr-i .dr-it { padding-inline-start: 30px; font-weight: 500; }
-.dr-i .dr-it svg { width: 20px; height: 20px; flex: none; color: var(--ink-2); }
-.dr-i .dr-it .lb { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.dr-i .dr-it .ct { font: 600 .8rem var(--text-font); color: var(--muted); }
+.dr-i .dr-it, .dr-i .dr-rc { padding-inline-start: 30px; font-weight: 500; }
+.dr-i .dr-it svg, .dr-i .dr-rc svg { width: 20px; height: 20px; flex: none; color: var(--ink-2); }
+.dr-i .dr-it .lb, .dr-i .dr-rc .lb { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.dr-i .dr-it .ct, .dr-i .dr-rc .ct { font: 600 .8rem var(--text-font); color: var(--muted); }
 .dr-i.on::before { content: ""; position: absolute; inset-block: 6px; inset-inline-start: 0; width: 3px; border-radius: 2px; background: var(--ruby); }
 .dr-i.on .dr-it { font-weight: 800; }
 .dr-i .st { flex: none; width: 48px; min-height: 48px; padding: 0; border: 0; background: transparent; color: var(--muted); border-radius: 0; display: grid; place-items: center; }

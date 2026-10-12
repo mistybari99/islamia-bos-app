@@ -52,7 +52,7 @@ function shell(title, body, back) {
   const nav = window.BOS_NAV && S.ctx && S.ctx.profile && S.ctx.profile.status === 'active';   // drawer UI only for signed-in, approved users
   const lead = back ? `<button data-act="go" data-v="${typeof back === 'string' ? back : 'home'}" aria-label="${esc(t('back'))}">←</button>` : '<img class="brand" src="mark.svg" alt="">';
   const h1 = title === t('app') ? `<span class="bn">${esc(BRAND.bn)}</span><span class="lat">${esc(BRAND.en)}</span>` : esc(title);
-  $('#app').innerHTML = `<header class="top">${nav ? window.BOS_NAV.menuBtn() : ''}${lead}<h1 class="${title === t('app') ? 'brandh' : ''}">${h1}</h1>${nav ? window.BOS_NAV.headExtra() : langBar()}</header>${body}`;
+  $('#app').innerHTML = `<header class="top">${nav ? window.BOS_NAV.menuBtn() : ''}${lead}<h1 class="${title === t('app') ? 'brandh' : ''}">${h1}</h1>${nav ? window.BOS_NAV.headExtra() : langBar()}</header>${nav && window.BOS_NAV.crumb ? window.BOS_NAV.crumb() : ''}${body}`;
   if (window.BOS_NAV) window.BOS_NAV.sync(!!nav);
 }
 function openSheet(html) {
@@ -163,7 +163,7 @@ const ROUTE_GRANTS = {
   locset: ['settings_approve', 'head_management', 'location_manage'],
   locsheet: ['settings_approve', 'head_management', 'location_manage'],
   locations: ['location_manage', 'head_management'],
-  control: ['head_management', 'location_manage', 'settings_approve', 'list_manage'],
+  control: ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage'],
 };
 function go(p) { location.hash = '#/' + p; }
 // does the signed-in person hold any of these grants (role grant, personal grant, emergency window)?  Cached per person for the session.

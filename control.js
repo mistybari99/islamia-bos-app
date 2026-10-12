@@ -37,7 +37,7 @@ const NEEDS = [['exceptions', 'exceptions'], ['releases', 'releases'], ['emergen
 // tiles: g group, k key, route (null = not built yet), cnt = server count key, who: owner | head | grant code(s) that also show it
 const TILES = [
   { g: 'places', k: 'locations', route: 'locations', cnt: 'location_setup', head: true, grants: ['location_manage'] },
-  { g: 'places', k: 'rollout', route: null, head: true, grants: [] },
+  { g: 'places', k: 'rollout', route: 'rollout', head: false, grants: ['rollout_manage'] },
   { g: 'places', k: 'locset', route: 'locset', cnt: 'settings_drafts', head: true, grants: ['settings_approve'] },
   { g: 'lists', k: 'lists', route: 'lists', cnt: 'lists', head: false, grants: ['list_manage'] },   // the Lists screen and its queue are decided by the list_manage grant on the server
   { g: 'lists', k: 'items', route: 'items', cnt: 'item_requests', head: false, grants: [] },
@@ -52,16 +52,16 @@ const TILES = [
 const GROUPS = ['places', 'lists', 'people', 'rules'];
 
 async function who() {
-  if (isOwner()) return { tier: 'owner', head: true, g: { location_manage: true, settings_approve: true, list_manage: true } };
-  const [head, lm, sa, lg] = await Promise.all(['head_management', 'location_manage', 'settings_approve', 'list_manage'].map((c) => A.hasAnyGrant([c])));
-  return { tier: head ? 'head' : (lm || sa || lg) ? 'delegate' : 'none', head, g: { location_manage: lm, settings_approve: sa, list_manage: lg } };
+  if (isOwner()) return { tier: 'owner', head: true, g: { location_manage: true, settings_approve: true, list_manage: true, rollout_manage: true } };
+  const [head, lm, sa, lg, rm] = await Promise.all(['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage'].map((c) => A.hasAnyGrant([c])));
+  return { tier: head ? 'head' : (lm || sa || lg || rm) ? 'delegate' : 'none', head, g: { location_manage: lm, settings_approve: sa, list_manage: lg, rollout_manage: rm } };
 }
 const visible = (tl, w) => w.tier === 'owner' || (w.head && tl.head) || tl.grants.some((g) => w.g[g]);
 
 async function view() {
-  shell(T('title'), `<p class="muted">${esc(t('loading'))}</p>`, true);
+  shell(T('title'), B.ui.state('loading'), true);
   const w = await who();
-  if (w.tier === 'none') return shell(T('title'), `<div class="notice bad">${esc(T('noacc'))}</div>`, true);
+  if (w.tier === 'none') return shell(T('title'), B.ui.state('error', T('noacc')), true);
   let cc = {}; try { const r = await sb.rpc('control_counts'); if (r && !r.error && r.data) cc = r.data; } catch (e) { /* phase16 not installed: tiles without counts */ }
   const icon = (k) => (A.ICON && (A.ICON[k] || A.ICON.rulehub)) || '';
   const needs = NEEDS.filter(([key]) => Number(cc[key]) > 0 && (w.tier === 'owner' || ['location_setup', 'settings_drafts', 'lists'].includes(key)));
@@ -71,7 +71,9 @@ async function view() {
     return soon ? `<div class="tile soon" data-tile="${tl.k}" aria-disabled="true" style="opacity:.6"><div>${icon('rulehub')}</div><span>${esc(T('t_' + tl.k))}</span><span class="chip">${esc(T('soon'))}</span></div>`
       : `<button class="tile" data-tile="${tl.k}" data-act="go" data-v="${tl.route}">${icon(tl.route)}<span>${esc(T('t_' + tl.k))}</span><small class="muted" style="font-weight:400">${esc(T('d_' + tl.k))}</small>${c ? `<span class="badge">${c}</span>` : ''}</button>`;
   };
-  const body = GROUPS.map((g) => { const ts = TILES.filter((x) => x.g === g && visible(x, w)); return ts.length ? `<div class="hsec">${esc(T('g_' + g))}</div><div class="grid" data-group="${g}">${ts.map(tile).join('')}</div>` : ''; }).join('');
+  // owner extras come from the one registry (ia.js, field cc): screens that were only in the drawer before
+  const xt = (g) => (w.tier === 'owner' && B.IA ? B.IA.filter((r) => r.cc === g && r.status === 'live').map((r) => `<button class="tile" data-xtile="${r.route}" data-act="go" data-v="${r.route}">${icon(r.icon)}<span>${esc(B.ia.label(r))}</span></button>`).join('') : '');
+  const body = GROUPS.map((g) => { const ts = TILES.filter((x) => x.g === g && visible(x, w)); return ts.length || xt(g) ? `<div class="hsec">${esc(T('g_' + g))}</div><div class="grid" data-group="${g}">${ts.map(tile).join('')}${xt(g)}</div>` : ''; }).join('');
   shell(T('title'), `<div class="row between"><span class="chip info" id="cc_tier">${esc(T('tier_' + w.tier))}</span></div>
     <div class="hsec">${esc(T('needs'))}${total ? `<small>${total}</small>` : ''}</div>
     <div class="card" id="cc_needs" style="padding:4px 12px">${needs.length ? needs.map(([key, route]) => `<button class="hrow mk info" data-act="go" data-v="${route}" data-need="${key}"><span>${esc(T('n_' + key))}</span><span class="n">${Number(cc[key])}</span><span class="cv">›</span></button>`).join('') : `<div class="dash-ok">${esc(T('nothing'))}</div>`}</div>

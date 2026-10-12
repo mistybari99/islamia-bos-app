@@ -38,7 +38,7 @@ const X = {
   locsw: L('লোকেশন', 'Location', 'Location'), all_loc: L('সব লোকেশন', 'All locations', 'সব Location'),
   s_screens: L('পাতা ও ফর্ম', 'Screens & forms', 'Page ও Form'), s_items: L('আইটেম', 'Items', 'Item'), s_cust: L('গ্রাহক', 'Customers', 'Customer'), s_more: L('আইটেম ও গ্রাহক খোঁজা হচ্ছে…', 'Searching items and customers…', 'Item ও Customer খোঁজা হচ্ছে…'),
   reset: L('প্রিয় ও ব্যবহারের হিসাব মুছুন', 'Clear my favourites & usage', 'Favourite ও Usage মুছুন'), logout: L('লগআউট', 'Log out', 'Logout'), roles: L('ভূমিকা', 'Roles', 'Role'),
-  modules: L('সব মডিউল', 'All modules', 'সব Module'),
+  modules: L('সব মডিউল', 'All modules', 'সব Module'), recent: L('সাম্প্রতিক', 'Recent', 'Recent'), refresh: L('নতুন করে দেখুন', 'Refresh', 'Refresh'), s_do: L('করুন', 'Do', 'Do (করুন)'), s_set: L('সেটিংস', 'Settings', 'Settings'), find_off: L('অফলাইন — আইটেম আর গ্রাহক খোঁজা যাবে না; মেনু ও কাজ খোঁজা চলবে', 'Offline - items and customers cannot be searched; menu and actions still work', 'Offline — Item ও Customer খোঁজা যাবে না; Menu ও Do চলবে'), n_pend: L('অনুমোদনের অপেক্ষায় এন্ট্রি', 'Entries waiting for your approval', 'Approval-এর অপেক্ষায় Entry'), n_low: L('ন্যূনতমের নিচে আইটেম', 'Items below minimum', 'Minimum-এর নিচে Item'), all_clear: L('সব ঠিক আছে — এখন কিছু করার নেই', 'All clear. Nothing needs you now.', 'সব ঠিক আছে — এখন কিছু করার নেই'), see_all: L('সব দেখুন', 'See all', 'See all'), recent_empty: L('এখনও কিছু খোলা হয়নি', 'Nothing opened yet', 'এখনও কিছু খোলা হয়নি'), cats: L('বিভাগ অনুযায়ী', 'By category', 'Category অনুযায়ী'), all_in: L('এই বিভাগের সব', 'Everything in this category', 'এই Category-র সব'), qa: L('দ্রুত কাজ', 'Quick actions', 'Quick action'), emptyg: L('এই বিভাগে আপনার জন্য কিছু নেই', 'Nothing here for you', 'এই Category-তে আপনার জন্য কিছু নেই'),
   em: L('জরুরি অনুরোধ', 'Emergency requests', 'জরুরি Request'), addprod: L('নতুন পণ্য যোগ', 'Add product', 'নতুন Product যোগ'), unitconv: L('একক রূপান্তর', 'Unit conversions', 'Unit conversion'),
   ctl: L('কন্ট্রোল সেন্টার', 'Control Center', 'Control Center'), ctl_d: L('লোকেশন, সীমা, তালিকা ও সেটিংস এক জায়গায়', 'Places, limits, lists and settings in one place', 'Location, limit, list ও settings এক জায়গায়'), locs: L('লোকেশন', 'Locations', 'Location'),
   n_loc: L('নতুন লোকেশনের সেটআপ বাকি', 'New places still being set up', 'নতুন Location-এর setup বাকি'), n_sd: L('সেটিংস শিটের খসড়া অনুমোদনের অপেক্ষায়', 'Settings sheet drafts waiting', 'Settings sheet draft approval-এর অপেক্ষায়'), n_wst: L('নষ্টের অনুমোদন বাকি', 'Wastage approvals waiting', 'Wastage approval বাকি'),
@@ -68,63 +68,22 @@ const uid = () => (S.ctx && S.ctx.profile && S.ctx.profile.id) || 'anon';
 const npMode = () => { let m = 'lock'; try { m = B.rule('ui_noperm_mode', 'lock'); } catch (e) { /* rules not loaded yet */ } return m === 'hide' ? 'hide' : 'lock'; };
 
 // ---------- registry: routes + forms ----------
-const ctlOk = () => isOwner() || GF.head_management === true || GF.location_manage === true || GF.settings_approve === true || GF.list_manage === true;
+const ctlOk = () => isOwner() || GF.rollout_manage === true || GF.head_management === true || GF.location_manage === true || GF.settings_approve === true || GF.list_manage === true;
 let GF = {};   // grants that open the day book / salary report for non-owners (server still decides on every call)
-const GROUPS = ['dash', 'acc', 'item', 'cust', 'sale', 'purch', 'supp', 'ops', 'people', 'reports', 'settings'];
+const GROUPS = B.ia.GID;   // the 13 categories live in ia.js
 const locOk = () => isOwner() || (S.ctx.roles || []).includes('management') || (S.ctx.locations || []).length > 0;   // stock / purchase pages: the server decides the rest
-const AREA_G = { cash: 'acc', stock: 'ops', factory: 'ops', assets: 'ops', purchase: 'purch', sales: 'sale', showroom: 'sale', staff: 'people', owner: 'reports' };
-const ROUTES = [
-  { k: 'home', g: 'dash', lb: () => t('home'), ic: 'home', ok: () => true },
-  { k: 'exceptions', g: 'dash', lb: () => t('exceptions'), ok: () => anyApprove(), cnt: 'ex', tone: 'bad' },
-  { k: 'pending', g: 'dash', lb: () => T('pending'), ic: 'doc', ok: () => anyApprove() },
-  { k: 'releases', g: 'dash', lb: () => t('releases'), ok: () => isOwner(), cnt: 'rel', tone: 'warn' },
-  { k: 'emergency', g: 'dash', lb: () => t('emergency'), ok: () => isOwner(), cnt: 'em', tone: 'warn' },
-  { k: 'items', g: 'item', lb: () => t('items'), ok: () => P('ITEMS', 'view') },
-  { k: 'items/new', g: 'item', lb: () => T('addprod'), ic: 'plus', ok: () => P('ITEMS', 'enter') },
-  { k: 'itemreq', g: 'item', lb: () => t('item_req'), ok: () => P('ITEMS', 'enter') || P('ITEMS', 'approve'), cnt: 'itm', tone: 'info' },
-  { k: 'lists', g: 'item', lb: () => t('lists'), ok: () => isOwner() || GF.list_manage === true, cnt: 'lq', tone: 'info' },
-  { k: 'settings2/units', g: 'item', lb: () => T('unitconv'), ok: () => isOwner() },
-  { k: 'itemimport', g: 'item', lb: () => lab(L('আইটেম মাস্টার ইমপোর্ট', 'Item master import', 'Item master import')), ic: 'doc', ok: () => isOwner() },
-  { k: 'itemmap', g: 'item', lb: () => lab(L('পুরনো আইটেম মেলানো', 'Old items to master codes', 'পুরনো Item মেলানো')), ic: 'doc', ok: () => isOwner() || GF.item_create === true },
-  { k: 'bulkitems', g: 'item', lb: () => lab(L('আইটেম একসাথে বদল', 'Bulk item editor', 'Item একসাথে বদল')), ic: 'items', ok: () => isOwner() || GF.item_bulk === true || GF.item_create === true || P('ITEMS', 'enter') },
-  { k: 'itemtypes', g: 'item', lb: () => lab(L('আইটেমের ধরন ও ডিফল্ট', 'Item types & defaults', 'Item type ও Default')), ic: 'doc', ok: () => isOwner() },
-  { k: 'assets', g: 'ops', lb: () => lab(L('সম্পদ-খাতা', 'Asset register', 'Asset register')), ic: 'doc', ok: () => locOk() },
-  { k: 'dues', g: 'cust', lb: () => t('dues'), ok: () => canPos() },
-  { k: 'stock', g: 'ops', lb: () => lab(L('স্টক', 'Stock', 'Stock')), ic: 'items', ok: () => locOk() },
-  { k: 'recipes', g: 'ops', lb: () => lab(L('রেসিপি ও উৎপাদন', 'Recipes & production', 'Recipe ও Production')), ic: 'doc', ok: () => locOk() },
-  { k: 'purchase', g: 'purch', lb: () => lab(L('ক্রয় বিল', 'Purchase bills', 'Purchase Bill')), ic: 'doc', ok: () => locOk() },
-  { k: 'purchase/new', g: 'purch', lb: () => lab(L('নতুন ক্রয় বিল', 'New purchase bill', 'নতুন Purchase bill')), ic: 'plus', ok: () => locOk() },
-  { k: 'purchase/return', g: 'purch', lb: () => lab(L('ক্রয় ফেরত', 'Purchase return', 'Purchase return')), ic: 'doc', ok: () => locOk() },
-  { k: 'daybook', g: 'acc', lb: () => T('daybook'), ic: 'doc', ok: () => isOwner() || GF.view_daybook === true },
-  { k: 'salary', g: 'people', lb: () => T('salary'), ic: 'doc', ok: () => isOwner() || GF.salary_view === true },
-  { k: 'salereturn', g: 'sale', lb: () => lab(L('বিক্রি ফেরত', 'Sale returns', 'Sale return')), ic: 'doc', ok: () => canPos() },
-  { k: 'payables', g: 'supp', lb: () => T('payables'), ic: 'dues', ok: () => locOk() },
-  { k: 'pos', g: 'sale', lb: () => t('pos'), ok: () => canPos() },
-  { k: 'reports', g: 'reports', lb: () => T('g_reports'), ic: 'doc', ok: () => true },
-  { k: 'biz', g: 'reports', lb: () => t('biz'), ok: () => isOwner() || P('POS', 'approve') },
-  { k: 'numaudit', g: 'reports', lb: () => t('numaudit'), ok: () => anyApprove() },
-  { k: 'logs', g: 'reports', lb: () => t('logs'), ok: () => isOwner() },
-  { k: 'staff', g: 'people', lb: () => t('staff'), ok: () => isOwner(), cnt: 'stf', tone: 'info' },
-  { k: 'rulehub', g: 'settings', lb: () => t('rulehub'), ok: () => isOwner() },
-  { k: 'rules', g: 'settings', lb: () => t('rules'), ok: () => isOwner() },
-  { k: 'matrix', g: 'settings', lb: () => t('matrix'), ok: () => isOwner() },
-  { k: 'settings', g: 'settings', lb: () => t('settings'), ok: () => isOwner() },
-  { k: 'settings2', g: 'settings', lb: () => T('set2'), ok: () => isOwner() },
-  { k: 'invoice', g: 'settings', lb: () => T('inv'), ok: () => isOwner() },
-  { k: 'locset', g: 'settings', lb: () => t('locset'), ok: () => isOwner() || GF.settings_approve === true || GF.head_management === true },
-  { k: 'control', g: 'settings', lb: () => T('ctl'), ic: 'control', ok: () => ctlOk(), cnt: 'ctl', tone: 'info' },
-  { k: 'rollout', g: 'settings', lb: () => lab(L('কাগজ / পাশাপাশি / অ্যাপ', 'Paper / Parallel / App', 'Paper / Parallel / App')), ic: 'control', ok: () => isOwner() || GF.rollout_manage === true },
-  { k: 'changes', g: 'ops', lb: () => lab(L('বদলের অনুরোধ', 'Change requests', 'Change request')), ic: 'doc', ok: () => isOwner() || GF.change_approve === true, cnt: 'chg', tone: 'info' },
-  { k: 'outbox', g: 'ops', lb: () => lab(L('ফোনে জমা (পাঠানো হয়নি)', 'Not sent yet', 'Phone-এ জমা (Not sent yet)')), ic: 'doc', ok: () => true, cnt: 'obx', tone: 'warn' },
-  { k: 'locations', g: 'settings', lb: () => T('locs'), ic: 'locations', ok: () => isOwner() || GF.location_manage === true || GF.head_management === true, cnt: 'loc', tone: 'info' },
-  { k: 'backup', g: 'settings', lb: () => t('backup'), ok: () => isOwner() },
-];
+const AREA_G = B.ia.AREA_G;
+const formLive = (code) => (code === '0-1' ? isOwner() : !!(B.forms && B.forms[code]));
+const cx = () => ({ own: isOwner(), roles: (S.ctx && S.ctx.roles) || [], P, GF, locOk, canPos, anyApprove, ctlOk, formLive });
+// reversible switch: rule ia_home_v2 (absent = ON) or this phone's bos_ia_home_v2 = 'off'; OFF = the old Home / bottom bar / search
+const v2 = () => { let r = true; try { r = B.rule('ia_home_v2', true) !== false; } catch (e) { r = true; } try { if (store.get('bos_ia_home_v2') === 'off') r = false; } catch (e) { /* keep */ } return r; };   // what the ia.js predicates may look at
 let FORMS = null;   // rows of the forms table, fetched once
 function entries() {
-  const out = ROUTES.map((r) => ({ key: 'r:' + r.k, route: r.k, g: r.g, label: r.lb(), icon: r.ic || r.k, ok: r.ok(), live: true, cnt: r.cnt, tone: r.tone, kind: 'r' }));
+  const c = cx();
+  const out = B.IA.filter((r) => r.status === 'live').map((r) => ({ key: 'r:' + r.route, route: r.route, g: r.group, label: B.ia.label(r), icon: r.icon, ok: B.ia.visible(r, c), live: true, cnt: r.cnt, tone: r.tone, kind: 'r', drawer: r.drawer !== false, rec: r }));
   (FORMS || []).filter((f) => f.area !== 'master' && f.code !== 'POS' && AREA_G[f.area]).forEach((f) => {
     const live = f.code === '0-1' ? isOwner() : !!(B.forms && B.forms[f.code]);
-    out.push({ key: 'f:' + f.code, route: 'form/' + f.code, g: AREA_G[f.area], label: f.code + ' · ' + nm(f), icon: 'doc', ok: P(f.code, 'view'), live, kind: 'f', code: f.code });
+    out.push({ key: 'f:' + f.code, route: 'form/' + f.code, g: AREA_G[f.area], label: f.code + ' · ' + nm(f), icon: 'doc', ok: P(f.code, 'view'), live, kind: 'f', code: f.code, drawer: true });
   });
   return out;
 }
@@ -134,7 +93,8 @@ function keyOfHash() {
   const page = p[0] || 'home';
   if (page === 'form' && p[1]) return 'f:' + p[1];
   if (page === 'entry' && p[1] === 'new' && p[2]) return 'f:' + p[2];
-  if (page === 'report') return 'r:reports';
+  const rr = B.ia.resolve(p.join('/'));
+  if (rr) return 'r:' + (rr.alias || rr.route);
   return 'r:' + page;
 }
 
@@ -149,7 +109,7 @@ let lastCounted = null;
 function countRoute() {
   const h = location.hash;
   if (h === lastCounted) return; lastCounted = h;
-  const k = keyOfHash(); if (k && byKey(k)) bump(k);
+  const k = keyOfHash(); if (k && byKey(k)) { bump(k); if (S.ctx && k.startsWith('r:')) B.ia.pushRecent(uid(), k.slice(2)); }
 }
 
 // ---------- server sync: user_favourites / role_favourites. localStorage stays the offline fallback; changes made offline wait in a small queue ----------
@@ -200,8 +160,11 @@ async function counts(force) {
   if (own || ctlOk()) { try { const r = await sb.rpc('control_counts'); if (r && !r.error && r.data) { loc = Number(r.data.location_setup) || 0; sd = Number(r.data.settings_drafts) || 0; wst = Number(r.data.wastage) || 0; if (!own) lq = Number(r.data.lists) || 0; } } catch (e) { /* phase16 not installed */ } }
   let chg = 0;      // phase17: change requests the caller may decide (0 for everybody else / when not installed)
   if (own || GF.change_approve) { try { const r = await sb.rpc('entry_change_counts'); if (r && !r.error && r.data) chg = Number(r.data.pending) || 0; } catch (e) { /* phase17 not installed */ } }
+  let pend = 0, pendOld = null, low = 0;   // Increment A: entries waiting for MY approval (same rule as #/pending) and items below minimum (stock_levels)
+  if (ap) { try { const r = await sb.from('entries').select('form_code,entry_date').eq('status', 'submitted').order('entry_date', { ascending: true }).limit(200); const l = (r && !r.error ? r.data || [] : []).filter((e) => own || P(e.form_code, 'approve')); pend = l.length; pendOld = l.length ? l[0].entry_date : null; } catch (e) { /* table unreadable */ } }
+  if (locOk()) { try { const cl = curLoc(); const r = await sb.rpc('stock_levels', { p_loc: cl === undefined ? null : cl, p_filters: { below_min: true } }); low = r && !r.error && Array.isArray(r.data) ? r.data.filter((x) => x.below_min !== false).length : 0; } catch (e) { low = 0; } }
   const obx = (B.outbox && B.outbox.count) ? B.outbox.count() : 0;      // forms waiting on this phone (offline queue)
-  CNT = { ex, rel, em, stf, itm, lq, loc, sd, wst, chg, obx, ctl: (own ? ex + rel + em + stf + itm + lq + wst : 0) + loc + sd + (own ? 0 : lq) }; cntAt = Date.now(); return CNT;
+  CNT = { ex, rel, em, stf, itm, lq, loc, sd, wst, chg, obx, pend, pendOld, low, ctl: (own ? ex + rel + em + stf + itm + lq + wst : 0) + loc + sd + (own ? 0 : lq) }; cntAt = Date.now(); return CNT;
 }
 async function loadGrantFlags() {
   if (!S.ctx || isOwner()) return;
@@ -275,7 +238,7 @@ async function searchMore(qq) {
   if (P('ITEMS', 'view') && window.BOS_ALL) jobs.push(itemsAll().then((a) => a.filter((it) => [it.code, it.name_bn, it.name_en, it.name_mix, it.barcode].some((v) => normQ(v).includes(ql))).slice(0, 8), () => []));
   else jobs.push(Promise.resolve([]));
   if (canPos()) {
-    const safe = ql.replace(/[^\p{L}\p{N} ]/gu, ' ').trim();
+    const safe = ql.replace(/[^\p{L}\p{M}\p{N} ]/gu, ' ').trim();
     jobs.push(safe.length < 2 ? Promise.resolve([]) : (async () => { try { const r = await sb.from('customers').select('id,name,mobile').or(`name.ilike.%${safe}%,mobile.ilike.%${safe}%`).order('name').limit(6); return r && !r.error ? r.data || [] : []; } catch (e) { return []; } })());
   } else jobs.push(Promise.resolve([]));
   const [it, cu] = await Promise.all(jobs);
@@ -317,37 +280,53 @@ function dr_shell() {
     <div class="dr-foot"><div id="nav_locbox"></div><div class="me-lang">${A.langBar()}</div><div class="row"><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net"></span><span id="nav_nett">${esc(navigator.onLine === false ? T('offline') : T('online'))}</span></span>
       <button class="lo" data-act="logout">${esc(T('logout'))}</button></div></div>`;
 }
+const crumbOf = (e) => B.ia.groupLabel(e.g) + ' › ' + e.label;
 function dr_body() {
   const body = $('#nav_body'); if (!body) return;
   drawLocBox();
   const all = entries(), mode = npMode(), cur = keyOfHash(), cn = CNT || {}, og = groupOpen(), ql = q.trim().toLowerCase();
-  const row = (e) => {
+  const row = (e, sub, cls = 'dr-it') => {
     const on = e.key === cur, pin = isPinned(e.key), c = e.cnt && cn[e.cnt];
-    return `<div class="dr-i ${on ? 'on' : ''}"><button class="rb dr-it" data-act="nav_go" data-v="${esc(e.route)}" ${on ? 'aria-current="page"' : ''}>${ico(e.icon)}<span class="lb">${esc(e.label)}</span>${c ? `<span class="ct">${c}</span><span class="dot ${e.tone || 'warn'}"></span>` : ''}</button>
+    return `<div class="dr-i ${on ? 'on' : ''}"><button class="rb ${cls}" data-act="nav_go" data-v="${esc(e.route)}" ${on ? 'aria-current="page"' : ''}>${ico(e.icon)}<span class="lb">${esc(e.label)}${sub ? `<small class="muted" style="display:block;font-weight:400">${esc(B.ia.groupLabel(e.g))}</small>` : ''}</span>${c ? `<span class="ct">${c}</span><span class="dot ${e.tone || 'warn'}"></span>` : ''}</button>
       <button class="st" data-act="nav_pin" data-v="${esc(e.key)}" aria-pressed="${pin}" aria-label="${esc(pin ? T('unpin') : T('pin'))}">${pin ? IC.starF : IC.star}</button></div>`;
   };
   const lockRow = (label) => `<div class="dr-i lock">${IC.lock}<span>${esc(label)}</span></div>`;
   if (ql) {
-    const hit = all.filter((e) => e.ok && e.live && (e.label.toLowerCase().includes(ql) || e.route.toLowerCase().includes(ql)));
+    const byK = new Map(all.map((e) => [e.key, e]));
+    const sc = B.ia.searchSections(q, cx());
+    const toE = (r) => byK.get('r:' + r.route);
+    const ia = (v2() ? sc.go : B.ia.search(q, cx()).filter(Boolean)).map(toE).filter((e) => e && e.ok && e.live);
+    const setH = v2() ? sc.settings.map(toE).filter((e) => e && e.ok && e.live) : [];
+    const fm0 = all.filter((e) => e.kind === 'f' && e.ok && e.live && (e.label.toLowerCase().includes(ql) || e.route.toLowerCase().includes(ql)));
+    const doH = v2() ? sc.do.filter((d) => !ia.some((e) => e.route === d.route) && !fm0.some((e) => e.route === d.route)).map((d) => ({ key: 'do:' + d.route, route: d.route, label: d.label, icon: d.icon, g: '', ok: true, live: true, kind: 'd' })) : [];
+    const fm = all.filter((e) => e.kind === 'f' && e.ok && e.live && (e.label.toLowerCase().includes(ql) || e.route.toLowerCase().includes(ql)));
+    const hit = [...ia, ...fm];
     const stale = SR.q !== ql;
-    const itH = stale ? [] : SR.items.map((it) => `<div class="dr-i"><button class="rb dr-it" data-act="nav_go" data-v="${esc(P('ITEMS', 'enter') ? 'items/edit/' + it.id : 'items')}">${ico('items')}<span class="lb">${esc(it.code)} · ${esc(nm(it))}${it.is_active === false ? ' ·' : ''}</span></button></div>`);
-    const cuH = stale ? [] : SR.cust.map((c) => `<div class="dr-i"><button class="rb dr-it" data-act="nav_go" data-v="dues">${ico('dues')}<span class="lb">${esc(c.name || '')}${c.mobile ? ' · ' + esc(c.mobile) : ''}</span></button></div>`);
+    const itH = stale ? [] : SR.items.map((it) => `<div class="dr-i"><button class="rb dr-it" data-act="nav_go" data-v="${esc(P('ITEMS', 'enter') ? 'items/edit/' + it.id : 'items')}">${ico('items')}<span class="lb">${esc(it.code)} · ${esc(nm(it))}${it.is_active === false ? ' ·' : ''}<small class="muted" style="display:block;font-weight:400">${esc(B.ia.groupLabel('item'))}</small></span></button></div>`);
+    const cuH = stale ? [] : SR.cust.map((c) => `<div class="dr-i"><button class="rb dr-it" data-act="nav_go" data-v="dues">${ico('dues')}<span class="lb">${esc(c.name || '')}${c.mobile ? ' · ' + esc(c.mobile) : ''}<small class="muted" style="display:block;font-weight:400">${esc(B.ia.groupLabel('cust'))}</small></span></button></div>`);
     const sec = (title, arr) => (arr.length ? `<div class="hsec">${esc(title)}<small>${arr.length}</small></div>${arr.join('')}` : '');
-    const loc = hit.map((e) => row({ ...e, label: e.label }));
-    body.innerHTML = (loc.length || itH.length || cuH.length ? sec(T('s_screens'), loc) + sec(T('s_items'), itH) + sec(T('s_cust'), cuH) : '')
-      + (SR.busy && ql.length >= 2 ? `<p class="muted center pad">${esc(T('s_more'))}</p>` : '')
-      + (!loc.length && !itH.length && !cuH.length && !SR.busy ? `<p class="muted center pad">${esc(T('nores'))}</p>` : '');
+    const loc = hit.map((e) => row(e, true));
+    const doR = doH.map((e) => `<div class="dr-i"><button class="rb dr-it" data-act="nav_go" data-v="${esc(e.route)}" data-do="1">${ico(e.icon)}<span class="lb">${esc(e.label)}</span></button></div>`);
+    const setR = setH.map((e) => row(e, true));
+    const offl = navigator.onLine === false ? `<p class="muted center pad" data-state="offline">${esc(T('find_off'))}</p>` : '';
+    body.innerHTML = (v2() ? sec(T('s_do'), doR) : '') + (loc.length || itH.length || cuH.length || setR.length ? sec(T('s_screens'), loc) + sec(T('s_set'), setR) + sec(T('s_items'), itH) + sec(T('s_cust'), cuH) : '') + (v2() ? offl : '')
+      + (SR.busy && ql.length >= 2 ? B.ui.state('loading', T('s_more')) : '')
+      + (!loc.length && !itH.length && !cuH.length && !doR.length && !setR.length && !SR.busy ? B.ui.state('empty', T('nores')) : '');
     return;
   }
-  body.innerHTML = GROUPS.map((g) => {
-    const list = all.filter((e) => e.g === g && e.live);
+  const rc = B.ia.recent(uid()).map((r) => all.find((e) => e.key === 'r:' + r)).filter((e) => e && e.ok && e.live && e.key !== cur);
+  const recent = rc.length ? `<div class="hsec">${esc(T('recent'))}</div>${rc.map((e) => row(e, true, 'dr-rc')).join('')}` : '';
+  let lockLines = 0;
+  body.innerHTML = recent + GROUPS.map((g) => {
+    const list = all.filter((e) => e.g === g && e.live && e.drawer);
     const okL = list.filter((e) => e.ok), bad = list.filter((e) => !e.ok);
-    if (!okL.length && !(mode === 'lock' && bad.length)) return '';
+    const core = (e) => e.kind === 'r' && e.rec && (e.rec.mod || (e.rec.mob >= 1 && e.rec.mob <= 2));
+    if (!okL.length) return '';
     const open = !!og[g] || okL.some((e) => e.key === cur), attn = okL.some((e) => e.cnt && cn[e.cnt]);
-    // locked forms collapse to one summary line; locked routes are listed one by one
-    const locks = mode === 'lock' ? [...bad.filter((e) => e.kind === 'r').map((e) => lockRow(e.label + ' · ' + T('noperm'))), ...(bad.some((e) => e.kind === 'f') ? [lockRow(T('noperm') + ' (' + bad.filter((e) => e.kind === 'f').length + ')')] : [])] : [];
-    return `<div class="dr-grp"><button class="rb dr-g" data-act="nav_grp" data-v="${g}" aria-expanded="${open}"><span class="gl">${esc(T('g_' + g))}${attn ? '<span class="dot warn"></span>' : ''}${!okL.length ? IC.lock.replace('<svg', '<svg width="16" height="16"') : ''}</span>${IC.cv.replace('<svg', '<svg class="cv"')}</button>
-      <div class="dr-list" ${open ? '' : 'hidden'}>${okL.map(row).join('')}${locks.join('')}</div></div>`;
+    // lock mode: ONE summary line per category (at most 8 lines in the whole drawer)
+    const locks = mode === 'lock' && bad.length && lockLines++ < 8 ? [lockRow(T('noperm') + ' (' + bad.length + ')')] : [];
+    return `<div class="dr-grp"><button class="rb dr-g" data-act="nav_grp" data-v="${g}" aria-expanded="${open}"><span class="gl">${esc(B.ia.groupLabel(g))}${attn ? '<span class="dot warn"></span>' : ''}${!okL.length ? IC.lock.replace('<svg', '<svg width="16" height="16"') : ''}</span>${IC.cv.replace('<svg', '<svg class="cv"')}</button>
+      <div class="dr-list" ${open ? '' : 'hidden'}>${okL.map((e) => row(e)).join('')}${okL.length ? `<div class="dr-i"><button class="rb dr-rc" data-act="go_group" data-v="${g}" data-grp="${g}" style="opacity:.8"><span class="lb"><small>${esc(T('all_in'))} ›</small></span></button></div>` : ''}${locks.join('')}</div></div>`;
   }).join('');
 }
 function setDrawer(on) {
@@ -360,7 +339,7 @@ async function openDrawer() {
   mount(); await ensureStatic(); q = ''; sig = ''; renderDrawer();
   try { history.pushState({ bosNav: 1 }, '', location.href); } catch (e) { /* ignore */ }
   setDrawer(true);
-  const cb = $('.dr-head button', el.drawer); if (cb) cb.focus();
+  requestAnimationFrame(() => { const cb = $('.dr-head button', el.drawer); if (cb) cb.focus(); });
   counts().then((c) => { if (drawerOpen) dr_body(); return c; }, () => {});
 }
 function closeDrawer() {
@@ -398,11 +377,20 @@ function syncBnav() {
   document.body.classList.toggle('has-bnav', show);
   if (!show) return;
   const page = (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0], pos = canPos(), mode = npMode();
-  const cur = drawerOpen ? 'menu' : page === 'home' ? 'home' : '';
+  const cur = drawerOpen ? 'menu' : page === 'home' ? 'home' : page === 'pos' ? 'pos' : keyOfHash();
   const b = (act, ic, lb, k, extra = '') => `<button data-act="${act}" ${cur === k ? 'aria-current="page"' : ''} ${extra}>${ic}<span>${esc(lb)}</span></button>`;
   const posBtn = pos ? b('go', ico('pos'), t('pos'), 'pos', 'data-v="pos"') : mode === 'lock' ? `<button disabled aria-label="${esc(t('pos') + ' · ' + T('noperm'))}">${IC.lock}<span>${esc(t('pos'))}</span></button>` : '';
   el.bnav.setAttribute('aria-label', T('menu'));
-  el.bnav.innerHTML = b('go', IC.home, t('home'), 'home', 'data-v="home"') + b('nav_open', IC.menu, T('menu'), 'menu') + posBtn + b('nav_me', IC.me, T('me'), 'me');
+  if (v2()) {
+    const cur2 = drawerOpen ? 'menu' : page === 'home' ? 'home' : keyOfHash();
+    const sl = B.ia.slots(cx()).map((x) => x.kind === 'home' ? `<button data-act="go" data-v="home" ${cur2 === 'home' ? 'aria-current="page"' : ''}>${IC.home}<span>${esc(t('home'))}</span></button>`
+      : x.kind === 'menu' ? `<button data-act="nav_open" ${cur2 === 'menu' ? 'aria-current="page"' : ''}>${IC.menu}<span>${esc(T('menu'))}</span></button>`
+      : x.kind === 'me' ? `<button data-act="nav_me">${IC.me}<span>${esc(T('me'))}</span></button>`
+      : `<button data-act="go" data-v="${esc(x.route)}" data-slot="${esc(x.route)}" ${cur2 === 'r:' + x.route || location.hash === '#/' + x.route ? 'aria-current="page"' : ''}>${ico(x.icon)}<span>${esc(x.label)}</span></button>`).join('');
+    el.bnav.setAttribute('aria-label', T('menu')); el.bnav.innerHTML = sl; return;
+  }
+  const sc = B.ia.bottom(cx()).map((r) => b('go', ico(r.icon), B.ia.label(r), 'r:' + r.route, `data-v="${esc(r.route)}"`)).join('');   // best other shortcut for this role (priority in ia.js)
+  el.bnav.innerHTML = b('go', IC.home, t('home'), 'home', 'data-v="home"') + posBtn + sc + b('nav_open', IC.menu, T('menu'), 'menu') + b('nav_me', IC.me, T('me'), 'me');
 }
 
 // ---------- header bits (called from shell) ----------
@@ -413,12 +401,22 @@ function headExtra() {
   const pin = isPinned(k);
   return `<button class="hbtn pin" id="hd_pin" data-act="nav_pin" data-v="${esc(k)}" aria-pressed="${pin}" aria-label="${esc(pin ? T('unpin') : T('pin'))}">${pin ? IC.starF : IC.star}</button>`;
 }
+function crumb() {
+  if (!S.ctx || !S.ctx.profile || S.ctx.profile.status !== 'active') return '';
+  const page = (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0];
+  if (page === 'home' || page === 'group') return '';
+  const e = byKey(keyOfHash()); if (!e || !e.ok) return '';
+  return `<nav class="crumb muted" aria-label="breadcrumb" style="font-size:.82rem;margin:2px 0 8px;display:flex;flex-wrap:wrap;gap:4px;align-items:center"><button data-act="go_group" data-v="${esc(e.g)}" style="background:none;border:0;padding:0 2px;min-height:44px;color:inherit;text-decoration:underline">${esc(B.ia.groupLabel(e.g))}</button><span aria-hidden="true">›</span><span>${esc(e.label)}</span></nav>`;
+}
 function updatePinBtn() {
   const b = $('#hd_pin'); if (!b) return; const pin = isPinned(b.dataset.v);
   b.setAttribute('aria-pressed', pin); b.setAttribute('aria-label', pin ? T('unpin') : T('pin')); b.innerHTML = pin ? IC.starF : IC.star;
 }
+let syncUid = null;
 function sync(live) {
   mount();
+  const who0 = live ? uid() : null;
+  if (who0 !== syncUid) { syncUid = who0; ITEMS_ALL = null; ITEMS_AT = 0; SR.items = []; SR.cust = []; SR.q = ''; CNT = null; }   // other person / logged out: no cached item list
   if (!live) { setDrawer(false); document.body.classList.remove('has-bnav'); return; }
   countRoute();
   if (!FORMS) ensureStatic().then(() => { renderDrawer(); }, () => {});
@@ -481,7 +479,7 @@ async function home() {
     <div id="hv_main"><p class="muted">${esc(t('loading'))}</p></div>`);
   await ensureStatic();
   if (!$('#hv_main')) return;
-  const cn = await counts(true).catch(() => ({}));
+  const cn = await counts().catch(() => ({}));   // 45 s cache; the refresh button forces
   if (!$('#hv_main')) return;
   const rows = [];
   if (own) rows.push(['em', cn.em, 'warn', t('emergency'), 'emergency']);
@@ -493,21 +491,25 @@ async function home() {
   if (own) rows.push(['wst', cn.wst, 'warn', T('n_wst'), 'stock']);
   if (own || GF.change_approve) rows.push(['chg', cn.chg, 'info', lab(L('বদলের অনুরোধ', 'Change requests', 'Change request')), 'changes']);
   rows.push(['obx', cn.obx, 'warn', lab(L('ফোনে জমা (পাঠানো হয়নি)', 'Not sent yet', 'Phone-এ জমা')), 'outbox']);
-  const hot = rows.filter((r) => r[1]).slice(0, 8);
-  const attn = ap || own || ctlOk() ? `<div class="hsec">${esc(T('attn'))}${hot.length ? `<small>${hot.reduce((s, r) => s + r[1], 0)}</small>` : ''}</div>
+  const V2 = v2();
+  if (V2 && ap) rows.push(['pend', cn.pend, 'info', T('n_pend') + (cn.pendOld ? ' · ' + cn.pendOld : ''), 'pending']);
+  if (V2 && locOk()) rows.push(['low', cn.low, 'warn', T('n_low'), 'stock']);
+  const hot = rows.filter((r) => r[1]).slice(0, V2 ? 5 : 8);
+  const attn = ap || own || ctlOk() ? `<div class="hsec">${esc(T('attn'))}${hot.length ? `<small>${hot.reduce((s, r) => s + r[1], 0)}</small>` : ''}${V2 ? `<button class="mini" data-act="hv_refresh" aria-label="${esc(T('refresh'))}">↻</button>` : ''}</div>
     <div class="card" style="padding:4px 12px">${hot.length ? hot.map((r) => `<button class="hrow mk ${r[2]}" data-act="go" data-v="${r[4]}"><span>${esc(r[3])}</span><span class="n">${r[1]}</span><span class="cv">›</span></button>`).join('')
-      : `<div class="dash-ok">${esc(T('attn_ok'))}</div>`}</div>` : '';
+      : `<div class="dash-ok">${esc(V2 ? T('all_clear') : T('attn_ok'))}</div>`}${V2 && rows.filter((r) => r[1]).length > 5 ? `<button class="hrow" data-act="go" data-v="${own || ctlOk() ? 'control' : 'pending'}"><span>${esc(T('see_all'))}</span><span class="cv">›</span></button>` : ''}</div>` : (V2 && hot.length ? `<div class="hsec">${esc(T('attn'))}<small>${hot.reduce((s, r) => s + r[1], 0)}</small></div><div class="card" style="padding:4px 12px">${hot.map((r) => `<button class="hrow mk ${r[2]}" data-act="go" data-v="${r[4]}"><span>${esc(r[3])}</span><span class="n">${r[1]}</span><span class="cv">›</span></button>`).join('')}</div>` : '');
   const posBtn = P('POS', 'enter') ? `<button class="primary hbig" data-act="go" data-v="pos">${esc(t('pos'))}</button>` : '';
-  $('#hv_main').innerHTML = `${posBtn}${attn}
+  $('#hv_main').innerHTML = `${V2 ? '' : posBtn}${attn}${V2 ? '<div id="hv_sheets"></div><div id="hv_qa"></div><div class="hsec">' + esc(T('fav')) + '</div><div id="hv_fav"></div><div id="hv_recent"></div>' : ''}
     <div class="seg" role="group" aria-label="${esc(T('biz') + ' / ' + T('acc'))}"><button data-act="hv_mode" data-v="biz" aria-pressed="${HS.mode === 'biz'}">${esc(T('biz'))}</button><button data-act="hv_mode" data-v="acc" aria-pressed="${HS.mode === 'acc'}">${esc(T('acc'))}</button></div>
     <div class="ptabs" role="tablist" id="hv_pt"></div><div id="hv_stats"></div>
-    <div id="hv_sheets"></div>
-    <div class="hsec">${esc(T('fav'))}</div><div id="hv_fav"></div>
+    ${V2 ? '' : '<div id="hv_sheets"></div><div class="hsec">' + esc(T('fav')) + '</div><div id="hv_fav"></div>'}
     <div class="hsec" id="hv_th"></div><div class="qgrid" id="hv_tiles"></div>
+    ${V2 ? '' : '<div id="hv_recent"></div><div id="hv_qa"></div>'}
     <div class="hsec">${esc(T('modules'))}</div><div class="grid" id="hv_mods"></div><div id="hv_ctl"></div>
+    <div class="hsec">${esc(T('cats'))}</div><div class="grid" id="hv_cats"></div>
     <details class="acc" id="hv_forms"><summary>${esc(T('forms'))}</summary><div class="accb" id="hv_formsb"></div></details>
     ${ap || canPos() ? `<details class="acc" id="hv_dt"><summary>${esc(T('detail'))}</summary><div class="accb"><div id="dash"></div></div></details>` : ''}`;
-  drawPeriod(); drawTiles(); drawFav(); drawMods(); drawCtl(); drawForms();
+  drawPeriod(); drawTiles(); drawFav(); drawMods(); drawCtl(); drawForms(); drawRecent(); drawCats();
   const dt = $('#hv_dt'); if (dt) dt.addEventListener('toggle', () => { if (dt.open && B.dash) B.dash.render().catch(() => {}); });
   loadStats(); loadSheets();
 }
@@ -579,10 +581,8 @@ function drawStats() {
   }
 }
 function tileDefs() {
-  const f = (code) => ({ key: 'f:' + code });
-  return HS.mode === 'biz'
-    ? [{ key: 'r:pos' }, { key: 'r:items' }, { key: 'r:itemreq' }, f('14-1'), f('03-1'), f('04-1'), { key: 'r:reports' }, { key: 'r:stock', label: () => T('stockbal') }]
-    : [f('10-1'), f('10-2'), f('10-4'), { key: 'r:dues' }, { key: 'r:biz', label: () => T('pl') }, { key: 'r:reports' }, { key: 'r:payables', label: () => T('payables') }, { key: 'r:daybook', label: () => T('daybook') }];
+  const lbl = B.ia.HOME_LABEL, mode = HS.mode;
+  return B.ia.homeKeys(mode).map((key) => (lbl[key] && lbl[key][mode] ? { key, label: () => T(lbl[key][mode]) } : { key }));
 }
 function tile(e, o = {}) {
   const pin = isPinned(e.key), c = e.cnt && CNT && CNT[e.cnt];
@@ -600,7 +600,12 @@ function drawTiles() {
     if (!e.live) return `<div class="qt soon"><div class="qm" aria-disabled="true"><span class="lb">${esc(e.label)}</span><span class="chip">${esc(T('soon'))}</span></div></div>`;
     if (!e.ok) return mode === 'lock' ? `<div class="qt lock"><div class="qm" aria-disabled="true">${IC.lock}<span class="lb">${esc(d.label ? d.label() : e.label)}</span><span class="chip">${esc(T('noperm'))}</span></div></div>` : '';
     return tile(e, d.label ? { label: d.label() } : {});
-  }).join('');
+  }).join('') + topUpTiles();
+}
+// role-relevant extras (priority in ia.js) when fewer than 8 tiles are usable for this person
+function topUpTiles() {
+  const have = tileDefs().filter((d) => { const e = byKey(d.key); return e && e.ok && e.live; }).length;
+  return B.ia.topUp(HS.mode, cx(), have, 8).map((k) => { const e = byKey(k); return e && e.ok && e.live ? tile(e) : ''; }).join('');
 }
 function drawFav() {
   const box = $('#hv_fav'); if (!box) return;
@@ -613,7 +618,7 @@ function drawFav() {
 function drawMods() {
   const box = $('#hv_mods'); if (!box) return;
   const cn = CNT || {}, mode = npMode();
-  const order = ['pos', 'dues', 'reports', 'biz', 'items', 'itemreq', 'assets', 'itemimport', 'exceptions', 'numaudit', 'emergency', 'releases', 'staff', 'rulehub'];
+  const order = B.ia.modules().map((r) => r.route);
   const lockable = new Set(['pos', 'dues', 'biz', 'items']);
   box.innerHTML = order.map((k) => {
     const e = byKey('r:' + k); if (!e) return '';
@@ -628,6 +633,22 @@ function drawCtl() {
   const c = (CNT && CNT.ctl) || 0;
   box.innerHTML = `<button class="tile t-ink" data-act="go" data-v="control" style="width:100%;margin-top:12px;min-height:76px;flex-direction:row;align-items:center;justify-content:flex-start">${ico('control')}<span style="flex:1;text-align:start"><b>${esc(T('ctl'))}</b><br><small>${esc(T('ctl_d'))}</small></span>${c ? `<span class="badge">${c}</span>` : ''}</button>`;
 }
+function drawRecent() {
+  const box = $('#hv_recent'), qa = $('#hv_qa'); if (!box || !v2()) return;   // switch OFF = the old Home
+  const rc = B.ia.recent(uid()).map((r) => byKey('r:' + r)).filter((e) => e && e.ok && e.live);
+  box.innerHTML = `<div class="hsec">${esc(T('recent'))}</div>` + (rc.length ? `<div class="row wrap">${rc.map((e) => `<button class="tog" data-act="go" data-v="${esc(e.route)}">${esc(e.label)}</button>`).join('')}</div>` : `<p class="muted" style="margin:0 0 10px">${esc(T('recent_empty'))}</p>`);
+  const acts = B.ia.quickActions(cx());
+  if (qa) qa.innerHTML = acts.length ? `<div class="hsec">${esc(T('qa'))}</div><div class="qgrid" id="hv_qgrid">${acts.map((a) => `<div class="qt"><button class="qm" data-act="go" data-v="${esc(a.route)}" data-quick="${esc(a.route)}">${ico(a.icon)}<span class="lb">${esc(a.label)}</span></button></div>`).join('')}</div>` : '';
+}
+function drawCats() {
+  const box = $('#hv_cats'); if (!box) return;
+  const all = entries().filter((e) => e.live && e.ok && e.drawer), cn = CNT || {};
+  box.innerHTML = GROUPS.filter((g) => g !== 'dash').map((g) => {
+    const l = all.filter((e) => e.g === g); if (!l.length) return '';
+    const n = l.reduce((s2, e) => s2 + (e.cnt && cn[e.cnt] && e.cnt !== 'ctl' ? cn[e.cnt] : 0), 0);
+    return `<button class="tile" data-act="go_group" data-v="${g}" data-cat="${g}">${ico(l[0].icon)}<span>${esc(B.ia.groupLabel(g))}</span>${n ? `<span class="badge">${n}</span>` : ''}</button>`;
+  }).join('');
+}
 function drawForms() {
   const box = $('#hv_formsb'); if (!box) return;
   const mine = (FORMS || []).filter((f) => f.area !== 'master' && f.code !== 'POS' && P(f.code, 'view') && !isOwnerFormHidden(f));
@@ -641,6 +662,26 @@ function drawForms() {
 }
 const isOwnerFormHidden = () => false;
 
+// ---------- category page (#/group/<id>): every screen of one category the person may open, with counts and quick actions ----------
+async function viewGroup() {
+  mount();
+  const g = (location.hash.replace(/^#\/?/, '').split('/')[1] || ''), grp = B.ia.groupOf(g), title = grp ? B.ia.groupLabel(g) : T('menu');
+  A.shell(title, B.ui.state('loading'), true);
+  await ensureStatic(); const cn = await counts().catch(() => ({}));
+  if (!$('#app') || !grp) return grp ? null : A.shell(title, B.ui.state('empty', T('emptyg')), true);
+  const mode = npMode(), all = entries().filter((e) => e.live && e.kind === 'r' && (e.g === g || (e.rec.also || []).includes(g)));
+  const okL = all.filter((e) => e.ok), bad = all.filter((e) => !e.ok);
+  const main = okL.filter((e) => e.rec.parent === undefined), subs = okL.filter((e) => e.rec.parent !== undefined);
+  const c = cx();
+  const rowF = (e) => { const n = e.cnt && cn[e.cnt]; return `<div class="row between"><button class="hrow ${n ? 'mk ' + (e.tone || 'warn') : ''}" style="flex:1" data-act="go" data-v="${esc(e.route)}" data-ia="${esc(e.route)}"><span>${esc(e.label)}</span>${n ? `<span class="n">${n}</span>` : ''}<span class="cv">›</span></button></div>` + (e.rec.qa || []).filter((a) => !a.ok || a.ok(c)).map((a) => `<button class="tog" style="margin:0 0 6px 12px" data-act="go" data-v="${esc(a.route)}">＋ ${esc(lab(L(a.label[0], a.label[1], a.label[2])))}</button>`).join(''); };
+  const forms = (FORMS || []).filter((f) => f.area !== 'master' && f.code !== 'POS' && AREA_G[f.area] === g && P(f.code, 'view') && (f.code === '0-1' ? isOwner() : !!(B.forms && B.forms[f.code])));
+  const body = main.map(rowF).join('') + (subs.length ? `<div class="hsec">${esc(T('set2'))}</div>${subs.map(rowF).join('')}` : '')
+    + (forms.length ? `<div class="hsec">${esc(T('forms'))}</div>${forms.map((f) => `<button class="hrow" data-act="openform" data-v="${esc(f.code)}"><span><b>${esc(f.code)}</b> · ${esc(nm(f))}</span><span class="cv">›</span></button>`).join('')}` : '')
+    + (mode === 'lock' && bad.length ? bad.map((e) => `<div class="dr-i lock">${IC.lock}<span>${esc(e.label)} · ${esc(T('noperm'))}</span></div>`).join('') : '');
+  A.shell(title, body ? `<div class="card" style="padding:4px 12px">${body}</div>` : B.ui.state('empty', T('emptyg')), true);
+}
+window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { group: viewGroup });
+
 // ---------- handlers ----------
 Object.assign(H, {
   nav_open: () => openDrawer(),
@@ -651,6 +692,9 @@ Object.assign(H, {
   },
   nav_grp: (a) => { const og = groupOpen(), g = a.dataset.v; og[g] = !og[g]; store.set('bos_navg_' + uid(), JSON.stringify(og)); dr_body(); },
   nav_pin: (a) => togglePin(a.dataset.v),
+  go_group: (a) => { const r = 'group/' + a.dataset.v; if (drawerOpen) H.nav_go({ dataset: { v: r } }); else location.hash = '#/' + r; },
+  hv_refresh: () => { CNT = null; HS.data = null; home(); },
+  ia_retry: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
   nav_picker: pickerSheet,
   nav_me: meSheet,
   nav_reset: () => { store.set('bos_pins_' + uid(), '[]'); store.set('bos_use_' + uid(), '{}'); setFavQ([]); okRes(sb.from('user_favourites').delete().eq('user_id', uid())).catch(() => {}); closeSheet(); afterPin(); },
@@ -662,5 +706,5 @@ const prevLang = H.lang;
 H.lang = (a) => { sig = ''; return prevLang(a); };
 
 B.curLoc = curLoc; B.setCurLoc = setCurLoc; B.fyStart = fyStart;
-window.BOS_NAV = { loadSheets, curLoc, fyStart, grantFlags: () => GF, ctlOk, menuBtn, headExtra, sync, home, open: openDrawer, close: closeDrawer, pins, usage, togglePin, entries: () => entries().filter((e) => e.live), syncFavs };
+window.BOS_NAV = { loadSheets, curLoc, fyStart, grantFlags: () => GF, ctlOk, menuBtn, headExtra, crumb, sync, home, open: openDrawer, close: closeDrawer, pins, usage, togglePin, entries: () => entries().filter((e) => e.live), syncFavs };
 })();
