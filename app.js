@@ -232,7 +232,7 @@ async function viewItems() {
 const canCostView = () => !!(S.ctx.perms.ITEM_COST && S.ctx.perms.ITEM_COST.view);
 const canCostEnter = () => !!(S.ctx.perms.ITEM_COST && S.ctx.perms.ITEM_COST.enter);
 async function loadItems() {
-  const [it, co] = await Promise.all([sb.from('items').select('*').order('code'), canCostView() ? sb.from('item_costs').select('*') : Promise.resolve({ data: [] })]);
+  const [it, co] = await Promise.all([window.BOS_ALL(sb.from('items').select('*').order('code')), canCostView() ? sb.from('item_costs').select('*') : Promise.resolve({ data: [] })]);
   if (it.error) return fail(it.error);
   if (co.error) return fail(co.error);
   const cm = new Map((co.data || []).map((c) => [c.item_id, c.cost_price]));
@@ -445,17 +445,34 @@ async function viewLogs() {
 }
 
 // ---------- backup (owner) ----------
-const BACKUP_TABLES = ['profiles', 'roles', 'user_roles', 'locations', 'user_locations', 'forms', 'role_form_perms', 'items', 'item_price_history', 'settings', 'audit_log', 'corrections'];
+// Every business-data table the owner can read through RLS (sale lines live inside sales.lines; sales_fact_t is a rebuildable report cache; serials/login_throttle have no read policy).
+// Never add a table that holds a PIN or secret (PINs are only inside Supabase Auth, never in these tables).
+const BACKUP_TABLES = ['profiles', 'roles', 'user_roles', 'locations', 'user_locations', 'forms', 'role_form_perms', 'items', 'item_costs', 'item_changes', 'item_price_history',
+  'settings', 'audit_log', 'corrections', 'location_settings', 'entries', 'exceptions', 'release_requests', 'emergency_requests', 'rules', 'rule_grants', 'grant_defs', 'user_grants',
+  'option_lists', 'customers', 'suppliers', 'sales', 'sale_payments', 'stock_ledger', 'stock_balance', 'stock_batches', 'stock_transfers', 'stock_wastage', 'purchase_bills', 'purchase_lines',
+  'supplier_payments', 'unit_conversions', 'shelf_life_rules', 'invoice_templates', 'print_profiles', 'report_brand_map', 'role_favourites', 'login_failures', 'login_attempts', 'wastage_requests', 'supplier_refunds', 'sale_returns'];
 function viewBackup() {
   shell(t('backup'), `<div class="card stack"><p>${esc(t('backup_text'))}</p>
     <button class="primary full" data-act="bk_all">${esc(t('backup_all'))}</button>
     <button class="full" data-act="bk_items">${esc(t('backup_items'))}</button></div>`, true);
 }
 async function fetchAll(table) {
+  // the two stock tables hold cost columns that are not granted: the owner reads them through definer RPCs (phase12)
+  if (table === 'stock_balance') { const r = await sb.rpc('backup_stock_balance'); if (r.error) throw r.error; return r.data || []; }
+  if (table === 'stock_ledger') { const out = []; let last = 0; for (;;) { const r = await sb.rpc('backup_stock_ledger', { p_from: last, p_limit: 1000 }); if (r.error) throw r.error; const d = r.data || []; out.push(...d); if (d.length < 1000) break; last = d[d.length - 1].id; } return out; }
   const out = []; for (let from = 0; ; from += 1000) {
     const { data, error } = await sb.from(table).select('*').range(from, from + 999); if (error) throw error;
     out.push(...data); if (data.length < 1000) break; }
   return out;
+}
+// one table failing (missing, no read right) never stops the backup: it is recorded in o.errors and the rest continues
+async function backupTables(o, tables) {
+  o.errors = o.errors || {}; o.row_counts = o.row_counts || {};
+  for (const tb of tables) {
+    try { o.tables[tb] = await fetchAll(tb); o.row_counts[tb] = o.tables[tb].length; }
+    catch (e) { o.errors[tb] = String((e && e.message) || e); o.row_counts[tb] = null; }
+  }
+  return o;
 }
 function download(name, text, type) {
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name;
@@ -463,8 +480,8 @@ function download(name, text, type) {
 }
 const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
 async function backupAll() {
-  try { const o = { exported_at: new Date().toISOString(), tables: {} };
-    for (const tb of BACKUP_TABLES) o.tables[tb] = await fetchAll(tb);
+  try { const o = { exported_at: new Date().toISOString(), note: 'row_counts = rows saved per table; errors = tables that could not be read (not included)', tables: {} };
+    await backupTables(o, BACKUP_TABLES);
     download(`bos-backup-${today()}.json`, JSON.stringify(o, null, 1), 'application/json'); toast(t('done'));
   } catch (e) { fail(e); }
 }

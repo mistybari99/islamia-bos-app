@@ -21,7 +21,7 @@ const X = {
   g_customers: L('গ্রাহক ও বাকি', 'Customers & dues', 'Customer ও বাকি'),
   views: L('আমার ভিউ', 'My views', 'My Views'), views_s: L('সংরক্ষিত ভিউ', 'Saved views', 'Saved Views'), noviews: L('এখনও কোনো ভিউ সংরক্ষণ করা হয়নি', 'No saved views yet', 'এখনও কোনো View save করা হয়নি'),
   shared: L('শেয়ার করা', 'Shared', 'Shared'), mine: L('আমার', 'Mine', 'Mine'),
-  noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), nores: L('কিছু পাওয়া যায়নি', 'Nothing found', 'কিছু পাওয়া যায়নি'),
+  pages_s: L('আলাদা পাতা', 'Other pages', 'আলাদা Page'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), nores: L('কিছু পাওয়া যায়নি', 'Nothing found', 'কিছু পাওয়া যায়নি'),
   engine: L('রিপোর্ট ইঞ্জিন এখনও চালু হয়নি — ডেটাবেসে phase9.sql চালাতে হবে', 'The report engine is not installed yet — phase9.sql must be run on the database', 'Report engine চালু হয়নি — database-এ phase9.sql চালাতে হবে'),
   loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), notfound: L('এই রিপোর্ট পাওয়া যায়নি', 'This report was not found', 'এই Report পাওয়া যায়নি'),
   filter: L('ফিল্টার', 'Filter', 'Filter'), colsb: L('কলাম', 'Columns', 'Columns'), viewsb: L('ভিউ', 'Views', 'Views'),
@@ -96,6 +96,7 @@ async function viewHub() {
     if (e.engine) return shell(T('title'), `<div class="notice warn mk warn">${esc(T('engine'))}</div>`, true);
     return fail(e);
   }
+  try { await Promise.all((B.reportLinks || []).map((l) => (l.check ? l.check() : null))); } catch (e) { /* links stay unchecked */ }
   HB.cat = cat; HB.views = views; drawHub();
 }
 function groupsOf(cat) { const g = []; cat.forEach((r) => { if (!g.includes(r.group)) g.push(r.group); }); return g; }
@@ -130,6 +131,11 @@ function drawHubList() {
       ? `<button class="rp-row" data-act="rp_open" data-v="${esc(r.key)}"><span class="nm">${esc(repName(r))}</span><span class="cv">›</span></button>`
       : `<div class="rp-row lock" aria-disabled="true">${LOCK}<span class="nm">${esc(repName(r))}</span><span class="chip">${esc(T('noperm'))}</span></div>`).join('')}</div>`;
   });
+  const lk = (B.reportLinks || []).filter((l) => !q || String(l.label()).toLowerCase().includes(q)).filter((l) => !HB.g || false);
+  const lkv = (HB.g ? [] : lk).filter((l) => l.allowed || mode === 'lock');
+  if (lkv.length) h += `<div class="hsec">${esc(T('pages_s'))}</div><div class="card" style="padding:4px 12px">${lkv.map((l) => (l.allowed
+    ? `<button class="rp-row" data-act="go" data-v="${esc(l.route)}"><span class="nm">${esc(l.label())}</span><span class="cv">›</span></button>`
+    : `<div class="rp-row lock" aria-disabled="true">${LOCK}<span class="nm">${esc(l.label())}</span><span class="chip">${esc(T('noperm'))}</span></div>`)).join('')}</div>`;
   box.innerHTML = h || `<p class="muted center pad">${esc(T('nores'))}</p>`;
 }
 

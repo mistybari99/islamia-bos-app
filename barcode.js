@@ -105,5 +105,13 @@ function scan() {
 }
 // find the item with this exact barcode in a list of items
 const find = (code, items) => { const c = String(code || '').trim(); return c ? ((items || []).find((i) => i.barcode && String(i.barcode).trim() === c) || null) : null; };
-B.barcode = { scan, modes, find, label: (k) => T(k) };
+// scan and resolve to an item of `items` (rows with a barcode column); a code with no product shows "No product has this barcode" and gives null.
+// Used by the purchase bill lines and the stock actions. Does nothing visible when both scan options are off (scan() then explains where to enable them).
+async function scanItem(items) {
+  const code = await scan(); if (!code) return null;
+  const it = find(code, items); if (!it) toast(T('nomatch') + ' · ' + code);
+  return it;
+}
+const enabled = () => { const m = modes(); return !!(m.cam || m.dev); };
+B.barcode = { scan, modes, find, scanItem, enabled, label: (k) => T(k) };
 })();

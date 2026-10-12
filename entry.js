@@ -92,7 +92,7 @@ B.GROUPS = { A: L('টাকা ও সীমা', 'Cash & limits'), B: L('স�
 const ENV = { staff: null, items: null, locs: null, byLoc: {}, lists: null, rules: null, grantDefs: null, sup: null, supManage: false };
 async function loadStatic() {
   if (!ENV.staff) { const r = await sb.rpc('staff_directory'); ENV.staff = r.data || []; }
-  if (!ENV.items) { const r = await sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,sell_price,is_active').order('code'); ENV.items = r.data || []; ENV.byCode = new Map(ENV.items.map((i) => [i.code, i])); }
+  if (!ENV.items) { const r = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,sell_price,is_active').order('code')); ENV.items = r.data || []; ENV.byCode = new Map(ENV.items.map((i) => [i.code, i])); }
   if (!ENV.locs) { const r = await sb.from('locations').select('*').order('sort'); ENV.locs = r.data || []; }
   if (!ENV.lists) await loadLists();
   if (!ENV.rules) await loadRules();

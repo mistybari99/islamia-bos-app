@@ -49,6 +49,12 @@ const X = {
   needItem: L('পণ্য বাছুন', 'Choose an item', 'Item বাছুন'), needQty: L('পরিমাণ ঠিক নয়', 'Quantity is not valid', 'Quantity ঠিক নয়'), needNote: L('নোট লিখুন', 'Write a note', 'Note লিখুন'),
   needReason: L('কারণ বাছুন', 'Choose a reason', 'Reason বাছুন'), needTo: L('গন্তব্য বাছুন', 'Choose where to send', 'গন্তব্য বাছুন'), badCost: L('দাম ঠিক নয়', 'Cost is not valid', 'Cost ঠিক নয়'),
   delta: L('পার্থক্য', 'Difference', 'Difference'), countDone: L('গণনা মেলানো হয়েছে', 'Count posted', 'Count posted'), sentOk: L('পাঠানো হয়েছে — গ্রহণের অপেক্ষায়', 'Sent — waiting to be received', 'Sent — receive-এর অপেক্ষায়'),
+  wa: L('অনুমোদন', 'Approvals', 'Approval'), waEmpty: L('অনুমোদনের অপেক্ষায় কিছু নেই ✓', 'Nothing waiting for approval ✓', 'Approval-এর অপেক্ষায় কিছু নেই ✓'),
+  waTitle: L('বড় নষ্ট মাল বাদ — অনুমোদন', 'Large wastage write-off — approval', 'বড় wastage write-off — approval'), approve: L('অনুমোদন', 'Approve', 'Approve'), reject: L('নামঞ্জুর', 'Reject', 'Reject'),
+  takeBack: L('আমার অনুরোধ ফিরিয়ে নিন', 'Take my request back', 'আমার request ফিরিয়ে নিন'), sentApproval: L('অনুমোদনের জন্য পাঠানো হয়েছে — অনুমোদন হলে স্টক কমবে', 'Sent for approval — the stock falls when it is approved', 'Approval-এর জন্য পাঠানো — approve হলে stock কমবে'),
+  waNote: L('নামঞ্জুরের কারণ (আবশ্যক)', 'Reason for rejecting (required)', 'Reject-এর reason (আবশ্যক)'), waMine: L('আমার অনুরোধ', 'My request', 'আমার request'), waBy: L('অনুরোধ', 'Requested by', 'Request করেছেন'),
+  waDone: L('সিদ্ধান্ত হয়েছে', 'Decision saved', 'Decision saved'), waWho: L('অন্য কেউ অনুমোদন দেবেন', 'Someone else must approve', 'অন্য কেউ approve করবেন'), more2: L('আরও অপশন', 'More options', 'আরও option'),
+  scan: L('স্ক্যান', 'Scan', 'Scan'), buyU: L('কেনা', 'Buy', 'Buy'), sellU: L('বিক্রি', 'Sell', 'Sell'), ledgerOpen: L('স্টকের খাতা দেখুন', 'Open the ledger', 'Ledger দেখুন'),
   loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), sqlMissing: L('স্টকের ডেটাবেস অংশ এখনও চালু হয়নি (phase10)', 'The stock database part is not installed yet (phase10)', 'Stock-এর database অংশ চালু হয়নি (phase10)'),
 };
 const T = (k) => lab(X[k]);
@@ -58,6 +64,8 @@ const RS = { opening: L('প্রারম্ভিক', 'Opening', 'Opening'),
   transfer_out: L('পাঠানো', 'Transfer out', 'Transfer out'), transfer_in: L('গ্রহণ', 'Transfer in', 'Transfer in'), wastage: L('নষ্ট', 'Wastage', 'Wastage'), count_adjust: L('গণনা ঠিক', 'Count', 'Count adjust'), reversal: L('উল্টানো', 'Reversal', 'Reversal') };
 // server error text -> friendly (shared with purchase.js). Order matters little: keys are whole words.
 const ERR = {
+  item_not_counted: L('এই আইটেম ব্যবসার হিসাবে ধরা নয় (সম্পদ / ভোগ্য / যন্ত্রপাতি) — স্টকে আসে না', 'This item is not counted in the business (asset / consumable / tool) — it has no stock', 'এই Item business-এর হিসাবে ধরা নয় — stock-এ আসে না'),
+  asset_qty_too_large: L('এক লাইনে ২০০-র বেশি সম্পদ হয় না — লাইন ভাগ করুন', 'More than 200 assets on one line is not allowed — split the line', 'এক line-এ ২০০-র বেশি asset হয় না — line ভাগ করুন'),
   unit_unknown: L('এই এককের রূপান্তর জানা নেই — পণ্যের বেস এককে লিখুন বা রূপান্তর বসান', 'This unit has no conversion for the item — use the base unit or add a conversion', 'এই unit-এর conversion জানা নেই — base unit-এ লিখুন বা conversion বসান'),
   insufficient_stock: L('মজুতে এত নেই', 'Not enough stock on hand', 'Stock-এ এত নেই'), item_not_tracked: L('এই পণ্যের স্টক ট্র্যাক বন্ধ', 'Stock tracking is off for this item', 'এই item-এ stock track বন্ধ'),
   item_not_found: L('পণ্য পাওয়া যায়নি', 'Item not found', 'Item পাওয়া যায়নি'), bad_qty: L('পরিমাণ ঠিক নয়', 'Quantity is not valid', 'Quantity ঠিক নয়'), bad_cost: L('দাম ঠিক নয়', 'Cost is not valid', 'Cost ঠিক নয়'),
@@ -77,6 +85,12 @@ const ERR = {
   return_needs_bill: L('ফেরতের জন্য মূল বিল বাছুন', 'Choose the original bill for a return', 'Return-এর জন্য মূল bill বাছুন'), return_exceeds_bill: L('ফেরত পরিমাণ মূল বিলের বাকির চেয়ে বেশি', 'The return is more than what is left on the original bill', 'Return quantity মূল bill-এর বাকির চেয়ে বেশি'),
   return_cost_above_bill: L('ফেরতের দাম মূল বিলের দামের চেয়ে বেশি', 'The return cost is above the bill cost', 'Return-এর দাম মূল bill-এর দামের চেয়ে বেশি'), purchase_return_unreferenced: L('এই ফেরতের মূল বিল নেই', 'This return has no original bill', 'এই return-এর মূল bill নেই'),
   bad_kind: L('ধরন ঠিক নয়', 'Kind is not valid', 'Kind ঠিক নয়'), already_void: L('আগেই বাতিল', 'Already voided', 'আগেই void'),
+  own_request: L('নিজের অনুরোধ নিজে অনুমোদন করা যায় না', 'You cannot approve your own request', 'নিজের request নিজে approve করা যায় না'), already_decided: L('এর সিদ্ধান্ত আগেই হয়ে গেছে', 'This was already decided', 'এর decision আগেই হয়ে গেছে'),
+  expired_stock_blocked: L('মেয়াদোত্তীর্ণ মাল বিক্রি বন্ধ আছে (মালিকের সেটিং)', 'Selling expired stock is blocked (owner setting)', 'মেয়াদোত্তীর্ণ মাল বিক্রি বন্ধ (owner setting)'),
+  refund_exceeds_credit: L('সাপ্লায়ারের কাছে এত জমা নেই', 'The supplier does not hold that much credit', 'Supplier-এর কাছে এত credit নেই'), sale_has_returns: L('এই বিক্রির ফেরত আছে — আগে ফেরত বাতিল করুন', 'This sale has returns — void the return first', 'এই sale-এর return আছে — আগে return void করুন'),
+  return_exceeds_sale: L('ফেরত পরিমাণ বিক্রির বাকির চেয়ে বেশি', 'More than what is left to return', 'Return quantity বাকির চেয়ে বেশি'), line_not_in_sale: L('এই পণ্য ওই বিক্রিতে নেই', 'That item is not in the sale', 'এই item ওই sale-এ নেই'),
+  sale_not_found: L('বিক্রি পাওয়া যায়নি', 'Sale not found', 'Sale পাওয়া যায়নি'), sale_not_done: L('এই বিক্রি বাতিল', 'This sale is voided', 'এই sale void'),
+  refund_mode_required: L('ফেরতের টাকা কীভাবে দিলেন বাছুন', 'Choose how the money was handed back', 'Refund কীভাবে দিলেন বাছুন'),
 };
 const NOPERM = L('এই কাজের অনুমতি নেই', 'You are not allowed to do this', 'এই কাজের permission নেই');
 // show the server error nicely. ctx = { grant, loc, context } lets "not allowed" offer the emergency request when the owner switched it on.
@@ -117,10 +131,16 @@ function shrink(file, max = 1280, q = 0.72) {
     img.onerror = () => rej(new Error('image')); img.src = u; });
 }
 const photoForm = (cands) => (S.ctx.is_owner ? cands[0] : (cands.find((c) => S.ctx.perms[c] && S.ctx.perms[c].enter) || cands[0]));
+// cands = storage prefixes in order of preference: the dedicated ones first (STOCK / PURCHASE, grant based, phase12), then the old form codes
+// (kept so a database that has not run phase12 yet keeps working: the first prefix the server accepts wins)
 async function uploadPhoto(file, cands, loc) {
-  const blob = await shrink(file), path = `${photoForm(cands)}/${loc}/${rid()}.jpg`;
-  const up = await sb.storage.from('photos').upload(path, blob, { contentType: 'image/jpeg' }); if (up.error) throw up.error;
-  return path;
+  const blob = await shrink(file); let last = null;
+  for (const c of cands) {
+    const path = `${c}/${loc}/${rid()}.jpg`;
+    const up = await sb.storage.from('photos').upload(path, blob, { contentType: 'image/jpeg' });
+    if (!up.error) return path; last = up.error;
+  }
+  throw last || new Error('photo');
 }
 async function thumb(img, path) {
   try { const r = await sb.storage.from('photos').createSignedUrls([path], 3600); const u = r && r.data && r.data[0] && r.data[0].signedUrl; if (u) img.src = u; } catch (e) { /* thumbnail optional */ }
@@ -137,6 +157,7 @@ css.textContent = `.s2-bar{position:sticky;bottom:0;z-index:4;display:flex;gap:8
 .s2-ph label.phadd{display:inline-flex;align-items:center;min-height:48px;padding:0 14px;border:1px dashed var(--hair);border-radius:12px;cursor:pointer;margin:0}
 .s2-need{color:var(--sig-bad)}.s2-sum{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}.s2-sum .stat{min-height:64px}
 .s2-lockrow svg,.s2-act svg{width:20px;height:20px;flex:none}.ptabs.s2t button{padding:0 8px;flex:1}.s2-bar .sec{flex:0 0 auto}
+.s2-dots{min-width:44px;min-height:44px;margin:-8px -8px 0 auto;display:block;font-size:1.25rem;line-height:1;background:none;border:0;color:var(--muted);box-shadow:none}.ptabs .cnt{display:inline-block;min-width:18px;padding:0 5px;border-radius:9px;background:var(--sig-warn,#b26a00);color:#fff;font-size:.75rem}
 .s2-lockrow{display:flex;align-items:center;gap:10px;min-height:48px;padding:0 12px;border:1px solid var(--hair);border-radius:12px;color:var(--muted);margin-top:8px}`;
 document.head.appendChild(css);
 const LOCK = '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="14" width="20" height="14" rx="3"/><path d="M10 14V9a6 6 0 0 1 12 0v5"/></svg>';
@@ -145,8 +166,10 @@ const LOCK = '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="cu
 let ITEMS = null;
 async function trackedItems() {
   if (ITEMS) return ITEMS;
-  const r = await sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,base_unit,tracked,is_active').eq('tracked', true).order('code');
-  ITEMS = r.error ? [] : (r.data || []).filter((i) => i.is_active !== false && i.tracked !== false);
+  // item master: only items counted in the business can be tracked (the server forces tracked off for assets, consumables, tools ...); hidden items stay out of the pickers
+  let r = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,base_unit,sell_units,barcode,tracked,is_active,count_in_business,hidden').eq('tracked', true).order('code'));
+  if (r.error) r = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,base_unit,sell_units,barcode,tracked,is_active').eq('tracked', true).order('code'));
+  ITEMS = r.error ? [] : (r.data || []).filter((i) => i.is_active !== false && i.tracked !== false && i.count_in_business !== false && !i.hidden);
   return ITEMS;
 }
 const itemText = (i) => i.code + ' · ' + nm(i);
@@ -155,7 +178,8 @@ const itemFrom = (items, v) => { const s = String(v || '').trim(); if (!s) retur
 const optHTML = (rows, cur) => rows.map(([v, l]) => `<option value="${esc(v)}" ${String(v) === String(cur) ? 'selected' : ''}>${esc(l)}</option>`).join('');
 const unitSel = (id, cur) => `<div><label for="${id}">${esc(T('unit'))}</label><select id="${id}"><option value="">${esc(T('baseUnit'))}</option>${optHTML(lists('units').map((r) => [r.value_code, lab(rowL(r))]), cur || '')}</select></div>`;
 const locSel = (id, label, cur, rows) => (rows.length > 1 ? `<div><label for="${id}">${esc(label)}</label><select id="${id}">${optHTML(rows.map((l) => [l.id, nm(l)]), cur)}</select></div>` : `<input type="hidden" id="${id}" value="${rows[0] ? rows[0].id : ''}">`);
-const itemFld = (items, id, preset, label) => `<div><label for="${id}">${esc(label || T('item'))}</label><input id="${id}" list="${id}_dl" autocomplete="off" value="${esc(preset ? itemText(preset) : '')}" placeholder="${esc(T('itemph'))}"><datalist id="${id}_dl">${items.map((i) => `<option value="${esc(itemText(i))}"></option>`).join('')}</datalist><div class="hint" id="${id}_h">${preset ? esc(T('baseIs') + ': ' + unitLabel(baseOf(preset))) : ''}</div></div>`;
+const scanOn = () => { try { return !!(B.barcode && B.barcode.enabled()); } catch (e) { return false; } };
+const itemFld = (items, id, preset, label) => `<div><label for="${id}">${esc(label || T('item'))}</label><div class="p2-inl"><input id="${id}" list="${id}_dl" autocomplete="off" value="${esc(preset ? itemText(preset) : '')}" placeholder="${esc(T('itemph'))}">${scanOn() ? `<button type="button" class="mini" data-act="s2_scan" data-t="${id}" aria-label="${esc(T('scan'))}">▮▮ ${esc(T('scan'))}</button>` : ''}</div><datalist id="${id}_dl">${items.map((i) => `<option value="${esc(itemText(i))}"></option>`).join('')}</datalist><div class="hint" id="${id}_h">${preset ? esc(T('baseIs') + ': ' + unitLabel(baseOf(preset))) : ''}</div></div>`;
 document.addEventListener('change', (e) => {
   const el = e.target; if (!el.id || !/^[a-z]+_item$/.test(el.id) || !ITEMS) return;
   const it = itemFrom(ITEMS, el.value), h = $('#' + el.id + '_h'); if (h) h.textContent = it ? T('baseIs') + ': ' + unitLabel(baseOf(it)) : '';
@@ -176,10 +200,16 @@ function readItem(items, id) { const it = itemFrom(items, ($('#' + id) || {}).va
 function readQty(id) { const q = nnum(($('#' + id) || {}).value); if (!(q > 0)) { toast(T('needQty')); return NaN; } return q; }
 const optNum = (id) => { const v = ($('#' + id) || {}).value; if (!v || !String(v).trim()) return null; const n = nnum(v); return n; };
 
-B.s2 = { X, T, ERR, errToast, rid, shrink, uploadPhoto, thumb, grant, costOk, lists, rowL, unitLabel, unitSel, optHTML, locSel, LOCS, allLocs, npMode, trackedItems, itemFrom, itemFld, itemText, baseOf, nnum, norm, money, q4, dt, LOCK, SH, sheetStart, submit, photoForm };
+// scan a barcode into an item field (stock actions); the purchase editor has its own per-line button
+async function scanInto(id) {
+  const items = await trackedItems(), it = await B.barcode.scanItem(items); if (!it) return;
+  const el = $('#' + id); if (!el) return; el.value = itemText(it); el.dispatchEvent(new Event('change', { bubbles: true }));
+}
+B.s2 = { X, T, ERR, scanInto, errToast, rid, shrink, uploadPhoto, thumb, grant, costOk, lists, rowL, unitLabel, unitSel, optHTML, locSel, LOCS, allLocs, npMode, trackedItems, itemFrom, itemFld, itemText, baseOf, nnum, norm, money, q4, dt, LOCK, SH, sheetStart, submit, photoForm };
 
 // ---------- hub state ----------
-const D = { loc: undefined, tab: 'levels', rows: [], cats: [], q: '', f: { category: '', below: false, zero: false }, shown: 50, expH: 24, exp: [], tr: [], acts: null, sqlMissing: false };
+const D = { loc: undefined, tab: 'levels', rows: [], cats: [], q: '', f: { category: '', below: false, zero: false }, shown: 50, expH: 24, exp: [], tr: [], wa: [], acts: null, sqlMissing: false, canApprove: false, nPending: 0 };
+let CONV = [];
 const ACTS = [['open', 'stock_opening', 'a_open'], ['waste', 'wastage_write_off', 'a_waste'], ['count', 'stock_count_adjust', 'a_count'], ['issue', 'stock_issue', 'a_issue'], ['prod', 'stock_production', 'a_prod'], ['xfer', 'stock_transfer', 'a_xfer']];
 const actLoc = () => (D.loc !== undefined && D.loc !== null ? D.loc : (LOCS()[0] || {}).id);
 const locName = (id) => nm(((B.ENV && B.ENV.locs) || []).find((l) => l.id === id) || { name_bn: '#' + id });
@@ -190,23 +220,43 @@ async function view() {
   try { await B.loadStatic(); } catch (e) { /* defaults */ }
   if (D.loc === undefined) D.loc = (LOCS()[0] || {}).id;       // one location first (zero-stock items show there); "all" is one tap away
   D.acts = null; GR.clear();
-  await Promise.all([trackedItems(), refreshActs()]);
+  await Promise.all([trackedItems(), refreshActs(), loadConv()]);
+  await loadPendingCount();
   draw();
 }
 async function refreshActs() {
-  const loc = actLoc(); const res = await Promise.all(ACTS.map(([, g]) => grant(g, loc)));
-  D.acts = {}; ACTS.forEach(([k], i) => { D.acts[k] = res[i]; });
+  const loc = actLoc(); const res = await Promise.all([...ACTS.map(([, g]) => grant(g, loc)), grant('wastage_approve', loc)]);
+  D.acts = {}; ACTS.forEach(([k], i) => { D.acts[k] = res[i]; }); D.canApprove = !!res[ACTS.length];
+}
+async function loadConv() { try { const r = await sb.from('unit_conversions').select('*'); CONV = r.error ? [] : (r.data || []).filter((c) => c.active !== false); } catch (e) { CONV = []; } }
+// waiting wastage approvals (phase12): the tab shows only for an approver or for someone who has a request waiting
+async function loadPendingCount() {
+  try { const r = await sb.rpc('wastage_pending', { p_loc: D.loc === undefined ? null : D.loc, p_status: 'pending' }); D.wa = r && !r.error && r.data ? r.data : []; } catch (e) { D.wa = []; }
+  D.nPending = D.wa.length;
+}
+// category label from the editable list (the code is only a fallback); units of an item from the conversions
+const catLabel = (code) => { if (!code) return ''; const r = lists('item_categories').find((x) => x.value_code === code); return r ? lab(rowL(r)) : code; };
+function unitLine(itemId, base) {
+  const it = (ITEMS || []).find((i) => i.id === itemId) || {}, b = base || baseOf(it), buy = [b];
+  CONV.forEach((c) => { if (c.item_id && c.item_id !== itemId) return; const o = c.to_unit === b ? c.from_unit : c.from_unit === b ? c.to_unit : null; if (o && !buy.includes(o)) buy.push(o); });
+  const sell = (it.sell_units || []).filter(Boolean);
+  return T('buyU') + ': ' + buy.map(unitLabel).join(', ') + (sell.length ? ' · ' + T('sellU') + ': ' + sell.map(unitLabel).join(', ') : '');
+}
+// one search for the list: code, Bangla / English / Bng-Eng name, category label (Bangla digits accepted)
+function rowsFor() {
+  const q = norm(D.q).toLowerCase(); if (!q) return D.rows;
+  return D.rows.filter((r) => { const it = (ITEMS || []).find((i) => i.id === r.item_id) || {}; return [r.code, r.name_bn, r.name_en, it.name_mix, catLabel(r.category), it.barcode].some((x) => String(x || '').toLowerCase().includes(q)); });
 }
 function draw() {
   const locs = LOCS(), filters = (D.f.category ? 1 : 0) + (D.f.below ? 1 : 0) + (D.f.zero ? 1 : 0);
   const anyAct = D.acts && Object.values(D.acts).some(Boolean), showActs = anyAct || npMode() === 'lock';
   shell(T('title'), `${locs.length > 1 || allLocs() ? `<div style="margin-bottom:8px"><select id="s2_loc" aria-label="${esc(T('location'))}">${allLocs() ? `<option value="">${esc(T('allLoc'))}</option>` : ''}${optHTML(locs.map((l) => [l.id, nm(l)]), D.loc)}</select></div>` : ''}
-    <div class="ptabs s2t" role="tablist">${[['levels', 'levels'], ['exp', 'expiring'], ['tr', 'transit']].map(([k, l]) => `<button role="tab" data-act="s2_tab" data-v="${k}" aria-selected="${D.tab === k}">${esc(T(l))}</button>`).join('')}</div>
+    <div class="ptabs s2t" role="tablist">${[['levels', 'levels'], ['exp', 'expiring'], ['tr', 'transit'], ...(D.canApprove || D.nPending ? [['wa', 'wa']] : [])].map(([k, l]) => `<button role="tab" data-act="s2_tab" data-v="${k}" aria-selected="${D.tab === k}">${esc(T(l))}${k === 'wa' && D.nPending ? ` <span class="cnt">${D.nPending}</span>` : ''}</button>`).join('')}</div>
     <div id="s2_main"></div>
     <div class="s2-bar">${showActs ? `<button class="primary" data-act="s2_actions">${esc(T('actions'))}</button>` : ''}${S.ctx.is_owner ? `<button class="sec" data-act="s2_recon">${esc(T('recon'))}</button>` : ''}</div>`, true);
   void filters; drawTab();
 }
-function drawTab() { if (D.tab === 'levels') loadLevels(); else if (D.tab === 'exp') loadExpiry(); else loadTransit(); }
+function drawTab() { if (D.tab === 'levels') loadLevels(); else if (D.tab === 'exp') loadExpiry(); else if (D.tab === 'wa') loadApprovals(); else loadTransit(); }
 
 // ----- levels -----
 async function loadLevels() {
@@ -220,7 +270,7 @@ async function loadLevels() {
 }
 function paintLevels() {
   const box = $('#s2_main'); if (!box) return;
-  const q = D.q.trim().toLowerCase(), list = D.rows.filter((r) => !q || [r.code, r.name_bn, r.name_en].some((x) => (x || '').toLowerCase().includes(q)));
+  const list = rowsFor();
   const below = D.rows.filter((r) => r.below_min).length;
   const costs = D.rows.filter((r) => r.value !== null && r.value !== undefined), total = costs.reduce((s, r) => s + Number(r.value), 0);
   const fc = (D.f.category ? 1 : 0) + (D.f.below ? 1 : 0) + (D.f.zero ? 1 : 0);
@@ -236,9 +286,10 @@ function paintRows(list) {
   const html = list.slice(0, D.shown).map((r) => {
     const i = D.rows.indexOf(r), out = Number(r.qty) <= 0, bar = out ? 'bad' : r.below_min ? 'warn' : '';
     return `<div class="card item s2-row mk ${bar}" data-act="s2_item" data-i="${i}" role="button" tabindex="0"><div><div class="nm">${esc(nm(r))}</div>
-      <div class="sub">${esc(r.code)}${r.category ? ' · ' + esc(r.category) : ''}${showLoc ? ' · ' + esc(locName(r.location_id)) : ''}${r.min_stock !== null && r.min_stock !== undefined ? ' · ' + esc(T('min')) + ' ' + q4(r.min_stock) : ''}</div>
+      <div class="sub">${esc(r.code)}${r.category ? ' · ' + esc(catLabel(r.category)) : ''}${showLoc ? ' · ' + esc(locName(r.location_id)) : ''}${r.min_stock !== null && r.min_stock !== undefined ? ' · ' + esc(T('min')) + ' ' + q4(r.min_stock) : ''}</div>
+      <div class="sub">${esc(unitLine(r.item_id, r.base_unit))}</div>
       ${out ? `<span class="chip bad">${esc(T('chipOut'))}</span>` : r.below_min ? `<span class="chip warn">${esc(T('chipLow'))}</span>` : ''}</div>
-      <div class="pr"><b>${q4(r.qty)} ${esc(unitLabel(r.base_unit))}</b>${r.avg_cost !== null && r.avg_cost !== undefined ? `<small>${esc(T('avg'))} ${esc(money(r.avg_cost))}</small>` : ''}${r.value !== null && r.value !== undefined ? `<small>${esc(money(r.value))}</small>` : ''}</div></div>`;
+      <div class="pr"><button type="button" class="mini s2-dots" data-act="s2_rowmenu" data-i="${i}" aria-label="${esc(T('more2'))}">⋮</button><b>${q4(r.qty)} ${esc(unitLabel(r.base_unit))}</b>${r.avg_cost !== null && r.avg_cost !== undefined ? `<small>${esc(T('avg'))} ${esc(money(r.avg_cost))}</small>` : ''}${r.value !== null && r.value !== undefined ? `<small>${esc(money(r.value))}</small>` : ''}</div></div>`;
   }).join('');
   box.innerHTML = (html || `<div class="card center"><p class="muted">${esc(T('none'))}</p><p class="muted" style="font-size:.85rem">${esc(T('noneHint'))}</p></div>`)
     + (list.length > D.shown ? `<button class="full" data-act="s2_more">${esc(T('more'))}</button>` : '');
@@ -281,7 +332,7 @@ async function loadTransit() {
 // ---------- filter sheet ----------
 function filterSheet() {
   openSheet(`<h2>${esc(T('filter'))}</h2><div class="stack">
-    <div><label for="sf_cat">${esc(T('category'))}</label><select id="sf_cat"><option value="">${esc(T('all'))}</option>${optHTML(D.cats.map((c) => [c, c]), D.f.category)}</select></div>
+    <div><label for="sf_cat">${esc(T('category'))}</label><select id="sf_cat"><option value="">${esc(T('all'))}</option>${optHTML(D.cats.map((c) => [c, catLabel(c)]), D.f.category)}</select></div>
     ${LOCS().length > 1 || allLocs() ? `<div><label for="sf_loc">${esc(T('location'))}</label><select id="sf_loc">${allLocs() ? `<option value="">${esc(T('allLoc'))}</option>` : ''}${optHTML(LOCS().map((l) => [l.id, nm(l)]), D.loc)}</select></div>` : ''}
     <button class="tog ${D.f.below ? 'on' : ''}" id="sf_below" data-act="sheettog" style="width:100%;justify-content:flex-start">${esc(T('belowMin'))}</button>
     <button class="tog ${D.f.zero ? 'on' : ''}" id="sf_zero" data-act="sheettog" style="width:100%;justify-content:flex-start">${esc(T('showZero'))}</button>
@@ -348,7 +399,7 @@ function drawPhoto() {
 }
 async function pickPhoto(file) {
   if (!file) return; toast(T('upl'));
-  try { SH.photo = await uploadPhoto(file, ['04-1', '04-2', '04-4'], Number(($('#a_loc') || {}).value) || actLoc()); drawPhoto(); const h = $('#a_ph_h'); if (h) { h.textContent = ''; h.classList.remove('s2-need'); } } catch (e) { fail(e); }
+  try { SH.photo = await uploadPhoto(file, ['STOCK', '04-1', '04-2', '04-4'], Number(($('#a_loc') || {}).value) || actLoc()); drawPhoto(); const h = $('#a_ph_h'); if (h) { h.textContent = ''; h.classList.remove('s2-need'); } } catch (e) { fail(e); }
 }
 document.addEventListener('change', (e) => { if (e.target.id === 'a_file') pickPhoto(e.target.files && e.target.files[0]); });
 
@@ -367,7 +418,7 @@ async function goWaste(btn) {
   const lim = B.rule('wastage_photo_above', null), loc = gloc();
   if (lim !== null && lim !== undefined && !unitVal() && q > Number(lim) && !SH.photo) { const h = $('#a_ph_h'); if (h) { h.textContent = T('photoReq'); h.classList.add('s2-need'); } return toast(T('photoReq')); }
   await submit(btn, () => sb.rpc('stock_wastage', { p_item: it.id, p_loc: loc, p_qty: q, p_reason: reason, p_note: noteVal(), p_photo: SH.photo, p_unit: unitVal(), p_client: SH.client, p_batch: null }),
-    () => { toast(T('saved')); afterWrite(); }, { grant: 'wastage_write_off', loc, context: { item: it.code }, onErr: (e) => { if (/photo_required/.test(e.message || '')) { const h = $('#a_ph_h'); if (h) { h.textContent = T('photoReq'); h.classList.add('s2-need'); } } } });
+    (d) => { toast(d && d.pending ? T('sentApproval') : T('saved')); if (d && d.pending) loadPendingCount().then(() => { if ($('#s2_main')) draw(); }); else afterWrite(); }, { grant: 'wastage_write_off', loc, context: { item: it.code }, onErr: (e) => { if (/photo_required/.test(e.message || '')) { const h = $('#a_ph_h'); if (h) { h.textContent = T('photoReq'); h.classList.add('s2-need'); } } } });
 }
 async function goCount(btn) {
   const items = await trackedItems(), it = readItem(items, 'a_item'); if (!it) return; const q = nnum(($('#a_qty') || {}).value); if (!(q >= 0)) return toast(T('needQty'));
@@ -392,6 +443,36 @@ async function goXfer(btn) {
 }
 function afterWrite() { if ($('#s2_main')) drawTab(); }
 
+// ----- wastage approvals (maker-checker, phase12) -----
+async function loadApprovals() {
+  const box = $('#s2_main'); if (!box) return; box.innerHTML = `<p class="muted">${esc(T('loading'))}</p>`;
+  const r = await sb.rpc('wastage_pending', { p_loc: D.loc === undefined ? null : D.loc, p_status: 'pending' });
+  if (r.error) { if (missingFn(r.error)) { box.innerHTML = `<div class="notice bad">${esc(T('sqlMissing'))}</div>`; return; } return errToast(r.error); }
+  D.wa = r.data || []; D.nPending = D.wa.length;
+  box.innerHTML = `<h3 style="margin:4px 0 8px">${esc(T('waTitle'))}</h3>` + (D.wa.map((x, i) => `<div class="card item s2-row mk warn"><div><div class="nm">${esc(nm(x))}</div>
+      <div class="sub">${esc(x.code)} · ${esc(locName(x.location_id))} · ${esc(T('waBy'))} ${esc(x.requested_staff || '?')} · ${esc(dt(x.requested_at))}</div>
+      <div class="sub">${esc(wasteReason(x.reason_code))}${x.note ? ' · ' + esc(x.note) : ''}</div>${x.mine ? `<span class="chip info">${esc(T('waMine'))}</span>` : !x.can_decide ? '' : ''}</div>
+      <div class="pr"><button type="button" class="mini s2-dots" data-act="s2_wamenu" data-i="${i}" aria-label="${esc(T('more2'))}">⋮</button><b>${q4(x.qty)} ${esc(unitLabel(x.base_unit))}</b></div></div>`).join('')
+    || `<div class="card center"><p class="muted">${esc(T('waEmpty'))}</p></div>`);
+}
+const wasteReason = (code) => { const r = lists('wastage_reasons').find((x) => x.value_code === code); return r ? lab(rowL(r)) : code; };
+function waMenu(x) {
+  sheetStart('wamenu');
+  openSheet(`<h2>${esc(nm(x))}</h2><div class="muted">${q4(x.qty)} ${esc(unitLabel(x.base_unit))} · ${esc(wasteReason(x.reason_code))}</div>${x.photo ? `<div class="s2-ph" style="margin:8px 0"><img alt="" width="84" height="84" id="wa_img"></div>` : ''}
+    <div class="stack" style="margin-top:10px">${x.can_decide ? `<button class="primary s2-act" data-act="s2_wa_yes" data-i="${D.wa.indexOf(x)}">${esc(T('approve'))}</button><button class="s2-act" data-act="s2_wa_no" data-i="${D.wa.indexOf(x)}">${esc(T('reject'))}</button>`
+      : x.mine ? `<div class="notice warn">${esc(T('waWho'))}</div>` : ''}
+      ${x.mine ? `<button class="s2-act" data-act="s2_wa_cancel" data-i="${D.wa.indexOf(x)}">${esc(T('takeBack'))}</button>` : ''}</div>
+    <button class="full" style="margin-top:12px" data-act="closesheet">${esc(T('close'))}</button>`);
+  if (x.photo) thumb($('#wa_img'), x.photo);
+}
+async function rowMenu(r) {
+  const acts = []; for (const [k, g, l] of ACTS) { const ok = await grant(g, r.location_id); if (ok) acts.push([k, l]); }
+  openSheet(`<h2>${esc(nm(r))}</h2><div class="muted">${esc(r.code)} · ${esc(locName(r.location_id))}</div><div class="stack" style="margin-top:10px">
+    <button class="s2-act" data-act="s2_item" data-i="${D.rows.indexOf(r)}">${esc(T('ledgerOpen'))}</button>
+    ${acts.map(([k, l]) => `<button class="s2-act" data-act="s2_do" data-v="${k}" data-i="${D.rows.indexOf(r)}">${esc(T(l))}</button>`).join('')}</div>
+    <button class="full" style="margin-top:12px" data-act="closesheet">${esc(T('close'))}</button>`);
+}
+
 // ---------- expire a batch / receive / cancel / reconcile ----------
 function expireSheet(x) {
   sheetStart('expwo');
@@ -409,7 +490,7 @@ function recvSheet(x) {
     <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" data-act="s2_go_recv" data-i="${D.tr.indexOf(x)}">${esc(T('receive'))}</button></div>`);
 }
 document.addEventListener('input', (e) => {
-  if (e.target.id === 's2_q') { D.q = e.target.value; const q = D.q.trim().toLowerCase(); D.shown = 50; paintRows(D.rows.filter((r) => !q || [r.code, r.name_bn, r.name_en].some((x) => (x || '').toLowerCase().includes(q)))); }
+  if (e.target.id === 's2_q') { D.q = e.target.value; D.shown = 50; paintRows(rowsFor()); }
   if (e.target.id === 'r_qty') { const v = nnum(e.target.value), s = Number(e.target.dataset.sent); const w = $('#r_short'); if (w) w.hidden = !(v >= 0 && v < s); }
 });
 document.addEventListener('change', (e) => { if (e.target.id === 's2_loc') { D.loc = e.target.value === '' ? null : Number(e.target.value); refreshActs().then(draw); } });
@@ -425,7 +506,7 @@ async function reconSheet() {
 
 Object.assign(H, {
   s2_tab: (a) => { D.tab = a.dataset.v; document.querySelectorAll('.ptabs button').forEach((b) => b.setAttribute('aria-selected', b.dataset.v === D.tab)); drawTab(); },
-  s2_more: () => { D.shown += 50; const q = D.q.trim().toLowerCase(); paintRows(D.rows.filter((r) => !q || [r.code, r.name_bn, r.name_en].some((x) => (x || '').toLowerCase().includes(q)))); },
+  s2_more: () => { D.shown += 50; paintRows(rowsFor()); },
   s2_filter: filterSheet,
   s2_freset: () => { D.f = { category: '', below: false, zero: false }; closeSheet(); loadLevels(); },
   s2_fapply: () => { D.f.category = ($('#sf_cat') || {}).value || ''; D.f.below = $('#sf_below').classList.contains('on'); D.f.zero = $('#sf_zero').classList.contains('on');
@@ -446,6 +527,18 @@ Object.assign(H, {
       <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('close'))}</button><button class="danger full" data-act="s2_go_xcancel" data-i="${a.dataset.i}">${esc(T('cancelX'))}</button></div>`); },
   s2_go_xcancel: async (a) => { const x = D.tr[Number(a.dataset.i)]; if (!x) return;
     await submit(a, () => sb.rpc('stock_cancel_transfer', { p_id: x.id, p_note: noteVal() }), () => { toast(T('saved')); afterWrite(); }, { grant: 'stock_transfer', loc: x.from_location_id, context: { transfer: x.id } }); },
+  s2_scan: (a) => scanInto(a.dataset.t),
+  s2_rowmenu: (a) => { const r = D.rows[Number(a.dataset.i)]; if (r) rowMenu(r); },
+  s2_wamenu: (a) => { const x = D.wa[Number(a.dataset.i)]; if (x) waMenu(x); },
+  s2_wa_yes: async (a) => { const x = D.wa[Number(a.dataset.i)]; if (!x) return;
+    await submit(a, () => sb.rpc('wastage_decide', { p_id: x.id, p_approve: true, p_note: null }), () => { toast(T('waDone')); loadPendingCount().then(() => { if ($('#s2_main')) draw(); }); }, { grant: 'wastage_approve', loc: x.location_id, context: { request: x.id } }); },
+  s2_wa_no: (a) => { const x = D.wa[Number(a.dataset.i)]; if (!x) return; sheetStart('wano');
+    openSheet(`<h2>${esc(T('reject'))} · ${esc(nm(x))}</h2><div><label for="a_note">${esc(T('waNote'))}</label><input id="a_note" autocomplete="off"></div>
+      <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('close'))}</button><button class="danger full" data-act="s2_wa_go_no" data-i="${a.dataset.i}">${esc(T('reject'))}</button></div>`); },
+  s2_wa_go_no: async (a) => { const x = D.wa[Number(a.dataset.i)]; if (!x) return; const n = noteVal(); if (!n) return toast(T('needNote'));
+    await submit(a, () => sb.rpc('wastage_decide', { p_id: x.id, p_approve: false, p_note: n }), () => { toast(T('waDone')); loadPendingCount().then(() => { if ($('#s2_main')) draw(); }); }, { grant: 'wastage_approve', loc: x.location_id, context: { request: x.id } }); },
+  s2_wa_cancel: async (a) => { const x = D.wa[Number(a.dataset.i)]; if (!x) return;
+    await submit(a, () => sb.rpc('wastage_cancel', { p_id: x.id }), () => { toast(T('waDone')); loadPendingCount().then(() => { if ($('#s2_main')) draw(); }); }, { context: { request: x.id } }); },
   s2_recon: reconSheet,
   s2_fix: async () => { const r = await sb.rpc('stock_reconcile', { p_fix: true }); if (r.error) return errToast(r.error); closeSheet(); toast(T('saved')); afterWrite(); },
 });
@@ -459,6 +552,8 @@ const FLAGS = {
   transit_short: L('পথে মাল কম', 'Short in transit', 'Transit-এ মাল কম'), purchase_price_jump: L('ক্রয়মূল্যে বড় বদল', 'Purchase price jump', 'Purchase price jump'),
   purchase_void: L('ক্রয় বিল বাতিল', 'Purchase voided', 'Purchase void'), supplier_payment_void: L('সাপ্লায়ার পেমেন্ট বাতিল', 'Supplier payment voided', 'Supplier payment void'),
   emergency_window_used: L('জরুরি অনুমোদনে কাজ', 'Emergency window used', 'Emergency window ব্যবহার'),
+  wastage_pending: L('বড় নষ্ট মাল — অনুমোদনের অপেক্ষায়', 'Large wastage — waiting for approval', 'বড় wastage — approval-এর অপেক্ষায়'), wastage_rejected: L('বড় নষ্ট মাল নামঞ্জুর', 'Large wastage rejected', 'বড় wastage reject'),
+  sale_return: L('বিক্রি ফেরত', 'Sale return', 'Sale return'), sale_return_void: L('বিক্রি ফেরত বাতিল', 'Sale return voided', 'Sale return void'), supplier_refund_void: L('সাপ্লায়ার রিফান্ড বাতিল', 'Supplier refund voided', 'Supplier refund void'),
 };
 B.flagChip = (code) => (FLAGS[code] ? `<span class="chip" style="margin-inline-end:6px">${esc(lab(FLAGS[code]))}</span>` : '');
 B.FLAGS_STOCK = FLAGS;

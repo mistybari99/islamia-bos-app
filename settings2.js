@@ -72,7 +72,7 @@ const X = {
   ac_note: L('নোট (ঐচ্ছিক)', 'Note (optional)', 'Note (ঐচ্ছিক)'), ac_forever: L('মেয়াদ নেই', 'no end date', 'no end date'), ac_nobody: L('কেউ নেই', 'nobody', 'কেউ নেই'), ac_hint: L('মালিক সবসময় পারেন। ব্যক্তিকে দিলে লোকেশন ও মেয়াদ ঠিক করা যায়; ভূমিকাকে দিলে সেই ভূমিকার সবাই পায়। আটকে গেলে স্টাফ "জরুরি অনুরোধ" পাঠাতে পারে।', 'The owner always may. A grant to a person can be limited by location and date; a grant to a role covers everyone with that role. A blocked person can send an emergency request.', 'Owner সবসময় পারেন। Person কে দিলে location ও মেয়াদ ঠিক করা যায়; Role কে দিলে সেই role এর সবাই পায়। আটকে গেলে staff "জরুরি request" পাঠাতে পারে।'),
   ac_baddate: L('তারিখ YYYY-MM-DD ফরম্যাটে লিখুন', 'Write the date as YYYY-MM-DD', 'Date YYYY-MM-DD ফরম্যাটে লিখুন'), ac_nopeople: L('তথ্য লাগবে — কোনো সক্রিয় স্টাফ পাওয়া যায়নি', 'Data needed — no active staff found', 'Data লাগবে — কোনো active staff পাওয়া যায়নি'), ac_em: L('জরুরি অনুরোধ দেখুন', 'See emergency requests', 'জরুরি Request দেখুন'),
   g_view_cost: L('ক্রয়মূল্য (কস্ট) দেখা', 'See cost', 'Cost দেখা'), g_view_profit: L('লাভ/ক্ষতি দেখা', 'See profit / loss', 'Profit/Loss দেখা'), g_view_reports: L('রিপোর্ট দেখা', 'See reports', 'Report দেখা'),
-  g_export_data: L('ডেটা এক্সপোর্ট', 'Export data', 'Data Export'), g_salary_view: L('বেতন দেখা', 'See salaries', 'Salary দেখা'), g_supplier_manage: L('সাপ্লায়ার পরিচালনা', 'Manage suppliers', 'Supplier পরিচালনা'), g_settings_invoice: L('ইনভয়েস সেটিংস', 'Invoice settings', 'Invoice settings'),
+  g_export_data: L('ডেটা এক্সপোর্ট', 'Export data', 'Data Export'), g_salary_view: L('বেতন দেখা', 'See salaries', 'Salary দেখা'), g_view_daybook: L('দিনের খাতা দেখা', 'See the day book', 'Day book দেখা'), g_supplier_manage: L('সাপ্লায়ার পরিচালনা', 'Manage suppliers', 'Supplier পরিচালনা'), g_settings_invoice: L('ইনভয়েস সেটিংস', 'Invoice settings', 'Invoice settings'),
   // role favourites
   rf_role: L('ভূমিকা বাছুন', 'Choose a role', 'Role বাছুন'), rf_add: L('সামনে রাখার মেনু যোগ করুন', 'Add a menu item to the front', 'সামনে রাখার Menu যোগ করুন'), rf_empty: L('তথ্য লাগবে — এই ভূমিকার জন্য কিছু ঠিক করা নেই', 'Data needed — nothing set for this role', 'Data লাগবে — এই role এর জন্য কিছু ঠিক করা নেই'),
   rf_note: L('যতক্ষণ কেউ নিজে প্রিয় না বাছে, ততক্ষণ তার হোমে এগুলো সামনে থাকে।', 'These sit in front on the home screen until the person pins their own.', 'যতক্ষণ কেউ নিজে favourite না বাছে, তার Home এ এগুলো সামনে থাকে।'),
@@ -82,7 +82,7 @@ const T = (k) => lab(X[k]);
 const DAYS = { sat: L('শনিবার', 'Saturday', 'Saturday'), sun: L('রবিবার', 'Sunday', 'Sunday'), mon: L('সোমবার', 'Monday', 'Monday'), tue: L('মঙ্গলবার', 'Tuesday', 'Tuesday'), wed: L('বুধবার', 'Wednesday', 'Wednesday'), thu: L('বৃহস্পতিবার', 'Thursday', 'Thursday'), fri: L('শুক্রবার', 'Friday', 'Friday') };
 const MONTHS = [['জানুয়ারি', 'January'], ['ফেব্রুয়ারি', 'February'], ['মার্চ', 'March'], ['এপ্রিল', 'April'], ['মে', 'May'], ['জুন', 'June'], ['জুলাই', 'July'], ['আগস্ট', 'August'], ['সেপ্টেম্বর', 'September'], ['অক্টোবর', 'October'], ['নভেম্বর', 'November'], ['ডিসেম্বর', 'December']];
 const monthName = (m) => (S.lang === 'bn' ? MONTHS[m - 1][0] : MONTHS[m - 1][1]);
-const GRANTS = ['view_cost', 'view_profit', 'view_reports', 'export_data', 'salary_view', 'supplier_manage', 'settings_invoice'];
+const GRANTS = ['view_cost', 'view_profit', 'view_reports', 'export_data', 'salary_view', 'view_daybook', 'supplier_manage', 'settings_invoice'];
 const gLabel = (c) => lab(X['g_' + c]);
 
 // ---------- small helpers ----------
@@ -184,7 +184,7 @@ function pgDisc() {
 
 // ---------- shared data ----------
 async function loadItems() {
-  const r = await sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,category,category_bn').order('code');
+  const r = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,category,category_bn').order('code'));
   cache.items = r.data || []; return cache.items;
 }
 const itemName = (id) => { const i = (cache.items || []).find((x) => x.id === id); return i ? i.code + ' · ' + nm(i) : id; };
@@ -391,7 +391,7 @@ Object.assign(A.H, {
   s2_sh_act: async (a) => { const r = cache.shelf.find((x) => String(x.id) === a.dataset.id); const { error } = await sb.from('shelf_life_rules').update({ active: !r.active }).eq('id', r.id); if (error) return fail(error); r.active = !r.active; drawShelf(); },
   s2_sh_step: async (a) => { const r = cache.shelf.find((x) => String(x.id) === a.dataset.id), n = round6(Number(r.value) + Number(a.dataset.d)); if (!(n > 0)) return toast(T('sh_bad'));
     const { error } = await sb.from('shelf_life_rules').update({ value: n }).eq('id', r.id); if (error) return fail(error); r.value = n; drawShelf(); },
-  s2_sh_del: async (a) => { const { error } = await sb.from('shelf_life_rules').delete().eq('id', idv(a.dataset.id)); if (error) return fail(error); cache.shelf = cache.shelf.filter((x) => String(x.id) !== a.dataset.id); drawShelf(); },
+  s2_sh_del: async (a) => { const { error } = await sb.from('shelf_life_rules').update({ active: false }).eq('id', idv(a.dataset.id)); if (error) return fail(error); const rr = cache.shelf.find((x) => String(x.id) === a.dataset.id); if (rr) rr.active = false; drawShelf(); },
   s2_sh_save: async (a) => {
     const sc = val('#sh_scope'), yr = $('#sh_year').classList.contains('on'), v = pnum(val('#sh_val')), row = { value: v, unit: val('#sh_unit'), season_label: (val('#sh_label') || '').trim() || null, item_id: null, category: null };
     if (!(v > 0)) return toast(T('sh_bad'));

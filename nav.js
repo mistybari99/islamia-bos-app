@@ -28,6 +28,7 @@ const X = {
   sales: L('বিক্রি', 'Sales', 'Sales'), cnt: L('টি সেল', 'sales', 'sales'), disc: L('ডিসকাউন্ট', 'Discount', 'Discount'), due_p: L('বাকিতে বিক্রি', 'Sold on credit', 'Due-তে বিক্রি'),
   perloc: L('শাখা অনুযায়ী', 'By location', 'Location অনুযায়ী'), total: L('মোট', 'Total', 'Total'),
   cash: L('নগদ গ্রহণ', 'Cash received', 'Cash গ্রহণ'), digital: L('মোবাইল ও কার্ড', 'Mobile & card', 'Mobile ও Card'), due_all: L('গ্রাহকের কাছে মোট বাকি', 'Total owed by customers', 'Customer-এর কাছে মোট Due'),
+  salary: L('বেতন রিপোর্ট', 'Salary report', 'Salary report'),
   payables: L('সরবরাহকারীর পাওনা', 'Supplier payables', 'Supplier-এর Payable'), pl: L('লাভ-ক্ষতি', 'Profit & loss', 'Profit-Loss'), daybook: L('দিনের খাতা', 'Day book', 'Day book'), stockbal: L('স্টক ব্যালেন্স', 'Stock balance', 'Stock Balance'),
   today_sheet: L('শোরুমের দৈনিক শিট', 'Showroom daily sheet', 'Showroom-এর Daily Sheet'),
   period_note: L('বছর = জানুয়ারি থেকে; অর্থবছরের শুরু সেটিংসে বসানো পরে আসবে', 'Year = from 1 January; fiscal-year start in settings comes later', 'Year = January থেকে; Fiscal-year Settings-এ পরে আসবে'),
@@ -60,6 +61,7 @@ const uid = () => (S.ctx && S.ctx.profile && S.ctx.profile.id) || 'anon';
 const npMode = () => { let m = 'lock'; try { m = B.rule('ui_noperm_mode', 'lock'); } catch (e) { /* rules not loaded yet */ } return m === 'hide' ? 'hide' : 'lock'; };
 
 // ---------- registry: routes + forms ----------
+let GF = {};   // grants that open the day book / salary report for non-owners (server still decides on every call)
 const GROUPS = ['dash', 'acc', 'item', 'cust', 'sale', 'purch', 'supp', 'ops', 'people', 'reports', 'settings'];
 const locOk = () => isOwner() || (S.ctx.roles || []).includes('management') || (S.ctx.locations || []).length > 0;   // stock / purchase pages: the server decides the rest
 const AREA_G = { cash: 'acc', stock: 'ops', factory: 'ops', assets: 'ops', purchase: 'purch', sales: 'sale', showroom: 'sale', staff: 'people', owner: 'reports' };
@@ -74,11 +76,18 @@ const ROUTES = [
   { k: 'itemreq', g: 'item', lb: () => t('item_req'), ok: () => P('ITEMS', 'enter') || P('ITEMS', 'approve'), cnt: 'itm', tone: 'info' },
   { k: 'lists', g: 'item', lb: () => t('lists'), ok: () => isOwner() },
   { k: 'settings2/units', g: 'item', lb: () => T('unitconv'), ok: () => isOwner() },
+  { k: 'itemimport', g: 'item', lb: () => lab(L('আইটেম মাস্টার ইমপোর্ট', 'Item master import', 'Item master import')), ic: 'doc', ok: () => isOwner() },
+  { k: 'itemmap', g: 'item', lb: () => lab(L('পুরনো আইটেম মেলানো', 'Old items to master codes', 'পুরনো Item মেলানো')), ic: 'doc', ok: () => isOwner() || GF.item_create === true },
+  { k: 'itemtypes', g: 'item', lb: () => lab(L('আইটেমের ধরন ও ডিফল্ট', 'Item types & defaults', 'Item type ও Default')), ic: 'doc', ok: () => isOwner() },
+  { k: 'assets', g: 'ops', lb: () => lab(L('সম্পদ-খাতা', 'Asset register', 'Asset register')), ic: 'doc', ok: () => locOk() },
   { k: 'dues', g: 'cust', lb: () => t('dues'), ok: () => canPos() },
   { k: 'stock', g: 'ops', lb: () => lab(L('স্টক', 'Stock', 'Stock')), ic: 'items', ok: () => locOk() },
   { k: 'purchase', g: 'purch', lb: () => lab(L('ক্রয় বিল', 'Purchase bills', 'Purchase Bill')), ic: 'doc', ok: () => locOk() },
   { k: 'purchase/new', g: 'purch', lb: () => lab(L('নতুন ক্রয় বিল', 'New purchase bill', 'নতুন Purchase bill')), ic: 'plus', ok: () => locOk() },
   { k: 'purchase/return', g: 'purch', lb: () => lab(L('ক্রয় ফেরত', 'Purchase return', 'Purchase return')), ic: 'doc', ok: () => locOk() },
+  { k: 'daybook', g: 'acc', lb: () => T('daybook'), ic: 'doc', ok: () => isOwner() || GF.view_daybook === true },
+  { k: 'salary', g: 'people', lb: () => T('salary'), ic: 'doc', ok: () => isOwner() || GF.salary_view === true },
+  { k: 'salereturn', g: 'sale', lb: () => lab(L('বিক্রি ফেরত', 'Sale returns', 'Sale return')), ic: 'doc', ok: () => canPos() },
   { k: 'payables', g: 'supp', lb: () => T('payables'), ic: 'dues', ok: () => locOk() },
   { k: 'pos', g: 'sale', lb: () => t('pos'), ok: () => canPos() },
   { k: 'reports', g: 'reports', lb: () => T('g_reports'), ic: 'doc', ok: () => true },
@@ -172,6 +181,16 @@ async function counts(force) {
     own ? head('profiles', 'pending') : 0, canDecide ? head('item_changes', 'pending') : 0]);
   CNT = { ex, rel, em, stf, itm }; cntAt = Date.now(); return CNT;
 }
+async function loadGrantFlags() {
+  if (!S.ctx || isOwner() || !locOk()) return;
+  const locs = (S.ctx.locations || []).length ? S.ctx.locations : [null];
+  for (const code of ['view_daybook', 'salary_view', 'item_create']) {
+    let ok = false;
+    for (const l of locs) { try { const r = await sb.rpc('has_grant', { p_code: code, p_loc: l }); if (r && !r.error && r.data === true) { ok = true; break; } } catch (e) { /* not granted */ } }
+    GF[code] = ok;
+  }
+  try { if ($('#hv_tiles')) drawTiles(); if (drawerOpen) dr_body(); } catch (e) { /* screens not drawn yet */ }
+}
 let staticP = null;
 function ensureStatic() {
   if (!staticP) staticP = (async () => {
@@ -179,6 +198,7 @@ function ensureStatic() {
     if (!FORMS) { const r = await sb.from('forms').select('code,area,name_bn,name_mix,name_en,sort,enabled').order('sort'); FORMS = r && r.data ? r.data : []; }
     try { if (B.rule('ui_calm', true) === false) document.body.removeAttribute('data-ui'); } catch (e) { /* keep calm */ }
     syncFavs();
+    await loadGrantFlags();
   })();
   return staticP;
 }
@@ -422,7 +442,7 @@ function tileDefs() {
   const f = (code) => ({ key: 'f:' + code });
   return HS.mode === 'biz'
     ? [{ key: 'r:pos' }, { key: 'r:items' }, { key: 'r:itemreq' }, f('14-1'), f('03-1'), f('04-1'), { key: 'r:reports' }, { key: 'r:stock', label: () => T('stockbal') }]
-    : [f('10-1'), f('10-2'), f('10-4'), { key: 'r:dues' }, { key: 'r:biz', label: () => T('pl') }, { key: 'r:reports' }, { key: 'r:payables', label: () => T('payables') }, { soon: 'daybook' }];
+    : [f('10-1'), f('10-2'), f('10-4'), { key: 'r:dues' }, { key: 'r:biz', label: () => T('pl') }, { key: 'r:reports' }, { key: 'r:payables', label: () => T('payables') }, { key: 'r:daybook', label: () => T('daybook') }];
 }
 function tile(e, o = {}) {
   const pin = isPinned(e.key), c = e.cnt && CNT && CNT[e.cnt];
@@ -453,7 +473,7 @@ function drawFav() {
 function drawMods() {
   const box = $('#hv_mods'); if (!box) return;
   const cn = CNT || {}, mode = npMode();
-  const order = ['pos', 'dues', 'reports', 'biz', 'items', 'itemreq', 'exceptions', 'numaudit', 'emergency', 'releases', 'staff', 'rulehub'];
+  const order = ['pos', 'dues', 'reports', 'biz', 'items', 'itemreq', 'assets', 'itemimport', 'exceptions', 'numaudit', 'emergency', 'releases', 'staff', 'rulehub'];
   const lockable = new Set(['pos', 'dues', 'biz', 'items']);
   box.innerHTML = order.map((k) => {
     const e = byKey('r:' + k); if (!e) return '';

@@ -41,6 +41,13 @@ const X = {
   appr: L('আপনার বদল অনুমোদনের জন্য গেছে।', 'Your change was sent for approval.', 'আপনার বদল approval-এর জন্য গেছে।'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
   nochange: L('কোনো বদল নেই', 'Nothing changed', 'কোনো বদল নেই'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'),
   vatoff: L('ভ্যাট সেটিংসে বন্ধ আছে', 'VAT is off in Settings', 'VAT Settings-এ বন্ধ'),
+  details: L('বিবরণ', 'Details', 'Details'), detailsph: L('উপাদান, ওজন, নোট…', 'Ingredients, weight, notes…', 'Ingredients, weight, notes…'),
+  lowNow: L('এখন স্টক কম', 'Low stock now', 'এখন stock কম'), lowNowH: L('শুধু ন্যূনতম স্টকের নিচে থাকা পণ্য (স্টকের হিসাব থেকে)', 'Only products below their minimum stock (from the stock ledger)', 'শুধু minimum stock-এর নিচে থাকা product (stock ledger থেকে)'),
+  type: L('ধরন', 'Type', 'Type'), flagf: L('ফ্ল্যাগ', 'Flag', 'Flag'), fl_locked: L('লক করা', 'Locked', 'Locked'), fl_hidden: L('লুকানো', 'Hidden', 'Hidden'), fl_nocount: L('ব্যবসার হিসাবে নেই', 'Not counted in business', 'Business-এর হিসাবে নেই'),
+  fl_noprice: L('দাম নেই (Data needed)', 'No price (Data needed)', 'দাম নেই (Data needed)'), fl_retired: L('অবসরপ্রাপ্ত', 'Retired', 'Retired'), fl_master: L('মাস্টার কোডে মেলানো', 'Linked to a master code', 'Master code-এ linked'),
+  dneeded: L('Data needed', 'Data needed', 'Data needed'), more2: L('আরও অপশন', 'More options', 'আরও Option'), pimp: L('আইটেম মাস্টার ইমপোর্ট', 'Item master import', 'Item master import'), pmap: L('পুরনো আইটেম মেলানো', 'Old items to master codes', 'পুরনো Item মেলানো'),
+  ptypes: L('আইটেমের ধরন ও ডিফল্ট', 'Item types & defaults', 'Item type ও Default'), passets: L('সম্পদ-খাতা', 'Asset register', 'Asset register'), bycat: L('ক্যাটাগরি ধরে', 'By category', 'Category ধরে'),
+  lowNoMin: L('ন্যূনতম স্টক না থাকলে কম-স্টক চিহ্ন হয় না', 'A product without a minimum stock is never flagged', 'Minimum stock না থাকলে low-stock চিহ্ন হয় না'), onHand: L('আছে', 'on hand', 'on hand'),
 };
 const T = (k) => lab(X[k]);
 const LEG = { kg: L('কেজি', 'KG', 'KG'), pc: L('পিস', 'Piece', 'Piece'), lb: L('পাউন্ড', 'Pound', 'Pound') };
@@ -52,8 +59,8 @@ const CATLEG = {
 const rl = (r) => ({ bn: r.label_bn, en: r.label_en || undefined, mix: r.label_mix || undefined });
 
 // ---------- state ----------
-const D = { items: [], cost: new Map(), canCost: false, conv: [], ready: false };
-const Fl = { q: '', cat: '', sub: '', source: '', tracked: '', low: false, active: '' };
+const D = { items: [], cost: new Map(), canCost: false, conv: [], ready: false, low: new Map(), lowOk: false, master: false };
+const Fl = { q: '', cat: '', sub: '', source: '', tracked: '', low: false, lowNow: false, active: '', type: '', flag: '' };
 let shown = PAGE;
 let F = null;                          // the open form: { id, cur, images, vat, ... }
 
@@ -65,17 +72,36 @@ const unitRow = (code) => lists('units').find((r) => r.value_code === code);
 
 async function load() {
   try { await B.loadStatic(); } catch (e) { /* defaults */ }
+  try { if (B.itemMaster) await B.itemMaster.init(); } catch (e) { /* item master not installed */ }
   const wantCost = !!(S.ctx.is_owner || (perms().ITEM_COST && perms().ITEM_COST.view));
-  const [it, co, cv] = await Promise.all([sb.from('items').select('*').order('code'), wantCost ? sb.from('item_costs').select('*') : Promise.resolve({ data: [] }),
-    sb.from('unit_conversions').select('*').order('id')]);
+  const [it, co, cv, lv] = await Promise.all([window.BOS_ALL(sb.from('items').select('*').order('code')), wantCost ? sb.from('item_costs').select('*') : Promise.resolve({ data: [] }),
+    sb.from('unit_conversions').select('*').order('id'), lowLevels()]);
   if (it.error) throw it.error;
   D.canCost = wantCost && !co.error;
   D.cost = new Map((co.data || []).map((c) => [c.item_id, c.cost_price]));
+  // only the grant view_cost (no ITEM_COST right): the costs come through a small server function instead of the table (phase12)
+  if (!D.canCost) {
+    try {
+      const g = await sb.rpc('has_grant', { p_code: 'view_cost' });
+      if (g && !g.error && g.data === true) { const r = await sb.rpc('items_with_cost'); if (r && !r.error && Array.isArray(r.data)) { D.canCost = true; D.cost = new Map(r.data.map((c) => [c.item_id, c.cost_price])); } }
+    } catch (e) { /* no costs */ }
+  }
+  D.low = lv;
   D.items = it.data || [];
+  D.master = !!(B.itemMaster && B.itemMaster.on() && D.items.length && D.items.some((i) => i.item_type !== undefined));
   D.conv = cv.error ? [] : (cv.data || []).filter((c) => c.active !== false);
   D.ready = true;
 }
 
+// items below their minimum stock now: the server's stock_levels (min_stock flag); no minimum = never flagged, nothing is guessed
+async function lowLevels() {
+  const m = new Map(); D.lowOk = false;
+  try {
+    const r = await sb.rpc('stock_levels', { p_loc: null, p_filters: { below_min: true } });
+    if (r && !r.error && Array.isArray(r.data)) { D.lowOk = true; r.data.forEach((x) => { if (x.below_min && (!m.has(x.item_id) || Number(x.qty) < m.get(x.item_id).qty)) m.set(x.item_id, { qty: Number(x.qty), min: x.min_stock, unit: x.base_unit }); }); }
+  } catch (e) { /* stock part not installed: no low-stock marks */ }
+  return m;
+}
 // ---------- option lists (category / sub-category / units) ----------
 function catMap() {
   const m = new Map();
@@ -114,27 +140,35 @@ function matches(i) {
   if (Fl.tracked === 'yes' && !i.tracked) return false;
   if (Fl.tracked === 'no' && i.tracked) return false;
   if (Fl.low && !(i.min_stock !== null && i.min_stock !== undefined)) return false;
+  if (Fl.lowNow && !D.low.has(i.id)) return false;
   if (Fl.active === 'yes' && !i.is_active) return false;
   if (Fl.active === 'no' && i.is_active) return false;
+  if (Fl.type && i.item_type !== Fl.type) return false;
+  if (Fl.flag === 'locked' && !i.locked) return false; if (Fl.flag === 'hidden' && !i.hidden) return false; if (Fl.flag === 'nocount' && i.count_in_business !== false) return false;
+  if (Fl.flag === 'noprice' && !(i.sell_price === null || i.sell_price === undefined)) return false; if (Fl.flag === 'retired' && !i.retired_at) return false; if (Fl.flag === 'master' && !i.master_code) return false;
   return true;
 }
-const nFilters = () => ['cat', 'sub', 'source', 'tracked', 'active'].filter((k) => Fl[k]).length + (Fl.low ? 1 : 0);
+const nFilters = () => ['cat', 'sub', 'source', 'tracked', 'active', 'type', 'flag'].filter((k) => Fl[k]).length + (Fl.low ? 1 : 0) + (Fl.lowNow ? 1 : 0);
 function chipsHTML() {
   const c = [];
   if (Fl.cat) c.push(['cat', catLabel(Fl.cat)]); if (Fl.sub) c.push(['sub', subLabel(Fl.sub)]);
   if (Fl.source) c.push(['source', T(Fl.source)]); if (Fl.tracked) c.push(['tracked', Fl.tracked === 'yes' ? T('tracked') : T('untracked')]);
-  if (Fl.low) c.push(['low', T('low')]); if (Fl.active) c.push(['active', Fl.active === 'yes' ? T('active') : T('inactive')]);
+  if (Fl.low) c.push(['low', T('low')]); if (Fl.lowNow) c.push(['lowNow', T('lowNow')]); if (Fl.active) c.push(['active', Fl.active === 'yes' ? T('active') : T('inactive')]);
+  if (Fl.type) c.push(['type', B.itemMaster ? B.itemMaster.typeLabel(Fl.type) : Fl.type]); if (Fl.flag) c.push(['flag', T('fl_' + Fl.flag)]);
   return c.map(([k, l]) => `<button type="button" class="chip" data-act="p2_chip_x" data-k="${k}" aria-label="${esc(l)} ✕">${esc(l)} ✕</button>`).join('');
 }
 function rowHTML(i) {
   const cost = D.canCost ? D.cost.get(i.id) : undefined;
   const loss = cost !== undefined && cost !== null && i.sell_price !== null && Number(cost) >= Number(i.sell_price);
   const sub = [i.code, catLabel(i.category) + (i.sub_category ? ' · ' + subLabel(i.sub_category) : ''), unitName(i.unit)].filter(Boolean).join(' · ');
-  const tags = [i.tracked ? `<span class="chip info">${esc(T('tracked'))}</span>` : '', i.is_active ? '' : `<span class="chip bad">${esc(T('inactive'))}</span>`,
+  const lw = D.low.get(i.id);
+  const mt = D.master ? [i.item_type ? `<span class="chip info">${esc(B.itemMaster.typeLabel(i.item_type))}</span>` : '', i.locked ? `<span class="chip warn">${esc(T('fl_locked'))}</span>` : '', i.hidden ? `<span class="chip">${esc(T('fl_hidden'))}</span>` : '',
+    i.count_in_business === false ? `<span class="chip">${esc(T('fl_nocount'))}</span>` : '', i.retired_at ? `<span class="chip bad">${esc(T('fl_retired'))}</span>` : ''].join('') : '';
+  const tags = [mt, lw ? `<span class="chip warn">${esc(T('lowNow'))} · ${fmt(lw.qty)} ${esc(unitName(lw.unit))}</span>` : '', i.tracked ? `<span class="chip info">${esc(T('tracked'))}</span>` : '', i.is_active ? '' : `<span class="chip bad">${esc(T('inactive'))}</span>`,
     i.min_stock !== null && i.min_stock !== undefined ? `<span class="chip warn">${esc(T('lowchip'))}${fmt(i.min_stock)}</span>` : '', loss ? `<span class="chip warn">${esc(t('loss_warn'))}</span>` : ''].join('');
   const act = canEnter() ? `data-act="itemedit" data-v="${esc(i.id)}" role="button" tabindex="0"` : '';
-  return `<div class="card p2-row mk" ${act} data-cat="${esc(i.category || '')}"><div><div class="nm">${esc(nm(i))}</div><div class="sub">${esc(sub)}</div>${tags ? `<div class="tags">${tags}</div>` : ''}</div>
-    <div class="pr"><b>${i.sell_price === null || i.sell_price === undefined ? '—' : money(i.sell_price)}</b>
+  return `<div class="card p2-row mk ${lw ? 'warn' : ''}" ${act} data-cat="${esc(i.category || '')}"><div><div class="nm">${esc(nm(i))}</div><div class="sub">${esc(sub)}</div>${tags ? `<div class="tags">${tags}</div>` : ''}</div>
+    <div class="pr">${D.master ? `<button type="button" class="mini im-dots" data-act="im_menu" data-v="${esc(i.id)}" aria-label="${esc(T('more2'))}">⋮</button>` : ''}<b>${i.sell_price === null || i.sell_price === undefined ? (D.master ? `<span class="muted" style="font-size:.85rem">${esc(T('dneeded'))}</span>` : '—') : money(i.sell_price)}</b>
       ${i.wholesale_price !== null && i.wholesale_price !== undefined ? `<small>${esc(T('wholesale'))} ${money(i.wholesale_price)}</small>` : ''}
       ${cost !== undefined ? `<small>${esc(T('cost'))} ${cost === null ? '—' : money(cost)}</small>` : ''}</div></div>`;
 }
@@ -154,7 +188,7 @@ async function viewList() {
   const canNew = canEnter();
   shell(T('title'), `<div class="p2-bar"><input id="p2_q" type="search" placeholder="${esc(T('search'))}" value="${esc(Fl.q)}" aria-label="${esc(T('search'))}" autocomplete="off">
       <button id="p2_fb" class="p2-fb" data-act="p2_filter" aria-label="${esc(T('filter'))}">${esc(T('filter'))}<span class="cnt" ${nFilters() ? '' : 'hidden'}>${nFilters()}</span></button>
-      ${canNew ? `<button class="primary" data-act="itemnew" aria-label="${esc(T('add'))}">＋</button>` : ''}</div>
+      ${canNew ? `<button class="primary" data-act="itemnew" aria-label="${esc(T('add'))}">＋</button>` : ''}${canNew && D.master ? `<button data-act="im_bycat" aria-label="${esc(T('bycat'))}">${esc(T('bycat'))}</button>` : ''}${D.master ? `<button class="mini im-dots" data-act="p2_pagemenu" aria-label="${esc(T('more2'))}">⋮</button>` : ''}</div>
     <div class="p2-chips" id="p2_chips"></div>
     <div class="row between muted" style="font-size:.88rem"><span id="p2_count"></span><span class="row">${canNew || S.ctx.is_owner ? `<a href="#/itemreq">${esc(T('pending'))}</a>` : ''}</span></div>
     <div id="p2_list"></div><button class="full" id="p2_more" data-act="p2_more" hidden>${esc(T('more'))}</button>`, 'home');
@@ -168,7 +202,10 @@ function filterSheet() {
     <div><label>${esc(T('src'))}</label>${sel('ff_src', [['made', T('made')], ['bought', T('bought')]], Fl.source)}</div>
     <div><label>${esc(T('tracked'))}</label>${sel('ff_trk', [['yes', T('yes')], ['no', T('no')]], Fl.tracked)}</div>
     <div><label>${esc(T('active'))}</label>${sel('ff_act', [['yes', T('active')], ['no', T('inactive')]], Fl.active)}</div>
+    ${D.master ? `<div><label>${esc(T('type'))}</label>${sel('ff_type', B.itemMaster.types().map((x) => [x.code, B.itemMaster.typeLabel(x.code)]), Fl.type)}</div>
+    <div><label>${esc(T('flagf'))}</label>${sel('ff_flag', ['locked', 'hidden', 'nocount', 'noprice', 'retired', 'master'].map((k) => [k, T('fl_' + k)]), Fl.flag)}</div>` : ''}
     <div class="row between"><span>${esc(T('low'))}</span><button class="tog ${Fl.low ? 'on' : ''}" id="ff_low" data-act="sheettog">${esc(Fl.low ? t('on') : t('off'))}</button></div>
+    ${D.lowOk ? `<div><div class="row between"><span>${esc(T('lowNow'))}</span><button class="tog ${Fl.lowNow ? 'on' : ''}" id="ff_lownow" data-act="sheettog">${esc(Fl.lowNow ? t('on') : t('off'))}</button></div><div class="hint">${esc(T('lowNowH'))}. ${esc(T('lowNoMin'))}</div></div>` : ''}
     <div class="row"><button class="full" data-act="p2_reset">${esc(T('reset'))}</button><button class="primary full" data-act="p2_apply">${esc(T('apply'))}</button></div></div>`);
 }
 
@@ -192,13 +229,15 @@ function convHTML(it) {
   return `<div class="card stack"><b>${esc(T('convh'))}</b>${rows.length ? rows.map((c) => `<div class="p2-conv">1 ${esc(c.from_unit)} = ${esc(String(c.factor))} ${esc(c.to_unit)}${c.item_id ? '' : ` <span class="muted">· ${esc(T('convall'))}</span>`}</div>`).join('') : `<div class="muted">${esc(T('convnone'))}</div>`}
     ${S.ctx.is_owner ? `<a class="tog" href="#/settings2/units/${esc(it.id)}" style="text-decoration:none">${esc(T('convedit'))} →</a>` : ''}</div>`;
 }
-async function viewForm(id) {
+async function viewForm(id, presetCat) {
   shell(T('title'), `<p class="muted">${esc(T('loading'))}</p>`, 'items');
   if (!canEnter()) return go('items');
   try { await load(); } catch (e) { return fail(e); }
   const cur = id ? D.items.find((i) => String(i.id) === String(id)) : null;
   if (id && !cur) return go('items');
-  const f = cur ? { ...cur, cost_price: D.canCost ? D.cost.get(cur.id) : undefined } : { name_bn: '', name_en: '', name_mix: '', category: '', unit: 'kg', sell_price: '', is_active: true, sell_units: [], images: [] };
+  const guessType = (cat) => { const n = {}; D.items.filter((x) => x.category === cat && x.item_type).forEach((x) => { n[x.item_type] = (n[x.item_type] || 0) + 1; }); const k = Object.keys(n).sort((a, z) => n[z] - n[a])[0]; return k || 'finished_good'; };
+  const f = cur ? { ...cur, cost_price: D.canCost ? D.cost.get(cur.id) : undefined } : { name_bn: '', name_en: '', name_mix: '', category: presetCat || '', unit: 'kg', sell_price: '', is_active: true, sell_units: [], images: [], item_type: D.master ? guessType(presetCat) : undefined };
+  if (!cur && D.master && f.item_type) { const d = B.itemMaster.types().find((x) => x.code === f.item_type); if (d) { f.count_in_business = d.count_in_business; f.sellable = d.sellable; } }
   F = { id: id || null, cur, images: [...(f.images || [])], vat: B.rule('vat_on', false) === true, up: 0 };
   const cats = [...catMap().keys()], subs = [...subMap().keys()], lu = listUnitOpts(), owner = !!S.ctx.is_owner;
   const hasWh = f.wholesale_price !== null && f.wholesale_price !== undefined, hasLow = f.min_stock !== null && f.min_stock !== undefined;
@@ -229,12 +268,15 @@ async function viewForm(id) {
       <div><label>${esc(T('images'))}</label><div class="photos" id="p_imgs"></div></div>
       <div><label for="p_bc">${esc(T('barcode'))}</label><div class="p2-inl"><input id="p_bc" value="${esc(val(f.barcode))}" autocomplete="off" inputmode="text"><button type="button" data-act="p2_scan">▮▮ ${esc(T('scan'))}</button></div><div class="hint" id="p_bc_h"></div></div>
       <div><label for="p_mix">${esc(T('name_mix'))}</label><input id="p_mix" value="${esc(val(f.name_mix))}" autocomplete="off"></div>
+      <div><label for="p_details">${esc(T('details'))}</label><textarea id="p_details" rows="3" maxlength="2000" placeholder="${esc(T('detailsph'))}">${esc(val(f.details))}</textarea></div>
     </div></details>
+    ${D.master ? B.itemMaster.formHTML(f, !cur) : ''}
     ${cur ? convHTML(cur) : ''}
     ${S.ctx.is_owner ? '' : `<div class="notice warn">${esc(t('needs_approval'))}</div>`}
     <div class="card"><label for="p_note">${esc(T('note'))}</label><input id="p_note" autocomplete="off"></div>
     <div class="p2-bar2"><button data-act="go" data-v="items">${esc(T('cancel'))}</button><button class="primary" data-act="p2_save">${esc(T('save'))}</button></div>`, 'items');
   drawImgs();
+  if (D.master && !cur && f.category) B.itemMaster.showNext('p_cat', 'im_code_h');
 }
 async function drawImgs() {
   const box = $('#p_imgs'); if (!box || !F) return;
@@ -276,7 +318,7 @@ async function save() {
   const cur = F.cur, num = (v) => (norm(v) === '' ? null : Number(norm(v)));
   const bad = (n) => n !== null && (!Number.isFinite(n) || n < 0);
   const name = $('#p_bn').value.trim(); if (!name) return toast(T('needname'));
-  const sell = num($('#p_sell').value); if (sell === null && !cur) return toast(T('needsell')); if (bad(sell)) return toast(T('badprice'));
+  const sell = num($('#p_sell').value); if (sell === null && !cur && (!D.master || isOn('im_sell_f'))) return toast(T('needsell')); if (bad(sell)) return toast(T('badprice'));
   const whOn = isOn('p_wh_on'), wh = whOn ? num($('#p_whs').value) : null; if (whOn && wh === null) return toast(T('needwh')); if (bad(wh)) return toast(T('badprice'));
   const lowOn = isOn('p_low_on'), mn = lowOn ? num($('#p_min').value) : null; if (lowOn && mn === null) return toast(T('needmin')); if (bad(mn)) return toast(T('badprice'));
   const cost = $('#p_cost') && canCostEnter() ? num($('#p_cost').value) : undefined; if (bad(cost ?? null)) return toast(T('badprice'));
@@ -290,7 +332,7 @@ async function save() {
   const next = { name_bn: name, name_en: $('#p_en').value.trim() || null, name_mix: $('#p_mix').value.trim() || null, category: cat || null, unit: $('#p_unit').value || null,
     sell_price: sell, is_active: isOn('p_act'), sub_category: sub || null, base_unit: $('#p_base').value || null,
     sell_units: [...document.querySelectorAll('#p_su .tog.on')].map((b) => b.dataset.su), wholesale_price: wh, tracked: isOn('p_trk'), min_stock: mn,
-    barcode: $('#p_bc').value.trim() || null, source: grpVal('src'), images: F.images.slice() };
+    barcode: $('#p_bc').value.trim() || null, source: grpVal('src'), images: F.images.slice(), details: ($('#p_details') ? $('#p_details').value.trim() : '') || null };
   if (cat) next.category_bn = catL ? catL.label_bn : catRow ? catRow.category_bn : undefined; if (next.category_bn === undefined) delete next.category_bn;
   if (F.vat) { const v = grpVal('vat'); next.vat_applicable = v === 'yes' ? true : v === 'no' ? false : null; }
   if (cost !== undefined) next.cost_price = cost;
@@ -300,12 +342,16 @@ async function save() {
     const was = cur ? (k === 'cost_price' ? D.cost.get(cur.id) : cur[k]) : undefined;
     if (cur ? !same(was, next[k]) : !empty(k, next[k])) patch[k] = next[k];
   }
+  if (D.master) Object.assign(patch, B.itemMaster.formPatch(cur));
   if (cur && !Object.keys(patch).length) { toast(T('nochange')); return go('items'); }
   const btn = $('[data-act=p2_save]'); if (btn) btn.disabled = true;
-  const { data, error } = await sb.rpc('submit_item_change', { p_item: F.id || null, p_patch: patch, p_note: ($('#p_note').value || '').trim() || null });
+  const note = ($('#p_note').value || '').trim() || null;
+  // item master installed: new items get their code from the category (item_new), changes go through item_apply (the owner or an item_create holder at once, others as a request)
+  const { data, error } = D.master ? (F.id ? await sb.rpc('item_apply', { p_item: F.id, p_patch: patch, p_note: note }) : await sb.rpc('item_new', { p_patch: patch, p_note: note }))
+    : await sb.rpc('submit_item_change', { p_item: F.id || null, p_patch: patch, p_note: note });
   if (btn) btn.disabled = false;
-  if (error) { if (/duplicate|unique/i.test(error.message || '')) return toast(T('dupbc')); return fail(error); }
-  toast(data && data.status === 'applied' ? T('saved') : T('appr'));
+  if (error) { if (/duplicate|unique/i.test(error.message || '')) return toast(T('dupbc')); if (/item_locked/.test(error.message || '')) return toast(lab(L('এই আইটেম লক করা — শুধু মালিক বদলাতে পারেন', 'This item is locked — only the owner can change it', 'এই Item locked — শুধু Owner বদলাতে পারেন'))); if (/item_has_stock/.test(error.message || '')) return toast(lab(L('স্টক আছে — আগে শূন্য করুন', 'There is stock — bring it to zero first', 'Stock আছে — আগে শূন্য করুন'))); return (B.itemMaster && B.itemMaster.errMsg(error) ? toast(B.itemMaster.errMsg(error)) : fail(error)); }
+  toast(data && (data.status === 'applied' || data.status === 'created') ? T('saved') + (data.code ? ' · ' + data.code : '') : T('appr'));
   F = null; go('items');
 }
 
@@ -314,9 +360,9 @@ Object.assign(H, {
   itemnew: () => go('items/new'),
   itemedit: (a) => go('items/edit/' + a.dataset.v),
   p2_filter: () => filterSheet(),
-  p2_apply: () => { Fl.cat = $('#ff_cat').value; Fl.sub = $('#ff_sub').value; Fl.source = $('#ff_src').value; Fl.tracked = $('#ff_trk').value; Fl.active = $('#ff_act').value; Fl.low = isOn('ff_low'); shown = PAGE; closeSheet(); drawList(); },
-  p2_reset: () => { Object.assign(Fl, { cat: '', sub: '', source: '', tracked: '', low: false, active: '' }); shown = PAGE; closeSheet(); drawList(); },
-  p2_chip_x: (a) => { const k = a.dataset.k; Fl[k] = k === 'low' ? false : ''; shown = PAGE; drawList(); },
+  p2_apply: () => { Fl.cat = $('#ff_cat').value; Fl.sub = $('#ff_sub').value; Fl.source = $('#ff_src').value; Fl.tracked = $('#ff_trk').value; Fl.active = $('#ff_act').value; Fl.type = $('#ff_type') ? $('#ff_type').value : ''; Fl.flag = $('#ff_flag') ? $('#ff_flag').value : ''; Fl.low = isOn('ff_low'); Fl.lowNow = isOn('ff_lownow'); shown = PAGE; closeSheet(); drawList(); },
+  p2_reset: () => { Object.assign(Fl, { cat: '', sub: '', source: '', tracked: '', low: false, lowNow: false, active: '', type: '', flag: '' }); shown = PAGE; closeSheet(); drawList(); },
+  p2_chip_x: (a) => { const k = a.dataset.k; Fl[k] = k === 'low' || k === 'lowNow' ? false : ''; shown = PAGE; drawList(); },
   p2_more: () => { shown += PAGE; drawList(); },
   p2_tg: (a) => {
     const on = !a.classList.contains('on'); a.classList.toggle('on', on); a.setAttribute('aria-pressed', on ? 'true' : 'false'); a.textContent = on ? t('on') : t('off');
@@ -328,6 +374,10 @@ Object.assign(H, {
   p2_scan: async () => { if (!B.barcode) return; const code = await B.barcode.scan(); if (code && $('#p_bc')) { $('#p_bc').value = code; syncBarcodeHint(); } },
   p2_img_del: (a) => { if (!F) return; F.images.splice(Number(a.dataset.i), 1); drawImgs(); },
   p2_save: save,
+  p2_pagemenu: () => {
+    const o = !!S.ctx.is_owner, ok = (route, label, show) => (show ? `<button class="im-act" data-act="go" data-v="${route}">${esc(T(label))}</button>` : '');
+    openSheet(`<h2>${esc(T('more2'))}</h2><div class="stack" style="margin-top:10px">${ok('assets', 'passets', true)}${ok('itemimport', 'pimp', o)}${ok('itemmap', 'pmap', o || (B.itemMaster && B.itemMaster.canFlag()))}${ok('itemtypes', 'ptypes', o)}</div><button class="full" style="margin-top:12px" data-act="closesheet">${esc(T('cancel'))}</button>`);
+  },
 });
 let qTimer = null;
 document.addEventListener('input', (e) => {
@@ -339,13 +389,14 @@ document.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key ==
 
 async function view() {
   const seg = location.hash.replace(/^#\/?/, '').split('/');
-  if (seg[1] === 'new') return viewForm(null);
+  if (seg[1] === 'new') return viewForm(null, seg[2] || '');
   if (seg[1] === 'edit' && seg[2]) return viewForm(seg[2]);
   return viewList();
 }
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { items: view, products: view });
 // labels for the approval screen (#/itemreq): the new item fields
-window.BOS_ITEM_LABELS = () => ({ sub_category: T('sub'), base_unit: T('base'), sell_units: T('sellu'), wholesale_price: T('whs'), tracked: T('trk'), min_stock: T('minst'),
-  barcode: T('barcode'), source: T('source'), vat_applicable: T('vat'), images: T('images') });
-B.items2 = { reload: load };
+window.BOS_ITEM_LABELS = () => ({ item_type: T('type'), control_class: lab(L('ডিকশনারি ক্লাস', 'Dictionary class', 'Dictionary class')), count_in_business: lab(L('ব্যবসার হিসাবে ধরা', 'Count in business', 'Business-এ ধরা')), sellable: lab(L('বিক্রির জন্য', 'For sale', 'Selling-এর জন্য')),
+  locked: T('fl_locked'), hidden: T('fl_hidden'), retired_reason: lab(L('কারণ', 'Reason', 'Reason')), master_code: lab(L('মাস্টার কোড', 'Master code', 'Master code')), sub_category: T('sub'), base_unit: T('base'), sell_units: T('sellu'), wholesale_price: T('whs'), tracked: T('trk'), min_stock: T('minst'),
+  barcode: T('barcode'), source: T('source'), vat_applicable: T('vat'), images: T('images'), details: T('details') });
+B.items2 = { reload: load, items: () => D.items, redraw: () => { try { drawList(); } catch (e) { /* not on the list */ } } };
 })();
