@@ -86,6 +86,7 @@ const ROUTES = [
   { k: 'settings2/units', g: 'item', lb: () => T('unitconv'), ok: () => isOwner() },
   { k: 'itemimport', g: 'item', lb: () => lab(L('আইটেম মাস্টার ইমপোর্ট', 'Item master import', 'Item master import')), ic: 'doc', ok: () => isOwner() },
   { k: 'itemmap', g: 'item', lb: () => lab(L('পুরনো আইটেম মেলানো', 'Old items to master codes', 'পুরনো Item মেলানো')), ic: 'doc', ok: () => isOwner() || GF.item_create === true },
+  { k: 'bulkitems', g: 'item', lb: () => lab(L('আইটেম একসাথে বদল', 'Bulk item editor', 'Item একসাথে বদল')), ic: 'items', ok: () => isOwner() || GF.item_bulk === true || GF.item_create === true || P('ITEMS', 'enter') },
   { k: 'itemtypes', g: 'item', lb: () => lab(L('আইটেমের ধরন ও ডিফল্ট', 'Item types & defaults', 'Item type ও Default')), ic: 'doc', ok: () => isOwner() },
   { k: 'assets', g: 'ops', lb: () => lab(L('সম্পদ-খাতা', 'Asset register', 'Asset register')), ic: 'doc', ok: () => locOk() },
   { k: 'dues', g: 'cust', lb: () => t('dues'), ok: () => canPos() },
@@ -205,7 +206,7 @@ async function counts(force) {
 async function loadGrantFlags() {
   if (!S.ctx || isOwner()) return;
   const locs = (S.ctx.locations || []).length ? [null, ...S.ctx.locations] : [null];
-  const codes = locOk() ? ['view_daybook', 'salary_view', 'item_create', 'head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'] : ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'];
+  const codes = locOk() ? ['view_daybook', 'salary_view', 'item_create', 'item_bulk', 'head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'] : ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'];
   await Promise.all(codes.map(async (code) => {
     let ok = false;
     for (const l of locs) { try { const r = await sb.rpc('has_grant', { p_code: code, p_loc: l }); if (r && !r.error && r.data === true) { ok = true; break; } } catch (e) { /* not granted */ } }

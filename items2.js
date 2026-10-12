@@ -44,6 +44,7 @@ const X = {
   details: L('বিবরণ', 'Details', 'Details'), detailsph: L('উপাদান, ওজন, নোট…', 'Ingredients, weight, notes…', 'Ingredients, weight, notes…'),
   lowNow: L('এখন স্টক কম', 'Low stock now', 'এখন stock কম'), lowNowH: L('শুধু ন্যূনতম স্টকের নিচে থাকা পণ্য (স্টকের হিসাব থেকে)', 'Only products below their minimum stock (from the stock ledger)', 'শুধু minimum stock-এর নিচে থাকা product (stock ledger থেকে)'),
   type: L('ধরন', 'Type', 'Type'), flagf: L('ফ্ল্যাগ', 'Flag', 'Flag'), fl_locked: L('লক করা', 'Locked', 'Locked'), fl_hidden: L('লুকানো', 'Hidden', 'Hidden'), fl_nocount: L('ব্যবসার হিসাবে নেই', 'Not counted in business', 'Business-এর হিসাবে নেই'),
+  fl_unpriced_fg: L('দাম-ছাড়া তৈরি পণ্য / কিনে-বিক্রি (দাম দিন বা লুকান)', 'Unpriced finished goods / resale (to price or hide)', 'দাম-ছাড়া finished / resale (দাম দিন বা লুকান)'), oldlist: L('পুরনো তালিকা', 'Old list', 'পুরনো list'), openbulk: L('একসাথে বদলের পাতায় খুলুন', 'Open in the bulk editor', 'Bulk editor-এ খুলুন'), pbulk: L('আইটেম একসাথে বদল', 'Bulk item editor', 'Item একসাথে বদল'),
   fl_noprice: L('দাম নেই (Data needed)', 'No price (Data needed)', 'দাম নেই (Data needed)'), fl_retired: L('অবসরপ্রাপ্ত', 'Retired', 'Retired'), fl_master: L('মাস্টার কোডে মেলানো', 'Linked to a master code', 'Master code-এ linked'),
   dneeded: L('Data needed', 'Data needed', 'Data needed'), more2: L('আরও অপশন', 'More options', 'আরও Option'), pimp: L('আইটেম মাস্টার ইমপোর্ট', 'Item master import', 'Item master import'), pmap: L('পুরনো আইটেম মেলানো', 'Old items to master codes', 'পুরনো Item মেলানো'),
   ptypes: L('আইটেমের ধরন ও ডিফল্ট', 'Item types & defaults', 'Item type ও Default'), passets: L('সম্পদ-খাতা', 'Asset register', 'Asset register'), bycat: L('ক্যাটাগরি ধরে', 'By category', 'Category ধরে'),
@@ -56,7 +57,7 @@ const CATLEG = {
   sweet_kg: L('মিষ্টি (কেজি)', 'Sweets (KG)', 'মিষ্টি (KG)'), sweet_pc: L('মিষ্টি (পিস)', 'Sweets (Piece)', 'মিষ্টি (Piece)'), doi: L('দই', 'Doi (Curd)', 'Doi (দই)'),
   cake_lb: L('কেক (পাউন্ড)', 'Cake (Pound)', 'Cake (Pound)'), cake_pc: L('কেক (পিস)', 'Cake (Piece)', 'Cake (Piece)'),
 };
-const rl = (r) => ({ bn: r.label_bn, en: r.label_en || undefined, mix: r.label_mix || undefined });
+const rl = (r) => ({ bn: r.label_bn || r.label_en || r.value_code, en: r.label_en || undefined, mix: r.label_mix || undefined });
 
 // ---------- state ----------
 const D = { items: [], cost: new Map(), canCost: false, conv: [], ready: false, low: new Map(), lowOk: false, master: false };
@@ -109,7 +110,7 @@ function catMap() {
   D.items.forEach((i) => { if (i.category && !m.has(i.category)) m.set(i.category, CATLEG[i.category] || { bn: i.category_bn || i.category }); });
   return m;
 }
-const catLabel = (code) => { if (!code) return ''; const r = lists('item_categories').find((x) => x.value_code === code); if (r) return lab(rl(r)); if (CATLEG[code]) return lab(CATLEG[code]); const i = D.items.find((x) => x.category === code); return (i && i.category_bn) || code; };
+const catLabel = (code) => { if (!code) return ''; const r = lists('item_categories').find((x) => x.value_code === code); if (r) return lab(rl(r)); if (CATLEG[code]) return lab(CATLEG[code]) + ' (' + T('oldlist') + ')'; const i = D.items.find((x) => x.category === code); return (i && i.category_bn) || code; };
 function subMap() {
   const m = new Map();
   lists('item_subcategories').forEach((r) => m.set(r.value_code, rl(r)));
@@ -145,7 +146,7 @@ function matches(i) {
   if (Fl.active === 'no' && i.is_active) return false;
   if (Fl.type && i.item_type !== Fl.type) return false;
   if (Fl.flag === 'locked' && !i.locked) return false; if (Fl.flag === 'hidden' && !i.hidden) return false; if (Fl.flag === 'nocount' && i.count_in_business !== false) return false;
-  if (Fl.flag === 'noprice' && !(i.sell_price === null || i.sell_price === undefined)) return false; if (Fl.flag === 'retired' && !i.retired_at) return false; if (Fl.flag === 'master' && !i.master_code) return false;
+  if (Fl.flag === 'unpriced_fg' && !(i.sell_price === null || i.sell_price === undefined) ) return false; if (Fl.flag === 'unpriced_fg' && !(['finished_good', 'resale'].includes(i.item_type) && i.is_active && !i.hidden)) return false; if (Fl.flag === 'noprice' && !(i.sell_price === null || i.sell_price === undefined)) return false; if (Fl.flag === 'retired' && !i.retired_at) return false; if (Fl.flag === 'master' && !i.master_code) return false;
   return true;
 }
 const nFilters = () => ['cat', 'sub', 'source', 'tracked', 'active', 'type', 'flag'].filter((k) => Fl[k]).length + (Fl.low ? 1 : 0) + (Fl.lowNow ? 1 : 0);
@@ -189,6 +190,7 @@ async function viewList() {
   shell(T('title'), `<div class="p2-bar"><input id="p2_q" type="search" placeholder="${esc(T('search'))}" value="${esc(Fl.q)}" aria-label="${esc(T('search'))}" autocomplete="off">
       <button id="p2_fb" class="p2-fb" data-act="p2_filter" aria-label="${esc(T('filter'))}">${esc(T('filter'))}<span class="cnt" ${nFilters() ? '' : 'hidden'}>${nFilters()}</span></button>
       ${canNew ? `<button class="primary" data-act="itemnew" aria-label="${esc(T('add'))}">＋</button>` : ''}${canNew && D.master ? `<button data-act="im_bycat" aria-label="${esc(T('bycat'))}">${esc(T('bycat'))}</button>` : ''}${D.master ? `<button class="mini im-dots" data-act="p2_pagemenu" aria-label="${esc(T('more2'))}">⋮</button>` : ''}</div>
+    ${D.master ? `<div class="row wrap" style="gap:6px;margin:4px 0"><button type="button" class="chip ${Fl.flag === 'unpriced_fg' ? 'warn' : ''}" id="p2_fg" data-act="p2_fg">${esc(T('fl_unpriced_fg'))} · <span id="p2_fgn">${D.items.filter((i) => ['finished_good', 'resale'].includes(i.item_type) && i.is_active && !i.hidden && (i.sell_price === null || i.sell_price === undefined)).length}</span></button>${Fl.flag === 'unpriced_fg' && canEnter() ? `<button type="button" class="chip info" data-act="p2_fg_bulk">${esc(T('openbulk'))} ›</button>` : ''}</div>` : ''}
     <div class="p2-chips" id="p2_chips"></div>
     <div class="row between muted" style="font-size:.88rem"><span id="p2_count"></span><span class="row">${canNew || S.ctx.is_owner ? `<a href="#/itemreq">${esc(T('pending'))}</a>` : ''}</span></div>
     <div id="p2_list"></div><button class="full" id="p2_more" data-act="p2_more" hidden>${esc(T('more'))}</button>`, 'home');
@@ -203,7 +205,7 @@ function filterSheet() {
     <div><label>${esc(T('tracked'))}</label>${sel('ff_trk', [['yes', T('yes')], ['no', T('no')]], Fl.tracked)}</div>
     <div><label>${esc(T('active'))}</label>${sel('ff_act', [['yes', T('active')], ['no', T('inactive')]], Fl.active)}</div>
     ${D.master ? `<div><label>${esc(T('type'))}</label>${sel('ff_type', B.itemMaster.types().map((x) => [x.code, B.itemMaster.typeLabel(x.code)]), Fl.type)}</div>
-    <div><label>${esc(T('flagf'))}</label>${sel('ff_flag', ['locked', 'hidden', 'nocount', 'noprice', 'retired', 'master'].map((k) => [k, T('fl_' + k)]), Fl.flag)}</div>` : ''}
+    <div><label>${esc(T('flagf'))}</label>${sel('ff_flag', ['locked', 'hidden', 'nocount', 'noprice', 'unpriced_fg', 'retired', 'master'].map((k) => [k, T('fl_' + k)]), Fl.flag)}</div>` : ''}
     <div class="row between"><span>${esc(T('low'))}</span><button class="tog ${Fl.low ? 'on' : ''}" id="ff_low" data-act="sheettog">${esc(Fl.low ? t('on') : t('off'))}</button></div>
     ${D.lowOk ? `<div><div class="row between"><span>${esc(T('lowNow'))}</span><button class="tog ${Fl.lowNow ? 'on' : ''}" id="ff_lownow" data-act="sheettog">${esc(Fl.lowNow ? t('on') : t('off'))}</button></div><div class="hint">${esc(T('lowNowH'))}. ${esc(T('lowNoMin'))}</div></div>` : ''}
     <div class="row"><button class="full" data-act="p2_reset">${esc(T('reset'))}</button><button class="primary full" data-act="p2_apply">${esc(T('apply'))}</button></div></div>`);
@@ -373,6 +375,8 @@ Object.assign(H, {
   itemnew: () => go('items/new'),
   itemedit: (a) => go('items/edit/' + a.dataset.v),
   p2_filter: () => filterSheet(),
+  p2_fg: () => { Fl.flag = Fl.flag === 'unpriced_fg' ? '' : 'unpriced_fg'; shown = PAGE; viewList(); },
+  p2_fg_bulk: () => { B.bulkPreset = 'fg'; go('bulkitems'); },
   p2_apply: () => { Fl.cat = $('#ff_cat').value; Fl.sub = $('#ff_sub').value; Fl.source = $('#ff_src').value; Fl.tracked = $('#ff_trk').value; Fl.active = $('#ff_act').value; Fl.type = $('#ff_type') ? $('#ff_type').value : ''; Fl.flag = $('#ff_flag') ? $('#ff_flag').value : ''; Fl.low = isOn('ff_low'); Fl.lowNow = isOn('ff_lownow'); shown = PAGE; closeSheet(); drawList(); },
   p2_reset: () => { Object.assign(Fl, { cat: '', sub: '', source: '', tracked: '', low: false, lowNow: false, active: '', type: '', flag: '' }); shown = PAGE; closeSheet(); drawList(); },
   p2_chip_x: (a) => { const k = a.dataset.k; Fl[k] = k === 'low' || k === 'lowNow' ? false : ''; shown = PAGE; drawList(); },
@@ -389,7 +393,7 @@ Object.assign(H, {
   p2_save: save,
   p2_pagemenu: () => {
     const o = !!S.ctx.is_owner, ok = (route, label, show) => (show ? `<button class="im-act" data-act="go" data-v="${route}">${esc(T(label))}</button>` : '');
-    openSheet(`<h2>${esc(T('more2'))}</h2><div class="stack" style="margin-top:10px">${ok('assets', 'passets', true)}${ok('itemimport', 'pimp', o)}${ok('itemmap', 'pmap', o || (B.itemMaster && B.itemMaster.canFlag()))}${ok('itemtypes', 'ptypes', o)}</div><button class="full" style="margin-top:12px" data-act="closesheet">${esc(T('cancel'))}</button>`);
+    openSheet(`<h2>${esc(T('more2'))}</h2><div class="stack" style="margin-top:10px">${ok('assets', 'passets', true)}${ok('itemimport', 'pimp', o)}${ok('itemmap', 'pmap', o || (B.itemMaster && B.itemMaster.canFlag()))}${ok('itemtypes', 'ptypes', o)}${ok('bulkitems', 'pbulk', o || canEnter())}</div><button class="full" style="margin-top:12px" data-act="closesheet">${esc(T('cancel'))}</button>`);
   },
 });
 let qTimer = null;
