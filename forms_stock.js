@@ -412,7 +412,7 @@ B.forms['06-5'] = {
     { collapsed: true, title: L('মূল তালিকা — মাসের শেষে বকেয়া', 'Master list: dues at month end'), fields: [
       T('m_month', L('মাস', 'Month')),
       NOTE(L('নতুন সাপ্লায়ার এলে: আগে এখানে এক লাইন, তারপর তাঁর নিজের পাতা।', "For a new supplier: first one line here, then the supplier's own page."), 'ok'),
-      TABLE('master', null, [T('name', L('সাপ্লায়ারের নাম', 'Supplier name'), { wide: true }), T('m_items', L('সরবরাহের আইটেম', 'Items supplied')), T('m_phone', L('ফোন', 'Phone')), T('m_page', L('পাতা নং', 'Page no.')), M('m_due', L('মাসের শেষে বকেয়া ৳', 'Dues at month end ৳'))], { min: 3 }),
+      TABLE('master', null, [SUP('name', L('সাপ্লায়ারের নাম', 'Supplier name'), { wide: true }), T('m_items', L('সরবরাহের আইটেম', 'Items supplied')), T('m_phone', L('ফোন', 'Phone')), T('m_page', L('পাতা নং', 'Page no.')), M('m_due', L('মাসের শেষে বকেয়া ৳', 'Dues at month end ৳'))], { min: 3 }),
       CALC('master_total', L('সব সাপ্লায়ারের মোট বকেয়া', 'Total dues of all suppliers'), 'money'), CK('master_posted', L('মাসের শেষে প্রতিটি পাতার বকেয়া এখানে এন্ট্রি (Posting) করা', "Each page's month-end dues posted here"))] },
     { who: 'checker', title: L('যাচাই (ব্যবস্থাপনা)', 'Check (management)'), fields: [
       CK('mgmt_checked', L('যাচাইকারী (Checked by) — ব্যবস্থাপনা: লেজার যাচাই করেছি', 'Checked by management: ledger checked'), { who: 'checker', req: true })] },
@@ -428,4 +428,155 @@ B.forms['06-5'] = {
     return { v, rows: { lines: out }, flags, needs: [] };
   },
 };
+
+/* ============ Forms <-> stock ledger links (phase20) ============
+   Switch `forms_post_to_ledger` (default OFF) + one switch per form (forms_ledger_cfg). When it is on, an approved 04-1 / 04-2 / 04-3 / 03-1 / 05-1 posts to the stock ledger on the server
+   (entry_post_ledger, a trigger on entries): nothing is typed twice.  Then 04-4 (store ledger) and 06-5 (supplier ledger) open as READ views over stock_ledger_rows / supplier_ledger;
+   the old paper-form entry stays one tap away ("paper entries") and is the only screen while the switch is off. Page #/ledgerlinks: the switches and the "could not post" retry list. */
+{
+const A = window.BOS_APP, { sb, S, esc, toast, fail, shell, fmt } = A, lab = B.lab;
+const $ = (q, el = document) => el.querySelector(q);
+const X = {
+  title: L('ফর্ম ও স্টক লেজারের যোগ', 'Forms and the stock ledger', 'Form ও Stock ledger যোগ'), master: L('অনুমোদনের সময় স্টক লেজারে নিজে পোস্ট', 'Post to the stock ledger when a form is approved', 'Approve হলে stock ledger এ নিজে পোস্ট'),
+  masterHint: L('বন্ধ থাকলে কিছুই বদলায় না। চালু করার আগে পুরোনো অনুমোদিত ফর্ম নিজে থেকে পোস্ট হয় না।', 'Off = nothing changes. Forms approved before you switch it on are not posted by themselves.', 'Off = কিছুই বদলায় না।'),
+  on: L('চালু', 'On', 'On'), off: L('বন্ধ', 'Off', 'Off'), forms: L('ফর্ম অনুযায়ী', 'Per form', 'Per form'), problems: L('পোস্ট হয়নি / বাদ গেছে', 'Not posted / skipped', 'Not posted / skipped'),
+  none: L('কোনো সমস্যা নেই ✓', 'No problems ✓', 'কোনো সমস্যা নেই ✓'), retry: L('আবার চেষ্টা', 'Retry', 'Retry'), failed: L('ব্যর্থ', 'failed', 'failed'), skipped: L('বাদ', 'skipped', 'skipped'),
+  saved: L('সংরক্ষিত', 'Saved', 'Saved'), retried: L('আবার চেষ্টা হয়েছে', 'Retried', 'Retried'), nonowner: L('শুধু মালিক বদলাতে পারেন', 'Only the owner can change these', 'Only the owner can change these'),
+  f04_1: L('GRN — মালামাল গ্রহণ', 'GRN — goods received', 'GRN'), f04_2: L('ইস্যু স্লিপ', 'Issue slip', 'Issue slip'), f04_3: L('স্টক কাউন্ট শিট', 'Stock count sheet', 'Count sheet'), f03_1: L('ট্রান্সফার চালান', 'Transfer challan', 'Transfer challan'), f05_1: L('কারখানা দৈনিক শিট', 'Factory daily sheet', 'Factory sheet'),
+  sl_title: L('স্টোর লেজার (শুধু দেখা)', 'Store ledger (read only)', 'Store ledger (শুধু দেখা)'), sup_title: L('সাপ্লায়ার লেজার (শুধু দেখা)', 'Supplier ledger (read only)', 'Supplier ledger (শুধু দেখা)'),
+  fromforms: L('অনুমোদিত ফর্ম ও স্টক পেজ থেকে নিজে আসে — এখানে টাইপ করতে হয় না।', 'Filled by itself from approved forms and the stock page: nothing to type here.', 'Approved form ও stock page থেকে নিজে আসে।'),
+  paper: L('কাগজের ফর্মের এন্ট্রি', 'Paper-form entries', 'Paper form entries'), place: L('লোকেশন', 'Place', 'Place'), search: L('আইটেম খুঁজুন…', 'Search item…', 'Item খুঁজুন…'), noitems: L('কোনো আইটেম নেই', 'No items', 'No items'),
+  qty: L('পরিমাণ', 'Quantity', 'Quantity'), bal: L('বাকি', 'Balance', 'Balance'), noledg: L('এই আইটেমে এখনও লেনদেন নেই', 'No movements yet for this item', 'No movements yet'), back: L('← তালিকা', '← List', '← List'),
+  stockpage: L('স্টক পেজ', 'Stock page', 'Stock page'), allp: L('সব লোকেশন', 'All places', 'All places'), sup: L('সাপ্লায়ার', 'Supplier', 'Supplier'), due: L('এখন বকেয়া', 'Due now', 'Due now'),
+  nosup: L('কোনো সাপ্লায়ার নেই', 'No suppliers', 'No suppliers'), debit: L('বিল / বকেয়া বাড়ে', 'Bill (adds)', 'Bill (adds)'), credit: L('পেমেন্ট (কমে)', 'Payment (reduces)', 'Payment (reduces)'), purpage: L('ক্রয় ও বকেয়া পেজ', 'Purchase and payables page', 'Purchase page'),
+  r_opening: L('শুরুর জের', 'Opening', 'Opening'), r_purchase_in: L('ক্রয়ে এল', 'Purchase in', 'Purchase in'), r_purchase_return: L('ক্রয় ফেরত', 'Purchase return', 'Purchase return'), r_sale_out: L('বিক্রি', 'Sale', 'Sale'), r_sale_void_in: L('বিক্রি বাতিল', 'Sale voided', 'Sale voided'),
+  r_sale_return: L('বিক্রি ফেরত', 'Sale return', 'Sale return'), r_issue_out: L('উৎপাদনে ইস্যু', 'Issued', 'Issued'), r_production_in: L('উৎপাদিত', 'Produced', 'Produced'), r_transfer_out: L('ট্রান্সফার আউট', 'Transfer out', 'Transfer out'),
+  r_transfer_in: L('ট্রান্সফার ইন', 'Transfer in', 'Transfer in'), r_wastage: L('অপচয়', 'Wastage', 'Wastage'), r_count_adjust: L('কাউন্টের সমন্বয়', 'Count adjustment', 'Count adjustment'), r_reversal: L('ফেরানো', 'Reversal', 'Reversal'),
+  k_bill: L('বিল', 'Bill', 'Bill'), k_paid: L('পরিশোধ', 'Paid', 'Paid'), k_payment: L('পেমেন্ট', 'Payment', 'Payment'), k_return: L('ফেরত', 'Return', 'Return'), k_refund: L('সাপ্লায়ারের ফেরত টাকা', 'Supplier refund', 'Supplier refund'), k_opening: L('শুরুর জের', 'Opening', 'Opening'),
+  loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), pick: L('একটি সাপ্লায়ার বাছুন', 'Pick a supplier', 'Pick a supplier'), more: L('সর্বশেষ ১০০টি', 'Latest 100', 'Latest 100'),
+};
+const T = (k) => lab(X[k]);
+const money = (n) => (n === null || n === undefined ? '—' : '৳ ' + fmt(Math.round(Number(n) * 100) / 100));
+const FORMS5 = [['04-1', 'f04_1'], ['04-2', 'f04_2'], ['04-3', 'f04_3'], ['03-1', 'f03_1'], ['05-1', 'f05_1']];
+const LS = { master: false, cfg: {}, loaded: false };
+async function loadSwitches() {
+  const [r, c] = await Promise.all([sb.from('rules').select('key,value,default_value').eq('key', 'forms_post_to_ledger'), sb.from('forms_ledger_cfg').select('form_code,is_on')]);
+  const row = !r.error && r.data && r.data[0]; const v = row ? (row.value !== null && row.value !== undefined ? row.value : row.default_value) : false;
+  LS.master = v === true || v === 'true'; LS.cfg = {}; (!c.error && c.data ? c.data : []).forEach((x) => { LS.cfg[x.form_code] = x.is_on !== false; }); LS.loaded = true;
+}
+const isOwner = () => !!(S.ctx && S.ctx.is_owner);
+const LOCS = () => { const all = (B.ENV && B.ENV.locs) || []; return isOwner() || (S.ctx.roles || []).includes('management') ? all : all.filter((l) => (S.ctx.locations || []).includes(l.id)); };
+const allPlaces = () => isOwner() || (S.ctx.roles || []).includes('management');
+const RS = { loc: null, q: '', item: null, sup: null, paper: null };
+
+/* ----- styles (own prefix) ----- */
+if (!document.getElementById('lk_css')) { const st = document.createElement('style'); st.id = 'lk_css'; st.textContent = `
+.lk-row{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:52px;padding:8px 0;border-bottom:1px solid var(--line,#0001);text-align:start}
+.lk-row:last-child{border-bottom:0} .lk-row .nm{font-weight:700} .lk-row .sub{font-size:.8rem;color:var(--muted)}
+.lk-num{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap} .lk-pos{color:var(--sig-ok)} .lk-neg{color:var(--sig-bad)}
+.lk-sw{display:flex;gap:6px} .lk-sw button{min-height:44px;padding:0 14px}
+.lk-note{font-size:.85rem;margin:6px 0 10px}`; document.head.appendChild(st); }
+
+/* ----- the read views for 04-4 and 06-5 ----- */
+async function viewStoreLedger() {
+  shell(T('sl_title'), `<p class="muted center pad">${esc(T('loading'))}</p>`, true);
+  const locs = LOCS(); if (!RS.loc || !locs.find((l) => l.id === RS.loc)) RS.loc = (locs[0] || {}).id;
+  const nm = A.nm;
+  const head = `<div class="notice ok lk-note">${esc(T('fromforms'))}</div>
+    <div class="row wrap" style="margin-bottom:8px"><select id="lk_loc" aria-label="${esc(T('place'))}" style="flex:1">${locs.map((l) => `<option value="${l.id}" ${l.id === RS.loc ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>
+    <button data-act="lk_stock">${esc(T('stockpage'))}</button><button data-act="lk_paper" data-v="04-4">${esc(T('paper'))}</button></div>`;
+  if (RS.item) {
+    const lv = await sb.rpc('stock_levels', { p_loc: RS.loc, p_filters: { item_ids: [RS.item.item_id], include_zero: true } });
+    const lr = await sb.rpc('stock_ledger_rows', { p_loc: RS.loc, p_item: RS.item.item_id, p_from: null, p_to: null, p_limit: 100 });
+    if (lr.error) return fail(lr.error);
+    const cur = lv.data && lv.data[0] ? Number(lv.data[0].qty) : null; let bal = cur;
+    const rows = (lr.data || []).map((r) => { const o = { r, after: bal }; if (bal !== null) bal = Math.round((bal - Number(r.qty_delta)) * 10000) / 10000; return o; });
+    shell(T('sl_title'), head + `<div class="row between" style="margin:6px 0"><button data-act="lk_back">${esc(T('back'))}</button><b>${esc(nm(RS.item))} · ${cur === null ? '—' : esc(fmt(cur))} ${esc(RS.item.base_unit || '')}</b></div>
+      <div class="card" style="padding:4px 12px">${rows.length ? rows.map(({ r, after }) => `<div class="lk-row"><div><div class="nm">${esc(lab(X['r_' + r.reason] || L(r.reason, r.reason)))}</div><div class="sub">${esc(String(r.made_at || '').slice(0, 16).replace('T', ' '))}${r.note ? ' · ' + esc(String(r.note).slice(0, 60)) : ''}</div></div>
+        <div style="text-align:end"><div class="lk-num ${Number(r.qty_delta) >= 0 ? 'lk-pos' : 'lk-neg'}">${Number(r.qty_delta) >= 0 ? '+' : '−'}${esc(fmt(Math.abs(Number(r.qty_delta))))}</div><div class="sub">${esc(T('bal'))} ${after === null ? '—' : esc(fmt(after))}</div></div></div>`).join('') : `<p class="muted center pad">${esc(T('noledg'))}</p>`}</div>
+      <p class="muted lk-note">${esc(T('more'))}</p>`, true);
+  } else {
+    const r = await sb.rpc('stock_levels', { p_loc: RS.loc, p_filters: { q: RS.q || undefined, include_zero: true } });
+    if (r.error) return fail(r.error);
+    shell(T('sl_title'), head + `<input id="lk_q" type="search" placeholder="${esc(T('search'))}" value="${esc(RS.q)}" style="width:100%;margin-bottom:8px">
+      <div class="card" style="padding:4px 12px">${(r.data || []).length ? r.data.map((x) => `<button class="lk-row" style="width:100%;background:transparent;border:0;border-bottom:1px solid var(--line,#0001);box-shadow:none;color:inherit" data-act="lk_item" data-v="${esc(x.item_id)}"><span><span class="nm">${esc(nm(x))}</span><span class="sub"> ${esc(x.code || '')}</span></span><span class="lk-num">${esc(fmt(x.qty))} ${esc(x.base_unit || '')}</span></button>`).join('') : `<p class="muted center pad">${esc(T('noitems'))}</p>`}</div>`, true);
+    RS.levels = r.data || [];
+  }
+}
+async function viewSupplierLedger() {
+  shell(T('sup_title'), `<p class="muted center pad">${esc(T('loading'))}</p>`, true);
+  const locs = LOCS(), all = allPlaces();
+  if (RS.loc === undefined || (RS.loc !== null && !locs.find((l) => l.id === RS.loc))) RS.loc = all ? null : (locs[0] || {}).id;
+  const nm = A.nm;
+  const head = `<div class="notice ok lk-note">${esc(T('fromforms'))}</div>
+    <div class="row wrap" style="margin-bottom:8px"><select id="lk_loc" aria-label="${esc(T('place'))}" style="flex:1">${all ? `<option value="" ${RS.loc === null ? 'selected' : ''}>${esc(T('allp'))}</option>` : ''}${locs.map((l) => `<option value="${l.id}" ${l.id === RS.loc ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>
+    <button data-act="lk_purpage">${esc(T('purpage'))}</button><button data-act="lk_paper" data-v="06-5">${esc(T('paper'))}</button></div>`;
+  if (RS.sup) {
+    const r = await sb.rpc('supplier_ledger', { p_supplier: RS.sup.supplier_id, p_loc: RS.loc });
+    if (r.error) return fail(r.error);
+    const rows = r.data || [], last = rows.length ? rows[rows.length - 1] : null;
+    shell(T('sup_title'), head + `<div class="row between" style="margin:6px 0"><button data-act="lk_back">${esc(T('back'))}</button><b>${esc(RS.sup.name)}${last ? ' · ' + esc(T('due')) + ' ' + money(last.balance) : ''}</b></div>
+      <div class="card" style="padding:4px 12px">${rows.length ? rows.map((x) => `<div class="lk-row"><div><div class="nm">${esc(lab(X['k_' + x.kind] || L(x.kind, x.kind)))}${x.ref ? ' · ' + esc(x.ref) : ''}</div><div class="sub">${x.kind === 'opening' ? '' : esc(String(x.at || '').slice(0, 10))}${x.note ? ' · ' + esc(String(x.note).slice(0, 60)) : ''}</div></div>
+        <div style="text-align:end"><div class="lk-num ${Number(x.debit) > 0 ? 'lk-neg' : 'lk-pos'}">${Number(x.debit) > 0 ? '+' + money(x.debit) : '−' + money(x.credit)}</div><div class="sub">${esc(T('bal'))} ${money(x.balance)}</div></div></div>`).join('') : `<p class="muted center pad">${esc(T('noledg'))}</p>`}</div>`, true);
+  } else {
+    const r = await sb.rpc('supplier_dues', { p_loc: RS.loc });
+    if (r.error) return fail(r.error);
+    shell(T('sup_title'), head + `<div class="card" style="padding:4px 12px">${(r.data || []).length ? r.data.map((x) => `<button class="lk-row" style="width:100%;background:transparent;border:0;border-bottom:1px solid var(--line,#0001);box-shadow:none;color:inherit" data-act="lk_sup" data-v="${esc(x.supplier_id)}"><span class="nm">${esc(x.name)}</span><span class="lk-num">${money(x.balance)}</span></button>`).join('') : `<p class="muted center pad">${esc(T('nosup'))}</p>`}</div>`, true);
+    RS.dues = r.data || [];
+  }
+}
+
+/* ----- take over #/form/04-4 and #/form/06-5 only while the master switch is on ----- */
+{
+  const orig = (window.BOS_PAGES || {}).form;
+  const leaveWatch = () => { if (RS.paper && !new RegExp('^#/?form/' + RS.paper + '(/|$)').test(location.hash)) RS.paper = null; };
+  window.addEventListener('hashchange', leaveWatch);
+  if (orig) window.BOS_PAGES.form = async function () {
+    const code = location.hash.replace(/^#\/?/, '').split('/')[1];
+    if ((code === '04-4' || code === '06-5') && RS.paper !== code) {
+      try { await loadSwitches(); } catch (e) { LS.master = false; }
+      if (LS.master) { RS.item = null; RS.sup = null; return code === '04-4' ? viewStoreLedger() : viewSupplierLedger(); }
+    }
+    return orig.apply(this, arguments);
+  };
+}
+
+/* ----- #/ledgerlinks: switches + retry list ----- */
+async function viewLinks() {
+  shell(T('title'), `<p class="muted center pad">${esc(T('loading'))}</p>`, true);
+  await loadSwitches();
+  const pr = await sb.rpc('ledger_post_problems', { p_loc: null });
+  const rows = pr.error ? [] : (pr.data || []);
+  const sw = (on, act, v) => `<div class="lk-sw"><button class="tog ${on ? 'on' : ''}" ${isOwner() ? '' : 'disabled'} data-act="${act}" data-v="${v}:1">${esc(T('on'))}</button><button class="tog ${!on ? 'on' : ''}" ${isOwner() ? '' : 'disabled'} data-act="${act}" data-v="${v}:0">${esc(T('off'))}</button></div>`;
+  shell(T('title'), `<div class="card panel"><div class="lk-row"><span><span class="nm">${esc(T('master'))}</span><div class="sub">${esc(T('masterHint'))}</div></span>${sw(LS.master, 'lk_set', 'master')}</div>
+      ${isOwner() ? '' : `<div class="muted lk-note">${esc(T('nonowner'))}</div>`}</div>
+    <div class="hsec">${esc(T('forms'))}</div><div class="card" style="padding:4px 12px">${FORMS5.map(([c, k]) => `<div class="lk-row"><span><span class="nm">${esc(c)}</span> <span class="sub">${esc(T(k))}</span></span>${sw(LS.cfg[c] !== false, 'lk_set', c)}</div>`).join('')}</div>
+    <div class="hsec">${esc(T('problems'))}</div><div class="card" style="padding:4px 12px">${rows.length ? rows.map((x) => `<div class="lk-row"><span><span class="nm">${esc(x.form_code)}-${esc(x.serial)}</span> <span class="sub">${esc(x.entry_date)} · ${Number(x.failed) ? esc(x.failed + ' ' + T('failed')) : ''}${Number(x.failed) && Number(x.skipped) ? ' · ' : ''}${Number(x.skipped) ? esc(x.skipped + ' ' + T('skipped')) : ''}${x.first_reason ? ' · ' + esc(String(x.first_reason).slice(0, 60)) : ''}</span></span>
+      ${Number(x.failed) ? `<button data-act="lk_retry" data-v="${esc(x.entry_id)}">${esc(T('retry'))}</button>` : ''}</div>`).join('') : `<p class="muted center pad">${esc(T('none'))}</p>`}</div>`, true);
+}
+
+Object.assign(A.H, {
+  lk_stock: () => { location.hash = '#/stock'; }, lk_purpage: () => { location.hash = '#/payables'; },
+  lk_paper: (a) => { RS.paper = a.dataset.v; const r = (window.BOS_PAGES || {}).form; if (r) r(); },
+  lk_back: () => { RS.item = null; RS.sup = null; return location.hash.indexOf('06-5') >= 0 ? viewSupplierLedger() : viewStoreLedger(); },
+  lk_item: (a) => { RS.item = (RS.levels || []).find((x) => x.item_id === a.dataset.v) || null; return viewStoreLedger(); },
+  lk_sup: (a) => { RS.sup = (RS.dues || []).find((x) => x.supplier_id === a.dataset.v) || null; return viewSupplierLedger(); },
+  lk_set: async (a) => {
+    if (!isOwner()) return;
+    const [k, v] = a.dataset.v.split(':'), on = v === '1';
+    const r = k === 'master' ? await sb.rpc('set_rule', { p_key: 'forms_post_to_ledger', p_value: on }) : await sb.rpc('forms_ledger_cfg_set', { p_form: k, p_on: on });
+    if (r.error) return fail(r.error); toast(T('saved')); return viewLinks();
+  },
+  lk_retry: async (a) => { const r = await sb.rpc('entry_post_ledger_retry', { p_entry: a.dataset.v }); if (r.error) return fail(r.error); toast(T('retried')); return viewLinks(); },
+});
+document.addEventListener('change', (e) => { if (e.target && e.target.id === 'lk_loc') { RS.loc = e.target.value === '' ? null : Number(e.target.value); RS.item = null; RS.sup = null;
+  if (/form\/06-5/.test(location.hash)) viewSupplierLedger(); else if (/form\/04-4/.test(location.hash)) viewStoreLedger(); } });
+document.addEventListener('input', (e) => { if (e.target && e.target.id === 'lk_q') { RS.q = e.target.value; clearTimeout(RS.tm); RS.tm = setTimeout(viewStoreLedger, 300); } });
+
+window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { ledgerlinks: viewLinks });
+B.reportLinks = B.reportLinks || [];
+B.reportLinks.push({ key: 'ledgerlinks', route: 'ledgerlinks', label: () => T('title'), allowed: null,
+  check: async () => { const l = B.reportLinks.find((x) => x.key === 'ledgerlinks'); if (isOwner()) { l.allowed = true; return; }
+    try { const r = await sb.rpc('ledger_post_problems', { p_loc: null }); l.allowed = !!(r && !r.error && (r.data || []).length > 0); } catch (e) { l.allowed = false; } } });
+}
 })();

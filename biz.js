@@ -17,7 +17,7 @@ B.SETTING_DEFS.push(
   { key: 'anomaly_ratio', group: 'A', label: L('স্টাফ সূচক: সহকর্মীদের মধ্যমার কত গুণ হলে দেখার মতো (যেমন ২)', 'Staff indicators: how many times the peer median counts as worth a look (e.g. 2)'), kind: 'number', unit: '×' });
 
 const X = {
-  title: L('ব্যবসার হিসাব', 'Business analysis', 'ব্যবসার Analysis'), period: L('সময়কাল', 'Period', 'Period'), days: L('দিন', 'days', 'days'),
+  title: L('ব্যবসার হিসাব', 'Business analysis', 'ব্যবসার Analysis'), period: L('সময়কাল', 'Period', 'Period'), fy: L('অর্থবছর (এ পর্যন্ত)', 'Fiscal year to date', 'Fiscal year (এ পর্যন্ত)'), days: L('দিন', 'days', 'days'),
   all: L('সব লোকেশন', 'All locations', 'All Location'), rev: L('বিক্রি (নিট)', 'Sales (net)', 'Sales (Net)'), disc: L('ডিসকাউন্ট', 'Discount', 'Discount'), voids: L('বাতিল সেল', 'Voided sales', 'Void Sale'),
   avg: L('দৈনিক গড় বিক্রি', 'Average daily sales', 'Daily গড় Sales'), cogs: L('পণ্যের ক্রয়মূল্য (COGS)', 'Cost of goods (COGS)', 'COGS (ক্রয়মূল্য)'), gp: L('মোট মুনাফা', 'Gross profit', 'Gross Profit'),
   gm: L('গ্রস মার্জিন', 'Gross margin', 'Gross Margin'), mk: L('মার্কআপ', 'Markup', 'Markup'),
@@ -53,6 +53,7 @@ async function viewBiz() {
   await B.loadStatic();
   const all = B.ENV.locs;
   P.locs = S.ctx.is_owner || S.ctx.roles.includes('management') ? all : all.filter((l) => S.ctx.locations.includes(l.id));
+  { const cl = B.curLoc ? B.curLoc() : null; P.loc = cl === null ? '' : String(cl); }      // the drawer's location switcher decides where the page opens
   if (P.loc && !P.locs.find((l) => String(l.id) === String(P.loc))) P.loc = '';
   if (!P.loc && P.locs.length === 1) P.loc = String(P.locs[0].id);
   draw();
@@ -62,9 +63,9 @@ async function draw() {
   const tok = ++drawTok; P.cache = null;
   shell(T('title'), `<div class="row wrap" style="margin-bottom:8px">
       <select id="bz_loc" style="flex:1"><option value="">${esc(T('all'))}</option>${P.locs.map((l) => `<option value="${l.id}" ${String(l.id) === String(P.loc) ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select></div>
-    <div class="row wrap" style="margin-bottom:10px"><span class="muted">${esc(T('period'))}:</span>${[7, 14, 30, 90].map((d) => `<button class="tog ${P.days === d ? 'on' : ''}" data-act="bz_days" data-v="${d}">${d} ${esc(T('days'))}</button>`).join('')}</div>
+    <div class="row wrap" style="margin-bottom:10px"><span class="muted">${esc(T('period'))}:</span>${[7, 14, 30, 90].map((d) => `<button class="tog ${P.days === d ? 'on' : ''}" data-act="bz_days" data-v="${d}">${d} ${esc(T('days'))}</button>`).join('')}<button class="tog ${P.days === 'fy' ? 'on' : ''}" data-act="bz_days" data-v="fy">${esc(T('fy'))}</button></div>
     <div id="bz_body"><p class="muted">${esc(t('loading'))}</p></div>`, true);
-  const td = dhaka(), from = addDays(td, -(P.days - 1)), loc = P.loc ? Number(P.loc) : null;
+  const td = dhaka(), from = P.days === 'fy' ? (B.fyStart ? B.fyStart(td) : td.slice(0, 4) + '-01-01') : addDays(td, -(P.days - 1)), loc = P.loc ? Number(P.loc) : null;
   const q = (p) => p.then((r) => r, (e) => ({ data: null, error: e }));
   const [dly, itm, stf] = await Promise.all([
     q(sb.rpc('biz_daily', { p_from: from, p_to: td, p_loc: loc })), q(sb.rpc('biz_items', { p_from: from, p_to: td, p_loc: loc })), q(sb.rpc('biz_staff', { p_from: from, p_to: td, p_loc: loc }))]);
@@ -147,7 +148,7 @@ function sugHTML(s) {
 }
 
 Object.assign(A.H, {
-  bz_days: (a) => { P.days = Number(a.dataset.v); draw(); },
+  bz_days: (a) => { P.days = a.dataset.v === 'fy' ? 'fy' : Number(a.dataset.v); draw(); },
   bz_apply: async (a) => {
     const loc = Number(P.loc); if (!loc) return;
     const { error } = await sb.from('location_settings').upsert({ location_id: loc, key: a.dataset.k, value: Number(a.dataset.v) }, { onConflict: 'location_id,key' });

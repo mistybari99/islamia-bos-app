@@ -484,7 +484,7 @@ const BACKUP_TABLES = ['profiles', 'roles', 'user_roles', 'locations', 'user_loc
   'settings', 'audit_log', 'corrections', 'location_settings', 'entries', 'exceptions', 'release_requests', 'emergency_requests', 'rules', 'rule_grants', 'grant_defs', 'user_grants',
   'option_lists', 'customers', 'suppliers', 'sales', 'sale_payments', 'stock_ledger', 'stock_balance', 'stock_batches', 'stock_transfers', 'stock_wastage', 'purchase_bills', 'purchase_lines',
   'supplier_payments', 'unit_conversions', 'shelf_life_rules', 'invoice_templates', 'print_profiles', 'report_brand_map', 'role_favourites', 'login_failures', 'login_attempts', 'wastage_requests', 'supplier_refunds', 'sale_returns',
-  'location_setup_steps', 'settings_sheets', 'settings_values', 'list_defs', 'option_requests', 'list_other_entries', 'list_managers', 'item_types', 'item_class_map', 'item_import_batches', 'item_mapping_review', 'item_master_links', 'assets', 'asset_costs', 'form_rollout', 'entry_change_requests', 'entry_revisions'];
+  'location_setup_steps', 'settings_sheets', 'settings_values', 'list_defs', 'option_requests', 'list_other_entries', 'list_managers', 'item_types', 'item_class_map', 'item_import_batches', 'item_mapping_review', 'item_master_links', 'assets', 'asset_costs', 'form_rollout', 'entry_change_requests', 'entry_revisions', 'entry_counts', 'entry_count_peeks', 'entry_signatures', 'blind_count_cfg', 'pin_sig_cfg', 'recipes', 'recipe_lines', 'product_packaging', 'production_runs', 'forms_ledger_cfg', 'entry_ledger_posts'];
 function viewBackup() {
   shell(t('backup'), `<div class="card stack"><p>${esc(t('backup_text'))}</p>
     <button class="primary full" data-act="bk_all">${esc(t('backup_all'))}</button>

@@ -381,7 +381,7 @@ async function openAction(kind, preset) {
   else if (kind === 'issue') body = head('a_issue') + `<div class="stack">${locSel('a_loc', T('location'), loc, locs)}${itemFld(items, 'a_item', pit)}<div class="row"><div style="flex:1"><label for="a_qty">${esc(T('qty'))}</label><input id="a_qty" inputmode="decimal"></div><div style="flex:1">${unitSel('a_unit')}</div></div>${note(false)}</div>${foot('s2_go_issue')}`;
   else if (kind === 'prod') {
     const now = new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Dhaka' }).replace(' ', 'T').slice(0, 16);
-    body = head('a_prod') + `<div class="stack">${locSel('a_loc', T('location'), loc, locs)}${itemFld(items, 'a_item', pit)}<div class="row"><div style="flex:1"><label for="a_qty">${esc(T('qty'))}</label><input id="a_qty" inputmode="decimal"></div><div style="flex:1">${unitSel('a_unit')}</div></div>
+    body = head('a_prod') + (B.recipes ? B.recipes.prodButton() : '') + `<div class="stack">${locSel('a_loc', T('location'), loc, locs)}${itemFld(items, 'a_item', pit)}<div class="row"><div style="flex:1"><label for="a_qty">${esc(T('qty'))}</label><input id="a_qty" inputmode="decimal"></div><div style="flex:1">${unitSel('a_unit')}</div></div>
       <div><label for="a_made">${esc(T('madeAt'))}</label><input id="a_made" type="datetime-local" value="${now}"></div>${cost}${note(false)}</div>${foot('s2_go_prod')}`;
   } else if (kind === 'xfer') {
     const others = ((B.ENV && B.ENV.locs) || []);

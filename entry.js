@@ -145,19 +145,20 @@ let E = null;
 const FIELD_ID = (() => { let n = 0; return () => 'x' + (n++); })();
 
 function ctxFor() {
-  return { d: E.data, c: E.check, s: E.settings, env: ENV, v: (E.calc && E.calc.v) || {}, cf: !!E.formRow.count_first, num, has, sum, den: (k) => denTotal(getp(E.data, k)), denC: (k) => denTotal(getp(E.check, k)),
+  return { d: E.data, c: E.check, s: E.settings, env: ENV, v: (E.calc && E.calc.v) || {}, cf: !!E.formRow.count_first, num, has, sum, pin: !!(E.pin && E.pin.on), den: (k) => denTotal(getp(E.data, k)), denC: (k) => denTotal(getp(E.check, k)),
     rows: (id) => (E.data[id] || []).map((r) => r || {}), rowsC: (id) => (E.check[id] || []).map((r) => r || {}), me: S.ctx.profile.staff_id, date: E.date, loc: E.loc, wd: weekday(E.date),
     L, lab, money, needs: [] };
 }
 function recompute() {
   const x = ctxFor(); const out = E.spec.calc ? E.spec.calc(x) : {};
   E.calc = { v: out.v || {}, rows: out.rows || {}, flags: out.flags || [], needs: [...new Set([...(out.needs || [])])] };
+  blindMask();
 }
 function flagsOf(src) { return E.calc.flags.filter((f) => (src === 'check' ? f.src === 'check' : f.src !== 'check')); }
 
 // ---------- rendering ----------
 const isEd = () => E.mode === 'edit' || E.mode === 'change';    // 'change' = a locked entry opened to ask for a change (W5)
-const modeEditable = (fd) => (isEd() && (fd.who || 'maker') === 'maker') || (E.mode === 'check' && fd.who === 'checker');
+const modeEditable = (fd) => !(E.blind && E.blind.saved && fd.id === BLIND_FIELD[E.code]) && (isEd() && (fd.who || 'maker') === 'maker') || (E.mode === 'check' && fd.who === 'checker');
 const curVal = (fd, path, w) => getp(w === 'c' ? E.check : E.data, path);
 const optsOf = (fd) => (typeof fd.options === 'function' ? fd.options() : fd.options);
 function optsHTML(options, cur, code) { if (cur && String(cur).startsWith('other:') && !options.some((o) => o[0] === cur)) options = [...options, [cur, { bn: 'অন্যান্য: ' + String(cur).slice(6), en: 'Other: ' + String(cur).slice(6) }]]; if (cur && code && !options.some((o) => o[0] === cur)) { const old = ((ENV.lists && ENV.lists[code]) || []).find((x) => x.value_code === cur); if (old) options = [...options, [old.value_code, rowL(old)]]; } return options.map(([v, l]) => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(lab(l))}</option>`).join(''); }
@@ -224,9 +225,10 @@ function tableHTML(fd, wrapAttrs) {
 function sectionHTML(sec, idx) {
   const ed = (f) => modeEditable(f);
   const sid = FIELD_ID(); if (sec.show) E.shows[sid] = sec.show;
-  const inner = sec.fields.map((f) => fieldHTML(f, f.id, f.who === 'checker' ? 'c' : 'd', ed(f), wrap(f))).join('');
   const checker = sec.who === 'checker';
-  const body = `<div class="secbody">${inner}</div>`;
+  if (blindPending() && E.code === '10-1' && !checker) return `<section class="card panel sec" data-sid="${sid}"><h3>${esc(lab(sec.title))}</h3><div class="notice warn" id="blind_hidden">${esc(lab(X18.hub_hidden))}</div></section>`;
+  const inner = sec.fields.map((f) => fieldHTML(f, f.id, f.who === 'checker' ? 'c' : 'd', ed(f), wrap(f))).join('');
+  const body = `<div class="secbody">${inner}${blindBoxHTML(sec)}</div>`;
   return `<section class="card panel sec ${checker ? 'checker' : ''}" data-sid="${sid}">
     ${sec.collapsed ? `<details ${E.openSecs.has(idx) ? 'open' : ''} data-sec="${idx}"><summary>${esc(lab(sec.title))}</summary>${body}</details>`
       : `<h3>${esc(lab(sec.title))}${checker ? ` <span class="chip warn">${esc(t('checker_part'))}</span>` : ''}</h3>${body}`}</section>`;
@@ -390,6 +392,118 @@ async function loadPendingChange() {
   if (!E.id || E.status !== 'approved') return;
   try { const r = await sb.from('entry_change_requests').select('id').eq('entry_id', E.id).eq('status', 'pending').limit(1); E.chgPending = !!(r && !r.error && r.data && r.data.length); } catch (e) { /* ignore */ }
 }
+
+// ---------- W5b: server-side blind count (14-1 drawer, 10-1 hub) and PIN signatures (supabase/phase18.sql) ----------
+// Rule 9: the person counts first; the expected figure is hidden until the count is saved on the server (count_save) and only then shown.
+// Rule 10: a second signature is another login with its own PIN (web/pinsign.js signs that person in on a throw-away client).
+// Both are OFF until the owner switches them on (rules blind_count_on, pin_signature_on). If phase18 is not installed every RPC fails and the old screen stays.
+const X18 = {
+  blind_t: L('গণনা — আগে গুনুন, তারপর সেভ', 'Count first, then save', 'Count — আগে গুনুন, তারপর save'),
+  blind_hint: L('গণনা সেভ করার পরেই প্রত্যাশিত অঙ্ক ও কম/বেশি দেখা যাবে। সেভ করলে গণনা আর বদলানো যায় না।', 'The expected figure and the short/over appear only after you save the count. A saved count cannot be changed.', 'Count save করার পরেই expected ও কম/বেশি দেখা যাবে। Save করলে count আর বদলানো যায় না।'),
+  save_count: L('গণনা সেভ করুন', 'Save count', 'Count save করুন'), peek: L('আগে প্রত্যাশিত দেখুন (লগ হবে)', 'Show expected first (logged)', 'আগে expected দেখুন (log হবে)'),
+  need_count: L('আগে নোট ধরে গণনা লিখুন', 'Enter the count by notes first', 'আগে note ধরে count লিখুন'), need_net: L('গণনা সেভ করতে নেট লাগবে', 'Saving the count needs a connection', 'Count save করতে net লাগবে'),
+  later: L('প্রত্যাশিত অঙ্ক ও কম/বেশি জমা দেওয়ার পর যাচাইকারীর কাছে দেখা যাবে', 'The expected figure and the short/over are shown to the approver after you submit', 'Expected ও কম/বেশি submit করার পর approver দেখবেন'),
+  saved_t: L('গণনা সেভ হয়েছে', 'Count saved', 'Count save হয়েছে'), counted: L('গণনায় প্রাপ্ত', 'Counted', 'Count'), expected: L('প্রত্যাশিত', 'Expected', 'Expected'),
+  so: L('কম / বেশি', 'Short / over', 'কম / বেশি'), matches: L('মিলেছে', 'matches', 'মিলেছে'), seen_early: L('প্রত্যাশিত অঙ্ক গণনার আগে দেখা হয়েছিল', 'The expected figure was seen before the count', 'Expected count-এর আগে দেখা হয়েছিল'),
+  hub_hidden: L('লেখকের গণনা ও হ্যান্ডওভার অঙ্ক আপনার গণনা সেভ হওয়া পর্যন্ত লুকানো', "The sender's count and handover amount stay hidden until your count is saved", 'Sender-এর count ও handover আপনার count save হওয়া পর্যন্ত লুকানো'),
+  pin_t: L('স্বাক্ষর — অন্য লগইন, নিজের পিন', 'Signatures - another login, own PIN', 'Signature — অন্য login, নিজের PIN'),
+  pin_hint: L('দ্বিতীয় স্বাক্ষরকারী এই ফোনেই নিজের স্টাফ আইডি ও পিন দিয়ে স্বাক্ষর করবেন। লেখক নিজে স্বাক্ষর করতে পারবেন না।', 'The second person signs on this phone with their own staff ID and PIN. The writer cannot sign.', 'দ্বিতীয় signer এই phone-এই নিজের staff ID ও PIN দিয়ে sign করবেন। লেখক নিজে sign করতে পারবেন না।'),
+  r_witness: L('সাক্ষী (দ্বিতীয়বার গণনা)', 'Witness (second count)', 'Witness (দ্বিতীয়বার count)'), r_second_sig: L('দ্বিতীয় স্বাক্ষর', 'Second signature', 'দ্বিতীয় signature'), r_hub_pair: L('হাব জোড়া — দ্বিতীয় জন', 'Hub pair - second person', 'Hub pair — দ্বিতীয় জন'),
+  sign: L('পিন দিয়ে স্বাক্ষর', 'Sign with PIN', 'PIN দিয়ে sign'), signed_by: L('স্বাক্ষর করেছেন', 'Signed by', 'Sign করেছেন'), notsigned: L('এখনও স্বাক্ষর হয়নি', 'Not signed yet', 'এখনও sign হয়নি'),
+  e_count_already_saved: L('এই গণনা আগেই সেভ হয়েছে — বদলানো যায় না', 'This count is already saved - it cannot change', 'এই count আগেই save হয়েছে — বদলানো যায় না'),
+  e_count_locked: L('সেভ করা গণনা এন্ট্রিতে বদলানো যায় না', 'The saved count cannot be changed in the entry', 'Save করা count entry-তে বদলানো যায় না'),
+  e_count_mismatch: L('লেখা গণনা আর সেভ করা গণনা মিলছে না', 'The typed count differs from the count being saved', 'লেখা count আর save করা count মিলছে না'),
+  e_count_not_open: L('এখন এই গণনা নেওয়ার সময় নয়', 'This count cannot be taken at this stage', 'এখন এই count নেওয়ার সময় নয়'),
+  e_bad_count: L('গণনার অঙ্ক ঠিক নয়', 'The count figures are not valid', 'Count-এর অঙ্ক ঠিক নয়'),
+  e_signer_is_maker: L('লেখক নিজে স্বাক্ষর করতে পারবেন না', 'The writer cannot sign', 'লেখক নিজে sign করতে পারবেন না'),
+  e_signer_already_signed: L('এই লগইন এই ফর্মে আগেই স্বাক্ষর করেছে', 'This login already signed this form', 'এই login এই form-এ আগেই sign করেছে'),
+  e_role_already_signed: L('এই স্বাক্ষর আগেই হয়ে গেছে', 'This signature is already done', 'এই signature আগেই হয়ে গেছে'),
+  e_signer_locked: L('এই লগইন ভুল পিনে তালাবদ্ধ — কিছুক্ষণ পরে', 'This login is locked after wrong PINs - try later', 'এই login ভুল PIN-এ locked — কিছুক্ষণ পরে'),
+  e_pin_signature_required: L('পিন স্বাক্ষর বাকি আছে', 'A PIN signature is still missing', 'PIN signature বাকি আছে'),
+  e_signature_mismatch: L('ফর্মের নাম আর স্বাক্ষরকারী মিলছে না', 'The name on the form does not match the signer', 'Form-এর নাম আর signer মিলছে না'),
+  e_count_missing: L('আগে নোট ধরে গণনা এন্ট্রিতে লিখে সেভ করুন', 'Type the count in the sheet and save it first', 'আগে count sheet-এ লিখে save করুন'),
+  e_count_draft_limit: L('আজ এই লোকেশনে আপনার একটি গণনা-করা খসড়া আগেই আছে — সেটা জমা দিন', 'You already have a counted draft here today - submit it first', 'আজ এই location-এ আপনার একটি counted draft আছে — আগে সেটা submit করুন'),
+  e_login_not_fresh: L('স্বাক্ষরকারীকে এখনই আবার পিন দিয়ে ঢুকতে হবে', 'The signer must sign in again just now', 'Signer-কে এখনই আবার PIN দিয়ে ঢুকতে হবে'),
+  e_pin_signature_stale: L('স্বাক্ষরের পর শিট বদলেছে — আবার স্বাক্ষর করান', 'The sheet changed after the signature - sign again', 'Signature-এর পর sheet বদলেছে — আবার sign করান'),
+  e_pin_signature_off: L('পিন স্বাক্ষর এখন বন্ধ আছে', 'PIN signature is switched off', 'PIN signature এখন off'),
+};
+Object.assign(X17, X18);
+const BLIND_SEC = { '14-1': 'drawer', '10-1': 'hub' };
+const BLIND_FIELD = { '14-1': 'cash_count', '10-1': 'rcount' };
+const BLIND_HIDE = { '14-1': ['expected', 'short_over'], '10-1': ['counted_total', 'handover', 'diff'] };
+const BLIND_V = { '14-1': ['expected', 'short_over', 'so_nonzero'], '10-1': ['counted_total', 'handover', 'diff', 'diff_nonzero'] };
+const BLIND_FLAG = { '14-1': 'cash_short_over', '10-1': 'hub_diff' };
+const PIN_ROLES = { '14-1': ['witness', 'second_sig'], '10-1': ['hub_pair'] };
+const blindStage = () => !!E && ((E.code === '14-1' && E.mode === 'edit') || (E.code === '10-1' && E.mode === 'check'));
+const blindRevealed = () => !!(E.blind.peeked || (E.blind.saved && E.blind.res && E.blind.res.expected !== undefined));    // the maker's own count_save answer carries no figures (server side blind)
+const blindPending = () => !!(E && E.blind && E.blind.on && blindStage() && !blindRevealed());
+function blindMask() {
+  if (!blindPending()) return;
+  BLIND_V[E.code].forEach((k) => { delete E.calc.v[k]; });
+  E.calc.flags = E.calc.flags.filter((f) => f.code !== BLIND_FLAG[E.code]);
+}
+async function loadW5b() {
+  E.blind = null; E.pin = null;
+  if (!BLIND_SEC[E.code]) return;
+  try {
+    const [b, p] = await Promise.all([sb.rpc('blind_active', { p_form: E.code, p_loc: E.loc }), sb.rpc('pin_sig_active', { p_form: E.code })]);
+    const bon = !b.error && b.data === true, pon = !p.error && p.data === true;
+    if (bon) {
+      E.blind = { on: true, saved: false, res: null, peeked: false, canPeek: false };
+      if (E.id) { const g = await sb.rpc('count_get', { p_entry: E.id, p_section: BLIND_SEC[E.code] }); if (!g.error && g.data && g.data.saved) { E.blind.saved = true; E.blind.res = g.data; } }
+      E.blind.canPeek = S.ctx.is_owner ? B.rule('owner_sees_expected_first', true) !== false : await A.hasAnyGrant(['see_expected']);
+    }
+    if (pon) {
+      E.pin = { on: true, sigs: {} };
+      if (E.id) { const s = await sb.from('entry_signatures').select('role,signer_staff').eq('entry_id', E.id); (s.data || []).forEach((r) => { E.pin.sigs[r.role] = r.signer_staff; }); }
+    }
+  } catch (e) { E.blind = null; E.pin = null; }
+}
+function blindBoxHTML(sec) {
+  if (!E.blind || !E.blind.on || !blindStage() || !sec.fields.some((f) => f.id === BLIND_FIELD[E.code])) return '';
+  const b = E.blind;
+  if (b.saved && b.res && b.res.expected === undefined) return `<div class="notice ok" id="blindbox"><b>${esc(lab(X18.saved_t))}</b> · ${esc(lab(X18.counted))}: ${esc(money(b.res.counted))}<div class="muted" style="font-size:.85rem" id="blind_later">${esc(lab(X18.later))}</div></div>`;
+  if (b.saved && b.res) {
+    const r = b.res, d = Number(r.diff);
+    return `<div class="notice ${d === 0 ? 'ok' : 'warn'}" id="blindbox"><b>${esc(lab(X18.saved_t))}</b><div>${esc(lab(X18.counted))}: ${esc(money(r.counted))} · ${esc(lab(X18.expected))}: ${esc(money(r.expected))}</div>
+      <div class="calc big ${d < 0 ? 'neg' : ''}" id="blind_diff">${esc(lab(X18.so))}: ${esc(d === 0 ? '0 (' + lab(X18.matches) + ')' : money(d))}</div>${r.seen_before_count ? `<div class="muted" style="font-size:.85rem">${esc(lab(X18.seen_early))}</div>` : ''}</div>`;
+  }
+  if (b.peeked) return `<div class="notice warn" id="blindbox">${esc(lab(X18.expected))}: ${esc(money(b.peekExpected))} · ${esc(lab(X18.seen_early))}</div><button class="primary full" data-act="e_count_save" id="blind_save">${esc(lab(X18.save_count))}</button>`;
+  return `<div class="notice warn" id="blindbox">${esc(lab(X18.blind_hint))}</div><button class="primary full" data-act="e_count_save" id="blind_save">${esc(lab(X18.save_count))}</button>${b.canPeek ? `<button class="full" data-act="e_count_peek" id="blind_peek" style="margin-top:6px">${esc(lab(X18.peek))}</button>` : ''}`;
+}
+async function countSave() {
+  if (!E || !E.blind || !blindStage()) return;
+  const sec = BLIND_SEC[E.code], obj = sec === 'drawer' ? getp(E.data, 'cash_count') : getp(E.check, 'rcount');
+  if (!obj || denTotal(obj) <= 0) return toast(lab(X18.need_count));
+  if (sec === 'drawer' && (E.dirty || !E.id || E.queued)) { const ok = await saveDraft(); if (!ok) return; }
+  const { data, error } = await sb.rpc('count_save', { p_entry: E.id, p_section: sec, p_counted: obj });
+  if (error) { if (isNet(error)) return toast(lab(X18.need_net)); return fail17(error); }
+  E.blind.saved = true; E.blind.res = { ...data, seen_before_count: E.blind.peeked };
+  toast(lab(X18.saved_t)); const sc = window.scrollY; draw(); window.scrollTo(0, sc);
+}
+async function countPeek() {
+  if (!E || !E.blind || !blindStage()) return;
+  if (!E.id || E.dirty || E.queued) { const ok = await saveDraft(); if (!ok) return; }
+  const { data, error } = await sb.rpc('count_peek', { p_entry: E.id, p_section: BLIND_SEC[E.code] });
+  if (error) return fail17(error);
+  E.blind.peeked = true; E.blind.peekExpected = data.expected;
+  const sc = window.scrollY; draw(); window.scrollTo(0, sc);
+}
+function pinBoxHTML() {
+  if (!E.pin || !E.pin.on || !PIN_ROLES[E.code]) return '';
+  const rows = PIN_ROLES[E.code].map((r) => { const who = E.pin.sigs[r];
+    return `<div class="row between" data-pinrole="${r}"><span>${esc(lab(X18['r_' + r]))}</span>${who ? `<span class="chip ok">${esc(lab(X18.signed_by))}: ${esc(staffName(who))}</span>` : E.mode === 'edit' ? `<button data-act="e_pin_sign" data-v="${r}">${esc(lab(X18.sign))}</button>` : `<span class="chip warn">${esc(lab(X18.notsigned))}</span>`}</div>`; }).join('');
+  return `<div class="notice" id="pinbox" style="margin-top:10px"><b>${esc(lab(X18.pin_t))}</b><div class="muted" style="font-size:.85rem">${esc(lab(X18.pin_hint))}</div><div class="stack" style="margin-top:6px">${rows}</div></div>`;
+}
+async function pinSignClick(role) {
+  if (!E || !E.pin || !E.pin.on || E.mode !== 'edit') return;
+  if (!E.id || E.dirty || E.queued) { const ok = await saveDraft(); if (!ok) return; }
+  if (!B.pinSign) return;
+  B.pinSign({ entryId: E.id, role, exclude: Object.values(E.pin.sigs), onDone: async (staff) => {
+    E.pin.sigs[role] = staff;
+    if (role === 'witness') E.data.witness = staff; else if (role === 'second_sig') E.data.second_sig = staff; else E.data.pair_by = staff;
+    E.dirty = true; await saveDraft(); const sc = window.scrollY; draw(); window.scrollTo(0, sc); } });
+}
 function draw() {
   B.curDate = E.date;
   E.shows = {}; E.rshows = {}; recompute();
@@ -406,7 +520,7 @@ function draw() {
       <span class="chip">${esc(wdv)}</span>${tag ? `<span class="chip warn">${esc(t('tag'))}: ${esc(tag)}</span>` : ''}</div>
       ${E.checked_staff ? `<div class="muted" style="font-size:.85rem;margin-top:6px">${esc(t('checked_by'))}: ${esc(staffName(E.checked_staff))}${E.check_note ? ' · ' + esc(E.check_note) : ''}</div>` : ''}
       ${rolloutHTML()}${laterHTML()}${E.mode === 'change' ? `<div class="notice warn" style="margin-top:8px">${esc(t17('chg_hint'))}</div>` : ''}
-      ${head ? `<div class="stack" style="margin-top:10px">${head}</div>` : ''}</div>
+      ${head ? `<div class="stack" style="margin-top:10px">${head}</div>` : ''}${pinBoxHTML()}</div>
     <div id="flagsbox">${flagsHTML()}</div>
     ${spec.sections.map(sectionHTML).join('')}</div>${actionsHTML()}`, 'form/' + E.code);
   refresh(); hydratePhotos();
@@ -429,6 +543,7 @@ function refresh() {
   });
   Object.entries(E.shows).forEach(([id, fn]) => { const el = document.querySelector(`[data-sid="${id}"]`); if (el) el.hidden = !fn(x); });
   Object.entries(E.rshows).forEach(([id, [fn, tid, i]]) => { const el = document.querySelector(`[data-rsid="${id}"]`); if (el) el.hidden = !fn({ ...x, row: (E.data[tid] || [])[i] || {}, rowC: (E.check[tid] || [])[i] || {} }); });
+  if (blindPending()) document.querySelectorAll('[data-calc]').forEach((el) => { if (BLIND_HIDE[E.code].includes(el.dataset.calc)) { const w = el.closest('.fld'); if (w) w.hidden = true; } });
   const fb = $('#flagsbox'); if (fb) fb.innerHTML = flagsHTML();
 }
 
@@ -505,6 +620,7 @@ function missingRequired() {
       } else if ((E.mode === 'check') === ((f.who || sec.who) === 'checker')) check(f, f.who === 'checker' || sec.who === 'checker' ? E.check : E.data, f.id, x);
     });
   });
+  if (E.pin && E.pin.on && E.mode === 'edit') (PIN_ROLES[E.code] || []).forEach((r) => { if (!E.pin.sigs[r]) miss.push(lab(X18['r_' + r]) + ' — ' + lab(X18.notsigned)); });
   return miss;
 }
 
@@ -533,7 +649,7 @@ async function submit() {
   if (E.queued) { const it = qfind(qkey()); if (it && !qput({ ...it, submit: true })) return queueFailSheet(); toast(t17('queued_submit')); return draw(); }
   const { error } = await callSubmit(E.id);
   if (error && isNet(error)) { if (!queueSubmit(E.id)) return queueFailSheet(); toast(t17('queued_submit')); return draw(); }
-  if (error) { if (/red_blocked/.test(error.message)) return releaseSheet(); return fail17(error); }
+  if (error) { if (/red_blocked/.test(error.message)) return releaseSheet(); if (/pin_signature_stale/.test(error.message) && E.pin) { E.pin.sigs = {}; fail17(error); return draw(); } return fail17(error); }
   toast(t('submitted_ok')); await reloadEntry(E.id);
 }
 async function loadReleases() {
@@ -579,7 +695,7 @@ async function startNew(code, loc) {
   E = { code, spec, formRow: fr.data, loc, date: today(), status: 'draft', mode: 'edit', data: {}, check: {}, flags: [], settings, serial: null, id: null, dirty: false, created_by: S.ctx.profile.id, openSecs: new Set(), releases: {}, cid: rid(), later: false, ps: '', pat: '', rev: 1 };
   try { const tmp = JSON.parse(store.get('bos_tmp_' + code + '_' + loc) || 'null'); if (tmp && ((tmp.d && Object.keys(tmp.d).length) || tmp.cid)) { E.data = tmp.d || {}; E.date = tmp.date || E.date; E.dirty = true; if (tmp.cid) E.cid = tmp.cid; E.later = !!tmp.later; E.ps = tmp.ps || ''; E.pat = tmp.pat || ''; toast(t('restored')); } } catch (e) { /* ignore */ }
   E.queued = !!qfind('c:' + E.cid);
-  await loadRollout();
+  await loadRollout(); await loadW5b();
   if (spec.init) spec.init(ctxFor(), E.data);
   if (E.rmode === 'paper' && laterOn() && !E.later) { E.later = true; E.pat = dhakaNow(); E.date = E.pat.slice(0, 10); }   // Paper here: the only way in is “entered later from paper”
   draw();
@@ -598,7 +714,7 @@ async function reloadEntry(id) {
     created_by: e.created_by, checked_staff: e.checked_staff, check_note: e.check_note, openSecs: keep, releases: {},
     later: !!e.entered_later, hadLater: !!e.entered_later, ps: e.paper_serial || '', pat: toDhaka(e.paper_at), rev: e.rev_no || 1, cid: e.client_id || null };
   E.queued = !!qfind('e:' + e.id);
-  await Promise.all([loadReleases(), loadRollout(), loadPendingChange()]); draw();
+  await Promise.all([loadReleases(), loadRollout(), loadPendingChange(), loadW5b()]); draw();
 }
 
 // ---------- form list ----------
@@ -740,6 +856,9 @@ Object.assign(A.H, {
   e_reopen_m: () => { closeSheet(); askNote(t('reopen'), (n) => reopen(n)); },
   e_to_outbox: () => { closeSheet(); location.hash = '#/outbox'; },
   e_save: () => saveDraft(),
+  e_count_save: () => countSave(),
+  e_count_peek: () => countPeek(),
+  e_pin_sign: (a) => pinSignClick(a.dataset.v),
   e_submit: submit,
   e_approve: () => decide(true),
   e_reject: () => askNote(t('reject'), (n) => decide(false, n)),

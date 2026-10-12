@@ -267,7 +267,7 @@ B.forms['14-1'] = {
       CALC('expected', L('প্রত্যাশিত ড্রয়ার ব্যালেন্স', 'Expected drawer balance'), 'money', { show: (x) => !x.cf || x.den('cash_count') > 0 }),
       CALC('short_over', L('কম / বেশি (গণনা − প্রত্যাশিত)', 'Short / over (count − expected)'), 'money', { big: true, show: (x) => !x.cf || x.den('cash_count') > 0 }),
       TA('so_reason', L('কম/বেশির কারণ (শূন্য হলেও যাচাই)', 'Reason for short/over'), { show: (x) => x.v.so_nonzero, req: (x) => x.v.so_nonzero }),
-      ST('witness', L('দ্বিতীয়বার গণনা — সাক্ষী', 'Second count — witness'), { req: true }), M('second_count', L('সাক্ষীর গণনায় প্রাপ্ত', "Witness's counted total"), { req: true }),
+      ST('witness', L('দ্বিতীয়বার গণনা — সাক্ষী', 'Second count — witness'), { req: (x) => !x.pin, show: (x) => !x.pin }), M('second_count', L('সাক্ষীর গণনায় প্রাপ্ত', "Witness's counted total"), { req: true }),
       M('leave_float', L('পরদিনের জন্য রেখে যাওয়া খুচরা', 'Float left for tomorrow'), { req: true }),
       CALC('hub_deposit', L('হাবে জমা = গণনায় প্রাপ্ত − রেখে যাওয়া', 'Hub deposit = counted − float left'), 'money', { big: true }),
       T('slip_no', L('ক্যাশ হ্যান্ডওভার স্লিপ নং', 'Cash handover slip no.')), CK('counterfoil', L('কাউন্টারফয়েল বইয়ে আছে', 'Counterfoil is in the book')), T('carrier', L('বহনকারী', 'Carrier')), TM('carry_time', L('সময়', 'Time'))] },
@@ -287,7 +287,7 @@ B.forms['14-1'] = {
     { collapsed: true, title: L('ঝ · গরমিল, ঘটনা ও মেরামত', 'I · Exceptions, incidents & repairs'), fields: [
       TABLE('incidents', null, [T('what', L('ঘটনা বা মেরামতের অনুরোধ', 'Incident or repair request'), { wide: true }), CH('urgency', L('ধরন', 'Type'), [['urgent', L('জরুরি', 'Urgent')], ['routine', L('রুটিন', 'Routine')]]), T('why', L('কারণ', 'Reason')), T('owner', L('দায়িত্বে', 'Responsible')), T('action', L('গৃহীত ব্যবস্থা', 'Action taken'), { wide: true }), CK('solved', L('সমাধান', 'Solved'))], { min: 1 }),
       CK('no_incident', L('কোনো ঘটনা না ঘটলে এখানে টিক', 'Tick if nothing happened'))] },
-    { title: L('স্বাক্ষর', 'Signatures'), fields: [ST('second_sig', L('দ্বিতীয় স্বাক্ষর — ব্যাকআপ ম্যানেজার / সাক্ষী', 'Second signature — backup manager / witness'), { req: true })] },
+    { title: L('স্বাক্ষর', 'Signatures'), fields: [ST('second_sig', L('দ্বিতীয় স্বাক্ষর — ব্যাকআপ ম্যানেজার / সাক্ষী', 'Second signature — backup manager / witness'), { req: (x) => !x.pin, show: (x) => !x.pin })] },
     { who: 'checker', title: L('হাবে গ্রহণ (হাব পূরণ করবে)', 'Received at the hub (hub fills)'), fields: [
       T('hub_ledger', L('ক্যাশ ও ব্যাংক লেজারের তারিখ ও লাইন নং', 'Cash & bank ledger date and line no.'), { who: 'checker', req: true }), TM('hub_time', L('সময়', 'Time'), { who: 'checker' }), CK('hub_received', L('হাবে ক্যাশ ও শিট গ্রহণ করা হয়েছে', 'Cash and sheet received at the hub'), { who: 'checker', req: true })] },
   ],

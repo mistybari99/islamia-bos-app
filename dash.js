@@ -56,11 +56,12 @@ async function render() {
   ]);
   const reds = (ex.data || []).filter((x) => x.level === 'red').length, yel = (ex.data || []).filter((x) => x.level === 'yellow').length;
   const mineToApprove = (sub.data || []).filter((e) => owner || (perms[e.form_code] && perms[e.form_code].approve)).length;
-  const sd = (sales.data || []).map((r) => ({ ...r, total: Number(r.total || 0), discount: Number(r.discount || 0), n: Number(r.n || 0), due: Number(r.due || 0) }));
+  const curL = B.curLoc ? B.curLoc() : null;      // the drawer's location switcher (null = all my places)
+  const sd = (sales.data || []).filter((r) => curL === null || r.location_id === curL).map((r) => ({ ...r, total: Number(r.total || 0), discount: Number(r.discount || 0), n: Number(r.n || 0), due: Number(r.due || 0) }));
   const sToday = sd.filter((s) => s.sale_date === td && s.status === 'done'), voids = sd.filter((s) => s.sale_date === td && s.status === 'void').reduce((a, r) => a + r.n, 0);
   const sum = (a, k = 'total') => a.reduce((s, x) => s + Number(x[k] || 0), 0);
   const cnt = (a) => a.reduce((s, x) => s + x.n, 0);
-  const locs = (B.ENV.locs || []).filter((l) => owner || S.ctx.roles.includes('management') || S.ctx.locations.includes(l.id));
+  const locs = (B.ENV.locs || []).filter((l) => (owner || S.ctx.roles.includes('management') || S.ctx.locations.includes(l.id)) && (curL === null || l.id === curL));
   let missingLoc = 0;
   if (ls.data && B.SETTING_DEFS) missingLoc = Math.max(0, B.SETTING_DEFS.length * (B.ENV.locs || []).length - ls.data.filter((x) => x.value !== null && x.value !== undefined && x.value !== '').length);
   const noSheet = sheets.data ? locs.filter((l) => !sheets.data.some((s) => s.location_id === l.id)) : [];

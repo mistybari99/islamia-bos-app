@@ -19,6 +19,8 @@ const X = {
   title: L('রিপোর্ট', 'Reports', 'Report'), search: L('রিপোর্ট খুঁজুন…', 'Search reports…', 'Report খুঁজুন…'), all: L('সব', 'All', 'All'),
   g_sales: L('বিক্রি', 'Sales', 'Sales (বিক্রি)'), g_pos: L('POS ও ক্যাশিয়ার', 'POS & cashier', 'POS ও Cashier'), g_cash: L('ক্যাশ ও পেমেন্ট', 'Cash & payments', 'Cash ও Payment'),
   g_customers: L('গ্রাহক ও বাকি', 'Customers & dues', 'Customer ও বাকি'),
+  g_stock: L('স্টক ও অপচয়', 'Stock & wastage', 'Stock ও অপচয়'), g_purchase: L('ক্রয় ও সরবরাহকারী', 'Purchases & suppliers', 'Purchase ও Supplier'), g_expense: L('খরচ', 'Expenses', 'খরচ'),
+  g_staff: L('কর্মীর হাজিরা', 'Staff attendance', 'Staff হাজিরা'), g_control: L('ব্যতিক্রম', 'Exceptions', 'Exception'),
   views: L('আমার ভিউ', 'My views', 'My Views'), views_s: L('সংরক্ষিত ভিউ', 'Saved views', 'Saved Views'), noviews: L('এখনও কোনো ভিউ সংরক্ষণ করা হয়নি', 'No saved views yet', 'এখনও কোনো View save করা হয়নি'),
   shared: L('শেয়ার করা', 'Shared', 'Shared'), mine: L('আমার', 'Mine', 'Mine'),
   pages_s: L('আলাদা পাতা', 'Other pages', 'আলাদা Page'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), nores: L('কিছু পাওয়া যায়নি', 'Nothing found', 'কিছু পাওয়া যায়নি'),
@@ -71,7 +73,10 @@ async function getCatalog(force) {
   if (CAT && !force && Date.now() - catAt < 60000) return CAT;
   const r = await sb.rpc('report_catalog');
   if (r.error || !Array.isArray(r.data)) { CAT = null; const e = new Error('engine'); e.engine = true; e.cause = r.error; throw e; }
-  CAT = r.data; catAt = Date.now(); return CAT;
+  CAT = r.data;
+  // the second engine (phase21): 12 more reports; absent or failing -> the first engine's list alone
+  try { if (B.reports2) { const more = await B.reports2.catalog(); if (more.length) CAT = CAT.concat(more); } } catch (e) { /* first engine only */ }
+  catAt = Date.now(); return CAT;
 }
 async function getViews(key) {
   let q = sb.from('report_views').select('*'); if (key) q = q.eq('report_code', key);
@@ -147,6 +152,7 @@ function applyCfg(c) {
   const d = V.def, needsDate = d.needs_date !== false;
   V.f = c && c.f && typeof c.f === 'object' ? c.f : F.defaults(needsDate);
   if (needsDate && !V.f.preset && !V.f.from && !V.f.to) V.f.preset = F.DEFAULT_PRESET;
+  { const cl = !(c && c.f) && B.curLoc ? B.curLoc() : null; if (cl !== null && (d.filters || []).includes('locations')) V.f.locations = [cl]; }      // a fresh report opens on the place chosen in the drawer
   const okDim = (g) => g === 'total' || (d.dims || []).some((x) => x.key === g);
   V.group = c && c.group && okDim(c.group) ? c.group : null; V.group2 = c && c.group2 && okDim(c.group2) && c.group2 !== 'total' ? c.group2 : null;
   V.sort = c && c.sort ? c.sort : null; V.hidden = new Set((c && c.hidden) || []);
@@ -185,7 +191,7 @@ function drawPage() {
 const effGroup = () => { const g = V.group === null ? (V.def.default_group || '') : V.group; return !g || g === 'total' || g === 'none' ? [] : g.split(',').filter(Boolean); };
 const groupParam = () => (V.group === null ? null : V.group === 'total' ? 'total' : V.group + (V.group2 ? ',' + V.group2 : ''));
 function drawTop() {
-  const box = $('#rp_top'); if (!box) return; const d = V.def, isAgg = d.kind === 'agg', dims = d.dims || [];
+  const box = $('#rp_top'); if (!box) return; const d = V.def, isAgg = d.kind === 'agg' || (d.engine === 2 && (d.dims || []).length > 0), dims = d.dims || [];
   const n = F.activeCount(V.f, d.filters, d.needs_date !== false), eg = effGroup();
   const hasBrand = dims.some((x) => x.key === 'brand'), hasLoc = dims.some((x) => x.key === 'location');
   const optDim = (x, sel, skip) => (x.key === skip ? '' : `<option value="${esc(x.key)}" ${sel === x.key ? 'selected' : ''} ${x.needs_rule === 'fy' && !(F.presetRange('this_fy')) ? 'disabled' : ''}>${esc(dimLabel(x))}${x.needs_rule === 'fy' && !F.presetRange('this_fy') ? ' · ' + esc(T('need')) : ''}</option>`);
@@ -202,7 +208,7 @@ function drawTop() {
       ${hasLoc ? `<button data-act="rp_sw" data-v="location" aria-pressed="${eg.length === 1 && eg[0] === 'location'}">${esc(T('loc'))}</button>` : ''}</div>` : ''}
     <div class="rp-sel">${isAgg ? `<div><label for="rp_g1">${esc(T('group'))}</label><select id="rp_g1"><option value="" ${V.group === null ? 'selected' : ''}>${esc(T('dflt'))}</option><option value="total" ${V.group === 'total' ? 'selected' : ''}>${esc(T('total'))}</option>${dims.map((x) => optDim(x, V.group)).join('')}</select></div>` : ''}
       <div><label for="rp_s1">${esc(T('sort'))}</label><select id="rp_s1"><option value="">${esc(T('dflt'))}</option>${sortOpts}</select></div>
-      ${isAgg && eg.length === 1 && V.group !== 'total' ? `<div><label for="rp_g2">${esc(T('then'))}</label><select id="rp_g2"><option value="">${esc(T('none'))}</option>${dims.map((x) => optDim(x, V.group2, eg[0])).join('')}</select></div>` : ''}</div>
+      ${isAgg && d.kind === 'agg' && eg.length === 1 && V.group !== 'total' ? `<div><label for="rp_g2">${esc(T('then'))}</label><select id="rp_g2"><option value="">${esc(T('none'))}</option>${dims.map((x) => optDim(x, V.group2, eg[0])).join('')}</select></div>` : ''}</div>
     ${isAgg && d.compare ? `<div class="rp-cmp"><button class="tog ${V.compare ? 'on' : ''}" data-act="rp_cmp" aria-pressed="${!!V.compare}">${esc(T('compare'))}</button>
       ${V.compare ? `<div class="seg rp-seg" role="group">${['prev', 'week', 'year'].map((m) => `<button data-act="rp_cm" data-v="${m}" aria-pressed="${V.compare === m}">${esc(T('c_' + m))}</button>`).join('')}</div>` : ''}</div>` : ''}`;
   drawMeta();
@@ -221,6 +227,7 @@ function errText(e) {
 }
 function callRun(page) {
   const flt = F.clean(V.f); if (V.compare) flt.compare_mode = V.compare;
+  if (V.def && V.def.engine === 2 && B.reports2) return B.reports2.run(V.key, flt, groupParam(), V.sort || null, page);
   return sb.rpc('report_run', { p_key: V.key, p_filters: flt, p_group: groupParam(), p_sort: V.sort || null, p_page: page, p_compare: !!V.compare });
 }
 async function run(append) {
@@ -387,7 +394,7 @@ function download(name, text, type) {
 let logMissing = false;
 function logExport(kind, n) {
   if (logMissing) return;      // best effort: the audit function arrives with the next SQL file
-  Promise.resolve(sb.rpc('log_report_export', { p_key: V.key, p_kind: kind, p_filters: F.clean(V.f), p_rows: n })).then((r) => { if (r && r.error) logMissing = true; }, () => { logMissing = true; });
+  Promise.resolve(V.def && V.def.engine === 2 && B.reports2 ? B.reports2.log(V.key, kind, F.clean(V.f), n) : sb.rpc('log_report_export', { p_key: V.key, p_kind: kind, p_filters: F.clean(V.f), p_rows: n })).then((r) => { if (r && r.error) logMissing = true; }, () => { logMissing = true; });
 }
 async function exportCSV() {
   if (!V.exp || !V.res) return; toast(T('exp_busy'));
@@ -525,6 +532,86 @@ table.rp-t{border-collapse:collapse;width:100%;font-size:.9rem;font-variant-nume
 }
 `;
   document.head.appendChild(st);
+}
+
+
+/* ============ Brand-level P&L (#/brandpnl) and Discounts (#/discounts) — phase20 ============
+   brand_pnl = the existing gross-profit figures (biz_daily) grouped by brand through report_brand_map (owner-editable). Cost and profit come back NULL unless the caller may see costs:
+   then the cards simply do not show them. discounts_report = every discounted sale with who approved it (a granted role = the seller, an emergency approval = the person who approved it). */
+{
+const Y = {
+  bp_title: L('ব্র্যান্ড অনুযায়ী লাভ-ক্ষতি', 'Brand-level P&L', 'Brand-level P&L'), dc_title: L('ডিসকাউন্ট ও অনুমোদনকারী', 'Discounts and approvers', 'Discounts ও approver'),
+  from: L('থেকে', 'From', 'From'), to: L('পর্যন্ত', 'To', 'To'), brand: L('ব্র্যান্ড অনুযায়ী', 'By brand', 'By brand'), comb: L('সব মিলিয়ে', 'Combined', 'Combined'),
+  rev: L('বিক্রি', 'Sales', 'Sales'), disc: L('ডিসকাউন্ট', 'Discount', 'Discount'), voids: L('বাতিল বিক্রি', 'Voided sales', 'Voided sales'), cogs: L('পণ্যের ক্রয়মূল্য', 'Cost of goods', 'Cost of goods'),
+  gp: L('মোট লাভ (খরচ জানা অংশে)', 'Gross profit (costed part)', 'Gross profit (costed part)'), gpp: L('লাভ %', 'GP %', 'GP %'), unc: L('ক্রয়মূল্যহীন বিক্রির অংশ', 'Share of sales without a cost', 'Share without a cost'),
+  places: L('লোকেশন', 'places', 'places'), bills: L('বিল', 'bills', 'bills'), nocost: L('খরচের তথ্য আপনার জন্য বন্ধ', 'Cost figures are hidden for your role', 'Cost figures are hidden'),
+  note: L('ব্র্যান্ড ঠিক করা আছে "রিপোর্ট ব্র্যান্ড ম্যাপ"-এ (মালিক বদলাতে পারেন)। কোনো সংখ্যা অনুমান করা হয়নি।', 'The brand of a place comes from the report brand map (the owner can change it). No figure is estimated.', 'Brand comes from the report brand map. Nothing is estimated.'),
+  none: L('এই সময়ে কিছু নেই', 'Nothing in this period', 'Nothing in this period'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), place: L('লোকেশন', 'Place', 'Place'), allp: L('সব লোকেশন', 'All places', 'All places'),
+  onlyap: L('শুধু অনুমোদিত', 'Approved only', 'Approved only'), count: L('ডিসকাউন্টের বিক্রি', 'Discounted sales', 'Discounted sales'), total: L('মোট ডিসকাউন্ট', 'Total discount', 'Total discount'),
+  seller: L('বিক্রেতা', 'Seller', 'Seller'), appr: L('অনুমোদনকারী', 'Approver', 'Approver'), k_grant: L('ভূমিকার অনুমতিতে', 'by role right', 'by role right'), k_emergency: L('জরুরি অনুমোদনে', 'by emergency approval', 'by emergency approval'),
+  within: L('সীমার ভেতরে / রেকর্ড নেই', 'within the limit / not recorded', 'within the limit / not recorded'), void: L('বাতিল', 'void', 'void'), recno: L('রসিদ', 'Receipt', 'Receipt'),
+};
+const Ty = (k) => lab(Y[k]);
+const dhakaToday = () => new Date(Date.now() + 6 * 3600 * 1000).toISOString().slice(0, 10);
+const PB = { from: null, to: null, mode: 'brand', loc: '', onlyap: false };
+const initDates = () => { if (!PB.to) { PB.to = dhakaToday(); PB.from = PB.to.slice(0, 8) + '01'; } };
+const dateBar = (extra) => `<div class="row wrap" style="margin-bottom:8px"><label class="muted" style="flex:1">${esc(Ty('from'))}<input type="date" id="px_from" value="${esc(PB.from)}" style="width:100%"></label>
+  <label class="muted" style="flex:1">${esc(Ty('to'))}<input type="date" id="px_to" value="${esc(PB.to)}" style="width:100%"></label></div>${extra || ''}`;
+const card = (k, v, sub) => `<div class="card"><div class="muted" style="font-size:.85rem">${esc(k)}</div><div class="mnum">${v}</div>${sub ? `<div class="muted" style="font-size:.8rem">${sub}</div>` : ''}</div>`;
+const pc = (n) => (n === null || n === undefined ? '—' : fmt(Math.round(Number(n) * 10) / 10) + '%');
+async function viewBrandPnl() {
+  initDates();
+  shell(Ty('bp_title'), `${dateBar(`<div class="row wrap" style="margin-bottom:8px"><button class="tog ${PB.mode === 'brand' ? 'on' : ''}" data-act="px_mode" data-v="brand">${esc(Ty('brand'))}</button><button class="tog ${PB.mode === 'comb' ? 'on' : ''}" data-act="px_mode" data-v="comb">${esc(Ty('comb'))}</button></div>`)}<div id="px_body"><p class="muted center pad">${esc(Ty('loading'))}</p></div>`, true);
+  const r = await sb.rpc('brand_pnl', { p_from: PB.from, p_to: PB.to, p_brand: null });
+  const box = $('#px_body'); if (!box) return;
+  if (r.error) return fail(r.error);
+  const rows = r.data || [], sum = (k) => rows.reduce((a, x) => a + Number(x[k] || 0), 0), costOn = rows.length > 0 && rows.every((x) => x.gross_profit !== null && x.gross_profit !== undefined);
+  const one = (name, x) => {
+    const rev = Number(x.revenue || 0), unc = costOn && rev > 0 ? 100 * (1 - Number(x.costed_rev || 0) / rev) : null;
+    return `<div class="card panel"><h3>${esc(name)}</h3><div class="muted" style="font-size:.8rem">${esc(fmt(x.locations))} ${esc(Ty('places'))} · ${esc(fmt(x.n))} ${esc(Ty('bills'))}</div>
+      <div class="bz-cards">${card(Ty('rev'), money(rev))}${card(Ty('disc'), money(x.discount))}${card(Ty('voids'), esc(fmt(x.void_n)), money(x.void_amt))}
+      ${costOn ? card(Ty('gp'), money(x.gross_profit), `${esc(Ty('gpp'))} ${pc(x.gp_pct)}`) : ''}</div>
+      ${costOn ? `<div class="row between muted" style="font-size:.85rem"><span>${esc(Ty('cogs'))}: ${money(x.cogs)}</span><span>${esc(Ty('unc'))}: ${pc(unc)}</span></div>` : `<div class="muted" style="font-size:.85rem">${esc(Ty('nocost'))}</div>`}</div>`;
+  };
+  let h = '';
+  if (!rows.length) h = `<p class="muted center pad">${esc(Ty('none'))}</p>`;
+  else if (PB.mode === 'comb') {
+    const tot = { locations: sum('locations'), n: sum('n'), revenue: sum('revenue'), discount: sum('discount'), void_n: sum('void_n'), void_amt: sum('void_amt'), costed_rev: sum('costed_rev'), cogs: sum('cogs'),
+      gross_profit: costOn ? sum('gross_profit') : null }; tot.gp_pct = costOn && sum('costed_rev') > 0 ? 100 * tot.gross_profit / sum('costed_rev') : null;
+    h = one(Ty('comb'), tot);
+  } else h = rows.map((x) => one(lab({ bn: x.brand_bn, en: x.brand_en }), x)).join('');
+  box.innerHTML = h + `<div class="notice ok" style="font-size:.85rem">${esc(Ty('note'))}</div>`;
+}
+async function viewDiscounts() {
+  initDates(); const locs = ((B.ENV && B.ENV.locs) || []).filter((l) => S.ctx.is_owner || (S.ctx.roles || []).includes('management') || (S.ctx.locations || []).includes(l.id));
+  shell(Ty('dc_title'), `${dateBar(`<div class="row wrap" style="margin-bottom:8px"><select id="px_loc" aria-label="${esc(Ty('place'))}" style="flex:1"><option value="">${esc(Ty('allp'))}</option>${locs.map((l) => `<option value="${l.id}" ${String(l.id) === String(PB.loc) ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>
+      <button class="tog ${PB.onlyap ? 'on' : ''}" data-act="px_onlyap">${esc(Ty('onlyap'))}</button></div>`)}<div id="px_body"><p class="muted center pad">${esc(Ty('loading'))}</p></div>`, true);
+  const r = await sb.rpc('discounts_report', { p_from: PB.from, p_to: PB.to, p_loc: PB.loc === '' ? null : Number(PB.loc), p_only_approved: PB.onlyap });
+  const box = $('#px_body'); if (!box) return;
+  if (r.error) return fail(r.error);
+  const rows = r.data || [];
+  box.innerHTML = (rows.length ? `<div class="bz-cards">${card(Ty('count'), esc(fmt(rows.length)))}${card(Ty('total'), money(rows.filter((x) => x.status !== 'void').reduce((a, x) => a + Number(x.discount || 0), 0)))}</div>
+    <div class="card" style="padding:4px 12px">${rows.map((x) => `<div class="row between" style="min-height:56px;padding:6px 0;border-bottom:1px solid var(--line,#0001)"><div><b>${esc(Ty('recno'))} ${esc(x.receipt)}</b> <span class="muted" style="font-size:.8rem">${esc(x.sale_date)}${x.status === 'void' ? ' · ' + esc(Ty('void')) : ''}</span>
+      <div class="muted" style="font-size:.8rem">${esc(Ty('seller'))}: ${esc(x.seller_staff || '—')} · ${esc(Ty('appr'))}: ${x.approval ? esc(x.approver_staff || '—') + ' (' + esc(Ty('k_' + x.approval)) + ')' : esc(Ty('within'))}</div></div>
+      <div style="text-align:end"><b class="mnum">${money(x.discount)}</b><div class="muted" style="font-size:.8rem">${x.discount_kind === 'percent' && x.discount_input !== null ? esc(fmt(x.discount_input)) + '%' : ''}</div></div></div>`).join('')}</div>` : `<p class="muted center pad">${esc(Ty('none'))}</p>`);
+}
+Object.assign(A.H, {
+  px_mode: (a) => { PB.mode = a.dataset.v; return viewBrandPnl(); },
+  px_onlyap: () => { PB.onlyap = !PB.onlyap; return viewDiscounts(); },
+});
+document.addEventListener('change', (e) => {
+  const id = e.target && e.target.id; if (!id || !id.startsWith('px_')) return;
+  const page = location.hash.replace(/^#\/?/, '').split('/')[0]; if (page !== 'brandpnl' && page !== 'discounts') return;
+  if (id === 'px_from' || id === 'px_to') { const v = e.target.value; if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return; PB[id === 'px_from' ? 'from' : 'to'] = v; }
+  else if (id === 'px_loc') PB.loc = e.target.value;
+  return page === 'brandpnl' ? viewBrandPnl() : viewDiscounts();
+});
+B.reportLinks = B.reportLinks || [];
+const bizCheck = (key) => async () => { const l = B.reportLinks.find((x) => x.key === key); if (S.ctx && S.ctx.is_owner) { l.allowed = true; return; }
+  const to = dhakaToday(); try { const r = await sb.rpc(key === 'brandpnl' ? 'brand_pnl' : 'discounts_report', key === 'brandpnl' ? { p_from: to, p_to: to, p_brand: null } : { p_from: to, p_to: to, p_loc: null, p_only_approved: false }); l.allowed = !!(r && !r.error); } catch (e) { l.allowed = false; } };
+B.reportLinks.push({ key: 'brandpnl', route: 'brandpnl', label: () => Ty('bp_title'), allowed: null, check: bizCheck('brandpnl') });
+B.reportLinks.push({ key: 'discounts', route: 'discounts', label: () => Ty('dc_title'), allowed: null, check: bizCheck('discounts') });
+window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { brandpnl: viewBrandPnl, discounts: viewDiscounts });
 }
 
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { reports: viewHub, report: viewReport });

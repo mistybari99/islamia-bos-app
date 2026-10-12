@@ -31,7 +31,12 @@ const X = {
   salary: L('বেতন রিপোর্ট', 'Salary report', 'Salary report'),
   payables: L('সরবরাহকারীর পাওনা', 'Supplier payables', 'Supplier-এর Payable'), pl: L('লাভ-ক্ষতি', 'Profit & loss', 'Profit-Loss'), daybook: L('দিনের খাতা', 'Day book', 'Day book'), stockbal: L('স্টক ব্যালেন্স', 'Stock balance', 'Stock Balance'),
   today_sheet: L('শোরুমের দৈনিক শিট', 'Showroom daily sheet', 'Showroom-এর Daily Sheet'),
-  period_note: L('বছর = জানুয়ারি থেকে; অর্থবছরের শুরু সেটিংসে বসানো পরে আসবে', 'Year = from 1 January; fiscal-year start in settings comes later', 'Year = January থেকে; Fiscal-year Settings-এ পরে আসবে'),
+  period_note: L('বছর = অর্থবছরের শুরু থেকে (সেটিংসের নিয়ম; না থাকলে ১ জানুয়ারি)', 'Year = from the fiscal-year start (a setting; 1 January when none is set)', 'Year = fiscal year শুরু থেকে (setting; না থাকলে ১ জানুয়ারি)'),
+  sheets: L('আজ যে শিটগুলো পূরণ করতে হবে', "Today's sheets to fill", 'আজ যে Sheet পূরণ করতে হবে'), sheets_none: L('আপনার জন্য কোনো শিট নেই', 'No sheets for you here', 'আপনার জন্য কোনো Sheet নেই'),
+  st_done: L('জমা হয়েছে', 'Done', 'Done'), st_pending: L('বাকি', 'Pending', 'Pending'), st_draft: L('খসড়া', 'Draft', 'Draft'), st_rej: L('ফেরত — ঠিক করুন', 'Sent back — fix', 'ফেরত — ঠিক করুন'), st_paper: L('কাগজে', 'On paper', 'কাগজে'),
+  sheets_of: L('জমা', 'done', 'done'), sheets_hint: L('মালিক চাইলে সেটিংসে "হোমে দৈনিক শিট" নিয়মে শুধু দৈনিক শিটগুলো বেছে দিতে পারেন', 'The owner can narrow this to the daily sheets with the rule "Daily sheets on home"', 'Owner চাইলে rule-এ শুধু দৈনিক Sheet বেছে দিতে পারেন'),
+  locsw: L('লোকেশন', 'Location', 'Location'), all_loc: L('সব লোকেশন', 'All locations', 'সব Location'),
+  s_screens: L('পাতা ও ফর্ম', 'Screens & forms', 'Page ও Form'), s_items: L('আইটেম', 'Items', 'Item'), s_cust: L('গ্রাহক', 'Customers', 'Customer'), s_more: L('আইটেম ও গ্রাহক খোঁজা হচ্ছে…', 'Searching items and customers…', 'Item ও Customer খোঁজা হচ্ছে…'),
   reset: L('প্রিয় ও ব্যবহারের হিসাব মুছুন', 'Clear my favourites & usage', 'Favourite ও Usage মুছুন'), logout: L('লগআউট', 'Log out', 'Logout'), roles: L('ভূমিকা', 'Roles', 'Role'),
   modules: L('সব মডিউল', 'All modules', 'সব Module'),
   em: L('জরুরি অনুরোধ', 'Emergency requests', 'জরুরি Request'), addprod: L('নতুন পণ্য যোগ', 'Add product', 'নতুন Product যোগ'), unitconv: L('একক রূপান্তর', 'Unit conversions', 'Unit conversion'),
@@ -85,6 +90,7 @@ const ROUTES = [
   { k: 'assets', g: 'ops', lb: () => lab(L('সম্পদ-খাতা', 'Asset register', 'Asset register')), ic: 'doc', ok: () => locOk() },
   { k: 'dues', g: 'cust', lb: () => t('dues'), ok: () => canPos() },
   { k: 'stock', g: 'ops', lb: () => lab(L('স্টক', 'Stock', 'Stock')), ic: 'items', ok: () => locOk() },
+  { k: 'recipes', g: 'ops', lb: () => lab(L('রেসিপি ও উৎপাদন', 'Recipes & production', 'Recipe ও Production')), ic: 'doc', ok: () => locOk() },
   { k: 'purchase', g: 'purch', lb: () => lab(L('ক্রয় বিল', 'Purchase bills', 'Purchase Bill')), ic: 'doc', ok: () => locOk() },
   { k: 'purchase/new', g: 'purch', lb: () => lab(L('নতুন ক্রয় বিল', 'New purchase bill', 'নতুন Purchase bill')), ic: 'plus', ok: () => locOk() },
   { k: 'purchase/return', g: 'purch', lb: () => lab(L('ক্রয় ফেরত', 'Purchase return', 'Purchase return')), ic: 'doc', ok: () => locOk() },
@@ -219,6 +225,70 @@ function ensureStatic() {
   return staticP;
 }
 
+// ---------- current location (drawer footer): one choice per person, followed by every screen that asks B.curLoc() ----------
+// null = all the places this person may use (the owner / management see every place; others only their own). A person with exactly one place is fixed to it.
+const wideLoc = () => isOwner() || (S.ctx.roles || []).includes('management');
+function locChoices() { const all = ((B.ENV && B.ENV.locs) || []).filter((l) => l.is_active !== false && l.status !== 'closed'); return wideLoc() ? all : all.filter((l) => (S.ctx.locations || []).includes(l.id)); }
+function curLoc() {
+  if (!S.ctx) return null;
+  const ch = locChoices(); if (ch.length === 1) return ch[0].id;
+  let v = null; try { v = store.get('bos_curloc_' + uid()); } catch (e) { v = null; }
+  const id = v === null || v === '' || v === 'all' ? null : Number(v);
+  return id !== null && ch.some((l) => l.id === id) ? id : null;
+}
+function setCurLoc(id) {
+  try { store.set('bos_curloc_' + uid(), id === null || id === undefined ? 'all' : String(id)); } catch (e) { /* private window: the choice lasts until reload */ }
+  if (id !== null && id !== undefined) { try { store.set('bos_pos_loc', String(id)); } catch (e) { /* ignore */ } }   // the POS reads its own remembered place
+  try { window.dispatchEvent(new CustomEvent('bos:loc', { detail: { id: id === undefined ? null : id } })); } catch (e) { /* old browser */ }
+}
+function drawLocBox() {
+  const box = $('#nav_locbox'); if (!box) return;
+  const ch = locChoices(); if (ch.length < 2) { box.innerHTML = ''; return; }
+  const cur = curLoc();
+  box.innerHTML = `<label for="nav_loc" style="font-size:.85rem;color:var(--muted)">${esc(T('locsw'))}</label>
+    <select id="nav_loc" aria-label="${esc(T('locsw'))}" style="width:100%;min-height:44px"><option value="all" ${cur === null ? 'selected' : ''}>${esc(T('all_loc'))}</option>${ch.map((l) => `<option value="${l.id}" ${cur === l.id ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>`;
+}
+document.addEventListener('change', (e) => {
+  if (!e.target || e.target.id !== 'nav_loc') return;
+  setCurLoc(e.target.value === 'all' ? null : Number(e.target.value));
+  setDrawer(false);
+  HS.data = null;
+  if ((location.hash.replace(/^#\/?/, '') || 'home').split('/')[0] === 'home') loadStats(); else window.dispatchEvent(new HashChangeEvent('hashchange'));   // the open screen draws again with the new place
+  if ($('#hv_sheets')) loadSheets();
+});
+
+// ---------- drawer search over items / customers (the menu itself is searched on the phone, instantly) ----------
+const SR = { q: '', items: [], cust: [], busy: false, tm: null };
+let ITEMS_ALL = null, ITEMS_AT = 0;
+async function itemsAll() {
+  if (ITEMS_ALL && Date.now() - ITEMS_AT < 300000) return ITEMS_ALL;
+  const r = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,barcode,is_active').order('code'));
+  ITEMS_ALL = r && !r.error ? r.data || [] : (ITEMS_ALL || []); ITEMS_AT = Date.now(); return ITEMS_ALL;
+}
+const normQ = (x) => String(x || '').toLowerCase().trim();
+async function searchMore(qq) {
+  const ql = normQ(qq);
+  if (ql.length < 2) { SR.items = []; SR.cust = []; SR.busy = false; SR.q = ql; return; }
+  SR.busy = true;
+  const jobs = [];
+  if (P('ITEMS', 'view') && window.BOS_ALL) jobs.push(itemsAll().then((a) => a.filter((it) => [it.code, it.name_bn, it.name_en, it.name_mix, it.barcode].some((v) => normQ(v).includes(ql))).slice(0, 8), () => []));
+  else jobs.push(Promise.resolve([]));
+  if (canPos()) {
+    const safe = ql.replace(/[^\p{L}\p{N} ]/gu, ' ').trim();
+    jobs.push(safe.length < 2 ? Promise.resolve([]) : (async () => { try { const r = await sb.from('customers').select('id,name,mobile').or(`name.ilike.%${safe}%,mobile.ilike.%${safe}%`).order('name').limit(6); return r && !r.error ? r.data || [] : []; } catch (e) { return []; } })());
+  } else jobs.push(Promise.resolve([]));
+  const [it, cu] = await Promise.all(jobs);
+  if (normQ(q) !== ql) return;      // typed on meanwhile: this answer is stale
+  SR.q = ql; SR.items = it; SR.cust = cu; SR.busy = false;
+}
+function queueSearch() {
+  clearTimeout(SR.tm);
+  const ql = normQ(q);
+  if (ql.length < 2) { SR.items = []; SR.cust = []; SR.busy = false; SR.q = ''; return; }
+  SR.busy = SR.q !== ql;
+  SR.tm = setTimeout(() => { searchMore(q).then(() => { if (drawerOpen && normQ(q) === ql) dr_body(); }, () => { SR.busy = false; }); }, 250);
+}
+
 // ---------- drawer ----------
 let drawerOpen = false, pendingRoute = null, openGroups = null, sig = '', q = '';
 const el = {};
@@ -243,11 +313,12 @@ function dr_shell() {
       <button class="hbtn" style="min-height:48px;min-width:48px;border:0;background:transparent;color:var(--ink)" data-act="nav_close" aria-label="${esc(T('close'))}">${IC.x.replace('<svg', '<svg width="22" height="22"')}</button></div>
     <div class="dr-search"><input id="nav_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" aria-label="${esc(T('search'))}" value="${esc(q)}"></div>
     <div class="dr-body" id="nav_body"></div>
-    <div class="dr-foot"><div class="me-lang">${A.langBar()}</div><div class="row"><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net"></span><span id="nav_nett">${esc(navigator.onLine === false ? T('offline') : T('online'))}</span></span>
+    <div class="dr-foot"><div id="nav_locbox"></div><div class="me-lang">${A.langBar()}</div><div class="row"><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net"></span><span id="nav_nett">${esc(navigator.onLine === false ? T('offline') : T('online'))}</span></span>
       <button class="lo" data-act="logout">${esc(T('logout'))}</button></div></div>`;
 }
 function dr_body() {
   const body = $('#nav_body'); if (!body) return;
+  drawLocBox();
   const all = entries(), mode = npMode(), cur = keyOfHash(), cn = CNT || {}, og = groupOpen(), ql = q.trim().toLowerCase();
   const row = (e) => {
     const on = e.key === cur, pin = isPinned(e.key), c = e.cnt && cn[e.cnt];
@@ -257,7 +328,14 @@ function dr_body() {
   const lockRow = (label) => `<div class="dr-i lock">${IC.lock}<span>${esc(label)}</span></div>`;
   if (ql) {
     const hit = all.filter((e) => e.ok && e.live && (e.label.toLowerCase().includes(ql) || e.route.toLowerCase().includes(ql)));
-    body.innerHTML = hit.length ? hit.map((e) => row({ ...e, label: e.label })).join('') : `<p class="muted center pad">${esc(T('nores'))}</p>`;
+    const stale = SR.q !== ql;
+    const itH = stale ? [] : SR.items.map((it) => `<div class="dr-i"><button class="rb dr-it" data-act="nav_go" data-v="${esc(P('ITEMS', 'enter') ? 'items/edit/' + it.id : 'items')}">${ico('items')}<span class="lb">${esc(it.code)} · ${esc(nm(it))}${it.is_active === false ? ' ·' : ''}</span></button></div>`);
+    const cuH = stale ? [] : SR.cust.map((c) => `<div class="dr-i"><button class="rb dr-it" data-act="nav_go" data-v="dues">${ico('dues')}<span class="lb">${esc(c.name || '')}${c.mobile ? ' · ' + esc(c.mobile) : ''}</span></button></div>`);
+    const sec = (title, arr) => (arr.length ? `<div class="hsec">${esc(title)}<small>${arr.length}</small></div>${arr.join('')}` : '');
+    const loc = hit.map((e) => row({ ...e, label: e.label }));
+    body.innerHTML = (loc.length || itH.length || cuH.length ? sec(T('s_screens'), loc) + sec(T('s_items'), itH) + sec(T('s_cust'), cuH) : '')
+      + (SR.busy && ql.length >= 2 ? `<p class="muted center pad">${esc(T('s_more'))}</p>` : '')
+      + (!loc.length && !itH.length && !cuH.length && !SR.busy ? `<p class="muted center pad">${esc(T('nores'))}</p>` : '');
     return;
   }
   body.innerHTML = GROUPS.map((g) => {
@@ -303,7 +381,7 @@ document.addEventListener('keydown', (e) => {
     if (e.shiftKey && document.activeElement === a) { e.preventDefault(); z.focus(); } else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); }
   }
 });
-document.addEventListener('input', (e) => { if (e.target.id === 'nav_q') { q = e.target.value; dr_body(); } if (e.target.id === 'pk_q') drawPicker(e.target.value); });
+document.addEventListener('input', (e) => { if (e.target.id === 'nav_q') { q = e.target.value; queueSearch(); dr_body(); } if (e.target.id === 'pk_q') drawPicker(e.target.value); });
 window.addEventListener('online', netDot); window.addEventListener('offline', netDot);
 function netDot() { const d = $('#nav_net'), tx = $('#nav_nett'); if (!d) return; const on = navigator.onLine !== false; d.className = 'dot ' + (on ? 'ok' : 'bad'); tx.textContent = on ? T('online') : T('offline'); }
 
@@ -383,7 +461,14 @@ function meSheet() {
 const HS = { mode: null, period: null, data: null, dataFrom: null };
 const dhaka = (d = new Date()) => d.toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
 const addDays = (iso, n) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
-function periodFrom(p) { const td = dhaka(); return p === 'day' ? td : p === 'week' ? addDays(td, -6) : p === 'month' ? td.slice(0, 8) + '01' : td.slice(0, 4) + '-01-01'; }
+// first day of the fiscal year that contains iso: the same rule as the server (fiscal_year_start_month / _day; empty = 1 January)
+function fyStart(iso) {
+  const nn = (k, lo, hi) => { const v = Number(B.rule(k, null)); return B.rule(k, null) !== null && Number.isInteger(v) && v >= lo && v <= hi ? v : 1; };
+  const mm = nn('fiscal_year_start_month', 1, 12), dd = nn('fiscal_year_start_day', 1, 31), y = Number(iso.slice(0, 4));
+  const mk = (yy) => { const last = new Date(Date.UTC(yy, mm, 0)).getUTCDate(); return yy + '-' + String(mm).padStart(2, '0') + '-' + String(Math.min(dd, last)).padStart(2, '0'); };
+  const s0 = mk(y); return iso < s0 ? mk(y - 1) : s0;
+}
+function periodFrom(p) { const td = dhaka(); return p === 'day' ? td : p === 'week' ? addDays(td, -6) : p === 'month' ? td.slice(0, 8) + '01' : fyStart(td); }
 const money = (n) => '৳ ' + fmt(n);
 const sumOf = (a, k = 'total') => a.reduce((s, x) => s + Number(x[k] || 0), 0);
 const hdef = () => { if (!HS.mode) HS.mode = store.get('bos_hmode_' + uid()) === 'acc' ? 'acc' : 'biz'; if (!HS.period) HS.period = ['day', 'week', 'month', 'year'].includes(store.get('bos_hper_' + uid())) ? store.get('bos_hper_' + uid()) : 'day'; };
@@ -415,6 +500,7 @@ async function home() {
   $('#hv_main').innerHTML = `${posBtn}${attn}
     <div class="seg" role="group" aria-label="${esc(T('biz') + ' / ' + T('acc'))}"><button data-act="hv_mode" data-v="biz" aria-pressed="${HS.mode === 'biz'}">${esc(T('biz'))}</button><button data-act="hv_mode" data-v="acc" aria-pressed="${HS.mode === 'acc'}">${esc(T('acc'))}</button></div>
     <div class="ptabs" role="tablist" id="hv_pt"></div><div id="hv_stats"></div>
+    <div id="hv_sheets"></div>
     <div class="hsec">${esc(T('fav'))}</div><div id="hv_fav"></div>
     <div class="hsec" id="hv_th"></div><div class="qgrid" id="hv_tiles"></div>
     <div class="hsec">${esc(T('modules'))}</div><div class="grid" id="hv_mods"></div><div id="hv_ctl"></div>
@@ -422,7 +508,39 @@ async function home() {
     ${ap || canPos() ? `<details class="acc" id="hv_dt"><summary>${esc(T('detail'))}</summary><div class="accb"><div id="dash"></div></div></details>` : ''}`;
   drawPeriod(); drawTiles(); drawFav(); drawMods(); drawCtl(); drawForms();
   const dt = $('#hv_dt'); if (dt) dt.addEventListener('toggle', () => { if (dt.open && B.dash) B.dash.render().catch(() => {}); });
-  loadStats();
+  loadStats(); loadSheets();
+}
+// ---------- staff home: today's sheets to fill (forms I may enter, at my place, in a mode that allows the app) ----------
+async function loadSheets() {
+  const box = $('#hv_sheets'); if (!box) return;
+  if (isOwner() || !FORMS) { box.innerHTML = ''; return; }
+  const only = String(B.rule('home_daily_forms', '') || '').split(/[\s,;]+/).filter(Boolean);
+  let list = FORMS.filter((f) => f.enabled !== false && f.area !== 'master' && f.code !== 'POS' && f.code !== '0-1' && P(f.code, 'enter') && B.forms && B.forms[f.code]);
+  if (only.length) list = list.filter((f) => only.includes(f.code));
+  if (!list.length) { box.innerHTML = ''; return; }
+  const cl = curLoc(), locs = locChoices().map((l) => l.id), ids = cl !== null ? [cl] : locs;
+  if (!ids.length) { box.innerHTML = ''; return; }
+  const td = dhaka(), key = td + '|' + ids.join(',');
+  let ents = [], roll = [];
+  try { const r = await sb.from('entries').select('form_code,location_id,status').eq('entry_date', td).in('location_id', ids).limit(1000); ents = r && !r.error ? r.data || [] : []; } catch (e) { ents = []; }
+  try { const r = await sb.from('form_rollout').select('form_code,location_id,mode').in('location_id', ids); roll = r && !r.error ? r.data || [] : []; } catch (e) { roll = []; }   // table missing / not readable: every place counts as app
+  if (!$('#hv_sheets') || key !== td + '|' + (cl !== null ? [cl] : locChoices().map((l) => l.id)).join(',')) return;
+  const rank = { done: 0, draft: 1, rej: 2, pending: 3, paper: 4 };
+  const rows = [];
+  list.forEach((f) => ids.forEach((id) => {
+    const mode = (roll.find((x) => x.form_code === f.code && x.location_id === id) || {}).mode || 'app';
+    const mine = ents.filter((x) => x.form_code === f.code && x.location_id === id);
+    let st = mode === 'paper' ? 'paper' : 'pending';
+    if (mode !== 'paper') { if (mine.some((x) => x.status === 'submitted' || x.status === 'approved')) st = 'done'; else if (mine.some((x) => x.status === 'draft')) st = 'draft'; else if (mine.some((x) => x.status === 'rejected')) st = 'rej'; }
+    rows.push({ f, id, st });
+  }));
+  rows.sort((a, b) => (a.st === 'done') - (b.st === 'done') || (a.st === 'paper') - (b.st === 'paper') || String(a.f.code).localeCompare(String(b.f.code), 'en', { numeric: true }));
+  const done = rows.filter((r) => r.st === 'done').length, app = rows.filter((r) => r.st !== 'paper').length;
+  const chipCls = { done: 'ok', pending: 'warn', draft: 'info', rej: 'bad', paper: '' };
+  const lname = (id) => { const l = (B.ENV && B.ENV.locs || []).find((x) => x.id === id); return l ? nm(l) : ''; };
+  box.innerHTML = `<div class="hsec">${esc(T('sheets'))}<small>${done}/${app} ${esc(T('sheets_of'))}</small></div>
+    <div class="card" style="padding:4px 12px">${rows.map((r) => `<button class="hrow" data-act="openform" data-v="${esc(r.f.code)}" ${r.st === 'paper' ? 'style="opacity:.7"' : ''}><span><b>${esc(r.f.code)}</b> · ${esc(nm(r.f))}${ids.length > 1 ? ` <small class="muted">${esc(lname(r.id))}</small>` : ''}</span><span class="chip ${chipCls[r.st]}">${esc(T('st_' + r.st))}</span><span class="cv">›</span></button>`).join('')}
+    ${only.length ? '' : `<p class="muted" style="font-size:.85rem;margin:6px 0">${esc(T('sheets_hint'))}</p>`}</div>`;
 }
 function drawPeriod() {
   const b = $('#hv_pt'); if (!b) return;
@@ -443,7 +561,7 @@ async function loadStats() {
 function drawStats() {
   const box = $('#hv_stats'); if (!box || !HS.data) return;
   const from = periodFrom(HS.period), td = dhaka();
-  const rows = (HS.data.s || []).map((r) => ({ ...r, total: Number(r.total || 0), discount: Number(r.discount || 0), n: Number(r.n || 0), due: Number(r.due || 0) })).filter((r) => r.status === 'done' && r.sale_date >= from && r.sale_date <= td);
+  const rows = (HS.data.s || []).map((r) => ({ ...r, total: Number(r.total || 0), discount: Number(r.discount || 0), n: Number(r.n || 0), due: Number(r.due || 0) })).filter((r) => r.status === 'done' && r.sale_date >= from && r.sale_date <= td && (curLoc() === null || r.location_id === curLoc()));
   const stat = (k, v, s, cls = '', wide = '') => `<div class="stat ${cls ? "mk " + cls : ""} ${wide}"><div class="k">${esc(k)}</div><div class="v">${v}</div>${s ? `<div class="s">${esc(s)}</div>` : ''}</div>`;
   if (HS.mode === 'biz') {
     const locs = ((B.ENV && B.ENV.locs) || []).filter((l) => isOwner() || (S.ctx.roles || []).includes('management') || (S.ctx.locations || []).includes(l.id));
@@ -542,5 +660,6 @@ Object.assign(H, {
 const prevLang = H.lang;
 H.lang = (a) => { sig = ''; return prevLang(a); };
 
-window.BOS_NAV = { grantFlags: () => GF, ctlOk, menuBtn, headExtra, sync, home, open: openDrawer, close: closeDrawer, pins, usage, togglePin, entries: () => entries().filter((e) => e.live), syncFavs };
+B.curLoc = curLoc; B.setCurLoc = setCurLoc; B.fyStart = fyStart;
+window.BOS_NAV = { loadSheets, curLoc, fyStart, grantFlags: () => GF, ctlOk, menuBtn, headExtra, sync, home, open: openDrawer, close: closeDrawer, pins, usage, togglePin, entries: () => entries().filter((e) => e.live), syncFavs };
 })();

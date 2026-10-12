@@ -61,7 +61,7 @@ const staffName = (sid) => { const s = ((B.ENV && B.ENV.staff) || []).find((x) =
 const errTxt = (e) => { const m = String((e && e.message) || ''); const hit = Object.keys(B.X17 || {}).filter((x) => x.startsWith('e_')).find((x) => m.includes(x.slice(2))); return hit ? lab(B.X17[hit]) : null; };
 const fx = (e) => { const m = errTxt(e); if (m) return toast(m); if (/not allowed/.test((e && e.message) || '')) return toast(T('noacc')); fail(e); };
 const mbtn = (act, label, attrs) => `<button class="full" style="margin-top:8px;text-align:left" data-act="${act}" ${attrs || ''}>${esc(label)}</button>`;
-const friendly = (m) => { m = String(m || ''); const R = [[/rollout_paper/, () => lab(B.X17.e_rollout_paper)], [/period_closed/, 'f_period'], [/location_paused/, 'f_paused'], [/red_blocked/, 'f_red'], [/note_required/, 'f_note'], [/jwt|token|401|expired|unauthor/i, 'f_auth'],
+const friendly = (m) => { m = String(m || ''); const R = [[/pin_signature_stale/, () => lab(B.X17.e_pin_signature_stale)], [/pin_signature_required/, () => lab(B.X17.e_pin_signature_required)], [/rollout_paper/, () => lab(B.X17.e_rollout_paper)], [/period_closed/, 'f_period'], [/location_paused/, 'f_paused'], [/red_blocked/, 'f_red'], [/note_required/, 'f_note'], [/jwt|token|401|expired|unauthor/i, 'f_auth'],
   [/locked/, 'f_locked'], [/switched off/, 'f_off'], [/not allowed|permission|row-level/i, 'f_perm']];
   for (const [re, k] of R) if (re.test(m)) return typeof k === 'function' ? k() : T(k);
   return errTxt({ message: m }) || m.slice(0, 160); };

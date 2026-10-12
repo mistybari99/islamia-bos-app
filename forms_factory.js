@@ -79,6 +79,9 @@ B.forms['05-1'] = {
       CK('machines_off', L('ফ্রিজ / চিলার চালু, বাকি যন্ত্র বন্ধ — সম্পন্ন', 'Fridge / chiller on, other machines off: done'), { req: true }),
       CK('gas_off', L('গ্যাস বন্ধ / নিরাপদ', 'Gas off / safe'), { req: true }), CK('power_off', L('বিদ্যুৎ বন্ধ / নিরাপদ', 'Power off / safe'), { req: true }), CK('fire_safe', L('আগুন — নিরাপদ', 'Fire: safe'), { req: true }),
       TM('shutter_time', L('শাটার বন্ধের সময়', 'Shutter closed at'), { req: true }), ST('key_to', L('চাবি গ্রহণকারী (Key received by)', 'Key received by'), { req: true })] },
+    { collapsed: true, title: L('তৈরি পণ্য (ঐচ্ছিক — স্টক লেজারে যায়)', 'Finished goods made (optional: goes to the stock ledger)'), fields: [
+      NOTE(L('স্টক লেজার সংযোগ চালু থাকলে শিট অনুমোদনের সময় এই লাইনগুলো উৎপাদন হিসেবে স্টকে যোগ হয়। ফাঁকা রাখলে স্টকে কিছু যায় না।', 'When the stock-ledger link is on, these lines are added to stock as production when the sheet is approved. Leave empty and nothing goes to stock.'), 'ok'),
+      TABLE('output', null, [ITEM('item', L('আইটেম', 'Item'), { wide: true }), N('qty', L('পরিমাণ (আইটেমের এককে)', 'Quantity (in the item unit)'))], { min: 3 })] },
     { title: L('Section D · গরমিল ও ঘটনা (Exceptions)', 'Section D · Exceptions & incidents'), fields: [
       NOTE(L('কোনো ঘটনা না থাকলে নিচের ঘরে টিক দিন।', 'If nothing happened, tick the box below.'), 'ok'),
       TABLE('incidents', null, [T('what', L('আজকের ঘটনা (Incident)', "Today's incident"), { wide: true }), T('cause', L('কারণ (Cause)', 'Cause')), T('owner', L('ইনচার্জ (In charge)', 'In charge')),
