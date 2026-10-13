@@ -121,7 +121,7 @@ async function viewPending() {
 async function viewNumAudit() {
   shell(T('gapt'), `<p class="muted">${esc(t('loading'))}</p>`, true);
   await B.loadStatic();
-  const r = await sb.rpc('number_audit_summary'); if (r.error) return fail(r.error);
+  const r = await sb.rpc('number_audit_summary'); if (r.error) return fail(r.error); r.data = r.data || [];
   const lc = (id) => nm(B.ENV.locs.find((l) => l.id === id));
   shell(T('gapt'), `<div class="notice ok">${esc(T('gaphint'))}</div>` + (r.data.length ? r.data.map((g) => `<div class="card item" data-act="na_open" data-f="${esc(g.form_code)}" data-l="${g.location_id}"><div><div class="nm">${esc(g.form_code)} · ${esc(lc(g.location_id))}</div>
       <div class="muted" style="font-size:.85rem">№ ${g.first_no} – ${g.last_no} · ${g.entered}</div></div><span class="chip warn">${g.missing_count}</span></div>`).join('') : `<div class="dash-ok">${esc(T('nogap'))}</div>`), true);

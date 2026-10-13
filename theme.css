@@ -320,3 +320,10 @@ html[data-skin] body .ctl-sheet { background: var(--raised); border-top: var(--b
 html[data-skin] body .ctl-opt { font-size: var(--fs-body); } html[data-skin] body .ctl-opt:hover, html[data-skin] body .ctl-opt:focus { background: var(--amber-a2); } html[data-skin] body .ctl-opt.on { background: var(--amber-a2); box-shadow: inset 2px 0 0 var(--amber); }
 html[data-skin] body .ctl-box, html[data-skin] body .ctl-tbox { background: var(--s2); box-shadow: var(--sh-in); border-color: var(--hair); }
 html[data-skin] body .ctl-opt.on .ctl-box, html[data-skin] body .ctl-tick input:checked + .ctl-tbox { background: var(--grad-brand); border-color: var(--amber); color: var(--on-brand); box-shadow: var(--glow-s); }
+
+/* POS: item names and cart lines are read at arm's length - bigger than the general small scale (owner request) */
+html[data-skin] body .pos-item .pn { font: 700 19px/1.3 var(--display); }
+html[data-skin] body .pos-item { min-height: 96px; }
+html[data-skin] body .pos-item .pp { font-size: 22px; }
+html[data-skin] body .pos-item .pp small { font-size: 13px; }
+.cart-line .nm { font-size: 17px; font-weight: 700; }

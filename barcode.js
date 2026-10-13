@@ -45,7 +45,7 @@ function scan() {
     root.addEventListener('click', (e) => { if (e.target === root) finish(null); });
     document.body.appendChild(root);
     document.addEventListener('keydown', onKey, true); window.addEventListener('hashchange', onHash);
-    const card = (html) => { root.innerHTML = `<div class="bc-card" role="dialog" aria-modal="true" aria-label="${esc(T('title'))}"><h2>${esc(T('title'))}</h2>${html}</div>`; return root.firstChild; };
+    const card = (html) => { root.innerHTML = `<div class="bc-card" role="dialog" aria-modal="true" aria-label="${esc(T('title'))}"><button type="button" class="sheet-x bc-x" aria-label="${esc(T('cancel'))}">✕</button><h2>${esc(T('title'))}</h2>${html}</div>`; const xb = root.querySelector('.bc-x'); if (xb) xb.addEventListener('click', () => finish(null)); return root.firstChild; };
     const on = (sel, fn) => { const el = root && root.querySelector(sel); if (el) el.addEventListener('click', fn); };
 
     const showNone = () => {

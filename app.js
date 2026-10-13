@@ -50,7 +50,10 @@ function langBar() {
 }
 function shell(title, body, back) {
   const nav = window.BOS_NAV && S.ctx && S.ctx.profile && S.ctx.profile.status === 'active';   // drawer UI only for signed-in, approved users
-  const lead = back ? `<button data-act="go" data-v="${typeof back === 'string' ? back : 'home'}" aria-label="${esc(t('back'))}">←</button>` : '<img class="brand" src="mark.svg" alt="">';
+  // every screen except Home gets a back arrow, even when the caller forgot to ask for one: it goes to the screen the person came from (or Home)
+  const pg = (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0];
+  const lead = back ? `<button data-act="go" data-v="${typeof back === 'string' ? back : 'home'}" aria-label="${esc(t('back'))}">←</button>`
+    : (nav && pg !== 'home' ? `<button data-act="goback" aria-label="${esc(t('back'))}">←</button>` : '<img class="brand" src="mark.svg" alt="">');
   const h1 = title === t('app') ? `<span class="bn">${esc(BRAND.bn)}</span><span class="lat">${esc(BRAND.en)}</span>` : esc(title);
   $('#app').innerHTML = `<header class="top">${nav ? window.BOS_NAV.menuBtn() : ''}${lead}<h1 class="${title === t('app') ? 'brandh' : ''}">${h1}</h1>${nav ? window.BOS_NAV.headExtra() : langBar()}</header>${nav && window.BOS_NAV.crumb ? window.BOS_NAV.crumb() : ''}${body}`;
   if (window.BOS_NAV) window.BOS_NAV.sync(!!nav);
@@ -58,7 +61,7 @@ function shell(title, body, back) {
 function openSheet(html) {
   closeSheet();
   const d = document.createElement('div'); d.className = 'sheet-bg'; d.id = 'sheet';
-  d.innerHTML = `<div class="sheet">${html}</div>`;
+  d.innerHTML = `<div class="sheet"><button type="button" class="sheet-x" data-act="closesheet" aria-label="${S.lang === 'en' ? 'Close' : 'বন্ধ করুন'}">✕</button>${html}</div>`;
   d.addEventListener('click', (e) => { if (e.target === d) closeSheet(); });
   document.body.appendChild(d);
 }
@@ -204,7 +207,7 @@ function dispatch(page) {
   if (page === 'items' && extra.items) return extra.items();           // products v2 (items2.js) takes over #/items; the old screen stays as the fallback
   (local[page] || extra[page] || viewHome)();
 }
-window.addEventListener('hashchange', route);
+window.__navCount = 1; window.addEventListener('hashchange', () => { window.__navCount = (window.__navCount || 1) + 1; route(); });
 window.BOS_APP = { hasAnyGrant, sb, S, t, esc, toast, fail, shell, openSheet, closeSheet, nm, fmt, store, ICON, langBar, go, H: null };
 
 function viewPending() {
@@ -540,6 +543,7 @@ const H = {
   dologin: doLogin, doregister: doRegister, logout,
   recheck: async () => { await loadCtx(); route(); },
   closesheet: closeSheet,
+  goback: () => { if ((window.__navCount || 1) > 1) { window.__navCount -= 2; history.back(); } else go('home'); },
   sheettog: (a) => a.classList.toggle('on'),
   itemcat: (a) => { S.itemCat = a.dataset.v; drawItems(); },
   itemnew: () => itemSheet(null),

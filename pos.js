@@ -19,7 +19,7 @@ const normMobile = (v) => { let d = norm(v).replace(/[^0-9+]/g, ''); if (d.start
 
 const CATS = { sweet_kg: L('মিষ্টি (কেজি)', 'Sweets (KG)', 'মিষ্টি (KG)'), sweet_pc: L('মিষ্টি (পিস)', 'Sweets (Piece)', 'মিষ্টি (Piece)'), doi: L('দই', 'Doi (Curd)', 'Doi (দই)'),
   cake_lb: L('কেক (পাউন্ড)', 'Cake (Pound)', 'Cake (Pound)'), cake_pc: L('কেক (পিস)', 'Cake (Piece)', 'Cake (Piece)') };
-const UNITS = { kg: L('কেজি', 'KG', 'KG'), pc: L('পিস', 'Piece', 'Piece'), lb: L('পাউন্ড', 'Pound', 'Pound') };
+const UNITS = { kg: L('কেজি', 'KG', 'KG'), pc: L('পিস', 'Piece', 'Piece'), lb: L('পাউন্ড', 'Pound', 'Pound'), g: L('গ্রাম', 'Gram', 'Gram'), dozen: L('ডজন', 'Dozen', 'Dozen'), box: L('বক্স', 'Box', 'Box') };
 const X = {
   title: L('সেল (POS)', 'Sales (POS)', 'Sale (POS)'), sell: L('বিক্রি', 'Sell', 'Sell'), today: L('আজকের সেল', "Today's sales", 'Today সেল'),
   quick: L('কুইক সেল', 'Quick sale', 'Quick Sale'), cart: L('কার্ট', 'Cart', 'Cart'), pay: L('পেমেন্ট', 'Pay', 'Pay'), total: L('মোট', 'Total', 'Total'),
@@ -38,6 +38,7 @@ const X = {
   custReq: L('বাকি বা পাইকারি সেলে গ্রাহকের মোবাইল নম্বর আর নাম লাগবেই', 'A customer mobile number and name are required for a due or wholesale sale', 'Due বা Wholesale sale এ Customer এর mobile number আর নাম লাগবেই'),
   known: L('পুরনো গ্রাহক', 'Existing customer', 'পুরনো Customer'), newc: L('নতুন গ্রাহক — নাম লিখুন', 'New customer — enter the name', 'নতুন Customer — নাম লিখুন'),
   owes: L('এখন বাকি', 'Owes now', 'এখন Due'), limit: L('বাকির সীমা', 'Credit limit', 'Credit limit'),
+  unit: L('একক', 'Unit', 'Unit'), convHow: L('অন্য এককেও বিক্রি করতে চান? (যেমন ১ পিস = ০.২ কেজি)', 'Sell in another unit too? (e.g. 1 pc = 0.2 kg)', 'অন্য unit-এও বিক্রি? (যেমন ১ pc = ০.২ kg)'), save: L('সংরক্ষণ', 'Save', 'Save'), convSaved: L('এককের হিসাব সংরক্ষিত', 'Unit conversion saved', 'Unit conversion saved'),
   other: L('অন্য আইটেম (তালিকায় নেই)', 'Other item (not in the list)', 'অন্য Item (list এ নেই)'), oname: L('আইটেমের নাম', 'Item name', 'Item এর নাম'), ounit: L('একক (কেজি, পিস…)', 'Unit (kg, piece…)', 'Unit (kg, piece…)'), oprice: L('একক দাম (৳)', 'Unit price (৳)', 'Unit price (৳)'),
   ohint: L('এটা মালিকের কাছে "তালিকায় নেই" হিসেবে যাবে, যাতে তালিকায় যোগ হয়।', 'The owner is told it is not in the list so it can be added.', 'Owner কে "list এ নেই" হিসেবে জানানো হবে, যাতে list এ যোগ হয়।'),
   newitem: L('＋ নতুন আইটেম', '＋ New item', '＋ নতুন Item'), full: L('নগদে সম্পন্ন', 'Done — cash', 'Cash এ Done'), more: L('মোবাইল / বাকি / ভাগ…', 'Mobile / due / split…', 'Mobile / Due / ভাগ…'),
@@ -78,6 +79,19 @@ const perms = () => S.ctx.perms.POS || {};
 const stepOf = (u) => (u === 'pc' ? 1 : 0.5);
 const unitL = (u) => lab(UNITS[u]) || u || '';
 const itemById = (id) => P.items.find((i) => i.id === id);
+// ---- selling in another unit (Kg / Pc ...): the cart always holds the quantity in the item's own unit (what the server prices and takes out of stock);
+// a line may also remember what was typed (alt = { unit, n }) so the screen can show "3 pc = 0.6 kg". The conversions are the owner's unit_conversions rows.
+const altList = (i) => {
+  const out = new Map(); out.set(i.unit, 1);
+  const rows = (P.conv || []).filter((c) => c.active !== false && (c.item_id === i.id || c.item_id === null || c.item_id === undefined));
+  rows.sort((a, z) => (a.item_id ? 0 : 1) - (z.item_id ? 0 : 1));       // the item's own row wins over a general one
+  rows.forEach((c) => { const f = Number(c.factor); if (!(f > 0)) return;
+    if (c.to_unit === i.unit && !out.has(c.from_unit)) out.set(c.from_unit, f);          // 1 from = f of the item unit
+    else if (c.from_unit === i.unit && !out.has(c.to_unit)) out.set(c.to_unit, 1 / f); });
+  return out;
+};
+const altFactor = (i, u) => altList(i).get(u) || null;
+const hasAlt = (i) => altList(i).size > 1;
 const lineAmt = (l) => (l.kind === 'quick' ? r2(l.amount) : r2(l.qty * l.price));
 const cartSub = () => r2(P.cart.reduce((s, l) => s + lineAmt(l), 0));
 const isNet = (e) => !navigator.onLine || /fetch|network|load failed|timeout/i.test((e && e.message) || '');
@@ -92,6 +106,7 @@ async function load() {
   let it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,unit,sell_price,is_active,barcode,sellable,hidden,item_type').eq('is_active', true).order('code'));
   if (it.error) it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,unit,sell_price,is_active,barcode').eq('is_active', true).order('code'));
   if (it.error) throw it.error;
+  try { const cv = await sb.from('unit_conversions').select('item_id,from_unit,to_unit,factor,active').eq('active', true); P.conv = cv.error ? (JSON.parse(store.get('bos_pos_conv') || '[]')) : (cv.data || []); if (!cv.error) store.set('bos_pos_conv', JSON.stringify(P.conv)); } catch (e) { P.conv = []; }
   P.items = it.data.filter((i) => i.sell_price !== null && i.sellable !== false && !i.hidden && i.item_type !== 'asset' && i.item_type !== 'raw_material');
   const all = B.liveLocs ? B.liveLocs(B.ENV.locs) : B.ENV.locs;
   P.locs = S.ctx.is_owner || S.ctx.roles.includes('management') ? all : all.filter((l) => S.ctx.locations.includes(l.id));
@@ -157,23 +172,35 @@ function refreshSell() { if (P.tab !== 'sell' || !$('#pos_items')) return; drawI
 function scanAdd(code) {
   const i = B.barcode && B.barcode.find(code, P.items);
   if (!i) return toast(code + ' · ' + lab(L('এই বারকোডের কোনো পণ্য নেই', 'No product has this barcode', 'এই barcode-এর কোনো product নেই')));
-  bump(i.id); if (i.unit === 'pc') addItem(i.id, 1); else qtySheet(i.id);
+  bump(i.id); if (i.unit === 'pc' && !hasAlt(i)) addItem(i.id, 1); else qtySheet(i.id);
 }
-function addItem(id, qty) {
+function addItem(id, qty, alt) {
   const i = itemById(id); if (!i) return;
   const ex = P.cart.find((l) => l.kind === 'item' && l.item_id === id);
-  if (ex) ex.qty = Math.round((ex.qty + qty) * 1000) / 1000; else P.cart.push({ kind: 'item', item_id: id, qty, price: Number(i.sell_price), ov: false });
+  if (ex) { ex.qty = Math.round((ex.qty + qty) * 1000) / 1000; ex.alt = ex.alt && alt && ex.alt.unit === alt.unit ? { unit: alt.unit, n: Math.round((ex.alt.n + alt.n) * 1000) / 1000 } : null; }
+  else P.cart.push({ kind: 'item', item_id: id, qty, price: Number(i.sell_price), ov: false, alt: alt || null });
   refreshSell();
 }
-function qtySheet(id) {
-  const i = itemById(id);
-  const presets = i.unit === 'pc' ? [1, 2, 3, 5, 10] : [0.25, 0.5, 1, 2, 5];
-  openSheet(`<h2>${esc(nm(i))}</h2><p class="muted">${money(i.sell_price)} / ${esc(unitL(i.unit))}</p>
+const presetsFor = (u) => (u === 'pc' ? [1, 2, 3, 5, 10] : u === 'dozen' ? [0.5, 1, 2, 3] : u === 'g' ? [100, 250, 500, 1000] : [0.25, 0.5, 1, 2, 5]);
+let QU = null;       // the unit chosen in the open quantity sheet
+function qtySheet(id, unit) {
+  const i = itemById(id); if (!i) return;
+  const al = altList(i); QU = unit && al.has(unit) ? unit : i.unit; const f = al.get(QU) || 1;
+  const units = [...al.keys()];
+  const chips = units.length > 1 ? `<div class="row wrap" style="margin-bottom:10px" role="group" aria-label="${esc(T('unit'))}">${units.map((u) => `<button class="tog ${u === QU ? 'on' : ''}" data-act="pos_q_unit" data-v="${id}" data-u="${esc(u)}" style="min-width:76px;font-size:1.1rem" aria-pressed="${u === QU}">${esc(unitL(u))}</button>`).join('')}</div>` : '';
+  const owner = !!(S.ctx && S.ctx.is_owner) && units.length === 1;
+  const setter = owner ? `<details data-ctl="off" style="margin-top:10px"><summary class="muted">${esc(T('convHow'))}</summary><div class="row" style="align-items:flex-end;margin-top:6px"><span>1</span>
+      <select id="cv_from" aria-label="${esc(T('unit'))}">${['pc', 'kg', 'dozen', 'lb', 'g', 'box'].filter((u) => u !== i.unit).map((u) => `<option value="${u}">${esc(unitL(u))}</option>`).join('')}</select><span>=</span>
+      <input id="cv_f" inputmode="decimal" placeholder="0.2" style="width:90px"><span>${esc(unitL(i.unit))}</span><button class="mini" data-act="pos_conv_save" data-v="${id}">${esc(T('save'))}</button></div></details>` : '';
+  const presets = presetsFor(QU);
+  openSheet(`<h2 style="font-size:1.35rem">${esc(nm(i))}</h2><p class="muted" style="font-size:1rem">${money(Number(i.sell_price) * f)} / ${esc(unitL(QU))}${QU !== i.unit ? ` <small>(${money(i.sell_price)} / ${esc(unitL(i.unit))})</small>` : ''}</p>${chips}
     <div class="row wrap" style="margin-bottom:10px">${presets.map((p) => `<button class="tog" data-act="pos_q_set" data-v="${id}" data-n="${p}" style="min-width:64px;font-size:1.15rem">${p}</button>`).join('')}</div>
-    <label>${esc(T('qty'))} (${esc(unitL(i.unit))})</label><input id="pos_qty" inputmode="decimal" value="1" style="font-size:1.4rem">
+    <label>${esc(T('qty'))} (${esc(unitL(QU))})</label><input id="pos_qty" inputmode="decimal" value="1" style="font-size:1.4rem">
+    <div class="muted" id="pos_qconv" style="min-height:1.3em"></div>${setter}
     <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(t('cancel'))}</button><button class="primary full" data-act="pos_q_ok" data-v="${id}">${esc(T('add'))}</button></div>`);
-  setTimeout(() => { const e = $('#pos_qty'); if (e) { e.focus(); e.select(); } }, 60);
+  setTimeout(() => { const e = $('#pos_qty'); if (e) { e.focus(); e.select(); } qConv(id); }, 60);
 }
+function qConv(id) { const i = itemById(id), el = $('#pos_qconv'); if (!i || !el) return; const f = altFactor(i, QU) || 1; if (QU === i.unit) { el.textContent = ''; return; } const n = nnum(($('#pos_qty') || {}).value); el.textContent = n > 0 ? `= ${fmt(Math.round(n * f * 1000) / 1000)} ${unitL(i.unit)} · ${money(r2(n * f * Number(i.sell_price)))}` : ''; }
 function otherSheet() {
   openSheet(`<h2>${esc(T('other'))}</h2><div class="notice ok">${esc(T('ohint'))}</div><div class="stack">
     <div><label>${esc(T('oname'))}</label><input id="ot_name"></div>
@@ -235,7 +262,7 @@ function drawCartLines() {
     const i = l.kind === 'item' ? itemById(l.item_id) : null;
     const name = l.kind === 'item' ? nm(i) : l.name, unit = l.kind === 'item' ? unitL(i.unit) : l.unit || '';
     return `<div class="cart-line"><div style="flex:1;min-width:0"><div class="nm">${esc(name)}${l.kind === 'quick' ? ' ⚡' : ''}${l.kind === 'custom' ? ' ◇' : ''}</div>
-      ${l.kind === 'quick' ? '' : `<div class="muted" style="font-size:.85rem" ${l.kind === 'item' ? `data-act="pos_price" data-k="${k}"` : ''}>${money(l.price)} / ${esc(unit)}${l.kind === 'item' ? ' ✎' : ''}${l.ov ? ' ✎' : ''}</div>`}</div>
+      ${l.kind === 'quick' ? '' : `<div class="muted" style="font-size:.85rem" ${l.kind === 'item' ? `data-act="pos_price" data-k="${k}"` : ''}>${money(l.price)} / ${esc(unit)}${l.kind === 'item' ? ' ✎' : ''}${l.ov ? ' ✎' : ''}${l.alt ? ` · <b>${fmt(l.alt.n)} ${esc(unitL(l.alt.unit))}</b>` : ''}</div>`}</div>
       ${l.kind === 'quick' ? `<button class="mini" data-act="pos_rm" data-k="${k}" aria-label="x">✕</button>` : `<div class="stepper"><button data-act="pos_step" data-k="${k}" data-d="-1">−</button><button data-act="pos_qedit" data-k="${k}" class="qv">${fmt(l.qty)}</button><button data-act="pos_step" data-k="${k}" data-d="1">＋</button></div>`}
       <b style="min-width:72px;text-align:right">${money(lineAmt(l))}</b></div>`; }).join('') || `<p class="muted">${esc(T('empty'))}</p>`;
   const tt = $('#cart_total'); if (tt) tt.textContent = money(netTotal());
@@ -385,7 +412,12 @@ Object.assign(A.H, {
   pos_cat: (a) => { P.cat = a.dataset.v; drawSell(true); },
   pos_add: (a) => { const i = itemById(a.dataset.v); bump(i.id); if (i.unit === 'pc') addItem(i.id, 1); else qtySheet(i.id); },
   pos_q_set: (a) => { $('#pos_qty').value = a.dataset.n; },
-  pos_q_ok: (a) => { const q = nnum($('#pos_qty').value); if (!(q > 0)) return toast(T('qty')); closeSheet(); addItem(a.dataset.v, q); },
+  pos_q_unit: (a) => qtySheet(a.dataset.v, a.dataset.u),
+  pos_q_ok: (a) => { const i = itemById(a.dataset.v), q = nnum($('#pos_qty').value); if (!i || !(q > 0)) return toast(T('qty')); const f = altFactor(i, QU) || 1, base = Math.round(q * f * 1000) / 1000;
+    if (!(base > 0)) return toast(T('qty')); closeSheet(); addItem(i.id, base, QU !== i.unit ? { unit: QU, n: q } : null); },
+  pos_conv_save: async (a) => { const i = itemById(a.dataset.v), f = nnum(($('#cv_f') || {}).value), u = ($('#cv_from') || {}).value; if (!i || !u || !(f > 0)) return toast(T('qty'));
+    const r = await sb.from('unit_conversions').insert({ item_id: i.id, from_unit: u, to_unit: i.unit, factor: f, active: true }); if (r.error) return fail(r.error);
+    (P.conv = P.conv || []).push({ item_id: i.id, from_unit: u, to_unit: i.unit, factor: f, active: true }); try { store.set('bos_pos_conv', JSON.stringify(P.conv)); } catch (e) { /* ignore */ } toast(T('convSaved')); qtySheet(i.id, u); },
   pos_other: () => otherSheet(),
   pos_ot_ok: () => { const name = ($('#ot_name').value || '').trim(), qty = nnum($('#ot_qty').value), price = nnum($('#ot_price').value);
     if (!name) return toast(lab(ERRS.name_required)); if (!(qty > 0) || !(price > 0)) return toast(T('oprice'));
@@ -395,10 +427,14 @@ Object.assign(A.H, {
   pos_type: (a) => { P.type = a.dataset.v; [...document.querySelectorAll('[data-act=pos_type]')].forEach((b) => b.classList.toggle('on', b.dataset.v === P.type)); drawCust(); },
   pos_dk: (a) => { if (P.dk === a.dataset.v) return; P.dk = a.dataset.v; const i = $('#cart_disc'); if (i) i.value = ''; discChanged(); },
   pos_cust_show: () => { P.cust.show = true; drawCust(); },
-  pos_step: (a) => { const l = P.cart[Number(a.dataset.k)], st = stepOf(l.kind === 'item' ? itemById(l.item_id).unit : 'pc'), n = Math.round((l.qty + Number(a.dataset.d) * st) * 1000) / 1000;
-    if (n <= 0) P.cart.splice(Number(a.dataset.k), 1); else l.qty = n; afterCartChange(); },
+  pos_step: (a) => { const k = Number(a.dataset.k), l = P.cart[k], d = Number(a.dataset.d);
+    if (l.kind === 'item' && l.alt) { const it = itemById(l.item_id), f = altFactor(it, l.alt.unit) || 1, st = stepOf(l.alt.unit), n = Math.round((l.alt.n + d * st) * 1000) / 1000;
+      if (n <= 0) P.cart.splice(k, 1); else { l.alt.n = n; l.qty = Math.round(n * f * 1000) / 1000; } return afterCartChange(); }
+    const st = stepOf(l.kind === 'item' ? itemById(l.item_id).unit : 'pc'), n = Math.round((l.qty + d * st) * 1000) / 1000;
+    if (n <= 0) P.cart.splice(k, 1); else l.qty = n; afterCartChange(); },
   pos_rm: (a) => { P.cart.splice(Number(a.dataset.k), 1); afterCartChange(); },
-  pos_qedit: (a) => { const l = P.cart[Number(a.dataset.k)]; const v = prompt(T('qty'), l.qty); if (v === null) return; const n = nnum(v); if (n > 0) { l.qty = n; afterCartChange(); } },
+  pos_qedit: (a) => { const l = P.cart[Number(a.dataset.k)]; const alt = l.kind === 'item' && l.alt; const v = prompt(T('qty') + (alt ? ' (' + unitL(alt.unit) + ')' : ''), alt ? alt.n : l.qty); if (v === null) return; const n = nnum(v);
+    if (n > 0) { if (alt) { l.alt.n = n; l.qty = Math.round(n * (altFactor(itemById(l.item_id), alt.unit) || 1) * 1000) / 1000; } else l.qty = n; afterCartChange(); } },
   pos_price: (a) => { const l = P.cart[Number(a.dataset.k)]; const v = prompt(T('priceov'), l.price); if (v === null) return; const n = nnum(v); if (n >= 0 && v.trim() !== '') { l.price = n; l.ov = n !== Number(itemById(l.item_id).sell_price); afterCartChange(); } },
   pos_confirm: () => {
     const disc = discVal(), sub = cartSub(), dk = P.dk;
@@ -431,6 +467,7 @@ Object.assign(A.H, {
 document.addEventListener('input', (e) => {
   const id = e.target.id;
   if (id === 'pos_q') { P.q = e.target.value; drawItems(true); }
+  if (id === 'pos_qty' && typeof QU !== 'undefined') { const sh = document.querySelector('[data-act=pos_q_ok]'); if (sh) qConv(sh.dataset.v); }
   if (id === 'cart_disc') discChanged();
   if (id === 'cu_mobile') { P.cust.mobile = e.target.value; P.cust.found = null; P.cust.name = ''; lookup(); const el = $('#cart_cust'); const m = normMobile(P.cust.mobile); if (m) drawCust(); }
   if (id === 'cu_name') P.cust.name = e.target.value;
