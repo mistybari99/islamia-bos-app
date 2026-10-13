@@ -38,7 +38,7 @@ async function render() {
   const td = dhaka(), from = addDays(td, -6);
   await B.loadStatic();
   const q = (x) => x.then((r) => (r && r.error ? { data: null, count: 0 } : r), () => ({ data: null, count: 0 }));
-  const [ex, rel, stf, itm, sub, dr, sales, sheets, ls, gaps, pays, dues, emp, mine] = await Promise.all([
+  const [ex, rel, stf, itm, sub, dr, sales, sheets, ls, gaps, pays, dues, emp, mine, needs] = await Promise.all([
     anyApprove ? q(sb.from('exceptions').select('level').eq('status', 'open')) : { data: [] },
     owner ? q(sb.from('release_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')) : { count: 0 },
     owner ? q(sb.from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'pending')) : { count: 0 },
@@ -53,6 +53,7 @@ async function render() {
     canPos ? q(sb.rpc('customer_dues')) : { data: null },
     owner ? q(sb.from('emergency_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')) : { count: 0 },
     q(sb.rpc('my_emergency')),
+    q(sb.rpc('needs_you_oldest', { p_limit: 6 })),
   ]);
   const reds = (ex.data || []).filter((x) => x.level === 'red').length, yel = (ex.data || []).filter((x) => x.level === 'yellow').length;
   const mineToApprove = (sub.data || []).filter((e) => owner || (perms[e.form_code] && perms[e.form_code].approve)).length;
@@ -76,6 +77,14 @@ async function render() {
   ].filter((r) => r[0]);
   const row = ([n, tone, label, to]) => `<div class="dash-row ${tone}" ${to ? `data-act="go" data-v="${to}"` : ''}><span class="dot"></span><span class="dl">${esc(label)}</span><b class="dn">${n}</b>${to ? '<span class="dc">›</span>' : ''}</div>`;
   let html = `<div class="card panel dash"><h3>${esc(T('problems'))}</h3>${rows.length ? rows.map(row).join('') : `<div class="dash-ok">${esc(T('clear'))}</div>`}</div>`;
+  const ny = (needs.data || []);
+  if (ny.length) {      // the oldest waiting things this person may decide, oldest first (supabase/phase28.sql needs_you_oldest)
+    const NY = { entry: B.L('ফর্ম', 'Form', 'Form'), release: B.L('ছাড়ের অনুরোধ', 'Release request', 'Release request'), emergency: B.L('জরুরি অনুরোধ', 'Emergency request', 'Emergency request'), item_change: B.L('আইটেম বদল', 'Item change', 'Item change'),
+      staff: B.L('নতুন স্টাফ', 'New staff', 'নতুন staff'), wastage: B.L('নষ্ট মাল', 'Wastage', 'Wastage'), parallel: B.L('পাশাপাশি মাসের সিদ্ধান্ত', 'Parallel month decision', 'Parallel মাসের সিদ্ধান্ত') };
+    const age = (s) => { const h = Math.max(0, Math.round((Date.now() - new Date(s).getTime()) / 3600000)); return h >= 48 ? Math.floor(h / 24) + (S.lang === 'en' ? ' d' : ' দিন') : h + (S.lang === 'en' ? ' h' : ' ঘণ্টা'); };
+    const nrow = (x) => `<div class="dash-row warn" ${x.kind === 'entry' ? `data-act="openentry" data-v="${esc(x.id)}"` : `data-act="go" data-v="${esc(x.route)}"`}><span class="dot"></span><span class="dl">${esc(B.lab(NY[x.kind] || NY.entry))} · ${esc(x.label || '')}${x.location_id ? ' · ' + esc((B.ENV.locs.find((l) => l.id === x.location_id) || {}).code || '') : ''}</span><b class="dn">${esc(age(x.since))}</b><span class="dc">›</span></div>`;
+    html += `<div class="card panel dash"><h3>${esc(B.lab(B.L('আপনার সিদ্ধান্তের অপেক্ষায় (পুরনো আগে)', 'Needs you (oldest first)', 'Needs you (পুরনো আগে)')))}</h3>${ny.map(nrow).join('')}</div>`;
+  }
   if (canPos) {
     const y = sum(sd.filter((s) => s.sale_date === addDays(td, -1) && s.status === 'done'));
     const days = Array.from({ length: 7 }, (_, i) => addDays(td, i - 6)).map((d) => [d, sum(sd.filter((s) => s.sale_date === d && s.status === 'done'))]);

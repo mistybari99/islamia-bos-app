@@ -252,6 +252,7 @@ const STATUS_CLS = { draft: '', submitted: 'warn', approved: 'ok', rejected: 'ba
 function actionsHTML() {
   const b = []; const canMaker = E.mode === 'edit', st = E.status;
   if (E.mode === 'change') return `<div class="actionbar"><button data-act="e_chg_cancel">${esc(t('cancel'))}</button><button class="primary" data-act="e_chg_send">${esc(lab(X17.chg_send))}</button></div>`;
+  if (canMaker && !E.id && !E.later && B.rule('smart_defaults_on', true) !== false) b.push(`<button data-act="e_copy_last">${esc(lab(X17.copy_last))}</button>`);
   if (canMaker && E.sb && E.sb.on) b.push(`<div class="notice warn" style="flex-basis:100%">${esc(lab(X17['sb_hint' + E.code.replace('-', '_')]))}</div>`);
   if (canMaker && E.sb && E.sb.on && !E.sb.sealed) b.push(`<button data-act="e_seal">${esc(lab(X17.sb_lock))}</button>`);
   if (canMaker) b.push(`<button data-act="e_save">${esc(t('save_draft'))}</button><button class="primary" data-act="e_submit">${esc(t('submit'))}</button>`);
@@ -417,6 +418,7 @@ const X18 = {
   r_witness: L('সাক্ষী (দ্বিতীয়বার গণনা)', 'Witness (second count)', 'Witness (দ্বিতীয়বার count)'), r_second_sig: L('দ্বিতীয় স্বাক্ষর', 'Second signature', 'দ্বিতীয় signature'), r_hub_pair: L('হাব জোড়া — দ্বিতীয় জন', 'Hub pair - second person', 'Hub pair — দ্বিতীয় জন'),
   sign: L('পিন দিয়ে স্বাক্ষর', 'Sign with PIN', 'PIN দিয়ে sign'), signed_by: L('স্বাক্ষর করেছেন', 'Signed by', 'Sign করেছেন'), notsigned: L('এখনও স্বাক্ষর হয়নি', 'Not signed yet', 'এখনও sign হয়নি'),
   e_count_already_saved: L('এই গণনা আগেই সেভ হয়েছে — বদলানো যায় না', 'This count is already saved - it cannot change', 'এই count আগেই save হয়েছে — বদলানো যায় না'),
+  copy_last: L('আগেরটা থেকে নিন', 'Start from my last one', 'আগেরটা থেকে নিন'), copy_none: L('আগের কোনো এন্ট্রি নেই', 'No earlier entry to copy', 'আগের কোনো entry নেই'), copy_done: L('আইটেম/সরবরাহকারী/পছন্দ নেওয়া হয়েছে — পরিমাণ নিজে লিখুন', 'Items, suppliers and choices copied - write the quantities yourself', 'Item/supplier/choice নেওয়া হয়েছে - পরিমাণ নিজে লিখুন'),
   sb_lock: L('গণনা সেভ ও লক করুন', 'Lock the counts', 'Count lock করুন'), sb_done: L('গণনা লক হয়েছে', 'Counts locked', 'Count lock হয়েছে'),
   sb_hint04_3: L('অন্ধ গণনা: আগে সব আইটেম গুনে লক করুন। লেজারের হিসাব জমা দেওয়ার পরে সিস্টেম নিজে বসাবে।', 'Blind count: count every item and lock. The book balance is added by the system when you submit.', 'Blind count: আগে সব item গুনে lock করুন। Book balance submit-এর পরে system বসাবে।'),
   sb_hint04_1: L('অন্ধ গ্রহণ: আগে গুনে লক করুন, তারপর মেমোর অঙ্ক লিখুন।', 'Blind receiving: count and lock first, then write the memo figure.', 'Blind receiving: আগে গুনে lock করুন, তারপর memo-র অঙ্ক লিখুন।'),
@@ -888,6 +890,15 @@ Object.assign(A.H, {
   e_count_save: () => countSave(),
   e_count_peek: () => countPeek(),
   e_pin_sign: (a) => pinSignClick(a.dataset.v),
+  e_copy_last: async () => {
+    const r = await sb.from('entries').select('data').eq('form_code', E.code).eq('location_id', E.loc).eq('created_by', S.ctx.profile.id).neq('status', 'rejected').order('created_at', { ascending: false }).limit(1);
+    const last = r.data && r.data[0] && r.data[0].data; if (!last) return toast(lab(X17.copy_none));
+    const KEEP = new Set(['item', 'supplier']), put = (fd, src, dst) => { if (!KEEP.has(fd.type) || src[fd.id] === undefined || src[fd.id] === null || src[fd.id] === '') return; if (dst[fd.id] === undefined || dst[fd.id] === '') dst[fd.id] = src[fd.id]; };
+    const walk = (fd) => { if (fd.type === 'table') { const rows = Array.isArray(last[fd.id]) ? last[fd.id] : []; if (!rows.length || rowsOf(fd)) return; E.data[fd.id] = E.data[fd.id] && E.data[fd.id].length ? E.data[fd.id] : rows.map(() => ({}));
+          rows.forEach((row, i) => { E.data[fd.id][i] = E.data[fd.id][i] || {}; fd.cols.forEach((c) => { if (c.who !== 'checker') put(c, row || {}, E.data[fd.id][i]); }); }); } else if (fd.who !== 'checker') put(fd, last, E.data); };
+    (E.spec.head || []).forEach(walk); (E.spec.sections || []).forEach((s) => (s.fields || []).forEach(walk));
+    E.dirty = true; recompute(); toast(lab(X17.copy_done)); const sc = window.scrollY; draw(); window.scrollTo(0, sc);
+  },
   e_seal: () => sealCounts(),
   e_submit: submit,
   e_approve: () => decide(true),

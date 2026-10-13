@@ -94,4 +94,13 @@ document.addEventListener('change', (e) => {
   const k = e.target.dataset && e.target.dataset.pay; if (!k || !pay.cur) return;
   const [i, f] = k.split('.'); const r = pay.cur.rows[Number(i)]; if (r) { r[f] = e.target.value; pay.refreshSum(); }
 });
+// shared list control on every wallet picker this file draws (POS, dues, purchase payments): + Add new follows the list's rule, "Other" keeps the old value and the words go to the Other queue
+const wireWallets = (root) => {
+  const lc = B.listctl; if (!lc || !root || !root.querySelectorAll) return;
+  root.querySelectorAll('select[data-pay$=".wallet"]').forEach((sel) => { if (!sel.dataset.lpid) lc.enhance(sel, 'wallets', { keepPrev: true, form: 'PAYMENT', ctx: { field: 'wallet' } }); });
+};
+pay.wire = wireWallets;
+try {
+  new MutationObserver((ms) => { for (const m of ms) m.addedNodes.forEach((n) => { if (n.nodeType === 1) wireWallets(n.matches && n.matches('select[data-pay]') ? n.parentNode : n); }); }).observe(document.documentElement, { childList: true, subtree: true });
+} catch (e) { /* no observer: the plain wallet select stays */ }
 })();

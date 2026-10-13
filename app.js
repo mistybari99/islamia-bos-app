@@ -159,6 +159,7 @@ async function start() {
 const OWNER_ONLY = new Set(['rulehub', 'emergency', 'lists', 'staff', 'matrix', 'rules', 'settings', 'logs', 'backup', 'releases', 'locset', 'locsheet', 'locations', 'control']);
 // owner-only screens that a delegated grant also opens (the server still decides on every call; this only stops the page bouncing a grant holder to Home)
 const ROUTE_GRANTS = {
+  releases: ['release_decide'],
   lists: ['list_manage'],
   locset: ['settings_approve', 'head_management', 'location_manage'],
   locsheet: ['settings_approve', 'head_management', 'location_manage'],
@@ -199,7 +200,7 @@ function dispatch(page) {
   const local = { home: viewHome, items: viewItems, staff: viewStaff, matrix: viewMatrix, rules: viewRules,
      settings: viewSettings, logs: viewLogs, backup: viewBackup, itemreq: viewItemReq };
   const extra = window.BOS_PAGES || {};
-  if ((page === 'exceptions' || page === 'releases') && !S.ctx.is_owner && !(page === 'exceptions' && Object.values(S.ctx.perms).some((p) => p.approve))) return viewHome();
+  if (page === 'exceptions' && !S.ctx.is_owner && !Object.values(S.ctx.perms).some((p) => p.approve)) return viewHome();
   if (page === 'items' && extra.items) return extra.items();           // products v2 (items2.js) takes over #/items; the old screen stays as the fallback
   (local[page] || extra[page] || viewHome)();
 }

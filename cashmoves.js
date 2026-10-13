@@ -102,6 +102,7 @@ document.addEventListener('change', (e) => {
   if (e.target.id === 'cm_loc') { D.loc = Number(e.target.value); show(); }
 });
 async function view() {
+  if (B.loadStatic) await B.loadStatic();
   const locs = LOCS(); if (!D.loc || !locs.find((l) => l.id === D.loc)) D.loc = (locs[0] || {}).id;
   shell(T('title'), '<div id="cm_body"><p class="muted">…</p></div>', true);
   try { await show(); } catch (e) { fail(e); }

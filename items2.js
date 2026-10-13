@@ -44,7 +44,7 @@ const X = {
   details: L('বিবরণ', 'Details', 'Details'), detailsph: L('উপাদান, ওজন, নোট…', 'Ingredients, weight, notes…', 'Ingredients, weight, notes…'),
   lowNow: L('এখন স্টক কম', 'Low stock now', 'এখন stock কম'), lowNowH: L('শুধু ন্যূনতম স্টকের নিচে থাকা পণ্য (স্টকের হিসাব থেকে)', 'Only products below their minimum stock (from the stock ledger)', 'শুধু minimum stock-এর নিচে থাকা product (stock ledger থেকে)'),
   type: L('ধরন', 'Type', 'Type'), flagf: L('ফ্ল্যাগ', 'Flag', 'Flag'), fl_locked: L('লক করা', 'Locked', 'Locked'), fl_hidden: L('লুকানো', 'Hidden', 'Hidden'), fl_nocount: L('ব্যবসার হিসাবে নেই', 'Not counted in business', 'Business-এর হিসাবে নেই'),
-  fl_unpriced_fg: L('দাম-ছাড়া তৈরি পণ্য / কিনে-বিক্রি (দাম দিন বা লুকান)', 'Unpriced finished goods / resale (to price or hide)', 'দাম-ছাড়া finished / resale (দাম দিন বা লুকান)'), oldlist: L('পুরনো তালিকা', 'Old list', 'পুরনো list'), openbulk: L('একসাথে বদলের পাতায় খুলুন', 'Open in the bulk editor', 'Bulk editor-এ খুলুন'), pbulk: L('আইটেম একসাথে বদল', 'Bulk item editor', 'Item একসাথে বদল'),
+  fl_notype: L('টাইপ নেই', 'No type', 'Type নেই'), fl_unpriced_fg: L('দাম-ছাড়া তৈরি পণ্য / কিনে-বিক্রি (দাম দিন বা লুকান)', 'Unpriced finished goods / resale (to price or hide)', 'দাম-ছাড়া finished / resale (দাম দিন বা লুকান)'), oldlist: L('পুরনো তালিকা', 'Old list', 'পুরনো list'), openbulk: L('একসাথে বদলের পাতায় খুলুন', 'Open in the bulk editor', 'Bulk editor-এ খুলুন'), pbulk: L('আইটেম একসাথে বদল', 'Bulk item editor', 'Item একসাথে বদল'),
   fl_noprice: L('দাম নেই (Data needed)', 'No price (Data needed)', 'দাম নেই (Data needed)'), fl_retired: L('অবসরপ্রাপ্ত', 'Retired', 'Retired'), fl_master: L('মাস্টার কোডে মেলানো', 'Linked to a master code', 'Master code-এ linked'),
   dneeded: L('Data needed', 'Data needed', 'Data needed'), more2: L('আরও অপশন', 'More options', 'আরও Option'), pimp: L('আইটেম মাস্টার ইমপোর্ট', 'Item master import', 'Item master import'), pmap: L('পুরনো আইটেম মেলানো', 'Old items to master codes', 'পুরনো Item মেলানো'),
   ptypes: L('আইটেমের ধরন ও ডিফল্ট', 'Item types & defaults', 'Item type ও Default'), passets: L('সম্পদ-খাতা', 'Asset register', 'Asset register'), bycat: L('ক্যাটাগরি ধরে', 'By category', 'Category ধরে'),
@@ -61,7 +61,7 @@ const rl = (r) => ({ bn: r.label_bn || r.label_en || r.value_code, en: r.label_e
 
 // ---------- state ----------
 const D = { items: [], cost: new Map(), canCost: false, conv: [], ready: false, low: new Map(), lowOk: false, master: false };
-const Fl = { q: '', cat: '', sub: '', source: '', tracked: '', low: false, lowNow: false, active: '', type: '', flag: '' };
+const Fl = { q: '', cat: '', sub: '', source: '', tracked: '', low: false, lowNow: false, active: '', type: '', cls: '', flag: '' };
 let shown = PAGE;
 let F = null;                          // the open form: { id, cur, images, vat, ... }
 
@@ -145,6 +145,7 @@ function matches(i) {
   if (Fl.active === 'yes' && !i.is_active) return false;
   if (Fl.active === 'no' && i.is_active) return false;
   if (Fl.type && i.item_type !== Fl.type) return false;
+  if (Fl.cls && i.control_class !== Fl.cls) return false;
   if (Fl.flag === 'locked' && !i.locked) return false; if (Fl.flag === 'hidden' && !i.hidden) return false; if (Fl.flag === 'nocount' && i.count_in_business !== false) return false;
   if (Fl.flag === 'unpriced_fg' && !(i.sell_price === null || i.sell_price === undefined) ) return false; if (Fl.flag === 'unpriced_fg' && !(['finished_good', 'resale'].includes(i.item_type) && i.is_active && !i.hidden)) return false; if (Fl.flag === 'noprice' && !(i.sell_price === null || i.sell_price === undefined)) return false; if (Fl.flag === 'retired' && !i.retired_at) return false; if (Fl.flag === 'master' && !i.master_code) return false;
   return true;
@@ -155,6 +156,7 @@ function chipsHTML() {
   if (Fl.cat) c.push(['cat', catLabel(Fl.cat)]); if (Fl.sub) c.push(['sub', subLabel(Fl.sub)]);
   if (Fl.source) c.push(['source', T(Fl.source)]); if (Fl.tracked) c.push(['tracked', Fl.tracked === 'yes' ? T('tracked') : T('untracked')]);
   if (Fl.low) c.push(['low', T('low')]); if (Fl.lowNow) c.push(['lowNow', T('lowNow')]); if (Fl.active) c.push(['active', Fl.active === 'yes' ? T('active') : T('inactive')]);
+  if (Fl.cls) c.push(['cls', Fl.cls]);
   if (Fl.type) c.push(['type', B.itemMaster ? B.itemMaster.typeLabel(Fl.type) : Fl.type]); if (Fl.flag) c.push(['flag', T('fl_' + Fl.flag)]);
   return c.map(([k, l]) => `<button type="button" class="chip" data-act="p2_chip_x" data-k="${k}" aria-label="${esc(l)} ✕">${esc(l)} ✕</button>`).join('');
 }
@@ -191,10 +193,20 @@ async function viewList() {
       <button id="p2_fb" class="p2-fb" data-act="p2_filter" aria-label="${esc(T('filter'))}">${esc(T('filter'))}<span class="cnt" ${nFilters() ? '' : 'hidden'}>${nFilters()}</span></button>
       ${canNew ? `<button class="primary" data-act="itemnew" aria-label="${esc(T('add'))}">＋</button>` : ''}${canNew && D.master ? `<button data-act="im_bycat" aria-label="${esc(T('bycat'))}">${esc(T('bycat'))}</button>` : ''}${D.master ? `<button class="mini im-dots" data-act="p2_pagemenu" aria-label="${esc(T('more2'))}">⋮</button>` : ''}</div>
     ${D.master ? `<div class="row wrap" style="gap:6px;margin:4px 0"><button type="button" class="chip ${Fl.flag === 'unpriced_fg' ? 'warn' : ''}" id="p2_fg" data-act="p2_fg">${esc(T('fl_unpriced_fg'))} · <span id="p2_fgn">${D.items.filter((i) => ['finished_good', 'resale'].includes(i.item_type) && i.is_active && !i.hidden && (i.sell_price === null || i.sell_price === undefined)).length}</span></button>${Fl.flag === 'unpriced_fg' && canEnter() ? `<button type="button" class="chip info" data-act="p2_fg_bulk">${esc(T('openbulk'))} ›</button>` : ''}</div>` : ''}
+    ${D.master ? `<div id="p2_badges">${badgesHTML()}</div>` : ''}
     <div class="p2-chips" id="p2_chips"></div>
     <div class="row between muted" style="font-size:.88rem"><span id="p2_count"></span><span class="row">${canNew || S.ctx.is_owner ? `<a href="#/itemreq">${esc(T('pending'))}</a>` : ''}</span></div>
     <div id="p2_list"></div><button class="full" id="p2_more" data-act="p2_more" hidden>${esc(T('more'))}</button>`, 'home');
   drawList();
+}
+// count badges: how many products of each type / dictionary class (active, not retired); a tap filters the list by it, a second tap clears
+function badgesHTML() {
+  const live = D.items.filter((i) => i.is_active && !i.retired_at), cnt = (k) => live.reduce((m, i) => { const v = i[k]; if (v) m[v] = (m[v] || 0) + 1; return m; }, {});
+  const t = cnt('item_type'), c = cnt('control_class'), none = live.filter((i) => !i.item_type).length;
+  const chip = (act, v, label, n, on) => `<button type="button" class="chip ${on ? 'info' : ''}" data-act="${act}" data-v="${esc(v)}" aria-pressed="${on}">${esc(label)} <b>${n}</b></button>`;
+  const types = Object.keys(t).sort((a, b) => t[b] - t[a]).map((k) => chip('p2_btype', k, B.itemMaster ? B.itemMaster.typeLabel(k) : k, t[k], Fl.type === k)).join('');
+  const classes = Object.keys(c).sort((a, b) => c[b] - c[a]).map((k) => chip('p2_bcls', k, k, c[k], Fl.cls === k)).join('');
+  return `<div class="row wrap" style="gap:6px;margin:4px 0">${types}${none ? `<span class="chip warn">${esc(T('fl_notype'))} <b>${none}</b></span>` : ''}</div>${classes ? `<div class="row wrap" style="gap:6px;margin:4px 0">${classes}</div>` : ''}`;
 }
 function filterSheet() {
   const sel = (id, opts, cur) => `<select id="${id}"><option value="">${esc(T('all'))}</option>${opts.map(([v, l]) => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`;
@@ -375,11 +387,13 @@ Object.assign(H, {
   itemnew: () => go('items/new'),
   itemedit: (a) => go('items/edit/' + a.dataset.v),
   p2_filter: () => filterSheet(),
+  p2_btype: (a) => { Fl.type = Fl.type === a.dataset.v ? '' : a.dataset.v; shown = PAGE; const b = $('#p2_badges'); if (b) b.innerHTML = badgesHTML(); drawList(); },
+  p2_bcls: (a) => { Fl.cls = Fl.cls === a.dataset.v ? '' : a.dataset.v; shown = PAGE; const b = $('#p2_badges'); if (b) b.innerHTML = badgesHTML(); drawList(); },
   p2_fg: () => { Fl.flag = Fl.flag === 'unpriced_fg' ? '' : 'unpriced_fg'; shown = PAGE; viewList(); },
   p2_fg_bulk: () => { B.bulkPreset = 'fg'; go('bulkitems'); },
   p2_apply: () => { Fl.cat = $('#ff_cat').value; Fl.sub = $('#ff_sub').value; Fl.source = $('#ff_src').value; Fl.tracked = $('#ff_trk').value; Fl.active = $('#ff_act').value; Fl.type = $('#ff_type') ? $('#ff_type').value : ''; Fl.flag = $('#ff_flag') ? $('#ff_flag').value : ''; Fl.low = isOn('ff_low'); Fl.lowNow = isOn('ff_lownow'); shown = PAGE; closeSheet(); drawList(); },
-  p2_reset: () => { Object.assign(Fl, { cat: '', sub: '', source: '', tracked: '', low: false, lowNow: false, active: '', type: '', flag: '' }); shown = PAGE; closeSheet(); drawList(); },
-  p2_chip_x: (a) => { const k = a.dataset.k; Fl[k] = k === 'low' || k === 'lowNow' ? false : ''; shown = PAGE; drawList(); },
+  p2_reset: () => { Object.assign(Fl, { cat: '', sub: '', source: '', tracked: '', low: false, lowNow: false, active: '', type: '', cls: '', flag: '' }); shown = PAGE; closeSheet(); const bd = $('#p2_badges'); if (bd) bd.innerHTML = badgesHTML(); drawList(); },
+  p2_chip_x: (a) => { const k = a.dataset.k; Fl[k] = k === 'low' || k === 'lowNow' ? false : ''; shown = PAGE; const bd = $('#p2_badges'); if (bd) bd.innerHTML = badgesHTML(); drawList(); },
   p2_more: () => { shown += PAGE; drawList(); },
   p2_tg: (a) => {
     const on = !a.classList.contains('on'); a.classList.toggle('on', on); a.setAttribute('aria-pressed', on ? 'true' : 'false'); a.textContent = on ? t('on') : t('off');

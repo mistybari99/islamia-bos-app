@@ -20,6 +20,7 @@ const X = {
   g_sales: L('বিক্রি', 'Sales', 'Sales (বিক্রি)'), g_pos: L('POS ও ক্যাশিয়ার', 'POS & cashier', 'POS ও Cashier'), g_cash: L('ক্যাশ ও পেমেন্ট', 'Cash & payments', 'Cash ও Payment'),
   g_customers: L('গ্রাহক ও বাকি', 'Customers & dues', 'Customer ও বাকি'),
   g_stock: L('স্টক ও অপচয়', 'Stock & wastage', 'Stock ও অপচয়'), g_purchase: L('ক্রয় ও সরবরাহকারী', 'Purchases & suppliers', 'Purchase ও Supplier'), g_expense: L('খরচ', 'Expenses', 'খরচ'),
+  g_profit: L('লাভ-ক্ষতি ও বেতন', 'Profit, loss & payroll', 'লাভ-ক্ষতি ও Salary'), g_quality: L('মান ও পরিচ্ছন্নতা', 'Quality & hygiene', 'মান ও hygiene'), g_marketing: L('মার্কেটিং', 'Marketing', 'Marketing'), g_orders: L('অর্ডার ও ডেলিভারি', 'Orders & delivery', 'Order ও delivery'),
   g_staff: L('কর্মীর হাজিরা', 'Staff attendance', 'Staff হাজিরা'), g_control: L('ব্যতিক্রম', 'Exceptions', 'Exception'),
   views: L('আমার ভিউ', 'My views', 'My Views'), views_s: L('সংরক্ষিত ভিউ', 'Saved views', 'Saved Views'), noviews: L('এখনও কোনো ভিউ সংরক্ষণ করা হয়নি', 'No saved views yet', 'এখনও কোনো View save করা হয়নি'),
   shared: L('শেয়ার করা', 'Shared', 'Shared'), mine: L('আমার', 'Mine', 'Mine'),

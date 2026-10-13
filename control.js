@@ -44,7 +44,7 @@ const TILES = [
   { g: 'people', k: 'staff', route: 'staff', cnt: 'staff_pending', head: false, grants: [] },
   { g: 'people', k: 'matrix', route: 'matrix', head: false, grants: [] },
   { g: 'rules', k: 'rules', route: 'rules', head: false, grants: [] },
-  { g: 'rules', k: 'printbooks', route: null, head: true, grants: [] },
+  { g: 'rules', k: 'printbooks', route: 'printbooks', head: true, grants: [] },
   { g: 'rules', k: 'settings', route: 'settings', head: false, grants: [] },
   { g: 'rules', k: 'logs', route: 'logs', head: false, grants: [] },
   { g: 'rules', k: 'backup', route: 'backup', head: false, grants: [] },

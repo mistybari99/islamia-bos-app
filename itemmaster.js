@@ -226,6 +226,7 @@ function newItemSheet(o = {}) {
     <div><label for="ni_unit">${esc(T('ni_unit'))}</label><select id="ni_unit">${unitOpts().map(([v, l]) => sopt(v, o.unit || 'pc', lab(l))).join('')}</select></div>
     <div class="row"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" id="ni_go" data-act="im_ni_go">${esc(T('ni_go'))}</button></div></div>`);
   showNext('ni_cat', 'ni_code');
+  if (B.listctl) B.listctl.enhance('#ni_unit', 'units', { keepPrev: true, form: 'ITEMS', ctx: { field: 'units', via: 'new_item' } });
 }
 async function showNext(selId, hintId) {
   const s = $('#' + selId), h = $('#' + hintId); if (!s || !h) return;
@@ -505,6 +506,7 @@ async function assetForm(id) {
     ${r ? `<div><label for="af_maint">${esc(T('as_maint'))}</label><select id="af_maint"><option value=""></option>${maint.map((m) => sopt(m.id, r.maintenance_ref, '#' + m.serial + ' · ' + m.entry_date)).join('')}${r.maintenance_ref && !maint.some((m) => m.id === r.maintenance_ref) ? sopt(r.maintenance_ref, r.maintenance_ref, '08-1') : ''}</select></div>` : ''}
     <div><label for="af_note">${esc(T('as_note'))}</label><input id="af_note" value="${esc(r ? r.note || '' : '')}" autocomplete="off"></div>
     <div class="row"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" data-act="as_save">${esc(T('save'))}</button></div></div>`);
+  if (B.listctl) B.listctl.enhance('#af_cond', 'asset_conditions', { otherBlank: true, form: 'ASSET', ctx: () => ({ field: 'asset_condition', asset_id: String((r && r.id) || '') }) });
 }
 async function assetSave() {
   const id = AS.edit, num = (v) => (norm(v) === '' ? null : Number(norm(v)));

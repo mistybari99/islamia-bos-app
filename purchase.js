@@ -182,7 +182,15 @@ function drawEditor() {
     <div><label>${esc(T('photo'))}</label><div class="s2-ph" id="pe_ph"></div></div>
     <div class="s2-bar"><button data-act="pu_save" id="pe_save">${esc(T('saveDraft'))}</button><button class="primary" data-act="pu_post" id="pe_post">${esc(T(ret ? 'postRet' : 'post'))}</button></div></div>`, 'purchase');
   drawEdPhoto(); const rs = $('#pe_ref'); if (rs) fillRef();
+  wireUnits(); if (ret) wireReason('pe_reason', false);
   drawPreviews();
+}
+// shared editable lists on the pickers (units per line, return reasons); old arrays stay the fallback when the list table is missing
+function wireUnits() { const lc = B.listctl; if (!lc) return; document.querySelectorAll('#pe_lines select[data-ln$=".unit"]').forEach((s) => lc.enhance(s, 'units', { otherBlank: true, form: 'PURCHASE', ctx: { field: 'purchase_unit' } })); }
+function wireReason(id, optional) {
+  const lc = B.listctl, sel = $('#' + id); if (!lc || !sel) return;
+  const oth = lists('return_reasons').some((r) => r.value_code === 'other' && r.active);
+  lc.enhance(sel, 'return_reasons', optional ? { otherBlank: true, form: 'PURCHASE', ctx: { field: 'return_reason' } } : oth ? { otherValue: 'other', form: 'PURCHASE', ctx: { field: 'return_reason' } } : { noOther: true, form: 'PURCHASE' });
 }
 const totHTML = (tt) => `<div class="row between"><span>${esc(T('subtotal'))}</span><b>${esc(money(tt.sub))}</b></div>${tt.disc ? `<div class="row between"><span>${esc(T('discount'))}</span><b>− ${esc(money(tt.disc))}</b></div>` : ''}<div class="row between"><span>${esc(T('total'))}</span><b class="mnum">${esc(money(tt.total))}</b></div>`;
 // ---- stock-effect preview per line (client side from stock_levels + the unit conversions; nothing is invented) ----
@@ -404,6 +412,7 @@ function refundSheet(sup, credit) {
     ${reasons.length ? `<div><label for="rf_reason">${esc(T('reasonOpt'))}</label><select id="rf_reason"><option value="">—</option>${optHTML(reasons, '')}</select></div>` : ''}
     <div><label for="rf_note">${esc(T('note'))}</label><input id="rf_note" autocomplete="off"></div></div>
     <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('close'))}</button><button class="primary full" data-act="py_refund_go" data-credit="${esc(String(credit))}">${esc(T('refundSheet'))}</button></div>`);
+  wireReason('rf_reason', true);
 }
 async function doRefund(btn) {
   const amt = nnum(($('#rf_amt') || {}).value), credit = Number(btn.dataset.credit);
@@ -463,14 +472,14 @@ Object.assign(H, {
   pu_more: () => { PL.shown += 60; drawList(PL.ge, PL.gr, false); },
   pu_open: (a) => { location.hash = '#/purchase/' + a.dataset.v; },
   pu_new: () => { location.hash = '#/purchase/new'; }, pu_new_ret: () => { location.hash = '#/purchase/return'; },
-  pu_addline: () => { syncFixed(); F.lines.push({ item_id: null, item: '', desc: '', qty: '', unit: '', cost: '' }); $('#pe_lines').innerHTML = F.lines.map(lineHTML).join(''); drawPreviews(); },
+  pu_addline: () => { syncFixed(); F.lines.push({ item_id: null, item: '', desc: '', qty: '', unit: '', cost: '' }); $('#pe_lines').innerHTML = F.lines.map(lineHTML).join(''); wireUnits(); drawPreviews(); },
   pu_newitem: () => B.itemMaster.newItemSheet({ type: 'asset', onCreated: async (it) => { if (!F || !it) return; syncFixed(); ITEMS_ALL = null; await allItems();
     const row = ITEMS_ALL.find((x) => x.id === it.item_id) || it; const l = F.lines.length === 1 && !F.lines[0].item_id && !F.lines[0].desc && !F.lines[0].qty ? F.lines[0] : null;
     const nl = l || { item_id: null, item: '', desc: '', qty: '', unit: '', cost: '' }; nl.item_id = row.id; nl.item = U.itemText(row); if (!l) F.lines.push(nl);
     drawEditor(); } }),
-  pu_delline: (a) => { F.lines.splice(Number(a.dataset.i), 1); $('#pe_lines').innerHTML = F.lines.map(lineHTML).join(''); refreshTot(); drawPreviews(); },
+  pu_delline: (a) => { F.lines.splice(Number(a.dataset.i), 1); $('#pe_lines').innerHTML = F.lines.map(lineHTML).join(''); wireUnits(); refreshTot(); drawPreviews(); },
   pu_scan: async (a) => { const i = Number(a.dataset.i), l = F && F.lines[i]; if (!l) return; const it = await B.barcode.scanItem(ITEMS_ALL); if (!it || !F) return;
-    l.item_id = it.id; l.item = U.itemText(it); $('#pe_lines').innerHTML = F.lines.map(lineHTML).join(''); drawPreviews(); },
+    l.item_id = it.id; l.item = U.itemText(it); $('#pe_lines').innerHTML = F.lines.map(lineHTML).join(''); wireUnits(); drawPreviews(); },
   pu_save: (a) => doSave(a), pu_post: (a) => doPost(a),
   pu_edit: () => { location.hash = '#/purchase/edit/' + CUR.id; },
   pu_retvs: () => { location.hash = '#/purchase/return/' + CUR.id; },
@@ -505,7 +514,7 @@ document.addEventListener('input', (e) => {
 });
 document.addEventListener('change', (e) => {
   const el = e.target;
-  if (el.dataset && el.dataset.ln && F) { const [i, f] = el.dataset.ln.split('.'), l = F.lines[Number(i)]; if (l && f !== 'item') l[f] = el.value; if (l && f === 'item') { const it = U.itemFrom(ITEMS_ALL, el.value); l.item_id = it ? it.id : null; l.item = it ? U.itemText(it) : el.value; if (!!l.item_id !== l._ri) { if (!redrawing) { redrawing = true; try { $('#pe_lines').innerHTML = F.lines.map(lineHTML).join(''); } finally { redrawing = false; } } } else { el.value = l.item; const us = document.querySelector(`[data-ln="${i}.unit"]`); if (us) us.options[0].textContent = (it && unitLabel(it.unit)) || T('itemUnit'); } } }
+  if (el.dataset && el.dataset.ln && F) { const [i, f] = el.dataset.ln.split('.'), l = F.lines[Number(i)]; if (l && f !== 'item') l[f] = el.value; if (l && f === 'item') { const it = U.itemFrom(ITEMS_ALL, el.value); l.item_id = it ? it.id : null; l.item = it ? U.itemText(it) : el.value; if (!!l.item_id !== l._ri) { if (!redrawing) { redrawing = true; try { $('#pe_lines').innerHTML = F.lines.map(lineHTML).join(''); wireUnits(); } finally { redrawing = false; } } } else { el.value = l.item; const us = document.querySelector(`[data-ln="${i}.unit"]`); if (us) us.options[0].textContent = (it && unitLabel(it.unit)) || T('itemUnit'); } } }
   if (el.dataset && el.dataset.ln && F) setTimeout(drawPreviews, 0);
   if (el.id === 'rf_mode') { const w = $('#rf_w'); if (w) w.hidden = el.value !== 'mobile'; }
   if (el.id === 'pe_loc' && F) { F.loc = Number(el.value) || F.loc; drawPreviews(); }

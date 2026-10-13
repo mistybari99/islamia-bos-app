@@ -73,6 +73,8 @@ async function open(saleId) {
       ${x.status === 'done' && d.can_return ? `<button class="mini s2-dots" data-act="sr_void" data-v="${esc(x.id)}" aria-label="${esc(T('voidRet'))}">⋮</button>` : ''}</div>`).join('') || `<p class="muted center">${esc(T('noReturns'))}</p>`}</div>
     <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('close'))}</button>${d.can_return && d.status === 'done' && lines.some((l) => Number(l.left) > 0) ? `<button class="primary full" id="sr_go" data-act="sr_go">${esc(T('go'))}</button>` : ''}</div>`);
   recalc();
+  { const lc = B.listctl, oth = lists('return_reasons').some((r) => r.value_code === 'other' && r.active);
+    if (lc && $('#sr_reason')) lc.enhance('#sr_reason', 'return_reasons', oth ? { otherValue: 'other', form: 'SALE_RETURN', ctx: { field: 'return_reason', sale: String(d.sale_id || '').slice(0, 40) } } : { noOther: true, form: 'SALE_RETURN' }); }
 }
 const rLabel = (code) => { const r = lists('return_reasons').find((x) => x.value_code === code); return r ? lab(rowL(r)) : code || ''; };
 // value / due / hand-back as the server will compute them (all from the sale's own numbers: price per unit, the discount factor, the customer's balance)

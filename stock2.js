@@ -390,6 +390,7 @@ async function openAction(kind, preset) {
   }
   openSheet(body);
   if (kind === 'waste') { drawPhoto(); wireReason(); }
+  if (B.listctl && $('#a_unit')) B.listctl.enhance('#a_unit', 'units', { otherBlank: true, form: 'STOCK', ctx: { field: 'stock_unit' } });
 }
 const photoFld = () => `<div><label>${esc(T('photo'))}</label><div class="s2-ph" id="a_ph"></div><div class="hint" id="a_ph_h"></div></div>`;
 function drawPhoto() {

@@ -172,7 +172,7 @@ async function counts(force) {
 async function loadGrantFlags() {
   if (!S.ctx || isOwner()) return;
   const locs = (S.ctx.locations || []).length ? [null, ...S.ctx.locations] : [null];
-  const codes = locOk() ? ['view_daybook', 'cash_move', 'production_void', 'salary_view', 'item_create', 'item_bulk', 'head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'] : ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'];
+  const codes = locOk() ? ['view_daybook', 'cash_move', 'production_void', 'release_decide', 'print_books', 'salary_view', 'item_create', 'item_bulk', 'head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'] : ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'];
   await Promise.all(codes.map(async (code) => {
     let ok = false;
     for (const l of locs) { try { const r = await sb.rpc('has_grant', { p_code: code, p_loc: l }); if (r && !r.error && r.data === true) { ok = true; break; } } catch (e) { /* not granted */ } }
@@ -514,7 +514,8 @@ async function home() {
     <div class="card" style="padding:4px 12px">${hot.length ? hot.map((r) => `<button class="hrow mk ${r[2]}" data-act="go" data-v="${r[4]}"><span>${esc(r[3])}</span><span class="n">${r[1]}</span><span class="cv">›</span></button>`).join('')
       : `<div class="dash-ok">${esc(V2 ? T('all_clear') : T('attn_ok'))}</div>`}${V2 && rows.filter((r) => r[1]).length > 5 ? `<button class="hrow" data-act="go" data-v="${own || ctlOk() ? 'control' : 'pending'}"><span>${esc(T('see_all'))}</span><span class="cv">›</span></button>` : ''}</div>` : (V2 && hot.length ? `<div class="hsec">${esc(T('attn'))}<small>${hot.reduce((s, r) => s + r[1], 0)}</small></div><div class="card" style="padding:4px 12px">${hot.map((r) => `<button class="hrow mk ${r[2]}" data-act="go" data-v="${r[4]}"><span>${esc(r[3])}</span><span class="n">${r[1]}</span><span class="cv">›</span></button>`).join('')}</div>` : '');
   const posBtn = P('POS', 'enter') ? `<button class="primary hbig sellbig" data-act="go" data-v="pos" data-sell="1">${ic3('sell', 34)}<span class="sb-t"><b>${esc(T('sell'))}</b><small>${esc(t('pos'))}</small></span></button>` : '';
-  $('#hv_main').innerHTML = `${posBtn}${attn}${V2 ? '<div id="hv_sheets"></div><div id="hv_qa"></div><div class="hsec">' + esc(T('fav')) + '</div><div id="hv_fav"></div><div id="hv_recent"></div>' : ''}
+  if (V2) setTimeout(() => loadOldest(), 0);
+  $('#hv_main').innerHTML = `${posBtn}${attn}${V2 ? '<div id="hv_oldest"></div>' : ''}${V2 ? '<div id="hv_sheets"></div><div id="hv_qa"></div><div class="hsec">' + esc(T('fav')) + '</div><div id="hv_fav"></div><div id="hv_recent"></div>' : ''}
     <div class="seg" role="group" aria-label="${esc(T('biz') + ' / ' + T('acc'))}"><button data-act="hv_mode" data-v="biz" aria-pressed="${HS.mode === 'biz'}">${esc(T('biz'))}</button><button data-act="hv_mode" data-v="acc" aria-pressed="${HS.mode === 'acc'}">${esc(T('acc'))}</button></div>
     <div class="ptabs" role="tablist" id="hv_pt"></div><div id="hv_stats"></div>
     ${V2 ? '' : '<div id="hv_sheets"></div><div class="hsec">' + esc(T('fav')) + '</div><div id="hv_fav"></div>'}
@@ -529,6 +530,17 @@ async function home() {
   loadStats(); loadSheets();
 }
 // ---------- staff home: today's sheets to fill (forms I may enter, at my place, in a mode that allows the app) ----------
+// the oldest waiting things this person may decide, oldest first (supabase/phase28.sql needs_you_oldest); nothing is shown when the function is missing or the list is empty
+async function loadOldest() {
+  const box = $('#hv_oldest'); if (!box) return;
+  let r; try { r = await sb.rpc('needs_you_oldest', { p_limit: 5 }); } catch (e) { return; }
+  const ny = r && !r.error && Array.isArray(r.data) ? r.data : []; if (!ny.length || !$('#hv_oldest')) return;
+  const KL = { entry: L('ফর্ম', 'Form', 'Form'), release: L('ছাড়ের অনুরোধ', 'Release request', 'Release request'), emergency: L('জরুরি অনুরোধ', 'Emergency request', 'Emergency request'), item_change: L('আইটেম বদল', 'Item change', 'Item change'),
+    staff: L('নতুন স্টাফ', 'New staff', 'নতুন staff'), wastage: L('নষ্ট মাল', 'Wastage', 'Wastage'), parallel: L('পাশাপাশি মাসের সিদ্ধান্ত', 'Parallel month decision', 'Parallel মাসের সিদ্ধান্ত') };
+  const age = (s) => { const h = Math.max(0, Math.round((Date.now() - new Date(s).getTime()) / 3600000)); return h >= 48 ? Math.floor(h / 24) + (S.lang === 'en' ? ' d' : ' দিন') : h + (S.lang === 'en' ? ' h' : ' ঘণ্টা'); };
+  box.innerHTML = `<div class="hsec">${esc(lab(L('পুরনো আগে', 'Oldest first', 'পুরনো আগে')))}</div><div class="card" style="padding:4px 12px">${ny.map((x) =>
+    `<button class="hrow mk warn" ${x.kind === 'entry' ? `data-act="openentry" data-v="${esc(x.id)}"` : `data-act="go" data-v="${esc(x.route)}"`}><span>${esc(lab(KL[x.kind] || KL.entry))} · ${esc(x.label || '')}</span><span class="n">${esc(age(x.since))}</span><span class="cv">›</span></button>`).join('')}</div>`;
+}
 async function loadSheets() {
   const box = $('#hv_sheets'); if (!box) return;
   if (isOwner() || !FORMS) { box.innerHTML = ''; return; }
