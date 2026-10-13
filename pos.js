@@ -242,9 +242,19 @@ function drawCust() {
   const m = normMobile(c.mobile), f = c.found;
   el.innerHTML = `<div class="card" style="margin:8px 0"><b>${esc(T('cust'))}${need ? ' *' : ''}</b>${need ? `<div class="muted" style="font-size:.85rem">${esc(T('custReq'))}</div>` : ''}
     <label>${esc(T('mobile'))}</label><input id="cu_mobile" inputmode="tel" value="${esc(c.mobile)}" placeholder="01XXXXXXXXX">
-    ${m && f && f.found ? `<div class="notice ok"><b>${esc(f.name)}</b> · ${esc(T('known'))}${Number(f.balance) > 0 ? ` · ${esc(T('owes'))}: ${money(f.balance)}` : ''}${f.credit_limit !== null && f.credit_limit !== undefined ? ` · ${esc(T('limit'))}: ${money(f.credit_limit)}` : ''}</div>`
+    ${m && f && f.found ? `<div class="notice ok"><b>${esc(f.name)}</b> · ${esc(T('known'))}${Number(f.balance) > 0 ? ` · ${esc(T('owes'))}: ${money(f.balance)}` : ''}${f.credit_limit !== null && f.credit_limit !== undefined ? ` · ${esc(T('limit'))}: ${money(f.credit_limit)}` : ''}</div>${tierBlock()}`
       : m ? `<label>${esc(T('cname'))} — ${esc(T('newc'))}</label><input id="cu_name" value="${esc(c.name)}">` : ''}</div>`;
   if (keepFocus === 'cu_mobile') { const i = $('#cu_mobile'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }
+}
+// phase43: the customer's tier chip + perks, a one-tap "apply the tier discount" button and a gift reminder (all from customer_pos_info; nothing here decides a right)
+const TX = { apply: L('স্তরের ছাড় দিন', 'Apply tier discount', 'Tier discount দিন'), gift: L('উপহার পাওনা', 'gift(s) due', 'gift পাওনা'), pts: L('পয়েন্ট', 'points', 'points'), capNote: L('সর্বোচ্চ', 'up to', 'সর্বোচ্চ') };
+function tierBlock() {
+  const i = P.cust.info; if (!i || !i.found || !i.tier) return '';
+  const tr = i.tier, name = (S.lang === 'en' ? (tr.name_en || tr.name_bn) : (tr.name_bn || tr.name_en)), pct = Number(tr.discount_percent);
+  return `<div class="stack" id="cart_tier" style="margin-top:6px"><div class="row wrap" style="gap:6px;align-items:center"><span class="chip" style="border-color:${esc(tr.color)};color:${esc(tr.color)}">${tr.badge ? esc(tr.badge) + ' ' : ''}${esc(name)}</span>
+      ${Number(i.gifts_due) > 0 ? `<span class="chip warn" id="cart_gift">🎁 ${Number(i.gifts_due)} ${esc(lab(TX.gift))}</span>` : ''}${i.points !== null && i.points !== undefined ? `<span class="chip">${Number(i.points)} ${esc(lab(TX.pts))}</span>` : ''}</div>
+      ${tr.perks ? `<div class="muted" style="font-size:.85rem">${esc(tr.perks)}</div>` : ''}
+      ${i.tier_discount_on ? `<button type="button" class="tog" id="cart_tier_btn" data-act="pos_tier_disc" style="min-height:40px">${esc(lab(TX.apply))}: ${esc(name)} ${pct}%${tr.discount_cap_amount !== null && tr.discount_cap_amount !== undefined ? ` (${esc(lab(TX.capNote))} ${money(tr.discount_cap_amount)})` : ''}</button>` : ''}</div>`;
 }
 let lookTimer = null;
 function lookup() {
@@ -253,7 +263,9 @@ function lookup() {
   lookTimer = setTimeout(async () => {
     const r = await sb.rpc('find_customer', { p_mobile: m }); if (r.error) return;
     if (normMobile(P.cust.mobile) !== m) return;
-    P.cust.found = r.data; if (r.data && r.data.found) P.cust.name = r.data.name; drawCust();
+    P.cust.found = r.data; if (r.data && r.data.found) P.cust.name = r.data.name;
+    P.cust.info = null; if (r.data && r.data.found) { try { const ri = await sb.rpc('customer_pos_info', { p_mobile: m }); if (!ri.error && ri.data && normMobile(P.cust.mobile) === m) P.cust.info = ri.data; } catch (e) { /* database without tiers: no tier line */ } }   // phase43: tier chip, perks, tier discount, gifts due
+    drawCust();
   }, 250);
 }
 function drawCartLines() {
@@ -328,7 +340,7 @@ async function submitSale(p, change) {
     afterSale();
   } finally { P.busy = false; }
 }
-function resetCart() { P.cart = []; P.type = 'retail'; P.cust = { mobile: '', name: '', found: null, show: false }; P.st = null; }
+function resetCart() { P.cart = []; P.type = 'retail'; P.cust = { mobile: '', name: '', found: null, info: null, show: false }; P.st = null; }
 function afterSale() { if (location.hash.startsWith('#/pos')) drawPos(); }
 let flushing = false;
 async function flush() {
@@ -427,6 +439,12 @@ Object.assign(A.H, {
   pos_type: (a) => { P.type = a.dataset.v; [...document.querySelectorAll('[data-act=pos_type]')].forEach((b) => b.classList.toggle('on', b.dataset.v === P.type)); drawCust(); },
   pos_dk: (a) => { if (P.dk === a.dataset.v) return; P.dk = a.dataset.v; const i = $('#cart_disc'); if (i) i.value = ''; discChanged(); },
   pos_cust_show: () => { P.cust.show = true; drawCust(); },
+  pos_tier_disc: () => {            // sets the discount field to the tier percent (or, above the tier cap, to the cap amount); the server still checks everything
+    const i = P.cust.info; if (!i || !i.tier || !i.tier_discount_on) return; const dm = dmodes(); if (!dm.a && !dm.p) return toast(lab(ERRS.discount_mode_off));
+    const pct = Number(i.tier.discount_percent), cap = i.tier.discount_cap_amount === null || i.tier.discount_cap_amount === undefined ? null : Number(i.tier.discount_cap_amount), amt = r2(cartSub() * pct / 100);
+    let kind = dm.p ? 'percent' : 'amount', v = pct;
+    if (cap !== null && amt > cap && dm.a) { kind = 'amount'; v = cap; } else if (kind === 'amount') v = amt;
+    P.dk = kind; const inp = $('#cart_disc'); if (inp) inp.value = String(v); discChanged(); drawDisc(); },
   pos_step: (a) => { const k = Number(a.dataset.k), l = P.cart[k], d = Number(a.dataset.d);
     if (l.kind === 'item' && l.alt) { const it = itemById(l.item_id), f = altFactor(it, l.alt.unit) || 1, st = stepOf(l.alt.unit), n = Math.round((l.alt.n + d * st) * 1000) / 1000;
       if (n <= 0) P.cart.splice(k, 1); else { l.alt.n = n; l.qty = Math.round(n * f * 1000) / 1000; } return afterCartChange(); }
@@ -469,7 +487,7 @@ document.addEventListener('input', (e) => {
   if (id === 'pos_q') { P.q = e.target.value; drawItems(true); }
   if (id === 'pos_qty' && typeof QU !== 'undefined') { const sh = document.querySelector('[data-act=pos_q_ok]'); if (sh) qConv(sh.dataset.v); }
   if (id === 'cart_disc') discChanged();
-  if (id === 'cu_mobile') { P.cust.mobile = e.target.value; P.cust.found = null; P.cust.name = ''; lookup(); const el = $('#cart_cust'); const m = normMobile(P.cust.mobile); if (m) drawCust(); }
+  if (id === 'cu_mobile') { P.cust.mobile = e.target.value; P.cust.found = null; P.cust.info = null; P.cust.name = ''; lookup(); const el = $('#cart_cust'); const m = normMobile(P.cust.mobile); if (m) drawCust(); }
   if (id === 'cu_name') P.cust.name = e.target.value;
 });
 document.addEventListener('keydown', (e) => {

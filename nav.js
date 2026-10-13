@@ -22,7 +22,7 @@ const X = {
   hi: L('স্বাগতম', 'Welcome', 'স্বাগতম'), biz: L('ব্যবসা', 'Business', 'Business'), acc: L('হিসাব', 'Accounting', 'Accounting'),
   p_day: L('আজ', 'Today', 'Today'), p_week: L('সপ্তাহ', 'Week', 'Week'), p_month: L('মাস', 'Month', 'Month'), p_year: L('বছর', 'Year', 'Year'),
   attn: L('সিদ্ধান্ত দরকার', 'Needs your decision', 'Decision দরকার'), attn_ok: L('এখন কোনো সিদ্ধান্ত বাকি নেই ✓', 'Nothing waiting for a decision ✓', 'এখন কোনো Decision বাকি নেই ✓'),
-  fav: L('প্রিয় ও বেশি ব্যবহৃত', 'Favourites & most used', 'Favourite ও Most-used'), fav_empty: L('☆ চেপে যেকোনো মেনু বা ফর্ম এখানে রাখুন। বেশি ব্যবহার করলে নিজে থেকেই উঠে আসবে।', 'Tap ☆ to keep any menu item or form here. The ones you use most also show up by themselves.', '☆ চেপে যেকোনো Menu বা Form এখানে রাখুন। Most-used নিজে থেকেই উঠে আসবে।'),
+  fav: L('প্রিয় ও বেশি ব্যবহৃত', 'Favourites & most used', 'Favourite ও Most-used'), fav_empty: L('যেকোনো মেনু বা ফর্মের ⋮ চেপে "প্রিয়তে রাখুন" দিন। বেশি ব্যবহার করলে নিজে থেকেই উঠে আসবে।', 'Tap ⋮ on any menu item or form and choose "Pin to favourites". The ones you use most also show up by themselves.', 'যেকোনো Menu বা Form-এর ⋮ চেপে "Favourite-এ রাখুন" দিন। Most-used নিজে থেকেই উঠে আসবে।'),
   add: L('যোগ করুন', 'Add', 'Add'), pick: L('প্রিয়তে যোগ করুন', 'Add to favourites', 'Favourite-এ যোগ করুন'), done: L('হয়েছে', 'Done', 'Done'),
   tiles_biz: L('ব্যবসার কাজ', 'Business work', 'Business-এর কাজ'), tiles_acc: L('হিসাবের কাজ', 'Accounting work', 'Accounting-এর কাজ'),
   forms: L('আপনার সব ফর্ম', 'All your forms', 'আপনার সব Form'), detail: L('আজকের বিস্তারিত সমস্যা ও সংখ্যা', 'Details: problems and numbers', 'Details: Problem ও সংখ্যা'),
@@ -40,6 +40,11 @@ const X = {
   s_screens: L('পাতা ও ফর্ম', 'Screens & forms', 'Page ও Form'), s_items: L('আইটেম', 'Items', 'Item'), s_cust: L('গ্রাহক', 'Customers', 'Customer'), s_more: L('আইটেম ও গ্রাহক খোঁজা হচ্ছে…', 'Searching items and customers…', 'Item ও Customer খোঁজা হচ্ছে…'),
   reset: L('প্রিয় ও ব্যবহারের হিসাব মুছুন', 'Clear my favourites & usage', 'Favourite ও Usage মুছুন'), logout: L('লগআউট', 'Log out', 'Logout'), roles: L('ভূমিকা', 'Roles', 'Role'),
   modules: L('সব মডিউল', 'All modules', 'সব Module'), recent: L('সাম্প্রতিক', 'Recent', 'Recent'), refresh: L('নতুন করে দেখুন', 'Refresh', 'Refresh'), s_do: L('করুন', 'Do', 'Do (করুন)'), s_set: L('সেটিংস', 'Settings', 'Settings'), find_off: L('অফলাইন — আইটেম আর গ্রাহক খোঁজা যাবে না; মেনু ও কাজ খোঁজা চলবে', 'Offline - items and customers cannot be searched; menu and actions still work', 'Offline — Item ও Customer খোঁজা যাবে না; Menu ও Do চলবে'), n_pend: L('অনুমোদনের অপেক্ষায় এন্ট্রি', 'Entries waiting for your approval', 'Approval-এর অপেক্ষায় Entry'), n_low: L('ন্যূনতমের নিচে আইটেম', 'Items below minimum', 'Minimum-এর নিচে Item'), all_clear: L('সব ঠিক আছে — এখন কিছু করার নেই', 'All clear. Nothing needs you now.', 'সব ঠিক আছে — এখন কিছু করার নেই'), see_all: L('সব দেখুন', 'See all', 'See all'), recent_empty: L('এখনও কিছু খোলা হয়নি', 'Nothing opened yet', 'এখনও কিছু খোলা হয়নি'), cats: L('বিভাগ অনুযায়ী', 'By category', 'Category অনুযায়ী'), all_in: L('এই বিভাগের সব', 'Everything in this category', 'এই Category-র সব'), qa: L('দ্রুত কাজ', 'Quick actions', 'Quick action'), emptyg: L('এই বিভাগে আপনার জন্য কিছু নেই', 'Nothing here for you', 'এই Category-তে আপনার জন্য কিছু নেই'),
+  more: L('আরও', 'More', 'More'), fav_edit: L('সাজান', 'Edit', 'Edit'), fav_done: L('হয়েছে', 'Done', 'Done'), m_up: L('উপরে নিন', 'Move up', 'Move up'), m_down: L('নিচে নিন', 'Move down', 'Move down'), m_top: L('একদম উপরে', 'Move to top', 'Move to top'), m_bottom: L('একদম নিচে', 'Move to bottom', 'Move to bottom'),
+  m_rename: L('নিজের নাম দিন', 'Rename label', 'নিজের নাম দিন'), m_hide: L('হোম থেকে লুকান', 'Hide from Home', 'Home থেকে লুকান'), m_open: L('খুলুন', 'Open', 'Open'), m_copy: L('লিংক কপি করুন', 'Copy link', 'Link copy করুন'), m_reset: L('প্রিয়র ক্রম আগের মতো করুন', 'Reset order', 'Favourite-এর order reset করুন'),
+  m_unhide: L('লুকানো সব আবার দেখান', 'Show hidden again', 'Hidden সব আবার দেখান'), m_refresh: L('হোম নতুন করে দেখুন', 'Refresh Home', 'Home refresh'), copied: L('লিংক কপি হয়েছে', 'Link copied', 'Link copied'), rn_t: L('নিজের নাম (শুধু আপনার জন্য)', 'Your own label (only for you)', 'নিজের নাম (শুধু আপনার জন্য)'),
+  rn_h: L('খালি রাখলে আসল নাম ফিরবে', 'Leave empty to use the original name', 'খালি রাখলে আসল নাম ফিরবে'), rn_save: L('সংরক্ষণ', 'Save', 'Save'), added: L('যোগ করা হয়েছে', 'Added', 'Added'), omode: L('মালিকের বোর্ড', 'Owner mode', 'Owner mode'), omode_d: L('আজ যা দেখা দরকার', 'What to check today', 'আজ যা দেখা দরকার'),
+  omode_on: L('হোমে মালিকের বোর্ড দেখান', 'Show the owner board as Home', 'Home-এ Owner board দেখান'), omode_off: L('সাধারণ হোমে ফিরুন', 'Back to the normal Home', 'Normal Home-এ ফিরুন'), omode_open: L('মালিকের বোর্ড খুলুন', 'Open the owner board', 'Owner board খুলুন'),
   em: L('জরুরি অনুরোধ', 'Emergency requests', 'জরুরি Request'), addprod: L('নতুন পণ্য যোগ', 'Add product', 'নতুন Product যোগ'), unitconv: L('একক রূপান্তর', 'Unit conversions', 'Unit conversion'),
   ctl: L('কন্ট্রোল সেন্টার', 'Control Center', 'Control Center'), ctl_d: L('লোকেশন, সীমা, তালিকা ও সেটিংস এক জায়গায়', 'Places, limits, lists and settings in one place', 'Location, limit, list ও settings এক জায়গায়'), locs: L('লোকেশন', 'Locations', 'Location'),
   n_loc: L('নতুন লোকেশনের সেটআপ বাকি', 'New places still being set up', 'নতুন Location-এর setup বাকি'), n_sd: L('সেটিংস শিটের খসড়া অনুমোদনের অপেক্ষায়', 'Settings sheet drafts waiting', 'Settings sheet draft approval-এর অপেক্ষায়'), n_wst: L('নষ্টের অনুমোদন বাকি', 'Wastage approvals waiting', 'Wastage approval বাকি'),
@@ -53,8 +58,6 @@ const IC = {
   menu: sv('<path d="M5 9h22M5 16h22M5 23h22"/>'), home: sv('<path d="M4 15L16 5l12 10M7 13v14h18V13"/><path d="M13 27v-8h6v8"/>'),
   me: sv('<circle cx="16" cy="11" r="5.5"/><path d="M5 28c1-6 5.5-9 11-9s10 3 11 9"/>'), pos: sv('<rect x="6" y="3" width="20" height="26" rx="3"/><path d="M10 9h12M10 15h3M16 15h3M10 21h3M16 21h3"/>'),
   doc: sv('<path d="M8 3h11l6 6v20H8z"/><path d="M19 3v6h6M12 15h9M12 20h9M12 25h5"/>'), lock: sv('<rect x="6" y="14" width="20" height="14" rx="3"/><path d="M10 14V9a6 6 0 0 1 12 0v5"/>'),
-  star: sv('<path d="M16 3.5l3.9 8 8.8 1.2-6.4 6.2 1.6 8.8L16 23.4 8.1 27.7l1.6-8.8L3.3 12.7l8.8-1.2z"/>'),
-  starF: sv('<path d="M16 3.5l3.9 8 8.8 1.2-6.4 6.2 1.6 8.8L16 23.4 8.1 27.7l1.6-8.8L3.3 12.7l8.8-1.2z" fill="currentColor"/>'),
   x: sv('<path d="M8 8l16 16M24 8L8 24"/>'), cv: sv('<path d="M12 6l10 10-10 10"/>'), plus: sv('<path d="M16 6v20M6 16h20"/>'),
 };
 const skin = () => document.documentElement.hasAttribute('data-skin');   // Premium themes: 3D glass icons (icons3d.js); Classic keeps the old icons
@@ -106,7 +109,13 @@ const jget = (k, d) => { try { const v = JSON.parse(store.get(k) || 'null'); ret
 const pins = () => jget('bos_pins_' + uid(), []);
 const usage = () => jget('bos_use_' + uid(), {});
 const setPins = (a) => store.set('bos_pins_' + uid(), JSON.stringify(a));
-const isPinned = (k) => pins().includes(k);
+// Module E: what each person sees of the favourites is only changed from the ⋮ menus. Own label and "hide from Home" are per person (synced in user_favourites.label / hidden, phase45)
+const hiddenKeys = () => jget('bos_hide_' + uid(), []);
+const setHidden = (a) => store.set('bos_hide_' + uid(), JSON.stringify(a));
+const isHidden = (k) => hiddenKeys().includes(k);
+const labelsMap = () => jget('bos_lbl_' + uid(), {});
+const setLabels = (m) => store.set('bos_lbl_' + uid(), JSON.stringify(m));
+const lblOf = (e) => (labelsMap()[e.key] || e.label);
 function bump(k) { if (!k || k === 'r:home' || !S.ctx) return; const u = usage(); u[k] = (u[k] || 0) + 1; store.set('bos_use_' + uid(), JSON.stringify(u)); pushUse(k); }
 let lastCounted = null;
 function countRoute() {
@@ -121,23 +130,47 @@ const keyOfFav = (r) => (r.kind === 'form' ? 'f:' : 'r:') + r.key;
 const favQ = () => jget('bos_favq_' + uid(), []);
 const setFavQ = (a) => store.set('bos_favq_' + uid(), JSON.stringify(a));
 const okRes = (p) => Promise.resolve(p).then((r) => (r && r.error ? Promise.reject(r.error) : r));
+const NOFN = /does not exist|could not find|schema cache|42883|PGRST20[1-5]/i;   // phase45 not installed: nothing to retry
 let RF = [], favSynced = null;
 function pushPin(key, pinned) {
   if (!S.ctx) return; const k = fkOf(key);
   okRes(sb.rpc('set_pin', { p_kind: k.kind, p_key: k.key, p_pinned: pinned })).catch(() => { setFavQ([...favQ().filter((x) => x.key !== key), { key, pinned }]); });
 }
 function pushUse(key) { if (!S.ctx || navigator.onLine === false) return; const k = fkOf(key); okRes(sb.rpc('touch_favourite', { p_kind: k.kind, p_key: k.key })).catch(() => {}); }
+// order of the pinned list and own label / hidden flag (phase45: fav_order_set / fav_meta_set); a failed push is retried at the next sync
+function pushOrder() {
+  if (!S.ctx) return;
+  okRes(sb.rpc('fav_order_set', { p_items: pins().map(fkOf) })).then(() => store.set('bos_favdirty_' + uid(), '0')).catch((e) => { if (!NOFN.test(String(e && e.message))) store.set('bos_favdirty_' + uid(), '1'); });
+}
+const metaQ = () => jget('bos_favmq_' + uid(), []);
+function pushMeta(key) {
+  if (!S.ctx) return; const k = fkOf(key);
+  okRes(sb.rpc('fav_meta_set', { p_kind: k.kind, p_key: k.key, p_label: labelsMap()[key] || null, p_hidden: isHidden(key) })).then(() => store.set('bos_favmq_' + uid(), JSON.stringify(metaQ().filter((x) => x !== key))))
+    .catch((e) => { if (!NOFN.test(String(e && e.message))) store.set('bos_favmq_' + uid(), JSON.stringify([...new Set([...metaQ(), key])])); });
+}
 async function syncFavs() {
   if (!S.ctx || favSynced === uid()) return; const me = uid(); favSynced = me;
   try {
     for (const q of favQ()) { const k = fkOf(q.key); await okRes(sb.rpc('set_pin', { p_kind: k.kind, p_key: k.key, p_pinned: q.pinned })); }
     setFavQ([]);
     if (store.get('bos_favmig_' + me) !== '1') { for (const key of pins()) { const k = fkOf(key); await okRes(sb.rpc('set_pin', { p_kind: k.kind, p_key: k.key, p_pinned: true })); } store.set('bos_favmig_' + me, '1'); }   // pins made before the sync existed go up once
-    const [r, rf] = await Promise.all([sb.from('user_favourites').select('kind,key,pinned,uses'), sb.from('role_favourites').select('role_code,kind,key,sort')]);
+    const dirty = store.get('bos_favdirty_' + me) === '1';
+    if (dirty) { try { await okRes(sb.rpc('fav_order_set', { p_items: pins().map(fkOf) })); store.set('bos_favdirty_' + me, '0'); } catch (e) { /* retried next time */ } }
+    for (const key of metaQ()) { const k = fkOf(key); try { await okRes(sb.rpc('fav_meta_set', { p_kind: k.kind, p_key: k.key, p_label: labelsMap()[key] || null, p_hidden: isHidden(key) })); store.set('bos_favmq_' + me, JSON.stringify(metaQ().filter((x) => x !== key))); } catch (e) { /* retried next time */ } }
+    let [r, rf] = await Promise.all([sb.from('user_favourites').select('kind,key,pinned,uses,sort,label,hidden'), sb.from('role_favourites').select('role_code,kind,key,sort')]);
+    let meta = true;
+    if (r && r.error) { meta = false; r = await sb.from('user_favourites').select('kind,key,pinned,uses'); }   // phase45 columns not there yet
     if (rf && !rf.error) RF = rf.data || [];
     if (r && !r.error) {
-      const rows = r.data || [], sp = rows.filter((x) => x.pinned).map(keyOfFav), loc = pins(), u = usage();
-      setPins([...loc.filter((k) => sp.includes(k)), ...sp.filter((k) => !loc.includes(k))]);
+      const rows = r.data || [], pr = rows.filter((x) => x.pinned), loc = pins(), u = usage();
+      const sp = (meta && pr.some((x) => x.sort !== null && x.sort !== undefined) && !dirty ? [...pr].sort((a, b) => (a.sort === null || a.sort === undefined ? 1e9 : a.sort) - (b.sort === null || b.sort === undefined ? 1e9 : b.sort)) : pr).map(keyOfFav);
+      setPins(meta && !dirty && pr.some((x) => x.sort !== null && x.sort !== undefined) ? [...sp, ...loc.filter((k) => !sp.includes(k))] : [...loc.filter((k) => sp.includes(k)), ...sp.filter((k) => !loc.includes(k))]);
+      if (meta) {
+        const mq = metaQ(), hid = rows.filter((x) => x.hidden).map(keyOfFav), lm = labelsMap();
+        setHidden([...new Set([...hid, ...hiddenKeys().filter((k) => mq.includes(k))])]);
+        rows.forEach((x) => { const k = keyOfFav(x); if (mq.includes(k)) return; if (x.label) lm[k] = x.label; else delete lm[k]; });
+        setLabels(lm);
+      }
       rows.forEach((x) => { const k = keyOfFav(x); u[k] = Math.max(u[k] || 0, Number(x.uses) || 0); });
       store.set('bos_use_' + me, JSON.stringify(u));
     }
@@ -146,6 +179,7 @@ async function syncFavs() {
 }
 const roleDefaults = () => { const mine = new Set((S.ctx && S.ctx.roles) || []); return [...new Set(RF.filter((x) => mine.has(x.role_code)).sort((a, b) => a.sort - b.sort).map(keyOfFav))]; };
 const effPins = () => { const p = pins(); return p.length ? p : roleDefaults(); };
+const isFav = (k) => effPins().includes(k);
 
 // ---------- attention counts ----------
 let CNT = null, cntAt = 0;
@@ -172,7 +206,7 @@ async function counts(force) {
 async function loadGrantFlags() {
   if (!S.ctx || isOwner()) return;
   const locs = (S.ctx.locations || []).length ? [null, ...S.ctx.locations] : [null];
-  const codes = locOk() ? ['view_daybook', 'cash_move', 'production_void', 'release_decide', 'print_books', 'salary_view', 'item_create', 'item_bulk', 'head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'] : ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'];
+  const codes = locOk() ? ['view_daybook', 'cash_move', 'production_void', 'release_decide', 'print_books', 'employee_view', 'employee_manage', 'deed_manage', 'attendance_manage', 'payroll_manage', 'accounts_view', 'accounts_manage', 'customer_manage', 'assistant_use',  'salary_view', 'item_create', 'item_bulk', 'head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'] : ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve', 'employee_view', 'attendance_manage', 'accounts_view', 'customer_manage', 'assistant_use'];
   await Promise.all(codes.map(async (code) => {
     let ok = false;
     for (const l of locs) { try { const r = await sb.rpc('has_grant', { p_code: code, p_loc: l }); if (r && !r.error && r.data === true) { ok = true; break; } } catch (e) { /* not granted */ } }
@@ -299,9 +333,9 @@ function dr_body() {
   drawLocBox();
   const all = entries(), mode = npMode(), cur = keyOfHash(), cn = CNT || {}, og = groupOpen(), ql = q.trim().toLowerCase();
   const row = (e, sub, cls = 'dr-it') => {
-    const on = e.key === cur, pin = isPinned(e.key), c = e.cnt && cn[e.cnt];
-    return `<div class="dr-i ${on ? 'on' : ''}"><button class="rb ${cls}" data-act="nav_go" data-v="${esc(e.route)}" ${on ? 'aria-current="page"' : ''}>${ico(e.icon, e.rec && e.rec.i3)}<span class="lb">${esc(e.label)}${sub ? `<small class="muted" style="display:block;font-weight:400">${esc(B.ia.groupLabel(e.g))}</small>` : ''}</span>${c ? `<span class="ct">${c}</span><span class="dot ${e.tone || 'warn'}"></span>` : ''}</button>
-      <button class="st" data-act="nav_pin" data-v="${esc(e.key)}" aria-pressed="${pin}" aria-label="${esc(pin ? T('unpin') : T('pin'))}">${pin ? IC.starF : IC.star}</button></div>`;
+    const on = e.key === cur, c = e.cnt && cn[e.cnt];
+    return `<div class="dr-i ${on ? 'on' : ''}"><button class="rb ${cls}" data-act="nav_go" data-v="${esc(e.route)}" ${on ? 'aria-current="page"' : ''}>${ico(e.icon, e.rec && e.rec.i3)}<span class="lb">${esc(lblOf(e))}${sub ? `<small class="muted" style="display:block;font-weight:400">${esc(B.ia.groupLabel(e.g))}</small>` : ''}</span>${c ? `<span class="ct">${c}</span><span class="dot ${e.tone || 'warn'}"></span>` : ''}</button>
+      ${dotsBtn(e.key, 'drawer')}</div>`;
   };
   const lockRow = (label) => `<div class="dr-i lock">${IC.lock}<span>${esc(label)}</span></div>`;
   if (ql) {
@@ -327,10 +361,8 @@ function dr_body() {
       + (!loc.length && !itH.length && !cuH.length && !doR.length && !setR.length && !SR.busy ? B.ui.state('empty', T('nores')) : '');
     return;
   }
-  const rc = B.ia.recent(uid()).map((r) => all.find((e) => e.key === 'r:' + r)).filter((e) => e && e.ok && e.live && e.key !== cur);
-  const recent = rc.length ? `<div class="hsec">${esc(T('recent'))}</div>${rc.map((e) => row(e, true, 'dr-rc')).join('')}` : '';
   let lockLines = 0;
-  body.innerHTML = recent + GROUPS.map((g) => {
+  body.innerHTML = GROUPS.map((g) => {
     const list = all.filter((e) => e.g === g && e.live && e.drawer);
     const okL = list.filter((e) => e.ok), bad = list.filter((e) => !e.ok);
     const core = (e) => e.kind === 'r' && e.rec && (e.rec.mod || (e.rec.mob >= 1 && e.rec.mob <= 2));
@@ -364,7 +396,7 @@ window.addEventListener('popstate', () => {
   if (drawerOpen) setDrawer(false);                 // hardware Back: close the drawer first
   if (pendingRoute) { const r = pendingRoute; pendingRoute = null; location.hash = '#/' + r; }
 });
-window.addEventListener('hashchange', () => { countRoute(); if (drawerOpen) setDrawer(false); syncBnav(); updatePinBtn(); });
+window.addEventListener('hashchange', () => { countRoute(); if (drawerOpen) setDrawer(false); syncBnav(); });
 document.addEventListener('keydown', (e) => {
   if (!drawerOpen) return;
   if (e.key === 'Escape') { closeDrawer(); return; }
@@ -412,9 +444,8 @@ function syncBnav() {
 function menuBtn() { return `<button class="hbtn" data-act="nav_open" aria-label="${esc(T('menu'))}" aria-haspopup="dialog">${ic3('menu', 24)}</button>`; }
 function headExtra() {
   const k = keyOfHash(), e = k !== 'r:home' ? byKey(k) : null;
-  if (!e || !e.ok) return '';
-  const pin = isPinned(k);
-  return `<button class="hbtn pin" id="hd_pin" data-act="nav_pin" data-v="${esc(k)}" aria-pressed="${pin}" aria-label="${esc(pin ? T('unpin') : T('pin'))}">${pin ? IC.starF : IC.star}</button>`;
+  if (k !== 'r:home' && !(e && e.ok) && !ownerBoardOk()) return '';
+  return `${B.notifications && B.notifications.badge ? B.notifications.badge() : ''}<button class="hbtn pin dots" id="hd_dots" data-act="nav_hmenu" aria-haspopup="menu" aria-label="${esc(T('more'))}">⋮</button>`;
 }
 function crumb() {
   if (!S.ctx || !S.ctx.profile || S.ctx.profile.status !== 'active') return '';
@@ -422,10 +453,6 @@ function crumb() {
   if (page === 'home' || page === 'group') return '';
   const e = byKey(keyOfHash()); if (!e || !e.ok) return '';
   return `<nav class="crumb muted" aria-label="breadcrumb" style="font-size:.82rem;margin:2px 0 8px;display:flex;flex-wrap:wrap;gap:4px;align-items:center"><button data-act="go_group" data-v="${esc(e.g)}" style="background:none;border:0;padding:0 2px;min-height:44px;color:inherit;text-decoration:underline">${esc(B.ia.groupLabel(e.g))}</button><span aria-hidden="true">›</span><span>${esc(e.label)}</span></nav>`;
-}
-function updatePinBtn() {
-  const b = $('#hd_pin'); if (!b) return; const pin = isPinned(b.dataset.v);
-  b.setAttribute('aria-pressed', pin); b.setAttribute('aria-label', pin ? T('unpin') : T('pin')); b.innerHTML = pin ? IC.starF : IC.star;
 }
 let syncUid = null;
 function sync(live) {
@@ -440,15 +467,84 @@ function sync(live) {
   syncBnav();
 }
 
-// ---------- pin / unpin ----------
+// ---------- favourites: pin / unpin / order / label / hide - all from the ⋮ menus (no star buttons anywhere) ----------
+const dotsBtn = (key, where) => `<button class="st dots" data-act="nav_menu" data-v="${esc(key)}" data-w="${where}" aria-haspopup="menu" aria-label="${esc(T('more'))}">⋮</button>`;
 function togglePin(k) {
-  const p = pins(), i = p.indexOf(k);
+  let p = pins();
+  if (!p.length) { const rd = roleDefaults(); if (rd.length) { p = rd.slice(); setPins(p); pushOrder(); } }   // first change: the role defaults become this person's own list
+  const i = p.indexOf(k);
   if (i >= 0) p.splice(i, 1); else p.push(k);
   setPins(p); afterPin(); pushPin(k, i < 0);
 }
+const visFavKeys = () => effPins().filter((k) => { const e = byKey(k); return e && e.ok && e.live && !isHidden(k); });
+function reorderFav(key, how) {
+  const all = effPins().slice(), vis = visFavKeys(), i = vis.indexOf(key); if (i < 0) return;
+  const j = Math.max(0, Math.min(vis.length - 1, how === 'top' ? 0 : how === 'bottom' ? vis.length - 1 : i + Number(how))); if (j === i) return;
+  const v2 = vis.slice(); v2.splice(i, 1); v2.splice(j, 0, key);
+  setPins([...v2, ...all.filter((k) => !vis.includes(k))]); afterPin(); pushOrder();
+}
+function resetOrder() {   // back to the order of the menu (registry), not the order of tapping
+  const idx = new Map(entries().map((e, n) => [e.key, n])); const p = effPins().slice().sort((a, b) => (idx.has(a) ? idx.get(a) : 1e9) - (idx.has(b) ? idx.get(b) : 1e9));
+  setPins(p); afterPin(); pushOrder();
+}
+function hideKey(k, on) {
+  const h = hiddenKeys().filter((x) => x !== k); if (on) h.push(k);
+  setHidden(h); afterPin(); pushMeta(k);
+}
+function renameSheet(k) {
+  const e = byKey(k); if (!e) return;
+  openSheet(`<h2>${esc(T('m_rename'))}</h2><div class="stack"><label for="rn_in">${esc(T('rn_t'))}</label><input id="rn_in" maxlength="40" autocomplete="off" value="${esc(labelsMap()[k] || '')}" placeholder="${esc(e.label)}"><p class="muted" style="margin:0;font-size:.85rem">${esc(T('rn_h'))}</p>
+    <button class="primary full" data-act="nav_rn_save" data-v="${esc(k)}">${esc(T('rn_save'))}</button></div>`);
+  setTimeout(() => { const i = $('#rn_in'); if (i) i.focus(); }, 30);
+}
+function copyLink(route) {
+  const url = location.origin + location.pathname + '#/' + route;
+  const done = () => A.toast(T('copied'));
+  try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(url).then(done, () => A.toast(url)); return; } } catch (e) { /* fall through */ }
+  A.toast(url);
+}
+// the ⋮ menu of one tile / drawer row / header: pin, order, label, hide, open, copy link, reset order
+function menuItems(key, where) {
+  const e = byKey(key); if (!e) return [];
+  const fav = isFav(key), vis = visFavKeys(), i = vis.indexOf(key), items = [];
+  items.push({ label: fav ? T('unpin') : T('pin'), onClick: () => togglePin(key) });
+  if (fav && i >= 0) items.push({ label: T('m_up'), disabled: i === 0, onClick: () => reorderFav(key, -1) }, { label: T('m_down'), disabled: i === vis.length - 1, onClick: () => reorderFav(key, 1) },
+    { label: T('m_top'), disabled: i === 0, onClick: () => reorderFav(key, 'top') }, { label: T('m_bottom'), disabled: i === vis.length - 1, onClick: () => reorderFav(key, 'bottom') });
+  items.push({ label: T('m_rename'), onClick: () => renameSheet(key) });
+  if (where !== 'header') {
+    items.push({ label: isHidden(key) ? T('m_unhide') : T('m_hide'), onClick: () => hideKey(key, !isHidden(key)) });
+    items.push({ label: T('m_open'), onClick: () => H.nav_go({ dataset: { v: e.route } }) });
+  }
+  items.push({ label: T('m_copy'), onClick: () => copyLink(e.route) }, { label: T('m_reset'), onClick: resetOrder });
+  return items;
+}
+function showMenu(title, items) {
+  const old = document.getElementById('nav_pop'); if (old) old.remove();
+  if (B.ctl && B.ctl.menu) { const t = B.ctl.menu({ label: title, items }); t.id = 'nav_pop'; t.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0'; document.body.appendChild(t); t.click(); return; }
+  navMenuItems = items;
+  openSheet(`<h2>${esc(title)}</h2><div class="stack">${items.map((it, n) => `<button class="full" data-act="nav_pick" data-i="${n}" ${it.disabled ? 'disabled' : ''}>${esc(it.label)}</button>`).join('')}</div>`);
+}
+let navMenuItems = [];
+// header ⋮: the page's own favourite actions, plus (Home) edit favourites / unhide / refresh, plus the owner-mode switch
+function headerItems() {
+  const k = keyOfHash(), home = k === 'r:home', e = home ? null : byKey(k), items = e && e.ok ? menuItems(k, 'header') : [];
+  if (home) {
+    items.push({ label: HS.favEdit ? T('fav_done') : T('fav_edit') + ' · ' + T('fav'), onClick: () => { HS.favEdit = !HS.favEdit; if ($('#hv_fav')) drawFav(); else H.nav_open(); } });
+    if (hiddenKeys().length) items.push({ label: T('m_unhide') + ' (' + hiddenKeys().length + ')', onClick: () => { const h = hiddenKeys(); setHidden([]); h.forEach(pushMeta); afterPin(); drawTiles(); } });
+    items.push({ label: T('m_reset'), onClick: resetOrder }, { label: T('m_refresh'), onClick: () => H.hv_refresh() });
+  }
+  if (ownerBoardOk()) items.push({ label: ownerModeOn() ? T('omode_off') : T('omode_on'), onClick: () => setOwnerMode(!ownerModeOn()) });
+  return items;
+}
+const ownerBoardOk = () => isOwner() && !!B.ia.byRoute('owner') && B.rule('owner_board_on', true) !== false;   // the screen itself (ownerboard.js) may load a moment after the first Home
+const ownerModeOn = () => { try { return ownerBoardOk() && !!B.ownerboard && store.get('bos_ownermode_' + uid()) === '1'; } catch (e) { return false; } };
+function setOwnerMode(on) {
+  try { store.set('bos_ownermode_' + uid(), on ? '1' : '0'); } catch (e) { /* ignore */ }
+  if ((location.hash.replace(/^#\/?/, '') || 'home').split('/')[0] === 'home') window.dispatchEvent(new HashChangeEvent('hashchange')); else location.hash = '#/home';
+}
 function afterPin() {
-  updatePinBtn(); if ($('#nav_body')) dr_body();
-  if ($('#hv_fav')) drawFav(); if ($('#pk_list')) drawPicker(($('#pk_q') || {}).value || '');
+  if ($('#nav_body')) dr_body();
+  if ($('#hv_fav')) drawFav(); if ($('#hv_tiles')) drawTiles(); if ($('#pk_list')) drawPicker(($('#pk_q') || {}).value || '');
 }
 function pickerSheet() {
   openSheet(`<h2>${esc(T('pick'))}</h2><input id="pk_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" aria-label="${esc(T('search'))}"><div id="pk_list" style="margin:8px 0"></div>
@@ -458,8 +554,8 @@ function pickerSheet() {
 function drawPicker(v) {
   const ql = (v || '').trim().toLowerCase(), box = $('#pk_list'); if (!box) return;
   const list = entries().filter((e) => e.ok && e.live && e.key !== 'r:home' && (!ql || e.label.toLowerCase().includes(ql)));
-  box.innerHTML = list.map((e) => { const pin = isPinned(e.key); return `<div class="pk-row"><span class="lb">${esc(e.label)}</span>
-    <button class="st" data-act="nav_pin" data-v="${esc(e.key)}" aria-pressed="${pin}" aria-label="${esc(pin ? T('unpin') : T('pin'))}">${pin ? IC.starF : IC.star}</button></div>`; }).join('') || `<p class="muted center">${esc(T('nores'))}</p>`;
+  box.innerHTML = list.map((e) => { const pin = isFav(e.key); return `<div class="pk-row" data-ctl="off"><span class="lb">${esc(lblOf(e))}</span>
+    <button class="mini pkb" data-act="nav_pin" data-v="${esc(e.key)}" aria-pressed="${pin}" style="min-height:44px;min-width:76px">${esc(pin ? '✓ ' + T('added') : '+ ' + T('add'))}</button></div>`; }).join('') || `<p class="muted center">${esc(T('nores'))}</p>`;
 }
 
 // ---------- Me sheet ----------
@@ -472,7 +568,7 @@ function meSheet() {
 }
 
 // ---------- Home v2 ----------
-const HS = { mode: null, period: null, data: null, dataFrom: null };
+const HS = { mode: null, period: null, data: null, dataFrom: null, favEdit: false };
 const dhaka = (d = new Date()) => d.toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
 const addDays = (iso, n) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 // first day of the fiscal year that contains iso: the same rule as the server (fiscal_year_start_month / _day; empty = 1 January)
@@ -490,6 +586,7 @@ const hdef = () => { if (!HS.mode) HS.mode = store.get('bos_hmode_' + uid()) ===
 async function home() {
   const p = S.ctx.profile, own = isOwner(), ap = anyApprove();
   hdef(); mount();
+  if (ownerModeOn()) return B.ownerboard.view({ home: true });   // Module E: the owner chose "Owner mode" as his Home
   A.shell(t('app'), `<div class="hgreet"><b>${esc(T('hi'))}, ${esc(p.full_name || p.staff_id)}</b><span>${esc(p.staff_id)}</span></div>
     <div id="hv_main"><p class="muted">${esc(t('loading'))}</p></div>`);
   await ensureStatic();
@@ -513,19 +610,20 @@ async function home() {
   const attn = ap || own || ctlOk() ? `<div class="hsec">${esc(T('attn'))}${hot.length ? `<small>${hot.reduce((s, r) => s + r[1], 0)}</small>` : ''}${V2 ? `<button class="mini" data-act="hv_refresh" aria-label="${esc(T('refresh'))}">↻</button>` : ''}</div>
     <div class="card" style="padding:4px 12px">${hot.length ? hot.map((r) => `<button class="hrow mk ${r[2]}" data-act="go" data-v="${r[4]}"><span>${esc(r[3])}</span><span class="n">${r[1]}</span><span class="cv">›</span></button>`).join('')
       : `<div class="dash-ok">${esc(V2 ? T('all_clear') : T('attn_ok'))}</div>`}${V2 && rows.filter((r) => r[1]).length > 5 ? `<button class="hrow" data-act="go" data-v="${own || ctlOk() ? 'control' : 'pending'}"><span>${esc(T('see_all'))}</span><span class="cv">›</span></button>` : ''}</div>` : (V2 && hot.length ? `<div class="hsec">${esc(T('attn'))}<small>${hot.reduce((s, r) => s + r[1], 0)}</small></div><div class="card" style="padding:4px 12px">${hot.map((r) => `<button class="hrow mk ${r[2]}" data-act="go" data-v="${r[4]}"><span>${esc(r[3])}</span><span class="n">${r[1]}</span><span class="cv">›</span></button>`).join('')}</div>` : '');
-  const posBtn = P('POS', 'enter') ? `<button class="primary hbig sellbig" data-act="go" data-v="pos" data-sell="1">${ic3('sell', 34)}<span class="sb-t"><b>${esc(T('sell'))}</b><small>${esc(t('pos'))}</small></span></button>` : '';
+  const sellBtn = P('POS', 'enter') ? `<button class="primary hbig sellbig" data-act="go" data-v="pos" data-sell="1">${ic3('sell', 34)}<span class="sb-t"><b>${esc(T('sell'))}</b><small>${esc(t('pos'))}</small></span></button>` : '';
+  const ownBtn = ownerBoardOk() ? `<button class="hbig ownbig" data-act="go" data-v="owner" data-owner="1">${ico('control', 'sliders', 34)}<span class="sb-t"><b>${esc(T('omode'))}</b><small>${esc(T('omode_d'))}</small></span></button>` : '';
+  const posBtn = sellBtn || ownBtn ? `<div class="hbigrow">${sellBtn}${ownBtn}</div>` : '';
   if (V2) setTimeout(() => loadOldest(), 0);
-  $('#hv_main').innerHTML = `${posBtn}${attn}${V2 ? '<div id="hv_oldest"></div>' : ''}${V2 ? '<div id="hv_sheets"></div><div id="hv_qa"></div><div class="hsec">' + esc(T('fav')) + '</div><div id="hv_fav"></div><div id="hv_recent"></div>' : ''}
+  $('#hv_main').innerHTML = `${posBtn}${attn}${V2 ? '<div id="hv_oldest"></div>' : ''}${V2 ? '<div id="hv_sheets"></div><div id="hv_qa"></div><div class="hsec">' + esc(T('fav')) + favEditBtn() + '</div><div id="hv_fav"></div>' : ''}
     <div class="seg" role="group" aria-label="${esc(T('biz') + ' / ' + T('acc'))}"><button data-act="hv_mode" data-v="biz" aria-pressed="${HS.mode === 'biz'}">${esc(T('biz'))}</button><button data-act="hv_mode" data-v="acc" aria-pressed="${HS.mode === 'acc'}">${esc(T('acc'))}</button></div>
     <div class="ptabs" role="tablist" id="hv_pt"></div><div id="hv_stats"></div>
-    ${V2 ? '' : '<div id="hv_sheets"></div><div class="hsec">' + esc(T('fav')) + '</div><div id="hv_fav"></div>'}
+    ${V2 ? '' : '<div id="hv_sheets"></div><div class="hsec">' + esc(T('fav')) + favEditBtn() + '</div><div id="hv_fav"></div>'}
     <div class="hsec" id="hv_th"></div><div class="qgrid" id="hv_tiles"></div>
-    ${V2 ? '' : '<div id="hv_recent"></div><div id="hv_qa"></div>'}
     <div class="hsec">${esc(T('modules'))}</div><div class="grid" id="hv_mods"></div><div id="hv_ctl"></div>
     <div class="hsec">${esc(T('cats'))}</div><div class="grid" id="hv_cats"></div>
     <details class="acc" id="hv_forms"><summary>${esc(T('forms'))}</summary><div class="accb" id="hv_formsb"></div></details>
     ${ap || canPos() ? `<details class="acc" id="hv_dt"><summary>${esc(T('detail'))}</summary><div class="accb"><div id="dash"></div></div></details>` : ''}`;
-  drawPeriod(); drawTiles(); drawFav(); drawMods(); drawCtl(); drawForms(); drawRecent(); drawCats();
+  drawPeriod(); drawTiles(); drawFav(); drawMods(); drawCtl(); drawForms(); drawQuick(); drawCats();
   const dt = $('#hv_dt'); if (dt) dt.addEventListener('toggle', () => { if (dt.open && B.dash) B.dash.render().catch(() => {}); });
   loadStats(); loadSheets();
 }
@@ -612,16 +710,18 @@ function tileDefs() {
   return B.ia.homeKeys(mode).map((key) => (lbl[key] && lbl[key][mode] ? { key, label: () => T(lbl[key][mode]) } : { key }));
 }
 function tile(e, o = {}) {
-  const pin = isPinned(e.key), c = e.cnt && CNT && CNT[e.cnt];
-  return `<div class="qt"><button class="qm" data-act="go" data-v="${esc(e.route)}">${ico(e.icon, e.rec && e.rec.i3)}<span class="lb">${esc(o.label || e.label)}</span>${c ? `<span class="dot ${e.tone || 'warn'}"></span>` : ''}</button>
-    <button class="st" data-act="nav_pin" data-v="${esc(e.key)}" aria-pressed="${pin}" aria-label="${esc(pin ? T('unpin') : T('pin'))}">${pin ? IC.starF : IC.star}</button></div>`;
+  const c = e.cnt && CNT && CNT[e.cnt], ed = o.fav && HS.favEdit && isFav(e.key);
+  return `<div class="qt ${ed ? 'edit' : ''}"><button class="qm" data-act="go" data-v="${esc(e.route)}">${ico(e.icon, e.rec && e.rec.i3)}<span class="lb">${esc(labelsMap()[e.key] || o.label || e.label)}</span>${c ? `<span class="dot ${e.tone || 'warn'}"></span>` : ''}</button>
+    ${dotsBtn(e.key, 'tile')}${ed ? `<div class="fedit" data-ctl="off"><button data-act="fav_mv" data-v="${esc(e.key)}" data-d="-1" aria-label="${esc(T('m_up'))}">↑</button><button data-act="fav_mv" data-v="${esc(e.key)}" data-d="1" aria-label="${esc(T('m_down'))}">↓</button><button data-act="fav_rm" data-v="${esc(e.key)}" aria-label="${esc(T('unpin'))}">✕</button></div>` : ''}</div>`;
 }
+const favEditBtn = () => `<button class="mini" id="hv_favedit" data-act="fav_edit" aria-pressed="${HS.favEdit}">${esc(HS.favEdit ? T('fav_done') : T('fav_edit'))}</button>`;
 function drawTiles() {
   const box = $('#hv_tiles'), hd = $('#hv_th'); if (!box) return;
   hd.textContent = T(HS.mode === 'biz' ? 'tiles_biz' : 'tiles_acc');
   const mode = npMode();
   box.innerHTML = tileDefs().map((d) => {
     if (d.soon) return `<div class="qt soon"><div class="qm" aria-disabled="true"><span class="lb">${esc(T(d.soon))}</span><span class="chip">${esc(T('soon'))}</span></div></div>`;
+    if (isHidden(d.key)) return '';   // "Hide from Home" (⋮ menu)
     const e = byKey(d.key);
     if (!e) return mode === 'lock' && d.key.startsWith('f:') ? '' : '';   // form not in the forms table at all: nothing to show
     if (!e.live) return `<div class="qt soon"><div class="qm" aria-disabled="true"><span class="lb">${esc(e.label)}</span><span class="chip">${esc(T('soon'))}</span></div></div>`;
@@ -632,15 +732,16 @@ function drawTiles() {
 // role-relevant extras (priority in ia.js) when fewer than 8 tiles are usable for this person
 function topUpTiles() {
   const have = tileDefs().filter((d) => { const e = byKey(d.key); return e && e.ok && e.live; }).length;
-  return B.ia.topUp(HS.mode, cx(), have, 8).map((k) => { const e = byKey(k); return e && e.ok && e.live ? tile(e) : ''; }).join('');
+  return B.ia.topUp(HS.mode, cx(), have, 8).map((k) => { const e = byKey(k); return e && e.ok && e.live && !isHidden(k) ? tile(e) : ''; }).join('');
 }
 function drawFav() {
   const box = $('#hv_fav'); if (!box) return;
-  const pinned = effPins().map(byKey).filter((e) => e && e.ok && e.live);
-  const u = usage(), pk = new Set(pinned.map((e) => e.key));
-  const used = Object.keys(u).filter((k) => !pk.has(k)).sort((a, b) => u[b] - u[a]).map(byKey).filter((e) => e && e.ok && e.live && e.key !== 'r:home').slice(0, Math.max(4, 8 - pinned.length));
+  const pinned = visFavKeys().map(byKey);
+  const u = usage(), pk = new Set(effPins());
+  const used = Object.keys(u).filter((k) => !pk.has(k) && !isHidden(k)).sort((a, b) => u[b] - u[a]).map(byKey).filter((e) => e && e.ok && e.live && e.key !== 'r:home').slice(0, Math.max(4, 8 - pinned.length));
   const add = `<div class="qt"><button class="qm" data-act="nav_picker">${IC.plus}<span class="lb">${esc(T('add'))}</span></button></div>`;
-  box.innerHTML = (pinned.length || used.length ? '' : `<p class="muted" style="margin:0 0 10px">${esc(T('fav_empty'))}</p>`) + `<div class="qgrid">${pinned.map((e) => tile(e)).join('')}${used.map((e) => tile(e)).join('')}${add}</div>`;
+  const fb = $('#hv_favedit'); if (fb) { fb.textContent = HS.favEdit ? T('fav_done') : T('fav_edit'); fb.setAttribute('aria-pressed', HS.favEdit); }
+  box.innerHTML = (pinned.length || used.length ? '' : `<p class="muted" style="margin:0 0 10px">${esc(T('fav_empty'))}</p>`) + `<div class="qgrid">${pinned.map((e) => tile(e, { fav: true })).join('')}${used.map((e) => tile(e, { fav: true })).join('')}${add}</div>`;
 }
 function drawMods() {
   const box = $('#hv_mods'); if (!box) return;
@@ -660,12 +761,10 @@ function drawCtl() {
   const c = (CNT && CNT.ctl) || 0;
   box.innerHTML = `<button class="tile t-ink" data-act="go" data-v="control" style="width:100%;margin-top:12px;min-height:76px;flex-direction:row;align-items:center;justify-content:flex-start">${ico('control', 'sliders', 30)}<span style="flex:1;text-align:start"><b>${esc(T('ctl'))}</b><br><small>${esc(T('ctl_d'))}</small></span>${c ? `<span class="badge">${c}</span>` : ''}</button>`;
 }
-function drawRecent() {
-  const box = $('#hv_recent'), qa = $('#hv_qa'); if (!box || !v2()) return;   // switch OFF = the old Home
-  const rc = B.ia.recent(uid()).map((r) => byKey('r:' + r)).filter((e) => e && e.ok && e.live);
-  box.innerHTML = `<div class="hsec">${esc(T('recent'))}</div>` + (rc.length ? `<div class="row wrap">${rc.map((e) => `<button class="tog" data-act="go" data-v="${esc(e.route)}">${esc(e.label)}</button>`).join('')}</div>` : `<p class="muted" style="margin:0 0 10px">${esc(T('recent_empty'))}</p>`);
+function drawQuick() {   // quick actions only: the "Recent" block is gone from Home (Module E)
+  const qa = $('#hv_qa'); if (!qa || !v2()) return;   // switch OFF = the old Home
   const acts = B.ia.quickActions(cx());
-  if (qa) qa.innerHTML = acts.length ? `<div class="hsec">${esc(T('qa'))}</div><div class="qgrid" id="hv_qgrid">${acts.map((a) => `<div class="qt"><button class="qm" data-act="go" data-v="${esc(a.route)}" data-quick="${esc(a.route)}">${ico(a.icon, a.i3)}<span class="lb">${esc(a.label)}</span></button></div>`).join('')}</div>` : '';
+  qa.innerHTML = acts.length ? `<div class="hsec">${esc(T('qa'))}</div><div class="qgrid" id="hv_qgrid">${acts.map((a) => `<div class="qt"><button class="qm" data-act="go" data-v="${esc(a.route)}" data-quick="${esc(a.route)}">${ico(a.icon, a.i3)}<span class="lb">${esc(a.label)}</span></button></div>`).join('')}</div>` : '';
 }
 function drawCats() {
   const box = $('#hv_cats'); if (!box) return;
@@ -719,12 +818,19 @@ Object.assign(H, {
   },
   nav_grp: (a) => { const og = groupOpen(), g = a.dataset.v; og[g] = !og[g]; store.set('bos_navg_' + uid(), JSON.stringify(og)); dr_body(); },
   nav_pin: (a) => togglePin(a.dataset.v),
+  nav_menu: (a) => { const e = byKey(a.dataset.v); showMenu(e ? lblOf(e) : T('more'), menuItems(a.dataset.v, a.dataset.w)); },
+  nav_hmenu: () => { const it = headerItems(); if (it.length) showMenu(T('more'), it); },
+  nav_pick: (a) => { closeSheet(); const it = navMenuItems[Number(a.dataset.i)]; if (it && it.onClick) it.onClick(); },
+  nav_rn_save: (a) => { const k = a.dataset.v, v = (($('#rn_in') || {}).value || '').trim().slice(0, 40), m = labelsMap(); if (v) m[k] = v; else delete m[k]; setLabels(m); closeSheet(); pushMeta(k); afterPin(); },
+  fav_edit: () => { HS.favEdit = !HS.favEdit; drawFav(); },
+  fav_mv: (a) => reorderFav(a.dataset.v, a.dataset.d),
+  fav_rm: (a) => togglePin(a.dataset.v),
   go_group: (a) => { const r = 'group/' + a.dataset.v; if (drawerOpen) H.nav_go({ dataset: { v: r } }); else location.hash = '#/' + r; },
   hv_refresh: () => { CNT = null; HS.data = null; home(); },
   ia_retry: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
   nav_picker: pickerSheet,
   nav_me: meSheet,
-  nav_reset: () => { store.set('bos_pins_' + uid(), '[]'); store.set('bos_use_' + uid(), '{}'); setFavQ([]); okRes(sb.from('user_favourites').delete().eq('user_id', uid())).catch(() => {}); closeSheet(); afterPin(); },
+  nav_reset: () => { store.set('bos_pins_' + uid(), '[]'); store.set('bos_use_' + uid(), '{}'); setHidden([]); setLabels({}); setFavQ([]); okRes(sb.from('user_favourites').delete().eq('user_id', uid())).catch(() => {}); closeSheet(); afterPin(); },
   hv_mode: (a) => { HS.mode = a.dataset.v; store.set('bos_hmode_' + uid(), HS.mode); document.querySelectorAll('.seg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === HS.mode)); drawTiles(); drawStats(); },
   hv_period: (a) => { HS.period = a.dataset.v; store.set('bos_hper_' + uid(), HS.period); drawPeriod(); loadStats(); },
 });
@@ -732,6 +838,17 @@ Object.assign(H, {
 const prevLang = H.lang;
 H.lang = (a) => { sig = ''; return prevLang(a); };
 
+// ---------- Module E styles (⋮ buttons, favourites edit row, Owner mode button next to Sell) ----------
+(() => {
+  if (document.getElementById('nav_e_css')) return; const st = document.createElement('style'); st.id = 'nav_e_css';
+  st.textContent = `.st.dots{font-size:1.35rem;font-weight:700;line-height:1;color:var(--muted)}.hbtn.dots{font-size:1.5rem;font-weight:700;min-width:44px;min-height:44px}
+  .hbigrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:0 0 4px}body .hbigrow>.hbig.hbig{margin:0}.hbigrow:empty{display:none}
+  .hbig.ownbig{display:flex;align-items:center;justify-content:center;gap:12px;min-height:68px;width:100%;background:var(--card);color:var(--ink);border:1px solid var(--hair)}.hbig.ownbig svg{width:34px;height:34px;flex:none;color:var(--ink-2)}.hbig.ownbig .sb-t{display:flex;flex-direction:column;align-items:flex-start;line-height:1.3;text-align:start}.hbig.ownbig .sb-t b{font-size:1.05rem}.hbig.ownbig .sb-t small{opacity:.85}
+  .qt.edit{flex-direction:column}.qt.edit>.qm{padding-inline-end:38px}.qt .fedit{display:flex;border:1px solid var(--hair);border-top:0;border-radius:0 0 14px 14px;background:var(--card)}
+  .qt .fedit button{flex:1;min-height:44px;border:0;background:transparent;color:var(--ink);font-size:1.1rem}.pk-row{display:flex;align-items:center;gap:8px;min-height:48px}.pk-row .lb{flex:1;min-width:0;overflow-wrap:anywhere}`;
+  document.head.appendChild(st);
+})();
+
 B.curLoc = curLoc; B.setCurLoc = setCurLoc; B.fyStart = fyStart;
-window.BOS_NAV = { loadSheets, curLoc, fyStart, grantFlags: () => GF, ctlOk, menuBtn, headExtra, crumb, sync, home, open: openDrawer, close: closeDrawer, pins, usage, togglePin, entries: () => entries().filter((e) => e.live), syncFavs };
+window.BOS_NAV = { loadSheets, curLoc, fyStart, grantFlags: () => GF, ctlOk, menuBtn, headExtra, crumb, sync, home, open: openDrawer, close: closeDrawer, pins, usage, togglePin, reorderFav, resetOrder, hideKey, hidden: hiddenKeys, labels: labelsMap, menuItems, setOwnerMode, ownerModeOn, entries: () => entries().filter((e) => e.live), syncFavs };
 })();

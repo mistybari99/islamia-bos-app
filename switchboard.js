@@ -26,7 +26,7 @@ const cur = (r) => (r.value !== null && r.value !== undefined ? r.value : r.defa
 const isOn = (r) => cur(r) === true || cur(r) === 'true';
 const changed = (r) => r.value !== null && r.value !== undefined && JSON.stringify(r.value) !== JSON.stringify(r.default_value);
 const MOD = { entries: L('ফর্ম ও এন্ট্রি', 'Forms & entries', 'Form ও entry'), stock: L('স্টক', 'Stock', 'Stock'), pos: L('বিক্রি / POS', 'Sales / POS', 'Sales / POS'), lists: L('তালিকা ও অনুমোদন', 'Lists & approvals', 'List ও approval'),
-  settings: L('সেটিংস', 'Settings', 'Settings'), reports: L('রিপোর্ট', 'Reports', 'Reports'), emergency: L('জরুরি', 'Emergency', 'Emergency'), ui: L('চেহারা / ব্যবহার', 'Look & feel', 'Look & feel'), cash: L('ক্যাশ', 'Cash', 'Cash') };
+  settings: L('সেটিংস', 'Settings', 'Settings'), books: L('হিসাবরক্ষণ', 'Accounting', 'Accounting'), customers: L('গ্রাহক ও স্তর', 'Customers & tiers', 'Customer ও Tier'), notify: L('নোটিফিকেশন ও ব্যাকআপ', 'Notifications & backup', 'Notification ও Backup'), partners: L('অংশীদারি ও বিনিয়োগ', 'Partners & investment', 'Partners ও Investment'), people: L('কর্মী, হাজিরা ও বেতন', 'People, attendance & payroll', 'People, হাজিরা ও Payroll'), items: L('আইটেম', 'Items', 'Items'), lists: L('তালিকা', 'Lists', 'Lists'), locations: L('জায়গা', 'Locations', 'Locations'), purchase: L('ক্রয়', 'Purchases', 'Purchases'), reports: L('রিপোর্ট', 'Reports', 'Reports'), emergency: L('জরুরি', 'Emergency', 'Emergency'), ui: L('চেহারা / ব্যবহার', 'Look & feel', 'Look & feel'), cash: L('ক্যাশ', 'Cash', 'Cash') };
 const modName = (m) => (MOD[m] ? lab(MOD[m]) : m);
 
 async function load() {
