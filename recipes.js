@@ -296,6 +296,7 @@ async function drawMake() {
   const box = $('#rc_main'); if (!box) return; const locs = LOCS();
   if (D.loc === undefined || D.loc === null) D.loc = (locs[0] || {}).id;
   box.innerHTML = `<h3 style="margin:8px 0">${esc(T('makeHead'))}</h3>${locs.length > 1 ? `<div style="margin-bottom:8px"><select id="mk_loc" aria-label="${esc(T('location'))}">${optH(locs.map((l) => [l.id, nm(l)]), D.loc)}</select></div>` : ''}<div id="mk_list"><p class="muted">${esc(T('loading'))}</p></div>`;
+  D.canVoid = !!(S.ctx.is_owner || (await sb.rpc('has_grant', { p_code: 'production_void', p_loc: D.loc })).data === true);
   const r = await sb.rpc('production_can_make', { p_loc: D.loc });
   const lst = $('#mk_list'); if (!lst) return;
   if (r.error) { lst.innerHTML = `<div class="notice bad">${esc(String(r.error.message || '').slice(0, 120))}</div>`; return; }
@@ -307,8 +308,21 @@ async function drawMake() {
       ${lim ? `<div class="sub">${esc(T('limit'))}: ${esc(nm(lim))}</div>` : ''}${x.unknown ? `<span class="chip warn">${esc(T('unknownMake'))}</span>` : ''}</div>
       <div class="pr"><b class="mnum">${mb === null ? '—' : q4(mb)}</b><small>${esc(T('maxB'))}</small></div></div>`; }).join('')
     : `<div class="card center"><p class="muted">${esc(T('makeEmpty'))}</p></div>`;
+  if (!$('#mk_runs')) lst.insertAdjacentHTML('afterend', '<div id="mk_runs"></div>');
+  drawRuns();
 }
 
+// ----- recent runs + void (phase 23) -----
+const XR = { head: L('সাম্প্রতিক উৎপাদন', 'Recent production', 'সাম্প্রতিক Production'), void: L('বাতিল করুন', 'Void', 'Void'), why: L('বাতিলের কারণ (অন্তত ৩ অক্ষর)', 'Why void (3+ letters)', 'Void-এর কারণ (৩+ অক্ষর)'),
+  done: L('উৎপাদন বাতিল, মাল ফিরেছে', 'Run voided, stock put back', 'Production void, stock ফিরেছে'), voided: L('বাতিল', 'Voided', 'Voided'), used: L('এই ব্যাচের কিছু বিক্রি হয়ে গেছে — বাতিল হবে না (অপচয়/কাউন্ট ব্যবহার করুন)', 'Part of this batch is already sold - cannot void (use wastage / count)', 'এই batch-এর কিছু sold - void হবে না (wastage/count ব্যবহার করুন)') };
+async function drawRuns() {
+  const box = $('#mk_runs'); if (!box) return;
+  const r = await sb.from('production_runs').select('id,item_id,batches,made_at,yield_base,status,note').eq('location_id', D.loc).order('made_at', { ascending: false }).limit(15);
+  const rows = r.data || []; if (!rows.length) { box.innerHTML = ''; return; }
+  box.innerHTML = `<h3 style="margin:14px 0 6px">${esc(lab(XR.head))}</h3>` + rows.map((x) => { const it = itemById(x.item_id);
+    return `<div class="card item ${x.status === 'void' ? 'muted' : ''}"><div><div class="nm">${esc(it ? nm(it) : '')}</div><div class="sub">${esc(String(x.made_at).slice(0, 16).replace('T', ' '))} · ${q4(x.batches)} × · ${q4(x.yield_base)} ${x.status === 'void' ? '· ' + esc(lab(XR.voided)) : ''}</div></div>
+      ${x.status === 'done' && D.canVoid ? `<button class="mini" data-act="rc_runvoid" data-v="${esc(x.id)}">⋮ ${esc(lab(XR.void))}</button>` : ''}</div>`; }).join('');
+}
 // ----- packaging -----
 function drawPack() {
   const box = $('#rc_main'); if (!box) return;
@@ -354,6 +368,9 @@ async function costSheet(r) {
 document.addEventListener('input', (e) => { if (e.target && e.target.id === 'rc_q') { D.q = e.target.value; drawList(); const q = $('#rc_q'); if (q) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); } } });
 const rec = (a) => D.recipes.find((r) => r.id === a.dataset.id);
 Object.assign(H, {
+  rc_runvoid: async (a) => { const n = window.prompt(lab(XR.why)); if (!n || n.trim().length < 3) return;
+    const r = await sb.rpc('production_void', { p_run: a.dataset.v, p_note: n.trim() });
+    if (r.error) return toast(/batch_partly_used/.test(r.error.message || '') ? lab(XR.used) : errMsg(r.error)); toast(lab(XR.done)); drawMake(); },
   rc_tab: (a) => { D.tab = a.dataset.v; draw(); },
   rc_f: (a) => { D.f = a.dataset.v; drawList(); },
   rc_new: () => { location.hash = '#/recipes/new'; },

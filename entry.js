@@ -127,7 +127,9 @@ async function locSettings(loc, fresh) {
   const r = await sb.from('location_settings').select('key,value').eq('location_id', loc);
   const m = {}; (r.data || []).forEach((x) => { m[x.key] = x.value; }); ENV.byLoc[loc] = m; return m;
 }
-const myLocs = () => (S.ctx.is_owner || S.ctx.roles.includes('management') ? ENV.locs : ENV.locs.filter((l) => S.ctx.locations.includes(l.id)));
+// paused / closed / planned places are not offered for new work (the server refuses them anyway); history screens still use the full list
+B.liveLocs = (a) => (a || []).filter((l) => !l.status || l.status === 'live' || l.status === 'setting_up');
+const myLocs = () => B.liveLocs(S.ctx.is_owner || S.ctx.roles.includes('management') ? ENV.locs : ENV.locs.filter((l) => S.ctx.locations.includes(l.id)));
 const locName = (id) => nm(ENV.locs.find((l) => l.id === Number(id)));
 const staffName = (sid) => { const s = ENV.staff.find((x) => x.staff_id === sid); return s ? (s.full_name || s.staff_id) : (sid || ''); };
 const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
@@ -146,6 +148,7 @@ const FIELD_ID = (() => { let n = 0; return () => 'x' + (n++); })();
 
 function ctxFor() {
   return { d: E.data, c: E.check, s: E.settings, env: ENV, v: (E.calc && E.calc.v) || {}, cf: !!E.formRow.count_first, num, has, sum, pin: !!(E.pin && E.pin.on), den: (k) => denTotal(getp(E.data, k)), denC: (k) => denTotal(getp(E.check, k)),
+    sbBook: !!(E.sb && E.sb.on && E.status === 'draft'), sbMemo: !!(E.sb && E.sb.on && !E.sb.sealed && E.status === 'draft'),
     rows: (id) => (E.data[id] || []).map((r) => r || {}), rowsC: (id) => (E.check[id] || []).map((r) => r || {}), me: S.ctx.profile.staff_id, date: E.date, loc: E.loc, wd: weekday(E.date),
     L, lab, money, needs: [] };
 }
@@ -158,8 +161,9 @@ function flagsOf(src) { return E.calc.flags.filter((f) => (src === 'check' ? f.s
 
 // ---------- rendering ----------
 const isEd = () => E.mode === 'edit' || E.mode === 'change';    // 'change' = a locked entry opened to ask for a change (W5)
-const modeEditable = (fd) => !(E.blind && E.blind.saved && fd.id === BLIND_FIELD[E.code]) && (isEd() && (fd.who || 'maker') === 'maker') || (E.mode === 'check' && fd.who === 'checker');
+const modeEditable = (fd) => !(E.sb && E.sb.sealed && fd.id === SB_FIELD[E.code]) && !(E.blind && E.blind.saved && fd.id === BLIND_FIELD[E.code]) && (isEd() && (fd.who || 'maker') === 'maker') || (E.mode === 'check' && fd.who === 'checker');
 const curVal = (fd, path, w) => getp(w === 'c' ? E.check : E.data, path);
+const rowsOf = (fd) => (typeof fd.rows === 'function' ? fd.rows() : fd.rows);
 const optsOf = (fd) => (typeof fd.options === 'function' ? fd.options() : fd.options);
 function optsHTML(options, cur, code) { if (cur && String(cur).startsWith('other:') && !options.some((o) => o[0] === cur)) options = [...options, [cur, { bn: 'অন্যান্য: ' + String(cur).slice(6), en: 'Other: ' + String(cur).slice(6) }]]; if (cur && code && !options.some((o) => o[0] === cur)) { const old = ((ENV.lists && ENV.lists[code]) || []).find((x) => x.value_code === cur); if (old) options = [...options, [old.value_code, rowL(old)]]; } return options.map(([v, l]) => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(lab(l))}</option>`).join(''); }
 
@@ -178,7 +182,7 @@ function inputHTML(fd, path, w, ed) {
     case 'choice': return `<div class="row wrap" data-ch="1" data-cur="${esc(val == null ? '' : val)}" ${fd.req ? 'data-req="1"' : ''}>${optsOf(fd).map(([v, l]) => `<button type="button" class="tog ${val === v ? 'on' : ''}" ${ed ? '' : 'disabled'} data-act="pick" ${a} data-v="${esc(v)}">${esc(lab(l))}</button>`).join('')}</div>`;
     case 'select': return `<select ${a}><option value=""></option>${optsHTML(optsOf(fd), val, fd.list)}</select>`;
     case 'staff': return `<select ${a}><option value=""></option>${ENV.staff.map((s) => `<option value="${esc(s.staff_id)}" ${s.staff_id === val ? 'selected' : ''}>${esc(s.full_name || s.staff_id)} · ${esc(s.staff_id)}</option>`).join('')}</select>`;
-    case 'loc': return `<select ${a}><option value=""></option>${ENV.locs.map((l) => `<option value="${l.id}" ${String(l.id) === String(val) ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}<option value="other" ${val === 'other' ? 'selected' : ''}>${esc(t('other'))}</option></select>`;
+    case 'loc': return `<select ${a}><option value=""></option>${B.liveLocs(ENV.locs).map((l) => `<option value="${l.id}" ${String(l.id) === String(val) ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}<option value="other" ${val === 'other' ? 'selected' : ''}>${esc(t('other'))}</option></select>`;
     case 'item': { const it = ENV.byCode && ENV.byCode.get(val); return `<input ${a} data-item="1" list="dl_items" placeholder="${esc(t('item_pick'))}" value="${esc(it ? it.code + ' · ' + nm(it) : (val || ''))}" autocomplete="off">`; }
     case 'supplier': { const sid = getp(w === 'c' ? E.check : E.data, path + '_id'); const known = sid && ENV.sup.some((x) => x.id === sid);
       return `<div class="supwrap"><input ${a} data-sup="1" list="dl_sup" placeholder="${esc(lab(SUPX.ph))}" value="${esc(val)}" autocomplete="off">${ed && ENV.supManage ? `<button type="button" class="mini supnew" data-act="sup_new" data-w="${w}" data-p="${esc(path)}" aria-label="${esc(lab(SUPX.add))}">＋</button>` : ''}</div><div class="hint">${val ? esc(lab(known ? SUPX.listed : SUPX.free)) : ''}</div>`; }
@@ -204,11 +208,11 @@ function wrap(fd, ed) { const id = FIELD_ID(); if (fd.show) E.shows[id] = fd.sho
 
 function tableHTML(fd, wrapAttrs) {
   const w = (fd.cols.some((c) => c.who === 'checker') && !fd.cols.some((c) => !c.who || c.who === 'maker')) ? 'c' : 'd';
-  const n = fd.rows ? fd.rows.length : Math.max((E.data[fd.id] || []).length, fd.min || 1, (E.check[fd.id] || []).length);
-  const canEditStruct = isEd() && !fd.rows;
+  const FR = rowsOf(fd), n = FR ? FR.length : Math.max((E.data[fd.id] || []).length, fd.min || 1, (E.check[fd.id] || []).length);
+  const canEditStruct = isEd() && !FR && !(E.sb && E.sb.sealed);
   let h = `<div class="tbl" ${wrapAttrs}>${fd.label ? `<label>${esc(lab(fd.label))}</label>` : ''}`;
   for (let i = 0; i < n; i++) {
-    h += `<div class="rowcard"><div class="rc-h"><b>${fd.rows ? esc(lab(fd.rows[i])) : (i + 1)}</b>${canEditStruct && n > (fd.min || 1) ? `<button type="button" class="mini" data-act="delrow" data-t="${fd.id}" data-i="${i}" aria-label="${esc(t('delete_row'))}">✕</button>` : ''}</div><div class="rc-g">`;
+    h += `<div class="rowcard"><div class="rc-h"><b>${FR ? esc(lab(FR[i])) : (i + 1)}</b>${canEditStruct && n > (fd.min || 1) ? `<button type="button" class="mini" data-act="delrow" data-t="${fd.id}" data-i="${i}" aria-label="${esc(t('delete_row'))}">✕</button>` : ''}</div><div class="rc-g">`;
     fd.cols.forEach((c) => {
       const cw = c.who === 'checker' ? 'c' : 'd', ed = modeEditable(c);
       const cid = FIELD_ID(); if (c.show) E.rshows[cid] = [c.show, fd.id, i];
@@ -248,6 +252,8 @@ const STATUS_CLS = { draft: '', submitted: 'warn', approved: 'ok', rejected: 'ba
 function actionsHTML() {
   const b = []; const canMaker = E.mode === 'edit', st = E.status;
   if (E.mode === 'change') return `<div class="actionbar"><button data-act="e_chg_cancel">${esc(t('cancel'))}</button><button class="primary" data-act="e_chg_send">${esc(lab(X17.chg_send))}</button></div>`;
+  if (canMaker && E.sb && E.sb.on) b.push(`<div class="notice warn" style="flex-basis:100%">${esc(lab(X17['sb_hint' + E.code.replace('-', '_')]))}</div>`);
+  if (canMaker && E.sb && E.sb.on && !E.sb.sealed) b.push(`<button data-act="e_seal">${esc(lab(X17.sb_lock))}</button>`);
   if (canMaker) b.push(`<button data-act="e_save">${esc(t('save_draft'))}</button><button class="primary" data-act="e_submit">${esc(t('submit'))}</button>`);
   if (E.mode === 'check') b.push(`<button class="danger" data-act="e_reject">${esc(t('reject'))}</button><button class="primary" data-act="e_approve">${esc(t('approve'))}</button>`);
   if (E.id && st !== 'draft' && (E.created_by === S.ctx.profile.id || S.ctx.is_owner) && !(st === 'approved' && !S.ctx.is_owner)) b.push(`<button data-act="e_reopen">${esc(t('reopen'))}</button>`);
@@ -411,6 +417,10 @@ const X18 = {
   r_witness: L('সাক্ষী (দ্বিতীয়বার গণনা)', 'Witness (second count)', 'Witness (দ্বিতীয়বার count)'), r_second_sig: L('দ্বিতীয় স্বাক্ষর', 'Second signature', 'দ্বিতীয় signature'), r_hub_pair: L('হাব জোড়া — দ্বিতীয় জন', 'Hub pair - second person', 'Hub pair — দ্বিতীয় জন'),
   sign: L('পিন দিয়ে স্বাক্ষর', 'Sign with PIN', 'PIN দিয়ে sign'), signed_by: L('স্বাক্ষর করেছেন', 'Signed by', 'Sign করেছেন'), notsigned: L('এখনও স্বাক্ষর হয়নি', 'Not signed yet', 'এখনও sign হয়নি'),
   e_count_already_saved: L('এই গণনা আগেই সেভ হয়েছে — বদলানো যায় না', 'This count is already saved - it cannot change', 'এই count আগেই save হয়েছে — বদলানো যায় না'),
+  sb_lock: L('গণনা সেভ ও লক করুন', 'Lock the counts', 'Count lock করুন'), sb_done: L('গণনা লক হয়েছে', 'Counts locked', 'Count lock হয়েছে'),
+  sb_hint04_3: L('অন্ধ গণনা: আগে সব আইটেম গুনে লক করুন। লেজারের হিসাব জমা দেওয়ার পরে সিস্টেম নিজে বসাবে।', 'Blind count: count every item and lock. The book balance is added by the system when you submit.', 'Blind count: আগে সব item গুনে lock করুন। Book balance submit-এর পরে system বসাবে।'),
+  sb_hint04_1: L('অন্ধ গ্রহণ: আগে গুনে লক করুন, তারপর মেমোর অঙ্ক লিখুন।', 'Blind receiving: count and lock first, then write the memo figure.', 'Blind receiving: আগে গুনে lock করুন, তারপর memo-র অঙ্ক লিখুন।'),
+  e_count_not_sealed: L('নতুন বা বদলানো লাইন — আবার "গণনা লক করুন" চাপুন', 'A new line - press "Lock the counts" again', 'নতুন line - আবার "Count lock করুন" চাপুন'),
   e_count_locked: L('সেভ করা গণনা এন্ট্রিতে বদলানো যায় না', 'The saved count cannot be changed in the entry', 'Save করা count entry-তে বদলানো যায় না'),
   e_count_mismatch: L('লেখা গণনা আর সেভ করা গণনা মিলছে না', 'The typed count differs from the count being saved', 'লেখা count আর save করা count মিলছে না'),
   e_count_not_open: L('এখন এই গণনা নেওয়ার সময় নয়', 'This count cannot be taken at this stage', 'এখন এই count নেওয়ার সময় নয়'),
@@ -433,7 +443,7 @@ const BLIND_FIELD = { '14-1': 'cash_count', '10-1': 'rcount' };
 const BLIND_HIDE = { '14-1': ['expected', 'short_over'], '10-1': ['counted_total', 'handover', 'diff'] };
 const BLIND_V = { '14-1': ['expected', 'short_over', 'so_nonzero'], '10-1': ['counted_total', 'handover', 'diff', 'diff_nonzero'] };
 const BLIND_FLAG = { '14-1': 'cash_short_over', '10-1': 'hub_diff' };
-const PIN_ROLES = { '14-1': ['witness', 'second_sig'], '10-1': ['hub_pair'] };
+const PIN_ROLES = { '14-1': ['witness', 'second_sig'], '10-1': ['hub_pair'], '04-3': ['witness'] };
 const blindStage = () => !!E && ((E.code === '14-1' && E.mode === 'edit') || (E.code === '10-1' && E.mode === 'check'));
 const blindRevealed = () => !!(E.blind.peeked || (E.blind.saved && E.blind.res && E.blind.res.expected !== undefined));    // the maker's own count_save answer carries no figures (server side blind)
 const blindPending = () => !!(E && E.blind && E.blind.on && blindStage() && !blindRevealed());
@@ -442,11 +452,29 @@ function blindMask() {
   BLIND_V[E.code].forEach((k) => { delete E.calc.v[k]; });
   E.calc.flags = E.calc.flags.filter((f) => f.code !== BLIND_FLAG[E.code]);
 }
-async function loadW5b() {
-  E.blind = null; E.pin = null;
-  if (!BLIND_SEC[E.code]) return;
+// ---------- B2: blind stock count (04-3) and GRN (04-1): counted figures are sealed on the server first (supabase/phase23.sql) ----------
+const SB_FIELD = { '04-3': 'count', '04-1': 'counted' };
+async function loadSB() {
+  E.sb = null; if (!SB_FIELD[E.code]) return;
   try {
-    const [b, p] = await Promise.all([sb.rpc('blind_active', { p_form: E.code, p_loc: E.loc }), sb.rpc('pin_sig_active', { p_form: E.code })]);
+    const b = await sb.rpc('stock_blind_active', { p_form: E.code, p_loc: E.loc }); if (b.error || b.data !== true) return;
+    E.sb = { on: true, sealed: false };
+    if (E.id) { const s = await sb.rpc('count_lines_state', { p_entry: E.id }); if (!s.error && s.data && s.data.all_sealed) E.sb.sealed = true; }
+  } catch (e) { E.sb = null; }
+}
+async function sealCounts() {
+  if (!E || !E.sb || !E.sb.on) return true;
+  if (E.dirty || !E.id || E.queued) { const ok = await saveDraft(); if (!ok) return false; }
+  const r = await sb.rpc('count_lines_seal', { p_entry: E.id });
+  if (r.error) { fail17(r.error); return false; }
+  E.sb.sealed = true; toast(lab(X17.sb_done)); draw(); return true;
+}
+async function loadW5b() {
+  await loadSB();
+  E.blind = null; E.pin = null;
+  if (!BLIND_SEC[E.code] && !PIN_ROLES[E.code]) return;
+  try {
+    const [b, p] = await Promise.all([BLIND_SEC[E.code] ? sb.rpc('blind_active', { p_form: E.code, p_loc: E.loc }) : { data: false }, sb.rpc('pin_sig_active', { p_form: E.code })]);
     const bon = !b.error && b.data === true, pon = !p.error && p.data === true;
     if (bon) {
       E.blind = { on: true, saved: false, res: null, peeked: false, canPeek: false };
@@ -610,12 +638,12 @@ function missingRequired() {
     const mine = (sec.who || 'maker') === (E.mode === 'check' ? 'checker' : 'maker');
     sec.fields.forEach((f) => {
       if (f.type === 'table') {
-        const n = f.rows ? f.rows.length : (E.data[f.id] || []).length;
+        const n = rowsOf(f) ? rowsOf(f).length : (E.data[f.id] || []).length;
         for (let i = 0; i < n; i++) {
           const row = (E.data[f.id] || [])[i] || {}, rowC = (E.check[f.id] || [])[i] || {};
           const any = Object.values(row).some(has) || Object.values(rowC).some(has);
-          if (!any && !f.rows) continue;
-          f.cols.forEach((c) => { const isC = c.who === 'checker'; if ((E.mode === 'check') !== isC) return; check(c, isC ? E.check : E.data, `${f.id}.${i}.${c.id}`, { ...x, row, rowC }, (f.rows ? lab(f.rows[i]) : String(i + 1)) + ' · '); });
+          if (!any && !rowsOf(f)) continue;
+          f.cols.forEach((c) => { const isC = c.who === 'checker'; if ((E.mode === 'check') !== isC) return; check(c, isC ? E.check : E.data, `${f.id}.${i}.${c.id}`, { ...x, row, rowC }, (rowsOf(f) ? lab(rowsOf(f)[i]) : String(i + 1)) + ' · '); });
         }
       } else if ((E.mode === 'check') === ((f.who || sec.who) === 'checker')) check(f, f.who === 'checker' || sec.who === 'checker' ? E.check : E.data, f.id, x);
     });
@@ -643,13 +671,14 @@ function askNote(title, cb, required = true) {
   A.noteCb = () => { const v = ($('#note_in').value || '').trim(); if (required && !v) return toast(t('note_needed')); closeSheet(); cb(v); };
 }
 async function submit() {
+  if (E.sb && E.sb.on && !E.sb.sealed) { if (!(await sealCounts())) return; }
   if (E.dirty || !E.id || E.queued) { const ok = await saveDraft(); if (!ok) { E.afterSave = submit; return; } }
   const miss = missingRequired();
   if (miss.length) return openSheet(`<h2>${esc(t('missing_title'))}</h2><div class="stack">${miss.map((m) => `<div class="notice bad">${esc(m)}</div>`).join('')}</div><button class="full" style="margin-top:12px" data-act="closesheet">${esc(t('done'))}</button>`);
   if (E.queued) { const it = qfind(qkey()); if (it && !qput({ ...it, submit: true })) return queueFailSheet(); toast(t17('queued_submit')); return draw(); }
   const { error } = await callSubmit(E.id);
   if (error && isNet(error)) { if (!queueSubmit(E.id)) return queueFailSheet(); toast(t17('queued_submit')); return draw(); }
-  if (error) { if (/red_blocked/.test(error.message)) return releaseSheet(); if (/pin_signature_stale/.test(error.message) && E.pin) { E.pin.sigs = {}; fail17(error); return draw(); } return fail17(error); }
+  if (error) { if (/count_not_sealed/.test(error.message) && E.sb) { E.sb.sealed = false; draw(); } if (/red_blocked/.test(error.message)) return releaseSheet(); if (/pin_signature_stale/.test(error.message) && E.pin) { E.pin.sigs = {}; fail17(error); return draw(); } return fail17(error); }
   toast(t('submitted_ok')); await reloadEntry(E.id);
 }
 async function loadReleases() {
@@ -859,6 +888,7 @@ Object.assign(A.H, {
   e_count_save: () => countSave(),
   e_count_peek: () => countPeek(),
   e_pin_sign: (a) => pinSignClick(a.dataset.v),
+  e_seal: () => sealCounts(),
   e_submit: submit,
   e_approve: () => decide(true),
   e_reject: () => askNote(t('reject'), (n) => decide(false, n)),

@@ -30,7 +30,10 @@ addDefs([
 ]);
 
 /* ============ 10-3 · Digital payment reconciliation register ============ */
-const SHOWROOMS = [['s1', L('ইসলামিয়া মিষ্টি ঘর — মেইন', 'ISLAMIYA MISTY GHAR — Main')], ['s2', L('ইসলামিয়া মিষ্টি ঘর — ২য় শাখা', 'ISLAMIYA MISTY GHAR — 2nd Branch')], ['s3', L('মিষ্টি বাড়ি', 'MISTY BARI')], ['s4', L('AL-CAKIZ', 'AL-CAKIZ')], ['other', L('অন্য', 'Other')]];
+// showrooms come from the locations table (paused / closed places are not offered); the old fixed list is only a fallback when the table could not be read
+const SHOWROOMS_FALLBACK = [['s1', L('ইসলামিয়া মিষ্টি ঘর — মেইন', 'ISLAMIYA MISTY GHAR — Main')], ['s2', L('ইসলামিয়া মিষ্টি ঘর — ২য় শাখা', 'ISLAMIYA MISTY GHAR — 2nd Branch')], ['s3', L('মিষ্টি বাড়ি', 'MISTY BARI')], ['s4', L('AL-CAKIZ', 'AL-CAKIZ')]];
+const showroomLocs = () => ((B.ENV && B.ENV.locs) || []).filter((l) => l.kind === 'showroom' && l.is_active !== false && ['live', 'setting_up', null, undefined].includes(l.status));
+const SHOWROOMS = () => { const ls = showroomLocs(); return [...(ls.length ? ls.map((l) => [l.code, { bn: l.name_bn, en: l.name_en || l.name_bn, mix: l.name_mix || l.name_bn }]) : SHOWROOMS_FALLBACK), ['other', L('অন্য', 'Other')]]; };
 const recCols = (nameCol, aLabel, cLabel, chgLabel, pre) => [nameCol,
   M('a', aLabel), M('b', L('স্টেটমেন্টে (B)', 'On the statement (B)')), M('chg', chgLabel), M('c', cLabel),
   CALC('d1', L('পার্থক্য: A − B', 'Difference: A − B'), 'money', { show: (x) => has(x.row.a) && has(x.row.b) }),
@@ -45,7 +48,7 @@ function recCalc(rows, pre, v) {
 B.forms['10-3'] = {
   title: L('ডিজিটাল পেমেন্ট রিকনসিলিয়েশন রেজিস্টার', 'Digital payment reconciliation register'),
   head: [D('week_from', L('সপ্তাহ — থেকে', 'Week from'), { req: true }), D('week_to', L('সপ্তাহ — পর্যন্ত', 'Week to'), { req: true })],
-  init(x, data) { if (!data.showroom) data.showroom = [{ who: 's1' }, { who: 's2' }, { who: 's3' }, { who: 's4' }]; },
+  init(x, data) { if (!data.showroom) data.showroom = (showroomLocs().length ? showroomLocs().slice(0, 4).map((l) => l.code) : ['s1', 's2', 's3', 's4']).map((c) => ({ who: c })); },
   sections: [
     { title: L('নিয়ম ও স্টেটমেন্ট সংগ্রহ', 'Rule & statement collection'), fields: [
       NOTE(L('স্টেটমেন্ট হাতে না পেলে রিকনসিলিয়েশন আটকে থাকবে; অনুমান করে লেখা যাবে না।', 'Without the statement in hand the reconciliation stays on hold; nothing may be written by guessing.'), 'warn'),

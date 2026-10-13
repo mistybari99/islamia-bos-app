@@ -93,7 +93,7 @@ async function load() {
   if (it.error) it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,unit,sell_price,is_active,barcode').eq('is_active', true).order('code'));
   if (it.error) throw it.error;
   P.items = it.data.filter((i) => i.sell_price !== null && i.sellable !== false && !i.hidden && i.item_type !== 'asset' && i.item_type !== 'raw_material');
-  const all = B.ENV.locs;
+  const all = B.liveLocs ? B.liveLocs(B.ENV.locs) : B.ENV.locs;
   P.locs = S.ctx.is_owner || S.ctx.roles.includes('management') ? all : all.filter((l) => S.ctx.locations.includes(l.id));
   if (!P.loc || !P.locs.find((l) => l.id === P.loc)) P.loc = store.get('bos_pos_loc') ? Number(store.get('bos_pos_loc')) : (P.locs[0] || {}).id;
   if (!P.locs.find((l) => l.id === P.loc)) P.loc = (P.locs[0] || {}).id;

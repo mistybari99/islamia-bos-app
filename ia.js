@@ -67,6 +67,7 @@ const IA = [
   rec('invoice', 'cust', ['ইনভয়েস ও প্রিন্ট', 'Invoice & print', 'Invoice ও Print'], { icon: 'doc', ok: owner, kw: ['invoice', 'print', 'template', 'label', 'logo', 'ইনভয়েস', 'প্রিন্ট', 'ছাপা', 'লেবেল'] }),
   // Accounting & finance
   rec('daybook', 'acc', ['দিনের খাতা', 'Day book', 'Day book'], { icon: 'doc', ok: (c) => c.own || c.GF.view_daybook === true, home: { acc: 8 }, kw: ['day book', 'cash book', 'ledger', 'expense', 'দিনের খাতা', 'ক্যাশবুক', 'খরচ', 'হিসাব'] }),
+  rec('cashmoves', 'acc', ['ক্যাশ ও ব্যাংকের লেনদেন', 'Cash & bank moves', 'Cash ও Bank লেনদেন'], { icon: 'money', ok: (c) => c.own || c.GF.cash_move === true, kw: ['bank deposit', 'deposit', 'owner', 'advance', 'top up', 'hub', 'ব্যাংক জমা', 'অগ্রিম', 'অ্যাডভান্স', 'মালিক', 'ক্যাশ'] }),
   rec('ledgerlinks', 'acc', ['খাতায় পোস্ট (লিংক)', 'Ledger links', 'Ledger links'], { icon: 'doc', ok: owner, kw: ['ledger', 'post', 'journal', 'link', 'খাতা', 'পোস্ট', 'লেজার'] }),
   // Approvals & exceptions
   rec('exceptions', 'appr', 't:exceptions', { ok: approver, cnt: 'ex', tone: 'bad', mob: 1, mod: 9, kw: ['exception', 'problem', 'red', 'alert', 'গরমিল', 'সমস্যা', 'লাল'] }),
@@ -95,6 +96,7 @@ const IA = [
   // Administration & settings
   rec('control', 'settings', ['কন্ট্রোল সেন্টার', 'Control Center', 'Control Center'], { icon: 'control', ok: (c) => c.ctlOk(), cnt: 'ctl', tone: 'info', kw: ['control', 'admin', 'কন্ট্রোল', 'নিয়ন্ত্রণ'] }),
   rec('rulehub', 'settings', 't:rulehub', { ok: owner, mod: 14, kw: ['rules', 'switch', 'grants', 'নিয়ম', 'অপশন', 'অনুমতি'] }),
+  rec('switchboard', 'settings', ['সুইচবোর্ড (সব চালু/বন্ধ)', 'Switchboard (all on/off)', 'Switchboard (সব on/off)'], { icon: 'settings', ok: owner, kw: ['switch', 'on off', 'toggle', 'blind', 'pin', 'flag', 'সুইচ', 'চালু', 'বন্ধ', 'অন', 'অফ', 'সেটিংস'] }),
   rec('rules', 'settings', 't:rules', { ok: owner, kw: ['form rule', 'count first', 'red block', 'ফর্মের নিয়ম'] }),
   rec('settings', 'settings', 't:settings', { ok: owner, kw: ['settings', 'config', 'সেটিংস'] }),
   rec('settings2', 'settings', ['সেটিংস (সব অপশন)', 'Settings (all options)', 'Settings (সব Option)'], { ok: owner, kw: ['fiscal', 'vat', 'barcode', 'tax', 'বছর', 'ভ্যাট', 'সেটিংস'] }),
@@ -112,7 +114,7 @@ const IA = [
 [['bulkitems', 'lists'], ['itemmap', 'lists'], ['itemimport', 'lists'], ['itemtypes', 'lists'], ['settings2', 'rules'], ['invoice', 'rules'], ['rulehub', 'rules'], ['changes', 'places']].forEach(([r, g]) => { const x = IA.find((y) => y.route === r); if (x) x.cc = g; });
 // 3D icon key per screen (icons3d.js). The old r.icon stays for the Classic theme; i3 is used by the Premium themes. Unknown routes fall back to icon, then doc.
 const I3 = { items: 'bag', 'items/new': 'plus', lists: 'list', 'settings2/units': 'scale', itemimport: 'download', itemmap: 'link', bulkitems: 'bag', itemtypes: 'tag', stock: 'box', assets: 'tool', purchase: 'cart', 'purchase/new': 'plus',
-  'purchase/return': 'swap', payables: 'money', recipes: 'chef', pos: 'pos', salereturn: 'swap', dues: 'dues', invoice: 'print', daybook: 'book', ledgerlinks: 'link', exceptions: 'warn', pending: 'stamp', itemreq: 'swap', releases: 'unlock',
+  'purchase/return': 'swap', payables: 'money', recipes: 'chef', pos: 'pos', salereturn: 'swap', dues: 'dues', invoice: 'print', daybook: 'book', cashmoves: 'money', switchboard: 'settings', ledgerlinks: 'link', exceptions: 'warn', pending: 'stamp', itemreq: 'swap', releases: 'unlock',
   emergency: 'alert', changes: 'edit', numaudit: 'hash', outbox: 'upload', reports: 'chart', biz: 'pie', brandpnl: 'pie', discounts: 'tag', staff: 'users', matrix: 'matrix', salary: 'money', locations: 'pin', locset: 'pinset', locsheet: 'pinset',
   rollout: 'sliders', control: 'sliders', rulehub: 'shield', rules: 'rules', settings: 'gear', settings2: 'sliders', logs: 'history', backup: 'download', home: 'home' };
 IA.forEach((r) => { r.i3 = I3[r.route] || (r.route.startsWith('settings2/') ? 'gear' : r.icon); });

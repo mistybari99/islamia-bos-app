@@ -58,6 +58,9 @@ const X = {
   scope: L('পরিধি', 'Scope', 'Scope'), wholePeriod: L('পুরো সময়', 'whole period', 'পুরো period'),
   openBal: L('শুরুর তারিখে জের (৳) — খালি = দেখানো হবে না', 'Opening balances at the start date (৳) — empty = not shown', 'Start date-এ জের (৳) — খালি = দেখানো হবে না'), balHint: L('শুধু "সব জায়গা" দেখায় ব্যবহৃত হয়; তিনটিই লাগবে', 'Used in the all-locations view only; all three are needed', 'শুধু "সব জায়গা" view-এ; তিনটিই লাগবে'),
   maskNames: L('মালিক ছাড়া অন্যদের জন্য নাম/রেফারেন্স লুকান', 'Mask names / references for non-owners', 'Owner ছাড়া অন্যদের জন্য নাম/ref লুকান'), bad_amount: L('টাকার অঙ্ক ঠিক নয়', 'Amount is not valid', 'Amount ঠিক নয়'),
+  t_bank_deposit: L('ব্যাংকে জমা', 'Bank deposit', 'Bank জমা'), t_bank_withdraw: L('ব্যাংক থেকে তোলা', 'Bank withdrawal', 'Bank থেকে তোলা'), t_owner_topup: L('মালিকের টাকা ঢুকেছে', 'Owner top-up', 'Owner top-up'),
+  t_owner_draw: L('মালিক টাকা নিয়েছেন', 'Owner draw', 'Owner draw'), t_cust_advance: L('গ্রাহকের অগ্রিম', 'Customer advance', 'Customer advance'), t_cust_advance_refund: L('অগ্রিম ফেরত', 'Advance refunded', 'Advance ফেরত'),
+  t_hub_receipt: L('হাবে ক্যাশ গ্রহণ', 'Hub cash receipt', 'Hub cash গ্রহণ'),
   t_sale_return: L('বিক্রি ফেরতে টাকা ফেরত', 'Sale return refund', 'Sale return refund'), t_supplier_refund: L('সাপ্লায়ারের ফেরত টাকা', 'Supplier refund', 'Supplier refund'),
   n_refunds_included: L('বিক্রি ফেরতের নগদ ফেরত (আউট) ও সাপ্লায়ারের ফেরত টাকা (ইন) ধরা হয় (phase12 থাকলে)', 'Customer refunds paid (out) and supplier refunds received (in) are included when phase12 is installed', 'Customer refund (out) ও supplier refund (in) ধরা হয় (phase12 থাকলে)'),
   n_future_dates_capped: L('আজকের পরের তারিখের লেনদেন ধরা হয় না', 'Movements dated after today are not counted', 'আজকের পরের date-এর movement ধরা হয় না'),
@@ -65,7 +68,7 @@ const X = {
   t_expense: L('খরচ ভাউচার', 'Expense voucher', 'Expense voucher'), t_handover: L('ক্যাশ হ্যান্ডওভার', 'Cash handover', 'Cash handover'), t_advance: L('স্টাফ অ্যাডভান্স', 'Staff advance', 'Staff advance'), t_salary: L('বেতন', 'Salary', 'Salary'),
 };
 const T = (k) => lab(X[k]);
-const TYPE_TONE = { sale_return: 'warn', supplier_refund: 'ok', sale: 'ok', collection: 'info', supplier: 'warn', bill: 'warn', expense: 'warn', handover: 'info', advance: 'warn', salary: 'warn' };
+const TYPE_TONE = { bank_deposit: 'info', bank_withdraw: 'info', owner_topup: 'ok', owner_draw: 'warn', cust_advance: 'ok', cust_advance_refund: 'warn', hub_receipt: 'info', sale_return: 'warn', supplier_refund: 'ok', sale: 'ok', collection: 'info', supplier: 'warn', bill: 'warn', expense: 'warn', handover: 'info', advance: 'warn', salary: 'warn' };
 const typeLabel = (t) => (X['t_' + t] ? T('t_' + t) : t);
 const modeLabel = (m) => (X[m] ? T(m) : m);
 

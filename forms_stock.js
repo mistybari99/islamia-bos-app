@@ -42,7 +42,7 @@ B.forms['04-1'] = {
         'Counting or weighing is done by the receiver personally, in front of the supplier. The memo figure must not be written in the “Counted / measured” box. The rate comes from the supplier bill, never from a verbal figure.'), 'warn'),
       CK('scale_checked', L('পাল্লা আজ পরীক্ষিত', 'Scale checked today'), { req: true }),
       TABLE('lines', null, [ITEM('item', L('আইটেম', 'Item'), { req: true, wide: true }), CALC('unit', L('একক', 'Unit'), 'text'),
-        N('memo', L('মেমোতে লেখা', 'Written on the memo')), N('counted', L('গণনা / পরিমাপে প্রাপ্ত', 'Counted / measured'), { req: true }),
+        N('memo', L('মেমোতে লেখা', 'Written on the memo'), { show: (x) => !x.sbMemo }), N('counted', L('গণনা / পরিমাপে প্রাপ্ত', 'Counted / measured'), { req: true }),
         CALC('var', L('পার্থক্য (প্রাপ্ত − মেমো)', 'Variance (received − memo)'), 'num', { show: (x) => has(x.row.counted) && has(x.row.memo) }),
         M('rate', L('দর ৳ (বিল অনুযায়ী)', 'Rate ৳ (as per the bill)')), CALC('amt', L('মোট ৳', 'Total ৳'), 'money', { show: (x) => has(x.row.counted) && has(x.row.rate) }),
         SEL('quality', L('মান যাচাই', 'Quality check'), QUALITY, { req: true }), T('remark', L('মন্তব্য', 'Remark'), { wide: true })], { min: 3 }),
@@ -465,7 +465,7 @@ async function loadSwitches() {
   LS.master = v === true || v === 'true'; LS.cfg = {}; (!c.error && c.data ? c.data : []).forEach((x) => { LS.cfg[x.form_code] = x.is_on !== false; }); LS.loaded = true;
 }
 const isOwner = () => !!(S.ctx && S.ctx.is_owner);
-const LOCS = () => { const all = (B.ENV && B.ENV.locs) || []; return isOwner() || (S.ctx.roles || []).includes('management') ? all : all.filter((l) => (S.ctx.locations || []).includes(l.id)); };
+const LOCS = () => { const all = B.liveLocs ? B.liveLocs((B.ENV && B.ENV.locs) || []) : ((B.ENV && B.ENV.locs) || []); return isOwner() || (S.ctx.roles || []).includes('management') ? all : all.filter((l) => (S.ctx.locations || []).includes(l.id)); };
 const allPlaces = () => isOwner() || (S.ctx.roles || []).includes('management');
 const RS = { loc: null, q: '', item: null, sup: null, paper: null };
 

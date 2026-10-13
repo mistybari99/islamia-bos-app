@@ -313,8 +313,12 @@ B.forms['02-6'] = {
 };
 
 /* ============ 02-7 · Duty & backup card ============ */
-const SLOT_A = [L('ইসলামিয়া মিষ্টি ঘর — মেইন — ম্যানেজার', 'ISLAMIYA MISTY GHAR — Main — manager'), L('ইসলামিয়া মিষ্টি ঘর — ২য় শাখা — ম্যানেজার', 'ISLAMIYA MISTY GHAR — 2nd Branch — manager'), L('মিষ্টি বাড়ি — ম্যানেজার', 'MISTY BARI — manager'), L('AL-CAKIZ — ম্যানেজার', 'AL-CAKIZ — manager')];
-const SLOT_B = [L('ইসলামিয়া মিষ্টি ঘর — ২য় শাখা — ব্যাকআপ', 'ISLAMIYA MISTY GHAR — 2nd Branch — backup'), L('মিষ্টি বাড়ি — ব্যাকআপ', 'MISTY BARI — backup'), L('AL-CAKIZ — ব্যাকআপ', 'AL-CAKIZ — backup'), L('রিজার্ভ — দুই শাখা একসাথে খালি হলে', 'Reserve — when two branches are empty together')];
+// sections A and B follow the live showrooms of the locations table (the old fixed names are only a fallback)
+const SLOT_A_FALLBACK = [L('ইসলামিয়া মিষ্টি ঘর — মেইন — ম্যানেজার', 'ISLAMIYA MISTY GHAR — Main — manager'), L('ইসলামিয়া মিষ্টি ঘর — ২য় শাখা — ম্যানেজার', 'ISLAMIYA MISTY GHAR — 2nd Branch — manager'), L('মিষ্টি বাড়ি — ম্যানেজার', 'MISTY BARI — manager'), L('AL-CAKIZ — ম্যানেজার', 'AL-CAKIZ — manager')];
+const SLOT_B_FALLBACK = [L('ইসলামিয়া মিষ্টি ঘর — ২য় শাখা — ব্যাকআপ', 'ISLAMIYA MISTY GHAR — 2nd Branch — backup'), L('মিষ্টি বাড়ি — ব্যাকআপ', 'MISTY BARI — backup'), L('AL-CAKIZ — ব্যাকআপ', 'AL-CAKIZ — backup')];
+const liveShowrooms = () => ((B.ENV && B.ENV.locs) || []).filter((l) => l.kind === 'showroom' && l.is_active !== false && ['live', 'setting_up', null, undefined].includes(l.status));
+const SLOT_A = () => { const ls = liveShowrooms(); return ls.length ? ls.map((l) => ({ bn: l.name_bn + ' — ম্যানেজার', en: (l.name_en || l.name_bn) + ' — manager', mix: (l.name_mix || l.name_bn) + ' — manager' })) : SLOT_A_FALLBACK; };
+const SLOT_B = () => { const ls = liveShowrooms(); return [...(ls.length ? ls.slice(1).map((l) => ({ bn: l.name_bn + ' — ব্যাকআপ', en: (l.name_en || l.name_bn) + ' — backup', mix: (l.name_mix || l.name_bn) + ' — backup' })) : SLOT_B_FALLBACK), L('রিজার্ভ — দুই শাখা একসাথে খালি হলে', 'Reserve — when two branches are empty together')]; };
 const SLOT_C = [L('খামির ব্যাকআপ 1', 'Yeast backup 1'), L('খামির ব্যাকআপ 2', 'Yeast backup 2'), L('খামির ব্যাকআপ 3', 'Yeast backup 3')];
 const SLOT_E = [L('গোডাউন — স্টোরকিপার', 'Godown — storekeeper'), L('গোডাউন — ব্যাকআপ', 'Godown — backup'), L('মিষ্টি কারখানার স্টোর — স্টোরকিপার', 'Sweet factory store — storekeeper'), L('মিষ্টি কারখানার স্টোর — ব্যাকআপ', 'Sweet factory store — backup'),
   L('কেক কারখানার স্টোর — স্টোরকিপার', 'Cake factory store — storekeeper'), L('কেক কারখানার স্টোর — ব্যাকআপ', 'Cake factory store — backup')];
@@ -385,10 +389,10 @@ B.forms['02-7'] = {
     dup('dup_store_purchase', 'স্টোরকিপার ও কোটেশন / পারচেজ অর্ডার / বাজারে ক্রয় একই ব্যক্তি (জন)', 'Storekeeper also in quotations / Purchase Orders / market purchase (people)', E([0, 1, 2, 3, 4, 5]), I([0, 1, 2]));
     // incomplete skill on a named slot is "partial": information only
     let partial = 0;
-    SLOT_TABLES.forEach(([id, labels]) => x.rows(id).slice(0, labels.length).forEach((r) => { if (nm(r) && r.skill === 'part') partial++; }));
+    SLOT_TABLES.forEach(([id, labels]) => x.rows(id).slice(0, (typeof labels === 'function' ? labels() : labels).length).forEach((r) => { if (nm(r) && r.skill === 'part') partial++; }));
     if (partial) flags.push(flag('skill_partial', 'yellow', 'স্কিল চেকলিস্ট আংশিক এমন স্লট আছে', 'Slots whose skill checklist is only partial', partial, QTY));
     let vacant = 0;
-    SLOT_TABLES.forEach(([id, labels]) => x.rows(id).slice(0, labels.length).forEach((r) => { if (r.vacant) vacant++; }));
+    SLOT_TABLES.forEach(([id, labels]) => x.rows(id).slice(0, (typeof labels === 'function' ? labels() : labels).length).forEach((r) => { if (r.vacant) vacant++; }));
     if (vacant) flags.push(flag('slot_vacant', 'yellow', 'খালি ডিউটি স্লট আছে', 'Vacant duty slots', vacant, QTY));
     return { v: {}, flags, needs: [] };
   },

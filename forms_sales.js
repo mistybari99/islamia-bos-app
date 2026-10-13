@@ -294,7 +294,10 @@ B.forms['08-1'] = {
 };
 
 /* ============ 01-1 · Weekly review note ============ */
-const SHOWROOMS = [L('ইসলামিয়া মিষ্টি ঘর — মেইন', 'ISLAMIYA MISTY GHAR — Main'), L('ইসলামিয়া মিষ্টি ঘর — ২য় শাখা', 'ISLAMIYA MISTY GHAR — 2nd Branch'), L('মিষ্টি বাড়ি', 'MISTY BARI'), L('AL-CAKIZ', 'AL-CAKIZ'), L('অন্য', 'Other')];
+// rows of the jalebi table = the live showrooms from the locations table (the old fixed list is only a fallback)
+const SHOWROOMS_FALLBACK = [L('ইসলামিয়া মিষ্টি ঘর — মেইন', 'ISLAMIYA MISTY GHAR — Main'), L('ইসলামিয়া মিষ্টি ঘর — ২য় শাখা', 'ISLAMIYA MISTY GHAR — 2nd Branch'), L('মিষ্টি বাড়ি', 'MISTY BARI'), L('AL-CAKIZ', 'AL-CAKIZ')];
+const SHOWROOMS = () => { const ls = ((B.ENV && B.ENV.locs) || []).filter((l) => l.kind === 'showroom' && l.is_active !== false && ['live', 'setting_up', null, undefined].includes(l.status));
+  return [...(ls.length ? ls.map((l) => ({ bn: l.name_bn, en: l.name_en || l.name_bn, mix: l.name_mix || l.name_bn })) : SHOWROOMS_FALLBACK), L('অন্য', 'Other')]; };
 B.forms['01-1'] = {
   title: L('সাপ্তাহিক রিভিউ নোট', 'Weekly review note'),
   head: [D('week_from', L('সপ্তাহ — থেকে', 'Week — from'), { req: true }), D('week_to', L('সপ্তাহ — পর্যন্ত', 'Week — to'), { req: true })],

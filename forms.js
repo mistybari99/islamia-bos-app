@@ -167,10 +167,10 @@ B.forms['04-3'] = {
       T('movement_detail', L('বিবরণ', 'Details'), { show: (x) => x.d.movement === 'yes', req: (x) => x.d.movement === 'yes' }),
       TABLE('rows', null, [ITEM('item', L('আইটেম', 'Item'), { req: true, wide: true }), CALC('unit', L('একক', 'Unit'), 'text'),
         N('count', L('গণনায় প্রাপ্ত', 'Counted'), { req: true }),
-        N('book', L('লেজারে বাকি (Book)', 'Book balance (ledger)'), { req: true, show: (x) => !x.cf || has(x.row.count) }),
+        N('book', L('লেজারে বাকি (Book)', 'Book balance (ledger)'), { req: true, show: (x) => (!x.cf || has(x.row.count)) && !x.sbBook }),
         CALC('var', L('পার্থক্য (গণনা − লেজার)', 'Variance (count − book)'), 'num', { show: (x) => has(x.row.count) && has(x.row.book) }),
         T('reason', L('কারণ', 'Reason'), { wide: true, req: (x) => has(x.row.count) && has(x.row.book) && num(x.row.count) !== num(x.row.book) })], { min: 5 }),
-      ST('witness', L('সাক্ষী / দ্বিতীয় জন', 'Witness / second person'), { req: true })] },
+      ST('witness', L('সাক্ষী / দ্বিতীয় জন', 'Witness / second person'), { req: (x) => !x.pin, show: (x) => !x.pin })] },
   ],
   calc(x) {
     const rows = x.rows('rows'), flags = [], needs = [];

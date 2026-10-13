@@ -112,7 +112,7 @@ const lists = (c) => ((B.ENV && B.ENV.lists && B.ENV.lists[c]) || []).filter((r)
 const rowL = (r) => ({ bn: r.label_bn, en: r.label_en || undefined, mix: r.label_mix || undefined });
 const unitLabel = (code) => { const r = lists('units').find((x) => x.value_code === code); return r ? lab(rowL(r)) : (code || ''); };
 const npMode = () => { let m = 'lock'; try { m = B.rule('ui_noperm_mode', 'lock'); } catch (e) { /* default */ } return m === 'hide' ? 'hide' : 'lock'; };
-const LOCS = () => { const all = (B.ENV && B.ENV.locs) || []; return S.ctx.is_owner || (S.ctx.roles || []).includes('management') ? all : all.filter((l) => (S.ctx.locations || []).includes(l.id)); };
+const LOCS = () => { const all = B.liveLocs ? B.liveLocs((B.ENV && B.ENV.locs) || []) : ((B.ENV && B.ENV.locs) || []); return S.ctx.is_owner || (S.ctx.roles || []).includes('management') ? all : all.filter((l) => (S.ctx.locations || []).includes(l.id)); };
 const allLocs = () => S.ctx.is_owner || (S.ctx.roles || []).includes('management');
 const GR = new Map();
 async function grant(code, loc) {
@@ -384,7 +384,7 @@ async function openAction(kind, preset) {
     body = head('a_prod') + (B.recipes ? B.recipes.prodButton() : '') + `<div class="stack">${locSel('a_loc', T('location'), loc, locs)}${itemFld(items, 'a_item', pit)}<div class="row"><div style="flex:1"><label for="a_qty">${esc(T('qty'))}</label><input id="a_qty" inputmode="decimal"></div><div style="flex:1">${unitSel('a_unit')}</div></div>
       <div><label for="a_made">${esc(T('madeAt'))}</label><input id="a_made" type="datetime-local" value="${now}"></div>${cost}${note(false)}</div>${foot('s2_go_prod')}`;
   } else if (kind === 'xfer') {
-    const others = ((B.ENV && B.ENV.locs) || []);
+    const others = B.liveLocs ? B.liveLocs((B.ENV && B.ENV.locs) || []) : ((B.ENV && B.ENV.locs) || []);
     body = head('a_xfer') + `<div class="stack">${locSel('a_loc', T('fromLoc'), loc, locs)}<div><label for="a_to">${esc(T('toLoc'))}</label><select id="a_to"><option value="">—</option>${optHTML(others.filter((l) => l.id !== loc).map((l) => [l.id, nm(l)]), '')}</select></div>${itemFld(items, 'a_item', pit)}
       <div class="row"><div style="flex:1"><label for="a_qty">${esc(T('qty'))}</label><input id="a_qty" inputmode="decimal"></div><div style="flex:1">${unitSel('a_unit')}</div></div>${note(false)}</div>${foot('s2_go_xfer')}`;
   }

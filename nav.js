@@ -172,7 +172,7 @@ async function counts(force) {
 async function loadGrantFlags() {
   if (!S.ctx || isOwner()) return;
   const locs = (S.ctx.locations || []).length ? [null, ...S.ctx.locations] : [null];
-  const codes = locOk() ? ['view_daybook', 'salary_view', 'item_create', 'item_bulk', 'head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'] : ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'];
+  const codes = locOk() ? ['view_daybook', 'cash_move', 'production_void', 'salary_view', 'item_create', 'item_bulk', 'head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'] : ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'];
   await Promise.all(codes.map(async (code) => {
     let ok = false;
     for (const l of locs) { try { const r = await sb.rpc('has_grant', { p_code: code, p_loc: l }); if (r && !r.error && r.data === true) { ok = true; break; } } catch (e) { /* not granted */ } }
