@@ -133,3 +133,26 @@ Source repo My-tools, `origin/integration/p72-p79` tip used: `dd9dd55666cd6975c5
 | Page | Phase | Payload bytes | Payload sha256 | CHECK bytes | CHECK sha256 |
 |---|---|---|---|---|---|
 | setup-run-14.html | 110 | 27803 | `37b8d8caaf4c1f0eeeb9165d3625a3fbaa9d121ac7f10c8597eff8965d80194a` | 1651 | `15b5c7d4cf01892d2ea618a0c32211fc9908f1f66a315a3b51b37031ee5fede9` |
+
+---
+
+# Web bundle 4 (build 1a9e6c6b70) and Run 15 (phases 112-118, 121)
+
+Source repo My-tools, branch `int/audit-fixes` (commit `44311c8`, includes merged impl/c1, impl/c2, impl/c5, impl/e1 and perf/webload). Web app built by `tools/build_web.sh --to` (core bundle + lazy screens, `?v=<hash>` per file, `sw.js` VERSION `bos-sw-1a9e6c6b70`). `config.js`, `setup-*.html` (except the new run-15 and the link line in `setup-sql.html`), `audit-a.html` and this file's earlier sections untouched. CSP meta kept as the perf branch built it. Phase 120 (perf review, c4) was not pushed yet and is NOT included.
+
+Owner has phases 72..111 installed. setup-run-15.html: ONE Copy block with phases 112, 113, 114, 115, 116, 117, 118, 121 in that order (121 patches the bodies of 112..118, so it goes last). Payload = `-- ===== phase NN =====` line + exact source bytes. Every new rule is OFF by default: pasting changes nothing visible. Chain lock: Run 15 needs Run 14 done (key `bos_setup_run_done_v1`). Read-only CHECK (single SELECT, phases 112..121) as a second small Copy button; same text in My-tools `docs/CHECK_RUNS_15.sql`. Tested on a fresh build up to phase 111: page payload pasted once and twice with no error, CHECK shows all eight phases as done.
+
+| Page | Phases | Payload bytes | Payload sha256 | CHECK bytes | CHECK sha256 |
+|---|---|---|---|---|---|
+| setup-run-15.html | 112, 113, 114, 115, 116, 117, 118, 121 | 355636 | `ee3a5864975a1768e8d4f4d5ad0616a6baac1a0003d823be31e06ae5fb68a84d` | 5673 | `b6fa805a78f1a2c0f527b7805c9485f399975160caf27511d85eae299086a985` |
+
+| Phase | Bytes | sha256 |
+|---|---|---|
+| 112 | 34003 | `2359cbab51805f534c5350ff1085ab12ae6cc25d75e9fca823e5c2a6e17577c0` |
+| 113 | 77340 | `ce09192bcc6bfdfbe939ebef82899a503363b730a179a0923fdbe13d63da93d4` |
+| 114 | 34268 | `0e124e9a582101e9fe08c8c12b0a731852d9a8095db4fd53d54244101d79d0ce` |
+| 115 | 26114 | `375ab165347c1d14f6b7ed145cb51dbe19a4f8eacff85f1334e26e981ae910ad` |
+| 116 | 90349 | `c4a32d2a2cffa204519edf4831b75afbf594a0991063b994b3f902dcebc704bf` |
+| 117 | 32233 | `0b770c9139e06fc791340b9ac11c146d3af21b6cdeed4ecd35345a8be3127381` |
+| 118 | 51067 | `1bb51430c9bd72f8de774a1afae7ac13185f3fe44da7fd7fb6d72c5def38640d` |
+| 121 | 10062 | `1a6399aecf183fe5638ec68250de31d3e371ae0277494c337e5b886c3f91276a` |

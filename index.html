@@ -2,17 +2,18 @@
 <html lang="bn" translate="no">
 <head>
 <meta charset="utf-8">
-<!-- bos111 (M5): see docs/briefs_p2p3/step_Sec2_REPORT.md; the sha256 is the theme script below - change that script and this hash together (tests/web/sec2_csp_test.js checks it) -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-/zibRcU0a+WHo6OiCt9LWFd4lFoHX6yNEmM7aWjqFrk=' 'wasm-unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://tessdata.projectnaptha.com; worker-src 'self' blob:; frame-src 'self' blob: about:; media-src 'self' blob: data:; manifest-src 'self'; base-uri 'self'; object-src 'none'"><!-- bos111 (M5): see docs/briefs_p2p3/step_Sec2_REPORT.md; the sha256 is the theme script below - change that script and this hash together (tests/web/sec2_csp_test.js checks it) -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<link rel="preload" as="script" href="core.js?v=4a68ac5807">
 <meta name="theme-color" content="#a1111e">
 <meta name="google" content="notranslate">
 <title>ইসলামিয়া মিষ্টি ঘর · ISLAMIYA MISTY GHAR</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wdth,wght@75..125,400..800&family=Hind+Siliguri:wght@400;500;600;700&family=Cormorant+Garamond:wght@600;700&display=swap">
-<link rel="stylesheet" href="styles.css?v=d92f6e1bd3">
-<link rel="stylesheet" href="theme.css?v=d92f6e1bd3">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wdth,wght@75..125,400..800&family=Hind+Siliguri:wght@400;500;600;700&family=Cormorant+Garamond:wght@600;700&display=swap" media="print" data-fontswap>
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wdth,wght@75..125,400..800&family=Hind+Siliguri:wght@400;500;600;700&family=Cormorant+Garamond:wght@600;700&display=swap"></noscript><!-- bos114: font CSS no longer blocks the first paint; lazy.js turns it on -->
+<link rel="stylesheet" href="app.css?v=e983932f49">
 <script>/* theme first (no flash): bos_theme = dark | light | classic; first run follows prefers-color-scheme (light -> Premium Light, otherwise Premium Dark) */
 (function(){var K='bos_theme',V={dark:1,light:1,classic:1,'glass-light':1,'glass-dark':1}/* bos109 */,h=document.documentElement;
 function rd(){try{var v=localStorage.getItem(K);return V[v]?v:null}catch(e){return null}}
@@ -22,49 +23,15 @@ var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('cont
 ap(rd()||first());
 window.BOS_THEME={KEY:K,list:['dark','light','classic','glass-light','glass-dark'],get:function(){return h.getAttribute('data-theme')||'dark'},set:function(v){if(!V[v])return;try{localStorage.setItem(K,v)}catch(e){}ap(v)}};
 })();</script>
-<link rel="stylesheet" href="controls.css?v=d92f6e1bd3">
-<link rel="stylesheet" href="theme_glass.css?v=d92f6e1bd3"><script src="theme_glass.js?v=d92f6e1bd3"></script><!-- bos109 Liquid Glass -->
-<!-- bos-build d92f6e1bd3 -->
+<script src="theme_glass.js?v=1a9e6c6b70"></script><!-- bos109 Liquid Glass -->
+<!-- bos-build 1a9e6c6b70 -->
 </head>
 <body>
 <div id="app"><p class="muted center pad">…</p></div>
 <div id="toast" role="status"></div>
-<script src="vendor/supabase.js?v=d92f6e1bd3"></script>
-<script src="pager.js?v=d92f6e1bd3"></script>
-<script src="config.js?v=d92f6e1bd3"></script>
-<script src="i18n.js?v=d92f6e1bd3"></script>
-<script src="app.js?v=d92f6e1bd3"></script>
-<script src="entry.js?v=d92f6e1bd3"></script><script src="errlog.js?v=d92f6e1bd3"></script>
-<script src="kbdfix.js?v=d92f6e1bd3"></script><script src="a11yfix.js?v=d92f6e1bd3"></script><!-- bos113 -->
-<script src="forms.js?v=d92f6e1bd3"></script>
-<script src="forms_stock.js?v=d92f6e1bd3"></script>
-<script src="forms_cash.js?v=d92f6e1bd3"></script>
-<script src="forms_sales.js?v=d92f6e1bd3"></script>
-<script src="forms_factory.js?v=d92f6e1bd3"></script>
-<script src="forms_staff.js?v=d92f6e1bd3"></script>
-<script src="pay.js?v=d92f6e1bd3"></script>
-<script src="pos.js?v=d92f6e1bd3"></script>
-<script src="coldstart.js?v=d92f6e1bd3"></script>
-<script src="dues.js?v=d92f6e1bd3"></script>
-<script src="dash.js?v=d92f6e1bd3"></script>
-<script src="biz.js?v=d92f6e1bd3"></script>
-<script src="lists.js?v=d92f6e1bd3"></script>
-<script src="listctl.js?v=d92f6e1bd3"></script>
-<script src="controls.js?v=d92f6e1bd3"></script>
-<script src="rules.js?v=d92f6e1bd3"></script>
-<script src="settings2.js?v=d92f6e1bd3"></script>
-<script src="invoice.js?v=d92f6e1bd3"></script>
-<script src="barcode.js?v=d92f6e1bd3"></script>
-<script src="items2.js?v=d92f6e1bd3"></script>
-<script src="itemmaster.js?v=d92f6e1bd3"></script>
-<script src="bulkitems.js?v=d92f6e1bd3"></script>
-<script src="locations.js?v=d92f6e1bd3"></script>
-<script src="icons3d.js?v=d92f6e1bd3"></script>
-<script src="ia.js?v=d92f6e1bd3"></script>
-<script src="control.js?v=d92f6e1bd3"></script>
-<script src="rollout.js?v=d92f6e1bd3"></script>
-<script src="pinsign.js?v=d92f6e1bd3"></script>
-<script src="nav.js?v=d92f6e1bd3"></script>
-<script src="filters.js?v=d92f6e1bd3"></script><script src="reports.js?v=d92f6e1bd3"></script><script src="reports2.js?v=d92f6e1bd3"></script><script src="stock2.js?v=d92f6e1bd3"></script><script src="purchase.js?v=d92f6e1bd3"></script><script src="salereturn.js?v=d92f6e1bd3"></script><script src="daybook.js?v=d92f6e1bd3"></script><script src="cashmoves.js?v=d92f6e1bd3"></script><script src="switchboard.js?v=d92f6e1bd3"></script><script src="paths.js?v=d92f6e1bd3"></script><script src="restoredrill.js?v=d92f6e1bd3"></script><script src="stockx.js?v=d92f6e1bd3"></script><script src="parallel.js?v=d92f6e1bd3"></script><script src="flow.js?v=d92f6e1bd3"></script><script src="delegation.js?v=d92f6e1bd3"></script><script src="swreg.js?v=d92f6e1bd3"></script><script src="printbooks.js?v=d92f6e1bd3"></script><script src="salary.js?v=d92f6e1bd3"></script><script src="recipes.js?v=d92f6e1bd3"></script><script src="recipebook.js?v=d92f6e1bd3"></script><script src="costing.js?v=d92f6e1bd3"></script><script src="costsources.js?v=d92f6e1bd3"></script><script src="costattrib.js?v=d92f6e1bd3"></script><script src="s1setup.js?v=d92f6e1bd3"></script><script src="ownerboard.js?v=d92f6e1bd3"></script><script src="accounts.js?v=d92f6e1bd3"></script><script src="finance2.js?v=d92f6e1bd3"></script><script src="employees.js?v=d92f6e1bd3"></script><script src="attendance.js?v=d92f6e1bd3"></script><script src="attend2.js?v=d92f6e1bd3"></script><script src="payroll.js?v=d92f6e1bd3"></script><script src="customers.js?v=d92f6e1bd3"></script><script src="salesx.js?v=d92f6e1bd3"></script><script src="inbox.js?v=d92f6e1bd3"></script><script src="partners.js?v=d92f6e1bd3"></script><script src="notifications.js?v=d92f6e1bd3"></script><script src="assistant_tools.js?v=d92f6e1bd3"></script><script src="assistant.js?v=d92f6e1bd3"></script><script src="integrations.js?v=d92f6e1bd3"></script><script src="setupadvisor.js?v=d92f6e1bd3"></script><script src="twofa.js?v=d92f6e1bd3"></script><script src="posfail.js?v=d92f6e1bd3"></script><script src="stepw_common.js?v=d92f6e1bd3"></script><script src="formscreens.js?v=d92f6e1bd3"></script><script src="chanedit.js?v=d92f6e1bd3"></script><script src="costboard.js?v=d92f6e1bd3"></script><script src="packflags.js?v=d92f6e1bd3"></script><script src="guards.js?v=d92f6e1bd3"></script><script src="scan.js?v=d92f6e1bd3"></script><script src="optviews.js?v=d92f6e1bd3"></script><script src="tpl_registry.js?v=d92f6e1bd3"></script><script src="tpl_docs.js?v=d92f6e1bd3"></script><script src="tpl_labels.js?v=d92f6e1bd3"></script><script src="tpl_msgs.js?v=d92f6e1bd3"></script><script src="tpl_samples.js?v=d92f6e1bd3"></script><script src="tplpicker.js?v=d92f6e1bd3"></script><script src="invoiceview.js?v=d92f6e1bd3"></script><script src="books85.js?v=d92f6e1bd3"></script><script src="cashdrawer.js?v=d92f6e1bd3"></script><script src="books96.js?v=d92f6e1bd3"></script><script src="landed.js?v=d92f6e1bd3"></script><script src="optionsx.js?v=d92f6e1bd3"></script><script src="catpick.js?v=d92f6e1bd3"></script><script src="landed_q4.js?v=d92f6e1bd3"></script><script src="badges107.js?v=d92f6e1bd3"></script><script src="setupundo.js?v=d92f6e1bd3"></script><script src="purchaseprint.js?v=d92f6e1bd3"></script><script src="itemimg.js?v=d92f6e1bd3"></script><script src="whatsnew.js?v=d92f6e1bd3"></script><script src="charts.js?v=d92f6e1bd3"></script><script src="dashx_metrics.js?v=d92f6e1bd3"></script><script src="dashx.js?v=d92f6e1bd3"></script>
+<!-- bos113 -->
+<script src="vendor/supabase.js"></script>
+<script src="config.js?v=3c7541bce7"></script>
+<script src="core.js?v=4a68ac5807"></script>
 </body>
 </html>
