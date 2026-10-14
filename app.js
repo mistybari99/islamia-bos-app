@@ -64,6 +64,7 @@ function openSheet(html) {
   d.innerHTML = `<div class="sheet"><button type="button" class="sheet-x" data-act="closesheet" aria-label="${S.lang === 'en' ? 'Close' : 'বন্ধ করুন'}">✕</button>${html}</div>`;
   d.addEventListener('click', (e) => { if (e.target === d) closeSheet(); });
   document.body.appendChild(d);
+  if (window.BOS_KBD) window.BOS_KBD.sheet(d); // bos102: sticky action bar + keyboard-aware sizing
 }
 function closeSheet() { const d = $('#sheet'); if (d) d.remove(); }
 const tog = (on, act, attrs = '', label) => `<button class="tog ${on ? 'on' : ''}" data-act="${act}" ${attrs}>${esc(label || (on ? t('on') : t('off')))}</button>`;

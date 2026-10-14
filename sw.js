@@ -1,7 +1,7 @@
 /* Islamia BOS · service worker. Goal: the app opens with no internet after the first visit (the POS and the form outbox already work offline once open).
    Rules: only same-origin GET requests are cached; Supabase (API, auth, storage) and anything else is never touched. Network first (so a new version is picked up at once),
    cache as the fallback; navigations fall back to the cached index.html. Bump VERSION to drop the old cache. */
-const VERSION = 'bos-sw-31e160ad85';
+const VERSION = 'bos-sw-a70e358993';
 self.addEventListener('install', (e) => { e.waitUntil(self.skipWaiting()); });
 self.addEventListener('activate', (e) => {
   e.waitUntil((async () => { const keys = await caches.keys(); await Promise.all(keys.filter((k) => k.startsWith('bos-sw-') && k !== VERSION).map((k) => caches.delete(k))); await self.clients.claim(); })());
