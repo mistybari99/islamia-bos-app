@@ -28,3 +28,42 @@ Order lock (chain): Run 2 needs Run 1 done, Run 3 needs Run 2 done. Shared local
 | 79 | dbecc25 | 46298 | `7a1a5d4dd3ac9f2491c248021b8dadb9af3d5551eb791df3d5d0318c05e65dd5` |
 | 80 | c23e82d | 94090 | `c5143b460a0fb2e8d7171644b8963b2dcf8c8b04896838199128d159eeee90d3` |
 | 81 | bb8913d | 66194 | `5985766b48667d68c565fe26ae5b8523257b5ad7fa141e044896bf0fdac6691d` |
+
+---
+
+# Runs 4-9 (phases 82-98)
+
+Source repo My-tools, branch `integration/p72-p79`, canonical order from `docs/PASTE_ORDER.md` (INT3): 82,83,84,85,86,87,88,90,91,89,92,93,95,94,96,97,98 (phase 89 after 91, 94 after 95, 98 last). Requested tip `0f24cea`; the branch has since moved (HEAD `0aea30e`, a later template merge), but phase82..98 files are byte-identical at both commits (`git diff 0f24cea HEAD` empty for them) and every sha256 below equals the list in `docs/briefs_p2p3/step_INT3_REPORT.md`. Runs 1-3 (phases 72-81) are unchanged.
+
+Pages (one Copy button each, chain lock Run N needs Run N-1 done, shared key `bos_setup_run_done_v1`, header "Run N of 9"). Payload = `-- ===== phase NN =====` line + exact source bytes, nothing else.
+
+| Page | Phases (paste order) | Payload bytes | Payload sha256 |
+|---|---|---|---|
+| setup-run-4.html | 82, 83, 84 | 129958 | `3df870f2966ab820f999fa7d9b807401a4edac3dfecbea9c8011f6b749c6be72` |
+| setup-run-5.html | 85, 86, 87 | 165543 | `ce58779ff2833cbed798da009dc6c6d271a737f35bca9bde9380b63c92d3b17d` |
+| setup-run-6.html | 88, 90, 91 | 119492 | `32ad02df09128a8a350e3ab644c82c60058ac5180b7b398608935f4563bab545` |
+| setup-run-7.html | 89, 92, 93 | 195107 | `3fd41eb71d0ebc5072da110980c6d116810d85a72350fc1e36921ab2c954a4d6` |
+| setup-run-8.html | 95, 94, 96 | 169231 | `6e5069da1e27db49e748a19b382c583a9aa3e2905b5040e72bd1eccc06705ea9` |
+| setup-run-9.html | 97, 98 | 198695 | `4e95dbd6b8467404f5369ea9fdbfa4fb15dcdeae418eeef515ad78a4e13a67cf` |
+
+Run 9 also has a read-only CHECK (single SELECT, 4421 bytes, sha256 `e74340588601ba7a2186f4e35220812ebac0d9e1b9d484c6b7e6d41c0e732943`): tick/cross per phase 82..98 (functions, tables, triggers, rule keys, and function-body tags for 89 and 98).
+
+| Phase | Bytes | sha256 |
+|---|---|---|
+| 82 | 49642 | `61439adc346e3328c89a0d17309443cfacfc08a6e63b29cffb636b5e6665495a` |
+| 83 | 68300 | `848328e519c1f4d9d63d47609cbed49e677c60e049151deb46367e39ca68e514` |
+| 84 | 11944 | `603f631fe38c2823bd3b8a954c4ff97584c8ddda377d0e516ca505a30c37c1d1` |
+| 85 | 84301 | `7b7f39d1e3b53216f216d6a8df0b1cff5af3eb182d08008fbdab4eff1f6b7a5e` |
+| 86 | 24535 | `ded9e918140ece5a1e187821982011bd5172b33485e77a0b9ad6c2a2fa73f993` |
+| 87 | 56635 | `37c6cc8fdcd18b30d29294a7707bbd0d373c6e8a3173448a9126ff5423c95e1a` |
+| 88 | 22291 | `1e675266dc2729f7f52a39f7cc1eff29b7d14be041f89ff0ffdb625db5922dad` |
+| 89 | 177201 | `e32f027d9ed9222a969c7a1e37e9d9892518b69366cc89a192d931d2b8d2b1e0` |
+| 90 | 53322 | `caf3bf9f2b21e1f7f88571ed252959b35a03897c1837903993cb24af84c9e6dc` |
+| 91 | 43807 | `c11e2663bce92cee7df14819b17c84c0be5c88250df06111122e2647fe661a5a` |
+| 92 | 12337 | `8289d6bed95d0cea79a37d5f95cdc24f0dc301975c9fa72d4ead0607dd146534` |
+| 93 | 5497 | `0f43319cc7b54f85efcac24acac371fa036fe9e30e274d2718573f146ed4671e` |
+| 94 | 51353 | `78a7be33c5bb83860532f19550d2fc1234654eaeca6709eb09ac8dcbf746b1bc` |
+| 95 | 15952 | `6d5e099b27c49a569e898cd43088ded58b9cfcc83be35b5a974cd3171302f150` |
+| 96 | 101854 | `944c8c1cc8484895754771d8b89dfa23f562bd1efc04665a744261d0c1dc217d` |
+| 97 | 151589 | `e5966fb62ae9bdc02e504b4169c1b3141496b4475e7a9faeed9c0620882cca6a` |
+| 98 | 47058 | `d18772a45739a45747b553afd5b53ca34be6249497f513ea6ba6b4f1c0ebc5ac` |
