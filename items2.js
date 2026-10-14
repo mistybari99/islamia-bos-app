@@ -44,8 +44,8 @@ const X = {
   details: L('বিবরণ', 'Details', 'Details'), detailsph: L('উপাদান, ওজন, নোট…', 'Ingredients, weight, notes…', 'Ingredients, weight, notes…'),
   lowNow: L('এখন স্টক কম', 'Low stock now', 'এখন stock কম'), lowNowH: L('শুধু ন্যূনতম স্টকের নিচে থাকা পণ্য (স্টকের হিসাব থেকে)', 'Only products below their minimum stock (from the stock ledger)', 'শুধু minimum stock-এর নিচে থাকা product (stock ledger থেকে)'),
   type: L('ধরন', 'Type', 'Type'), flagf: L('ফ্ল্যাগ', 'Flag', 'Flag'), fl_locked: L('লক করা', 'Locked', 'Locked'), fl_hidden: L('লুকানো', 'Hidden', 'Hidden'), fl_nocount: L('ব্যবসার হিসাবে নেই', 'Not counted in business', 'Business-এর হিসাবে নেই'),
-  fl_notype: L('টাইপ নেই', 'No type', 'Type নেই'), fl_unpriced_fg: L('দাম-ছাড়া তৈরি পণ্য / কিনে-বিক্রি (দাম দিন বা লুকান)', 'Unpriced finished goods / resale (to price or hide)', 'দাম-ছাড়া finished / resale (দাম দিন বা লুকান)'), oldlist: L('পুরনো তালিকা', 'Old list', 'পুরনো list'), openbulk: L('একসাথে বদলের পাতায় খুলুন', 'Open in the bulk editor', 'Bulk editor-এ খুলুন'), pbulk: L('আইটেম একসাথে বদল', 'Bulk item editor', 'Item একসাথে বদল'),
-  fl_noprice: L('দাম নেই (Data needed)', 'No price (Data needed)', 'দাম নেই (Data needed)'), fl_retired: L('অবসরপ্রাপ্ত', 'Retired', 'Retired'), fl_master: L('মাস্টার কোডে মেলানো', 'Linked to a master code', 'Master code-এ linked'),
+  fl_notype: L('টাইপ নেই', 'No type', 'Type নেই'), fl_unpriced_fg: L('প্রাইস-ছাড়া তৈরি পণ্য / কিনে-বিক্রি (প্রাইস দিন বা লুকান)', 'Unpriced finished goods / resale (to price or hide)', 'price-ছাড়া finished / resale (price দিন বা লুকান)'), oldlist: L('পুরনো তালিকা', 'Old list', 'পুরনো list'), openbulk: L('একসাথে বদলের পাতায় খুলুন', 'Open in the bulk editor', 'Bulk editor-এ খুলুন'), pbulk: L('আইটেম একসাথে বদল', 'Bulk item editor', 'Item একসাথে বদল'),
+  fl_noprice: L('প্রাইস নেই (Data needed)', 'No price (Data needed)', 'price নেই (Data needed)'), fl_retired: L('অবসরপ্রাপ্ত', 'Retired', 'Retired'), fl_master: L('মাস্টার কোডে মেলানো', 'Linked to a master code', 'Master code-এ linked'),
   dneeded: L('Data needed', 'Data needed', 'Data needed'), more2: L('আরও অপশন', 'More options', 'আরও Option'), pimp: L('আইটেম মাস্টার ইমপোর্ট', 'Item master import', 'Item master import'), pmap: L('পুরনো আইটেম মেলানো', 'Old items to master codes', 'পুরনো Item মেলানো'),
   ptypes: L('আইটেমের ধরন ও ডিফল্ট', 'Item types & defaults', 'Item type ও Default'), passets: L('সম্পদ-খাতা', 'Asset register', 'Asset register'), bycat: L('ক্যাটাগরি ধরে', 'By category', 'Category ধরে'),
   lowNoMin: L('ন্যূনতম স্টক না থাকলে কম-স্টক চিহ্ন হয় না', 'A product without a minimum stock is never flagged', 'Minimum stock না থাকলে low-stock চিহ্ন হয় না'), onHand: L('আছে', 'on hand', 'on hand'),
@@ -349,7 +349,7 @@ async function save() {
   let cat = $('#p_cat').value, sub = $('#p_sub').value;
   { // "Other" on category / sub-category / unit: the old value stays; the typed words go into Details (and the owner's Other queue, with this item's id)
     const labels = { p_cat: 'Category', p_sub: 'Sub-category', p_unit: 'Unit' }, oth = Object.keys(labels).map((id) => [id, $('#' + id) && $('#' + id).dataset.lpOther]).filter((x) => x[1]);
-    if (!cur && oth.some(([id]) => (id === 'p_cat' || id === 'p_unit') && !$('#' + id).value)) return toast(lab(L('"অন্যান্য" দিলে এখন একটি তালিকা-মান বেছে নিন; লেখা মালিকের কাছে গেছে', 'You used "Other": pick a listed value for now - your words went to the owner', '"Other" দিলে এখন একটি list-মান বেছে নিন; লেখা Owner এর কাছে গেছে')));
+    if (!cur && oth.some(([id]) => (id === 'p_cat' || id === 'p_unit') && !$('#' + id).value)) return toast(lab(L('"অন্যান্য" দিলে এখন একটি তালিকা-মান বেছে নিন; লেখা মালিকের কাছে গেছে', 'You used "Other": pick a listed value for now - your words went to the owner', '"Other" দিলে এখন একটি list-মান বেছে নিন; লেখা Owner-এর কাছে গেছে')));
     if (oth.length && $('#p_details')) { const add = oth.map(([id, w]) => 'Other ' + labels[id].toLowerCase() + ': ' + w).join('\n'); $('#p_details').value = (($('#p_details').value || '').trim() + '\n' + add).trim(); oth.forEach(([id]) => { $('#' + id).dataset.lpOther = ''; }); }
   }
   try {
@@ -427,7 +427,7 @@ async function view() {
 }
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { items: view, products: view });
 // labels for the approval screen (#/itemreq): the new item fields
-window.BOS_ITEM_LABELS = () => ({ item_type: T('type'), control_class: lab(L('ডিকশনারি ক্লাস', 'Dictionary class', 'Dictionary class')), count_in_business: lab(L('ব্যবসার হিসাবে ধরা', 'Count in business', 'Business-এ ধরা')), sellable: lab(L('বিক্রির জন্য', 'For sale', 'Selling-এর জন্য')),
+window.BOS_ITEM_LABELS = () => ({ item_type: T('type'), control_class: lab(L('ডিকশনারি ক্লাস', 'Dictionary class', 'Dictionary class')), count_in_business: lab(L('ব্যবসার হিসাবে ধরা', 'Count in business', 'Business-এ ধরা')), sellable: lab(L('সেলের জন্য', 'For sale', 'Selling-এর জন্য')),
   locked: T('fl_locked'), hidden: T('fl_hidden'), retired_reason: lab(L('কারণ', 'Reason', 'Reason')), master_code: lab(L('মাস্টার কোড', 'Master code', 'Master code')), sub_category: T('sub'), base_unit: T('base'), sell_units: T('sellu'), wholesale_price: T('whs'), tracked: T('trk'), min_stock: T('minst'),
   barcode: T('barcode'), source: T('source'), vat_applicable: T('vat'), images: T('images'), details: T('details') });
 B.items2 = { reload: load, items: () => D.items, redraw: () => { try { drawList(); } catch (e) { /* not on the list */ } } };

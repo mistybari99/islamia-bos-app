@@ -20,7 +20,7 @@ const CFG = { timeoutMs: 8000, maxPerMinute: 20 };
 // ---------- texts ----------
 const X = {
   title: L('প্রশ্ন করুন (ব্যবসার সহকারী)', 'Ask (business assistant)', 'Ask (ব্যবসার সহকারী)'),
-  ph: L('প্রশ্ন লিখুন… যেমন: আজ বিক্রি কত?', 'Ask… e.g. How are sales today?', 'প্রশ্ন লিখুন… যেমন: আজ sale কত?'),
+  ph: L('প্রশ্ন লিখুন… যেমন: আজ সেল কত?', 'Ask… e.g. How are sales today?', 'প্রশ্ন লিখুন… যেমন: আজ sale কত?'),
   send: L('পাঠান', 'Send', 'Send'), mic: L('কথা বলে প্রশ্ন', 'Speak the question', 'Voice-এ প্রশ্ন'),
   hello: L('আমি শুধু পড়ি ও হিসাব দেখাই — কিছু বদলাই না। প্রত্যেক সংখ্যা সার্ভারের রিপোর্ট থেকে আসে; না থাকলে "তথ্য দরকার" বলি।', 'I only read and show figures - I never change anything. Every number comes from a server report; when it is missing I say "data needed".', 'আমি শুধু পড়ি — কিছু বদলাই না। প্রত্যেক number server report থেকে; না থাকলে "Data needed"।'),
   g_today: L('আজ', 'Today', 'আজ'), g_money: L('টাকা', 'Money', 'টাকা'), g_stock: L('স্টক', 'Stock', 'Stock'), g_people: L('মানুষ', 'People', 'মানুষ'), g_setup: L('সেটআপ', 'Setup', 'Setup'), g_control: L('নিয়ন্ত্রণ', 'Control', 'Control'),
@@ -36,45 +36,45 @@ const X = {
   error: L('উত্তর আনা গেল না', 'Could not get the answer', 'উত্তর আনা গেল না'), dayoff: L('দৈনিক খাতা বন্ধ আছে', 'The day book is switched off', 'Day book বন্ধ'),
   range: L('সময়কাল খুব লম্বা (সর্বোচ্চ ৩৬৬ দিন)', 'The period is too long (366 days at most)', 'সময়কাল খুব লম্বা (max 366 দিন)'),
   empty: L('এই সময়ে কিছু নেই (তথ্য দরকার)', 'Nothing in this period (data needed)', 'এই সময়ে কিছু নেই (Data needed)'),
-  r_write: L('আমি কিছু বদলাতে, মুছতে বা অনুমোদন দিতে পারি না — শুধু পড়ি। ঠিক পেজটি খুলে নিজে করুন:', 'I cannot change, delete or approve anything - I only read. Open the right screen and do it there:', 'আমি কিছু বদলাতে/মুছতে/approve করতে পারি না — শুধু পড়ি। ঠিক পেজ খুলুন:'),
-  r_sql: L('আমি SQL, টেবিল বা ডাটাবেস দেখাই না। প্রশ্ন সাধারণ ভাষায় করুন, যেমন "আজ বিক্রি কত?"', 'I do not run or show SQL, tables or the database. Ask in plain words, e.g. "How are sales today?"', 'SQL / table / database দেখাই না। সাধারণ ভাষায় প্রশ্ন করুন।'),
+  r_write: L('আমি কিছু বদলাতে, মুছতে বা অ্যাপ্রুভ দিতে পারি না — শুধু পড়ি। ঠিক পেজটি খুলে নিজে করুন:', 'I cannot change, delete or approve anything - I only read. Open the right screen and do it there:', 'আমি কিছু বদলাতে/মুছতে/approve করতে পারি না — শুধু পড়ি। ঠিক পেজ খুলুন:'),
+  r_sql: L('আমি SQL, টেবিল বা ডাটাবেস দেখাই না। প্রশ্ন সাধারণ ভাষায় করুন, যেমন "আজ সেল কত?"', 'I do not run or show SQL, tables or the database. Ask in plain words, e.g. "How are sales today?"', 'SQL / table / database দেখাই না। সাধারণ ভাষায় প্রশ্ন করুন।'),
   r_secret: L('পাসওয়ার্ড, পিন, টোকেন বা কোনো গোপন তথ্য আমি জানি না ও দেখাই না। পিন ভুলে গেলে মালিককে বলুন।', 'I never know or show passwords, PINs, tokens or any secret. If a PIN is forgotten, ask the owner.', 'Password / PIN / token কখনো দেখাই না।'),
   r_injection: L('এই ধরনের নির্দেশ আমি মানি না। আমার নিয়ম বদলায় না; আপনার অনুমতি অনুযায়ীই উত্তর দিই।', 'I do not follow instructions like that. My rules do not change; I answer only within your access.', 'এমন নির্দেশ মানি না; আপনার access অনুযায়ীই উত্তর দিই।'),
   r_rate: L('একটু ধীরে — এক মিনিটে অনেক প্রশ্ন হয়েছে।', 'Slow down a little - many questions in one minute.', 'একটু ধীরে — এক মিনিটে অনেক প্রশ্ন।'),
-  oos: L('এটা ব্যবসার হিসাবের বাইরে। আমি বিক্রি, খরচ, বাকি, স্টক, স্টাফ ও সেটআপ নিয়ে বলতে পারি।', 'That is outside the business data. I can help with sales, expenses, dues, stock, staff and setup.', 'এটা business-এর বাইরে। Sale, খরচ, বাকি, stock, staff, setup নিয়ে বলতে পারি।'),
+  oos: L('এটা ব্যবসার হিসাবের বাইরে। আমি সেল, খরচ, বাকি, স্টক, স্টাফ ও সেটআপ নিয়ে বলতে পারি।', 'That is outside the business data. I can help with sales, expenses, dues, stock, staff and setup.', 'এটা business-এর বাইরে। Sale, খরচ, বাকি, stock, staff, setup নিয়ে বলতে পারি।'),
   clarify: L('কোনটা জানতে চান?', 'Which one do you mean?', 'কোনটা জানতে চান?'),
   exportB: L('CSV ডাউনলোড', 'Export CSV', 'CSV download'), printB: L('প্রিন্ট', 'Print', 'Print'), whyB: L('কেন?', 'Ask why', 'কেন?'), open: L('খুলুন', 'Open', 'Open'),
-  noExport: L('ডাউনলোডের অনুমতি নেই (export_data)', 'You have no export right (export_data)', 'Export-এর অনুমতি নেই'), nothingToExport: L('ডাউনলোড করার মতো টেবিল নেই', 'There is no table to export', 'Export করার table নেই'),
+  noExport: L('ডাউনলোডের অনুমতি নেই (এক্সপোর্ট_ডেটা)', 'You have no export right (export_data)', 'Export-এর অনুমতি নেই'), nothingToExport: L('ডাউনলোড করার মতো টেবিল নেই', 'There is no table to export', 'Export করার table নেই'),
   interp: L('ব্যাখ্যা (শুধু উপরের সংখ্যা থেকে)', 'Interpretation (only from the numbers above)', 'ব্যাখ্যা (উপরের number থেকে)'),
   calc: L('হিসাব: উপরের সার্ভার-সংখ্যার যোগ/বিয়োগ', 'Arithmetic on the server figures above', 'হিসাব: server number-এর যোগ/বিয়োগ'),
   kbFrom: L('অ্যাপের নিজের জ্ঞানভান্ডার থেকে', 'From the app’s own knowledge', 'App-এর knowledge থেকে'), kbVer: L('জ্ঞান-সংস্করণ', 'Knowledge version', 'Knowledge version'),
   kbNone: L('এ বিষয়ে জ্ঞানভান্ডারে কিছু পেলাম না।', 'I found nothing about that in the knowledge base.', 'Knowledge base-এ পেলাম না।'),
   stepDone: L('হয়েছে', 'Done', 'Done'), stepTodo: L('বাকি', 'To do', 'বাকি'), stepCheck: L('নিজে দেখুন', 'Check yourself', 'নিজে দেখুন'), stepUnknown: L('জানা নেই', 'Unknown', 'Unknown'), now: L('এখন', 'now', 'এখন'),
-  approvedOwner: L('মালিকের অনুমোদিত', 'Approved by the owner', 'Owner অনুমোদিত'), noNotes: L('মালিক এখনও কোনো নিয়ম লেখেননি।', 'The owner has not written any rule yet.', 'Owner এখনও নিয়ম লেখেননি।'),
+  approvedOwner: L('মালিকের অ্যাপ্রুভড', 'Approved by the owner', 'Owner approved'), noNotes: L('মালিক এখনও কোনো নিয়ম লেখেননি।', 'The owner has not written any rule yet.', 'Owner এখনও নিয়ম লেখেননি।'),
   engine: L('ইঞ্জিন: ফোনেই (বিনা খরচে)', 'Engine: on the phone (free)', 'Engine: phone-এ (free)'), engineProxy: L('ইঞ্জিন: AI প্রক্সি', 'Engine: AI proxy', 'Engine: AI proxy'),
   settings: L('সহকারীর সেটিংস ও খরচ (মালিক)', 'Assistant settings and usage (owner)', 'Assistant settings ও usage (owner)'),
   usage: L('এই মাসের ব্যবহার', 'Usage this month', 'এই মাসের usage'), questions: L('প্রশ্ন', 'questions', 'প্রশ্ন'), tokens: L('টোকেন', 'tokens', 'tokens'),
-  estCost: L('আনুমানিক খরচ (শুধু AI প্রক্সিতে; অনুমান)', 'Estimated cost (AI proxy only; estimate)', 'আনুমানিক খরচ (estimate)'), budget: L('মাসিক সীমা', 'Monthly budget', 'Monthly budget'),
-  proxyOff: L('AI প্রক্সি বসানো নেই — কোনো পেইড সার্ভিস চালু নেই। চালু করতে মালিকের অনুমোদন ও Edge Function লাগবে (docs/ASSISTANT.md)।', 'No AI proxy is deployed - no paid service is on. It needs the owner’s approval and an Edge Function (docs/ASSISTANT.md).', 'AI proxy বসানো নেই — কোনো paid service চালু নেই।'),
+  estCost: L('আনুমানিক কস্ট (শুধু AI প্রক্সিতে; অনুমান)', 'Estimated cost (AI proxy only; estimate)', 'আনুমানিক cost (estimate)'), budget: L('মাসিক সীমা', 'Monthly budget', 'Monthly budget'),
+  proxyOff: L('AI প্রক্সি বসানো নেই — কোনো পেইড সার্ভিস চালু নেই। চালু করতে মালিকের অ্যাপ্রুভ ও Edge Function লাগবে (docs/ASSISTANT.md)।', 'No AI proxy is deployed - no paid service is on. It needs the owner’s approval and an Edge Function (docs/ASSISTANT.md).', 'AI proxy বসানো নেই — কোনো paid service চালু নেই।'),
   notesT: L('মালিকের নিয়ম / পদ্ধতি / তথ্য', 'Owner rules / procedures / facts', 'Owner-এর নিয়ম / পদ্ধতি'), addNote: L('নতুন নিয়ম যোগ', 'Add a rule', 'নতুন নিয়ম'),
-  nTitle: L('শিরোনাম', 'Title', 'Title'), nBn: L('বাংলায়', 'In Bangla', 'বাংলায়'), nEn: L('ইংরেজিতে', 'In English', 'English-এ'), save: L('সংরক্ষণ', 'Save', 'Save'), retire: L('বাদ দিন', 'Retire', 'Retire'),
-  k_rule: L('নিয়ম', 'Rule', 'নিয়ম'), k_procedure: L('পদ্ধতি', 'Procedure', 'পদ্ধতি'), k_fact: L('তথ্য', 'Fact', 'তথ্য'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
+  nTitle: L('শিরোনাম', 'Title', 'Title'), nBn: L('বাংলায়', 'In Bangla', 'বাংলায়'), nEn: L('ইংরেজিতে', 'In English', 'English-এ'), save: L('সেভ', 'Save', 'Save'), retire: L('বাদ দিন', 'Retire', 'Retire'),
+  k_rule: L('নিয়ম', 'Rule', 'নিয়ম'), k_procedure: L('পদ্ধতি', 'Procedure', 'পদ্ধতি'), k_fact: L('তথ্য', 'Fact', 'তথ্য'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'),
   e_looks_like_secret: L('গোপন তথ্যের মতো দেখাচ্ছে (পাসওয়ার্ড/পিন/টোকেন) — রাখা হলো না', 'Looks like a secret (password / PIN / token) - not stored', 'Secret-এর মতো — রাখা হলো না'),
   e_title_required: L('শিরোনাম দিন', 'Write a title', 'Title দিন'), e_body_required: L('লেখা দিন', 'Write the text', 'লেখা দিন'), e_reason_required: L('কারণ লিখুন', 'Write a reason', 'কারণ লিখুন'),
   earlier: L('আগের কথোপকথন', 'Earlier in this session', 'আগের কথা'), only: L('শুধু আপনার জায়গার হিসাব', 'Only your places are included', 'শুধু আপনার জায়গা'),
-  costHidden: L('খরচ ও লাভের কলাম আপনার জন্য বন্ধ', 'Cost and profit columns are hidden for your role', 'Cost/profit column বন্ধ'),
+  costHidden: L('কস্ট ও লাভের কলাম আপনার জন্য বন্ধ', 'Cost and profit columns are hidden for your role', 'Cost/profit column বন্ধ'),
   defPeriod: L('সময় বলা হয়নি: এই মাসের শুরু থেকে আজ', 'No period given: this month to date', 'সময় বলা হয়নি: এই মাস'),
   truncated: L('৫০০-র বেশি সারি; শুধু প্রথম অংশ', 'More than 500 rows; only the first part', '৫০০-র বেশি row'),
   help1: L('আমি যা দেখাতে পারি (আপনার অনুমতি অনুযায়ী):', 'What I can show (within your access):', 'যা দেখাতে পারি:'), help2: L('যা আপনার জন্য বন্ধ:', 'Closed for you:', 'আপনার জন্য বন্ধ:'),
-  help3: L('আমি কিছু লিখি না, বদলাই না, অনুমোদন দিই না; ঠিক পেজের লিংক দিই।', 'I never write, change or approve anything; I give the link to the right screen.', 'আমি কিছু লিখি/বদলাই না; লিংক দিই।'),
+  help3: L('আমি কিছু লিখি না, বদলাই না, অ্যাপ্রুভ দিই না; ঠিক পেজের লিংক দিই।', 'I never write, change or approve anything; I give the link to the right screen.', 'আমি কিছু লিখি/বদলাই না; লিংক দিই।'),
   vs: L('আগে', 'before', 'আগে'), highest: L('সবচেয়ে বেশি', 'Highest', 'সবচেয়ে বেশি'), lowest: L('সবচেয়ে কম', 'Lowest', 'সবচেয়ে কম'),
-  total: L('মোট', 'Total', 'Total'), status: L('অবস্থা', 'Status', 'Status'), item: L('কী', 'What', 'কী'), amount: L('পরিমাণ', 'Amount', 'Amount'), now2: L('এখন', 'Now', 'এখন'), before: L('আগে', 'Before', 'আগে'), changeH: L('পরিবর্তন', 'Change', 'Change'),
-  fp_cash: L('নগদ + ব্যাংক + মোবাইল', 'Cash + bank + mobile', 'Cash + bank + mobile'), fp_recv: L('গ্রাহকের কাছে পাওনা', 'Customers owe us', 'Customer-এর বাকি'), fp_pay: L('সরবরাহকারীর দেনা', 'We owe suppliers', 'Supplier দেনা'),
+  total: L('টোটাল', 'Total', 'Total'), status: L('অবস্থা', 'Status', 'Status'), item: L('কী', 'What', 'কী'), amount: L('পরিমাণ', 'Amount', 'Amount'), now2: L('এখন', 'Now', 'এখন'), before: L('আগে', 'Before', 'আগে'), changeH: L('পরিবর্তন', 'Change', 'Change'),
+  fp_cash: L('ক্যাশ + ব্যাংক + মোবাইল', 'Cash + bank + mobile', 'Cash + bank + mobile'), fp_recv: L('কাস্টমারের কাছে পাওনা', 'Customers owe us', 'Customer-এর বাকি'), fp_pay: L('সাপ্লায়ারের দেনা', 'We owe suppliers', 'Supplier দেনা'),
   fp_stock: L('স্টকের মূল্য (ক্রয়মূল্যে)', 'Stock value (at cost)', 'Stock value'), fp_pnl: L('এই মাসের লাভ (খরচ জানা অংশে)', 'Profit this month (costed part)', 'এই মাসের লাভ'), fp_bs: L('ব্যালান্স শিট (হিসাব মডিউল)', 'Balance sheet (accounting module)', 'Balance sheet'),
-  fp_net: L('যাচাইকৃত লাইনগুলোর যোগ-বিয়োগ (নগদ + পাওনা + স্টক − দেনা)', 'Verified lines added up (cash + receivable + stock - payable)', 'Verified line-এর যোগফল'),
+  fp_net: L('যাচাইকৃত লাইনগুলোর যোগ-বিয়োগ (ক্যাশ + পাওনা + স্টক − দেনা)', 'Verified lines added up (cash + receivable + stock - payable)', 'Verified line-এর যোগফল'),
   fp_netNote: L('এটা ব্যালান্স শিট নয়: স্থায়ী সম্পদ, ঋণ ও মালিকের মূলধন ডেটায় নেই।', 'This is not a balance sheet: fixed assets, loans and owner capital are not in the data.', 'এটা balance sheet নয়।'),
-  noStart: L('দৈনিক খাতার শুরুর তারিখ নেই', 'Day-book start date not set', 'Day book start date নেই'), noOpening: L('শুরুর ব্যালান্স নেই বা সব জায়গা আপনি দেখেন না', 'Opening balances not set, or you do not see every place', 'Opening balance নেই'),
-  noCost: L('খরচ জানা নেই', 'No costs entered', 'Cost নেই'),
+  noStart: L('দৈনিক খাতার শুরুর ডেট নেই', 'Day-book start date not set', 'Day book start date নেই'), noOpening: L('শুরুর ব্যালান্স নেই বা সব জায়গা আপনি দেখেন না', 'Opening balances not set, or you do not see every place', 'Opening balance নেই'),
+  noCost: L('কস্ট জানা নেই', 'No costs entered', 'Cost নেই'),
   sig: L('লক্ষণ', 'Signal', 'Signal'), noUnusual: L('এই সময়ে কোনো সতর্ক-লক্ষণ পাওয়া যায়নি (যে রিপোর্টগুলো দেখা গেল)।', 'No warning signal in this period (in the reports I could see).', 'কোনো warning signal নেই।'),
   detectors: L('এগুলো অ্যাপের বিদ্যমান ধরার নিয়ম থেকে; নতুন কোনো অনুমান-মডেল নয়।', 'These come from the app’s existing detectors - no new guessing model.', 'বিদ্যমান detector থেকে।'),
   prioNote: L('প্রস্তাবিত ক্রম (নিয়ম: আটকে থাকা কাজ ও ঝুঁকিতে থাকা টাকা আগে) — এটা ব্যাখ্যা, হিসাব নয়।', 'Suggested order (rule of thumb: blocked work and money at risk first) - interpretation, not a calculation.', 'প্রস্তাবিত ক্রম — ব্যাখ্যা।'),
@@ -95,12 +95,12 @@ const fmtV = (v, type) => { if (v === null || v === undefined || v === '') retur
   if (type === 'datetime') { try { return new Date(v).toLocaleString('en-GB', { timeZone: 'Asia/Dhaka', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch (e) { return String(v); } }
   return String(v); };
 const MONEYK = /^(net|gross|amount|value|balance|overdue|discount|disc|due|paid|void_amt|total|cash_in|cash_out|net_cash|current|previous|change|profit|net_sales|cogs|expenses|salary|fixed|revenue|margin|short_amount|over_amount|reorder_value|no_receipt_amount|gross_pay|net_pay|adv_outstanding|amount_period|over_total|avg_bill|spend)$/;
-const HEADLAB = { lines: L('লাইন', 'Lines', 'Lines'), customers: L('গ্রাহক', 'Customers', 'Customer'), no_limit_set: L('সীমা ছাড়া', 'Without a limit', 'Limit ছাড়া'), at_zero: L('শূন্যে', 'At zero', 'শূন্যে'),
-  batches: L('ব্যাচ', 'Batches', 'Batch'), expired_batches: L('মেয়াদোত্তীর্ণ ব্যাচ', 'Expired batches', 'Expired batch'), suppliers: L('সরবরাহকারী', 'Suppliers', 'Supplier'), items: L('আইটেম', 'Items', 'Item'),
+const HEADLAB = { lines: L('লাইন', 'Lines', 'Lines'), customers: L('কাস্টমার', 'Customers', 'Customer'), no_limit_set: L('সীমা ছাড়া', 'Without a limit', 'Limit ছাড়া'), at_zero: L('শূন্যে', 'At zero', 'শূন্যে'),
+  batches: L('ব্যাচ', 'Batches', 'Batch'), expired_batches: L('মেয়াদ শেষ ব্যাচ', 'Expired batches', 'Expired batch'), suppliers: L('সাপ্লায়ার', 'Suppliers', 'Supplier'), items: L('আইটেম', 'Items', 'Item'),
   unsold_items: L('অবিক্রীত আইটেম', 'Unsold items', 'Unsold item'), transfers: L('ট্রান্সফার', 'Transfers', 'Transfer'), not_received: L('পৌঁছায়নি', 'Not received', 'পৌঁছায়নি'), short_received: L('কম পৌঁছেছে', 'Short received', 'কম পৌঁছেছে'),
   findings: L('সমস্যা', 'Findings', 'Finding'), bad: L('গুরুতর', 'Serious', 'গুরুতর'), warn: L('সতর্ক', 'Warnings', 'Warning'), waiting: L('অপেক্ষায়', 'Waiting', 'অপেক্ষায়'), places: L('জায়গা', 'Places', 'Place'),
-  missing_count: L('বাদ পড়া নম্বর', 'Missing numbers', 'Missing number'), forms: L('ফর্ম', 'Forms', 'Form'), total: L('মোট', 'Total', 'Total'), overdue: L('মেয়াদোত্তীর্ণ', 'Overdue', 'Overdue'),
-  balance: L('মোট পাওনা', 'Total balance', 'মোট balance'), low_lines: L('কম-স্টক লাইন', 'Low lines', 'Low line') };
+  missing_count: L('বাদ পড়া নম্বর', 'Missing numbers', 'Missing number'), forms: L('ফর্ম', 'Forms', 'Form'), total: L('টোটাল', 'Total', 'Total'), overdue: L('মেয়াদ শেষ', 'Overdue', 'Overdue'),
+  balance: L('টোটাল পাওনা', 'Total balance', 'total balance'), low_lines: L('কম-স্টক লাইন', 'Low lines', 'Low line') };
 function colOf(res, k) { return (res.columns || []).find((c) => c.key === k); }
 function headLabel(res, k) { const c = colOf(res, k); if (c) return isEn() ? (c.label_en || c.label_bn) : (c.label_bn || c.label_en); return HEADLAB[k] ? lab(HEADLAB[k]) : k; }
 function headType(res, k) { const c = colOf(res, k); return c ? c.type : (MONEYK.test(k) ? 'money' : 'int'); }
@@ -263,8 +263,8 @@ function optionFor(k) { const tl = AT.TOOLS[k] || AT.COMPOSITE[k]; return { tool
 function clarifyOptions(has) { const o = has.cost ? ['expenses_by_head', 'item_margin', 'purchases_by_supplier'] : ['sales_summary', 'expenses_by_head', 'receivables', 'stock_low']; return o.map(optionFor); }
 function writeLinks(has) {
   const r = []; const add = (route, l) => { if (!r.some((x) => x.route === route)) r.push({ route, label: l }); };
-  if (has.sales || has.void) add('pos', L('বিক্রি (POS)', 'Sales (POS)', 'Sale (POS)')); if (has.attention || has.discount) add('pending', L('অপেক্ষমাণ', 'Pending', 'Pending'));
-  if (has.item || has.stock) add('items', L('আইটেম ও দাম', 'Items & prices', 'Item ও price')); if (has.pay || has.supplier) add('payables', L('সরবরাহকারীর পাওনা', 'Supplier payables', 'Supplier payable'));
+  if (has.sales || has.void) add('pos', L('সেল (POS)', 'Sales (POS)', 'Sale (POS)')); if (has.attention || has.discount) add('pending', L('অপেক্ষমাণ', 'Pending', 'Pending'));
+  if (has.item || has.stock) add('items', L('আইটেম ও প্রাইস', 'Items & prices', 'Item ও price')); if (has.pay || has.supplier) add('payables', L('সাপ্লায়ারের পাওনা', 'Supplier payables', 'Supplier payable'));
   if (has.staff || has.salary) add('staff', L('স্টাফ', 'Staff', 'Staff'));
   if (!r.length) add('switchboard', L('সুইচবোর্ড', 'Switchboard', 'Switchboard'));
   return r;
@@ -415,12 +415,12 @@ async function whatChanged(p, me) {
   const facts = [], movers = [], interp = []; let cmpLbl = '';
   if (loc.ok && loc.compare && loc.compare.delta && loc.compare.delta.net) {
     const dn = loc.compare.delta.net; cmpLbl = loc.compare.from + ' → ' + loc.compare.to;
-    facts.push(lbl(L('নিট বিক্রি', 'Net sales', 'Net sale')) + ': ' + fmtV(dn.current, 'money') + ' (' + T('vs') + ' ' + fmtV(dn.previous, 'money') + (dn.pct !== null && dn.pct !== undefined ? ', ' + (dn.pct > 0 ? '+' : '') + fmtN(dn.pct) + '%' : '') + ')');
+    facts.push(lbl(L('নিট সেল', 'Net sales', 'Net sale')) + ': ' + fmtV(dn.current, 'money') + ' (' + T('vs') + ' ' + fmtV(dn.previous, 'money') + (dn.pct !== null && dn.pct !== undefined ? ', ' + (dn.pct > 0 ? '+' : '') + fmtN(dn.pct) + '%' : '') + ')');
     const prev = new Map((loc.compare.rows || []).map((r) => [String(r.location_id), num(r.net)]));
     const lm = (loc.rows || []).map((r) => { const pv = prev.has(String(r.location_id)) ? prev.get(String(r.location_id)) : 0; const cu = num(r.net) || 0; return { what: labelOf(r, 'location'), now: cu, before: pv, change: Math.round((cu - pv) * 100) / 100, pct: pctCalc(cu, pv) }; });
     (loc.compare.rows || []).forEach((r) => { if (!(loc.rows || []).some((x) => String(x.location_id) === String(r.location_id))) lm.push({ what: labelOf(r, 'location'), now: 0, before: num(r.net) || 0, change: -(num(r.net) || 0), pct: -100 }); });
     lm.sort((a, b) => Math.abs(b.change) - Math.abs(a.change)); movers.push(...lm.slice(0, 5).map((m) => Object.assign({ kind: T('places') }, m)));
-    if (lm.length && dn.previous !== null && Number(dn.current) !== Number(dn.previous)) { const top = lm[0]; interp.push(lbl(L('বিক্রি', 'Sales', 'Sale')) + ' ' + (dn.pct !== null && dn.pct !== undefined ? (dn.pct > 0 ? '+' : '') + fmtN(dn.pct) + '%' : '') + ': ' + lbl(L('সবচেয়ে বড় পরিবর্তন', 'the biggest change is', 'বড় পরিবর্তন')) + ' ' + top.what + ' ' + (top.change > 0 ? '+' : '') + fmtV(top.change, 'money') + (top.pct !== null ? ' (' + (top.pct > 0 ? '+' : '') + fmtN(top.pct) + '%)' : '')); }
+    if (lm.length && dn.previous !== null && Number(dn.current) !== Number(dn.previous)) { const top = lm[0]; interp.push(lbl(L('সেল', 'Sales', 'Sale')) + ' ' + (dn.pct !== null && dn.pct !== undefined ? (dn.pct > 0 ? '+' : '') + fmtN(dn.pct) + '%' : '') + ': ' + lbl(L('সবচেয়ে বড় পরিবর্তন', 'the biggest change is', 'বড় পরিবর্তন')) + ' ' + top.what + ' ' + (top.change > 0 ? '+' : '') + fmtV(top.change, 'money') + (top.pct !== null ? ' (' + (top.pct > 0 ? '+' : '') + fmtN(top.pct) + '%)' : '')); }
   }
   if (items.ok && items.compare) {
     const prev = new Map((items.compare.rows || []).map((r) => [String(r.item_id), num(r.net)]));
@@ -445,10 +445,10 @@ async function unusual(p, me) {
   const sig = []; const add = (k, label, v, type, route) => { if (num(v) && num(v) > 0) sig.push({ signal: label, value: num(v), _type: type, money: type === 'money' ? num(v) : 0, route, src: k }); };
   const t = (k) => (R[k] && R[k].ok && R[k].totals) || {};
   add('cash_short_over', lbl(L('ক্যাশ কম পড়েছে', 'Cash short', 'Cash কম')), t('cash_short_over').short_amount, 'money', 'report/cash_short_over');
-  add('voids', lbl(L('বাতিল বিলের টাকা', 'Voided bills (amount)', 'Void amount')), t('voids').void_amt, 'money', 'report/voids');
+  add('voids', lbl(L('ভয়েড বিলের টাকা', 'Voided bills (amount)', 'Void amount')), t('voids').void_amt, 'money', 'report/voids');
   add('wastage', lbl(L('অপচয়ের মূল্য', 'Wastage value', 'অপচয় value')), t('wastage').value, 'money', 'report/wastage');
   add('discounts', lbl(L('সীমার বেশি ছাড়ের বিল', 'Bills with a discount over the limit', 'Limit-এর বেশি ছাড়')), t('discounts').over_limit_bills, 'int', 'report/discounts');
-  add('discounts', lbl(L('দাম বদলানো লাইন', 'Price-override lines', 'Price override line')), t('discounts').override_lines, 'int', 'report/discounts');
+  add('discounts', lbl(L('প্রাইস বদলানো লাইন', 'Price-override lines', 'Price override line')), t('discounts').override_lines, 'int', 'report/discounts');
   add('exceptions_summary', lbl(L('খোলা লাল ব্যতিক্রম', 'Open red exceptions', 'খোলা red exception')), t('exceptions_summary').red, 'int', 'exceptions');
   add('exceptions_summary', lbl(L('খোলা ব্যতিক্রম', 'Open exceptions', 'খোলা exception')), t('exceptions_summary').open, 'int', 'exceptions');
   add('count_variance', lbl(L('গণনায় গরমিল', 'Counts off', 'Count গরমিল')), t('count_variance').off_n, 'int', 'report/k2_count_variance');
@@ -470,7 +470,7 @@ async function priorities(p, me) {
     else if ((R.needs_you.rows || []).length) list.push({ w: 60, text: lbl(L('অপেক্ষায়', 'Waiting for you', 'অপেক্ষায়')) + ': ' + R.needs_you.rows.length, route: 'pending' }); }
   if (R.exceptions_summary.ok && num((R.exceptions_summary.totals || {}).red)) list.push({ w: 80, text: lbl(L('লাল ব্যতিক্রম', 'Red exceptions', 'Red exception')) + ': ' + fmtN(R.exceptions_summary.totals.red, 0), route: 'exceptions' });
   if (R.cash_short_over.ok && num((R.cash_short_over.totals || {}).short_amount)) list.push({ w: 75, text: lbl(L('ক্যাশ কম', 'Cash short', 'Cash কম')) + ': ' + fmtV(R.cash_short_over.totals.short_amount, 'money'), route: 'report/cash_short_over' });
-  if (R.payables.ok && num((R.payables.totals || {}).overdue)) list.push({ w: 70, text: lbl(L('মেয়াদোত্তীর্ণ দেনা', 'Overdue to suppliers', 'Overdue দেনা')) + ': ' + fmtV(R.payables.totals.overdue, 'money'), route: 'payables' });
+  if (R.payables.ok && num((R.payables.totals || {}).overdue)) list.push({ w: 70, text: lbl(L('মেয়াদ শেষ দেনা', 'Overdue to suppliers', 'Overdue দেনা')) + ': ' + fmtV(R.payables.totals.overdue, 'money'), route: 'payables' });
   if (R.stock_low.ok && num((R.stock_low.totals || {}).lines)) list.push({ w: 50, text: lbl(L('কম-স্টক লাইন', 'Low-stock lines', 'Low stock line')) + ': ' + fmtN(R.stock_low.totals.lines, 0), route: 'report/stock_low' });
   if (R.health.ok) { const wn = (R.health.findings || []).filter((x) => x.severity === 'warn'); if (wn.length) list.push({ w: 40, text: lbl(L('সেটআপ-সতর্কতা', 'Setup warnings', 'Setup warning')) + ': ' + wn.length, route: 'assistant' }); }
   list.sort((a, b) => b.w - a.w);

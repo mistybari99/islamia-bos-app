@@ -21,54 +21,54 @@ const addDays = (d, n) => { const x = new Date(d + 'T00:00:00Z'); x.setUTCDate(x
 const q2 = (n) => (n === null || n === undefined || !Number.isFinite(Number(n)) ? '—' : Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 }));
 
 const X = {
-  title: L('Category ও Sub-category', 'Categories and sub-categories', 'Category ও Sub-category'),
-  intro: L('প্রতিটি Item-এর একটি Category ও Sub-category থাকবে। এখান থেকে যোগ, নাম বদল, একত্র (merge), ক্রম ঠিক ও বন্ধ করা যায়।', 'Every item has a Category and a Sub-category. Add, rename, merge, reorder or switch them off here.', 'প্রতিটি Item-এর একটি Category ও Sub-category থাকবে। এখান থেকে add, rename, merge, ক্রম ঠিক ও বন্ধ করা যায়।'),
+  title: L('ক্যাটাগরি ও সাব-ক্যাটাগরি', 'Categories and sub-categories', 'Category ও Sub-category'),
+  intro: L('প্রতিটি আইটেমের একটি ক্যাটাগরি ও সাব-ক্যাটাগরি থাকবে। এখান থেকে যোগ, নাম বদল, একত্র (merge), ক্রম ঠিক ও বন্ধ করা যায়।', 'Every item has a Category and a Sub-category. Add, rename, merge, reorder or switch them off here.', 'প্রতিটি Item-এর একটি Category ও Sub-category থাকবে। এখান থেকে add, rename, merge, ক্রম ঠিক ও বন্ধ করা যায়।'),
   loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), none: L('কিছু নেই', 'Nothing here', 'কিছু নেই'),
   noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'),
   noFn: L('এই অংশের ডেটাবেস এখনও চালু হয়নি (phase100 বাকি)', 'The database part for this is not installed yet (phase100 is missing)', 'এই অংশের database এখনও চালু হয়নি (phase100 বাকি)'),
-  saved: L('সংরক্ষিত', 'Saved', 'Saved'), close: L('বন্ধ', 'Close', 'Close'), cancel: L('বাতিল', 'Cancel', 'Cancel'), save: L('সংরক্ষণ', 'Save', 'Save'), apply: L('প্রয়োগ', 'Apply', 'Apply'),
-  cat: L('Category', 'Category', 'Category'), sub: L('Sub-category', 'Sub-category', 'Sub-category'), item: L('Item', 'Item', 'Item'), items: L('Items', 'Items', 'Items'),
-  all: L('সব', 'All', 'All'), noCat: L('Category নেই', 'No category', 'Category নেই'), noSub: L('Sub-category নেই', 'No sub-category', 'Sub-category নেই'),
-  pickCat: L('Category বাছুন', 'Choose a Category', 'Category বাছুন'), pickSub: L('Sub-category বাছুন', 'Choose a Sub-category', 'Sub-category বাছুন'),
-  nItems: L('টি Item', 'items', 'টি Item'), inactive: L('বন্ধ', 'Inactive', 'Inactive'),
-  addCat: L('+ Category যোগ', '+ Add a Category', '+ Category যোগ'), addSub: L('+ Sub-category যোগ', '+ Add a Sub-category', '+ Sub-category যোগ'),
+  saved: L('সেভ হয়েছে', 'Saved', 'Saved'), close: L('বন্ধ', 'Close', 'Close'), cancel: L('ক্যান্সেল', 'Cancel', 'Cancel'), save: L('সেভ', 'Save', 'Save'), apply: L('অ্যাপ্লাই', 'Apply', 'Apply'),
+  cat: L('ক্যাটাগরি', 'Category', 'Category'), sub: L('সাব-ক্যাটাগরি', 'Sub-category', 'Sub-category'), item: L('আইটেম', 'Item', 'Item'), items: L('আইটেম', 'Items', 'Items'),
+  all: L('সব', 'All', 'All'), noCat: L('ক্যাটাগরি নেই', 'No category', 'Category নেই'), noSub: L('সাব-ক্যাটাগরি নেই', 'No sub-category', 'Sub-category নেই'),
+  pickCat: L('ক্যাটাগরি বাছুন', 'Choose a Category', 'Category বাছুন'), pickSub: L('সাব-ক্যাটাগরি বাছুন', 'Choose a Sub-category', 'Sub-category বাছুন'),
+  nItems: L('টি আইটেম', 'items', 'টি Item'), inactive: L('বন্ধ', 'Inactive', 'Inactive'),
+  addCat: L('+ ক্যাটাগরি যোগ', '+ Add a Category', '+ Category যোগ'), addSub: L('+ সাব-ক্যাটাগরি যোগ', '+ Add a Sub-category', '+ Sub-category যোগ'),
   nameBn: L('নাম (বাংলা)', 'Name (Bangla)', 'নাম (বাংলা)'), nameEn: L('নাম (ইংরেজি)', 'Name (English)', 'নাম (English)'),
   rename: L('নাম বদল (মালিক)', 'Rename (owner)', 'Rename (owner)'), merge: L('অন্যটির সাথে একত্র (মালিক)', 'Merge into another (owner)', 'অন্যটির সাথে merge (owner)'),
   mergeInto: L('যেটার মধ্যে একত্র হবে', 'Merge into', 'যেটার মধ্যে merge হবে'),
-  mergeHint: L('সব Item ওই Category-তে চলে যাবে, এটি বন্ধ হবে। ফেরানো যায় না — শুধু Item আলাদা করে সরানো যায়।', 'Every item moves there and this one is switched off. It cannot be undone; items can only be moved one by one afterwards.', 'সব Item ওই Category-তে চলে যাবে, এটি বন্ধ হবে। ফেরানো যায় না।'),
-  mergeDone: L('একত্র হয়েছে', 'Merged', 'Merge হয়েছে'), movedN: L('টি Item সরেছে', 'items moved', 'টি Item সরেছে'),
-  moveItems: L('Item সরান', 'Move items', 'Item সরান'), moveSub: L('অন্য Category-তে নিন', 'Move under another Category', 'অন্য Category-তে নিন'),
+  mergeHint: L('সব আইটেম ওই ক্যাটাগরি-তে চলে যাবে, এটি বন্ধ হবে। ফেরানো যায় না — শুধু আইটেম আলাদা করে সরানো যায়।', 'Every item moves there and this one is switched off. It cannot be undone; items can only be moved one by one afterwards.', 'সব Item ওই Category-তে চলে যাবে, এটি বন্ধ হবে। ফেরানো যায় না।'),
+  mergeDone: L('একত্র হয়েছে', 'Merged', 'Merge হয়েছে'), movedN: L('টি আইটেম সরেছে', 'items moved', 'টি Item সরেছে'),
+  moveItems: L('আইটেম সরান', 'Move items', 'Item সরান'), moveSub: L('অন্য ক্যাটাগরি-তে নিন', 'Move under another Category', 'অন্য Category-তে নিন'),
   moveTo: L('যেখানে সরবে', 'Move to', 'যেখানে সরবে'), moveDone: L('সরানো হয়েছে', 'Moved', 'সরানো হয়েছে'),
   off: L('বন্ধ করুন', 'Switch off', 'বন্ধ করুন'), on: L('চালু করুন', 'Switch on', 'চালু করুন'), up: L('ওপরে', 'Move up', 'ওপরে'), down: L('নিচে', 'Move down', 'নিচে'),
   more: L('আরও', 'More', 'আরও'),
-  ruleTitle: L('Category লাগবে কি?', 'Is a Category needed?', 'Category লাগবে কি?'),
+  ruleTitle: L('ক্যাটাগরি লাগবে কি?', 'Is a Category needed?', 'Category লাগবে কি?'),
   r_off: L('বন্ধ — আগের মতো', 'Off - as before', 'Off — আগের মতো'), r_warn: L('সতর্কতা — তালিকা দেখায়, আটকায় না (প্রস্তাবিত)', 'Warn - lists the items, never blocks (recommended)', 'Warn — তালিকা দেখায়, আটকায় না (recommended)'),
-  r_required: L('বাধ্যতামূলক — নতুন Item Category ছাড়া সেভ হবে না', 'Required - a new item cannot be saved without one', 'Required — নতুন Item Category ছাড়া save হবে না'),
+  r_required: L('জরুরি — নতুন Item Category ছাড়া সেভ হবে না', 'Required - a new item cannot be saved without one', 'Required — নতুন Item Category ছাড়া save হবে না'),
   ruleOwner: L('শুধু মালিক বদলাতে পারেন', 'Only the owner can change this', 'শুধু owner বদলাতে পারেন'),
-  missing: L('Category ছাড়া Item', 'Items without a Category', 'Category ছাড়া Item'), missingNone: L('সব Item-এর Category আছে ✓', 'Every item has a Category ✓', 'সব Item-এর Category আছে ✓'),
-  missSub: L('Sub-category ছাড়া Item', 'Items without a Sub-category', 'Sub-category ছাড়া Item'),
-  setFor: L('বাছাই করা Item-এর Category ঠিক করুন', 'Set the Category of the selected items', 'বাছাই করা Item-এর Category ঠিক করুন'),
-  selAll: L('সব বাছুন', 'Select all', 'সব বাছুন'), nSel: L('টি বাছা', 'selected', 'টি বাছা'), needItems: L('আগে Item বাছুন', 'Choose items first', 'আগে Item বাছুন'),
-  needCat: L('Category বাছুন', 'Choose a Category', 'Category বাছুন'),
-  reqHint: L('Category লাগবেই', 'A Category is required', 'Category লাগবেই'), warnHint: L('Category দেওয়া ভালো', 'A Category is recommended', 'Category দেওয়া ভালো'),
-  rpTitle: L('Category অনুযায়ী রিপোর্ট', 'Report by Category', 'Category অনুযায়ী report'), rpSales: L('বিক্রি', 'Sales', 'Sales'), rpStock: L('স্টকের মূল্য', 'Stock value', 'Stock value'),
-  rpFrom: L('থেকে', 'From', 'From'), rpTo: L('পর্যন্ত', 'To', 'To'), rpLevel: L('স্তর', 'Level', 'Level'), rpByCat: L('Category', 'Category', 'Category'), rpBySub: L('Category ও Sub-category', 'Category + Sub-category', 'Category + Sub-category'),
-  rpRun: L('দেখান', 'Show', 'Show'), rpRev: L('বিক্রি (৳)', 'Revenue', 'Revenue (৳)'), rpCost: L('খরচ (৳)', 'Cost', 'Cost (৳)'), rpShare: L('অংশ %', 'Share %', 'Share %'), rpVal: L('মূল্য (৳)', 'Value', 'Value (৳)'),
-  rpTotal: L('মোট', 'Total', 'Total'), rpUnk: L('খরচ অজানা Item', 'items with unknown cost', 'খরচ অজানা Item'), rpNoCost: L('খরচ দেখার অধিকার নেই, তাই খরচ ফাঁকা', 'No cost right, so cost is blank', 'Cost দেখার অধিকার নেই, তাই cost ফাঁকা'),
-  rpCsv: L('CSV নামান', 'Download CSV', 'CSV download'), rpNone: L('এই সময়ে কিছু নেই', 'Nothing in this period', 'এই সময়ে কিছু নেই'), rpManage: L('Category পাতা', 'Category page', 'Category page'),
-  rpUncat: L('(Category নেই)', '(no category)', '(Category নেই)'),
+  missing: L('ক্যাটাগরি ছাড়া আইটেম', 'Items without a Category', 'Category ছাড়া Item'), missingNone: L('সব আইটেমের ক্যাটাগরি আছে ✓', 'Every item has a Category ✓', 'সব Item-এর Category আছে ✓'),
+  missSub: L('সাব-ক্যাটাগরি ছাড়া আইটেম', 'Items without a Sub-category', 'Sub-category ছাড়া Item'),
+  setFor: L('বাছাই করা আইটেমের ক্যাটাগরি ঠিক করুন', 'Set the Category of the selected items', 'বাছাই করা Item-এর Category ঠিক করুন'),
+  selAll: L('সব বাছুন', 'Select all', 'সব বাছুন'), nSel: L('টি বাছা', 'selected', 'টি বাছা'), needItems: L('আগে আইটেম বাছুন', 'Choose items first', 'আগে Item বাছুন'),
+  needCat: L('ক্যাটাগরি বাছুন', 'Choose a Category', 'Category বাছুন'),
+  reqHint: L('ক্যাটাগরি লাগবেই', 'A Category is required', 'Category লাগবেই'), warnHint: L('ক্যাটাগরি দেওয়া ভালো', 'A Category is recommended', 'Category দেওয়া ভালো'),
+  rpTitle: L('ক্যাটাগরি অনুযায়ী রিপোর্ট', 'Report by Category', 'Category অনুযায়ী report'), rpSales: L('সেল', 'Sales', 'Sales'), rpStock: L('স্টকের মূল্য', 'Stock value', 'Stock value'),
+  rpFrom: L('থেকে', 'From', 'From'), rpTo: L('পর্যন্ত', 'To', 'To'), rpLevel: L('স্তর', 'Level', 'Level'), rpByCat: L('ক্যাটাগরি', 'Category', 'Category'), rpBySub: L('ক্যাটাগরি ও সাব-ক্যাটাগরি', 'Category + Sub-category', 'Category + Sub-category'),
+  rpRun: L('দেখান', 'Show', 'Show'), rpRev: L('বিক্রি (৳)', 'Revenue', 'Revenue (৳)'), rpCost: L('কস্ট (৳)', 'Cost', 'Cost (৳)'), rpShare: L('অংশ %', 'Share %', 'Share %'), rpVal: L('মূল্য (৳)', 'Value', 'Value (৳)'),
+  rpTotal: L('টোটাল', 'Total', 'Total'), rpUnk: L('কস্ট অজানা আইটেম', 'items with unknown cost', 'cost অজানা Item'), rpNoCost: L('কস্ট দেখার অনুমতি নেই, তাই কস্ট ফাঁকা', 'No cost right, so cost is blank', 'Cost দেখার অধিকার নেই, তাই cost ফাঁকা'),
+  rpCsv: L('CSV নামান', 'Download CSV', 'CSV download'), rpNone: L('এই সময়ে কিছু নেই', 'Nothing in this period', 'এই সময়ে কিছু নেই'), rpManage: L('ক্যাটাগরি পাতা', 'Category page', 'Category page'),
+  rpUncat: L('(ক্যাটাগরি নেই)', '(no category)', '(Category নেই)'),
 };
 const T = (k) => lab(X[k]);
 const ERR = {
   name_taken: L('এই নামে আগেই আছে', 'That name is already used here', 'এই নামে আগেই আছে'), name_required: L('নাম লিখুন', 'Enter a name', 'নাম লিখুন'),
-  same_level_only: L('Category-র সাথে Category, Sub-category-র সাথে Sub-category একত্র হয়', 'A Category merges with a Category and a Sub-category with a Sub-category', 'Category-র সাথে Category, Sub-category-র সাথে Sub-category merge হয়'),
-  bad_parent: L('এই Category বাছা যায় না', 'This Category cannot be used', 'এই Category বাছা যায় না'), sub_exists: L('ওই Category-তে একই Sub-category আছে', 'That Category already has this Sub-category', 'ওই Category-তে একই Sub-category আছে'),
-  category_required: L('Category লাগবে (নিয়ম: বাধ্যতামূলক)', 'A Category is required (rule: required)', 'Category লাগবে (rule: required)'),
-  sub_category_required: L('এই Category-র Sub-category বাছুন (নিয়ম: বাধ্যতামূলক)', 'Choose a Sub-category of this Category (rule: required)', 'এই Category-র Sub-category বাছুন (rule: required)'),
+  same_level_only: L('ক্যাটাগরি-র সাথে ক্যাটাগরি, সাব-ক্যাটাগরি-র সাথে সাব-ক্যাটাগরি একত্র হয়', 'A Category merges with a Category and a Sub-category with a Sub-category', 'Category-র সাথে Category, Sub-category-র সাথে Sub-category merge হয়'),
+  bad_parent: L('এই ক্যাটাগরি বাছা যায় না', 'This Category cannot be used', 'এই Category বাছা যায় না'), sub_exists: L('ওই ক্যাটাগরি-তে একই সাব-ক্যাটাগরি আছে', 'That Category already has this Sub-category', 'ওই Category-তে একই Sub-category আছে'),
+  category_required: L('ক্যাটাগরি লাগবে (নিয়ম: জরুরি)', 'A Category is required (rule: required)', 'Category লাগবে (rule: required)'),
+  sub_category_required: L('এই ক্যাটাগরি-র সাব-ক্যাটাগরি বাছুন (নিয়ম: জরুরি)', 'Choose a Sub-category of this Category (rule: required)', 'এই Category-র Sub-category বাছুন (rule: required)'),
   merged: L('একত্র হয়ে যাওয়াটি আবার চালু হয় না', 'A merged one cannot be switched on again', 'Merge হওয়াটি আবার চালু হয় না'), target_inactive: L('যেটার মধ্যে একত্র হবে সেটি বন্ধ', 'The target is switched off', 'Target বন্ধ'),
-  bad_category: L('Category ঠিক নয়', 'The Category is not valid', 'Category ঠিক নয়'), bad_sub_category: L('এই Sub-category ওই Category-র নয়', 'That Sub-category does not belong to the Category', 'এই Sub-category ওই Category-র নয়'),
+  bad_category: L('ক্যাটাগরি ঠিক নয়', 'The Category is not valid', 'Category ঠিক নয়'), bad_sub_category: L('এই সাব-ক্যাটাগরি ওই ক্যাটাগরি-র নয়', 'That Sub-category does not belong to the Category', 'এই Sub-category ওই Category-র নয়'),
   bad_request: L('অনুরোধ ঠিক নয়', 'The request is not valid', 'Request ঠিক নয়'), bad_level: L('স্তর ঠিক নয়', 'The level is not valid', 'Level ঠিক নয়'),
-  bad_range: L('তারিখের সীমা ঠিক নয় (সর্বোচ্চ ৪০০ দিন)', 'Date range is not valid (400 days at most)', 'তারিখের range ঠিক নয় (সর্বোচ্চ ৪০০ দিন)'),
+  bad_range: L('ডেটের সীমা ঠিক নয় (সর্বোচ্চ ৪০০ দিন)', 'Date range is not valid (400 days at most)', 'date-এর range ঠিক নয় (সর্বোচ্চ ৪০০ দিন)'),
 };
 const errMsg = (e) => { const m = (e && e.message) || ''; for (const k of Object.keys(ERR)) if (m.indexOf(k) >= 0) return toast(lab(ERR[k])); if (/not allowed/.test(m)) return toast(T('noperm')); if (/function .* does not exist|schema cache|Could not find/i.test(m)) return toast(T('noFn')); return fail(e); };
 const call = async (fn, args) => { const r = await sb.rpc(fn, args || {}); if (r.error) throw r.error; return r.data; };
@@ -485,7 +485,7 @@ function paintReport() {
     <tr class="cat-tot"><td><b>${esc(T('rpTotal'))}</b></td>${sub ? '<td></td>' : ''}<td class="n">${esc(q2(t.items))}</td>${sales ? `<td class="n"><b>${esc(q2(t.rev))}</b></td><td class="n">${t.cost === null ? '—' : esc(q2(t.cost))}</td><td></td>` : `<td class="n"><b>${esc(q2(t.rev))}</b></td>`}</tr></tbody></table></div>
     ${sales && t.cost === null ? `<div class="notice info">${esc(T('rpNoCost'))}</div>` : ''}${sales && t.unk ? `<div class="muted">${esc(T('rpUnk'))}: ${t.unk}</div>` : ''}`;
 }
-const csvCell = (v) => { const s = String(v ?? ''); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+const csvCell = (v) => { let s = String(v ?? ''); if (/^[=+\-@\t\r]/.test(s) && isNaN(Number(s))) s = "'" + s; return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };   // bos111 (L1): a name that starts with = + - @ is text in Excel, never a formula
 function csvText() {
   const rows = R.rows || [], sales = R.kind === 'sales', sub = R.level === 'sub';
   const head = ['category'].concat(sub ? ['sub_category'] : [], ['items'], sales ? ['revenue', 'cost', 'share_pct'] : ['value']);

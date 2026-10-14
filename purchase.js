@@ -51,16 +51,16 @@ const X = {
   openPay: L('পেমেন্টের অনুমতি নেই', 'No permission to pay', 'Pay-এর permission নেই'),
   mode_: L('ধরন', 'Mode', 'Mode'), scan: L('স্ক্যান', 'Scan', 'Scan'), more: L('আরও অপশন', 'More options', 'আরও option'), open: L('খুলুন', 'Open', 'Open'),
   // stock-effect preview
-  pvUntracked: L('এই পণ্যের স্টক ট্র্যাক বন্ধ — স্টকে প্রভাব নেই', 'Stock tracking is off for this item — no stock effect', 'এই item-এ stock track বন্ধ — stock-এ effect নেই'),
-  pvStock: L('স্টক', 'stock', 'stock'), pvAt: L('এ', 'at', 'at'), pvAvg: L('নতুন গড় দাম', 'new average cost', 'নতুন average cost'),
-  pvNeed: L('তথ্য লাগবে', 'Data needed', 'Data needed'), pvUnit: L('এককের রূপান্তর জানা নেই', 'unit conversion unknown', 'unit conversion জানা নেই'), pvCost: L('গড় দাম দেখার অনুমতি/তথ্য নেই', 'average cost not available', 'average cost দেখার permission/data নেই'),
+  pvUntracked: L('এই আইটেমের স্টক ট্র্যাক বন্ধ — স্টকে প্রভাব নেই', 'Stock tracking is off for this item — no stock effect', 'এই item-এ stock track বন্ধ — stock-এ effect নেই'),
+  pvStock: L('স্টক', 'stock', 'stock'), pvAt: L('এ', 'at', 'at'), pvAvg: L('নতুন গড় কস্ট', 'new average cost', 'নতুন average cost'),
+  pvNeed: L('তথ্য লাগবে', 'Data needed', 'Data needed'), pvUnit: L('এককের রূপান্তর জানা নেই', 'unit conversion unknown', 'unit conversion জানা নেই'), pvCost: L('গড় কস্ট দেখার অনুমতি/তথ্য নেই', 'average cost not available', 'average cost দেখার permission/data নেই'),
   pvLoad: L('স্টক দেখা হচ্ছে…', 'Checking stock…', 'Stock দেখা হচ্ছে…'),
   // supplier refund
   refund: L('সাপ্লায়ারের কাছ থেকে টাকা ফেরত পাওয়া', 'Refund received from the supplier', 'Supplier-এর কাছ থেকে refund পাওয়া'), refundSheet: L('সাপ্লায়ারের টাকা ফেরত', 'Supplier refund', 'Supplier refund'),
   credit: L('সাপ্লায়ারের কাছে জমা', 'Credit held by the supplier', 'Supplier-এর কাছে credit'), creditList: L('যে সাপ্লায়ারের কাছে আমাদের টাকা জমা আছে', 'Suppliers that hold our credit', 'যে supplier-এর কাছে আমাদের credit আছে'),
   refundOk: L('রিফান্ড লেখা হয়েছে', 'Refund recorded', 'Refund recorded'), refundAmt: L('ফেরত পাওয়া টাকা', 'Amount received back', 'ফেরত পাওয়া amount'), refundRef: L('রেফারেন্স / ট্রান্সঅ্যাকশন', 'Reference / transaction', 'Reference / transaction'),
   refundMax: L('জমার চেয়ে বেশি হবে না', 'Cannot be more than the credit', 'Credit-এর বেশি হবে না'), noCredit: L('এই সাপ্লায়ারের কাছে জমা নেই', 'This supplier holds no credit', 'এই supplier-এর কাছে credit নেই'),
-  kRefund: L('ফেরত পাওয়া', 'Refund received', 'Refund received'), voidRef: L('রিফান্ড বাতিল', 'Void refund', 'Refund void'), refVoided: L('রিফান্ড বাতিল হয়েছে', 'Refund voided', 'Refund voided'), wallet: L('ওয়ালেট (বিকাশ/নগদ…)', 'Wallet (bKash / Nagad…)', 'Wallet (bKash/Nagad…)'),
+  kRefund: L('ফেরত পাওয়া', 'Refund received', 'Refund received'), voidRef: L('রিফান্ড ভয়েড', 'Void refund', 'Refund void'), refVoided: L('রিফান্ড ভয়েড হয়েছে', 'Refund voided', 'Refund voided'), wallet: L('ওয়ালেট (বিকাশ/নগদ…)', 'Wallet (bKash / Nagad…)', 'Wallet (bKash/Nagad…)'),
   reasonOpt: L('কারণ (ঐচ্ছিক)', 'Reason (optional)', 'Reason (ঐচ্ছিক)'),
 };
 const T = (k) => lab(X[k]);
@@ -157,7 +157,7 @@ function lineHTML(l, i) {
   const items = ITEMS_ALL, it = l.item_id ? items.find((x) => x.id === l.item_id) : null; l._ri = !!it;
   return `<div class="rowcard" data-li="${i}"><div class="rc-h"><b>#${i + 1}</b>${F.lines.length > 1 ? `<button type="button" class="mini" data-act="pu_delline" data-i="${i}" aria-label="✕">✕</button>` : ''}</div><div class="stack">
     <div><label>${esc(T('item'))}</label><div class="p2-inl"><input data-ln="${i}.item" list="pu_dl" autocomplete="off" value="${esc(l.item)}" placeholder="${esc(T('itemph'))}">${scanOn() ? `<button type="button" class="mini" data-act="pu_scan" data-i="${i}" aria-label="${esc(T('scan'))}">▮▮ ${esc(T('scan'))}</button>` : ''}</div></div>
-    ${it && it.item_type === 'asset' ? `<div class="hint">${esc(lab(L('সম্পদ: স্টকে নয়, সম্পদ-খাতায় যোগ হবে', 'Asset: goes to the asset register, not to stock', 'Asset: stock এ নয়, asset register এ যোগ হবে')))}</div>` : ''}
+    ${it && it.item_type === 'asset' ? `<div class="hint">${esc(lab(L('সম্পদ: স্টকে নয়, সম্পদ-খাতায় যোগ হবে', 'Asset: goes to the asset register, not to stock', 'Asset: stock-এ নয়, asset register-এ যোগ হবে')))}</div>` : ''}
     ${it ? '' : `<div><label>${esc(T('desc'))}</label><input data-ln="${i}.desc" autocomplete="off" value="${esc(l.desc)}"></div>`}
     <div class="row"><div style="flex:1"><label>${esc(T('qty'))}</label><input data-ln="${i}.qty" inputmode="decimal" value="${esc(l.qty)}"></div>
       <div style="flex:1"><label>${esc(T('unit'))}</label><select data-ln="${i}.unit"><option value="">${esc(it ? unitLabel(it.unit) || T('itemUnit') : T('itemUnit'))}</option>${optHTML(lists('units').map((r) => [r.value_code, lab(rowL(r))]), l.unit)}</select></div>
@@ -174,7 +174,7 @@ function drawEditor() {
     <div class="row"><div style="flex:1"><label for="pe_no">${esc(T('billNo'))}</label><input id="pe_no" autocomplete="off" value="${esc(F.billNo)}"></div><div style="flex:1"><label for="pe_date">${esc(T('date'))}</label><input id="pe_date" type="date" value="${esc(F.date)}"></div></div>
     ${ret ? `<div><label for="pe_reason">${esc(T('reason'))} *</label><select id="pe_reason"><option value="">—</option>${optHTML(reasons, F.reason)}</select></div><div><label for="pe_ref">${esc(T('againstBill'))}</label><select id="pe_ref"><option value="">—</option></select></div>` : ''}
     <datalist id="pu_dl">${ITEMS_ALL.map((i) => `<option value="${esc(U.itemText(i))}"></option>`).join('')}</datalist>
-    <h3 style="margin:6px 0 0">${esc(T('lines'))}</h3><div id="pe_lines">${F.lines.map(lineHTML).join('')}</div><button type="button" class="full" data-act="pu_addline">＋ ${esc(T('addLine'))}</button>${!ret && B.itemMaster && B.itemMaster.canNew() ? `<button type="button" class="full" data-act="pu_newitem">＋ ${esc(lab(L('নতুন আইটেম (সম্পদ) তালিকায় যোগ', 'New item (asset) added to the item list', 'নতুন Item (Asset) list এ যোগ')))}</button>` : ''}
+    <h3 style="margin:6px 0 0">${esc(T('lines'))}</h3><div id="pe_lines">${F.lines.map(lineHTML).join('')}</div><button type="button" class="full" data-act="pu_addline">＋ ${esc(T('addLine'))}</button>${!ret && B.itemMaster && B.itemMaster.canNew() ? `<button type="button" class="full" data-act="pu_newitem">＋ ${esc(lab(L('নতুন আইটেম (সম্পদ) তালিকায় যোগ', 'New item (asset) added to the item list', 'নতুন Item (Asset) list-এ যোগ')))}</button>` : ''}
     <div><label for="pe_disc">${esc(T('discount'))}</label><input id="pe_disc" inputmode="decimal" value="${esc(F.discount)}"></div>
     <div class="card stack" id="pe_tot">${totHTML(tt)}</div>
     ${F.canPay && !ret ? `<h3 style="margin:6px 0 0">${esc(T('payNow'))}</h3><div id="pe_pay">${B.pay.html(F.pay)}</div><div class="hint">${esc(T('payHint'))}</div>` : ''}

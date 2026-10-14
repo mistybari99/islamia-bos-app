@@ -25,24 +25,24 @@ const SHARE_Q = 'bos_iv92_shareq';
 const X = {
   title: L('ইনভয়েস', 'Invoice', 'Invoice'), show: L('ইনভয়েস দেখুন', 'Show invoice', 'Invoice দেখুন'), openHist: L('ইনভয়েস দেখুন / পাঠান', 'View / send invoice', 'Invoice দেখুন / পাঠান'),
   receipt: L('ইনভয়েস', 'Invoice', 'Invoice'), prov: L('সাময়িক নম্বর', 'Provisional no.', 'সাময়িক number'),
-  pending: L('সার্ভারে এখনো যায়নি — নেট এলে নিজে জমা হবে। এই নম্বরটি সাময়িক, চূড়ান্ত নম্বর পরে পাবেন।', 'Pending sync: not on the server yet. It will be sent when the phone is online. This number is provisional; the final number comes after sync.', 'সার্ভারে এখনো যায়নি (pending sync) — net এলে নিজে জমা হবে। এই number টি সাময়িক, final number পরে পাবেন।'),
-  synced: L('সার্ভারে জমা হয়েছে', 'Synced to the server', 'সার্ভারে জমা হয়েছে'), check: L('জমা হয়েছে কি দেখুন', 'Check sync', 'Sync হয়েছে কি দেখুন'), stillPending: L('এখনো জমা হয়নি', 'Not synced yet', 'এখনো sync হয়নি'),
+  pending: L('সার্ভারে এখনো যায়নি — নেট এলে নিজে সিঙ্ক হবে। এই নম্বরটি সাময়িক, সিঙ্কের পরে চূড়ান্ত নম্বর পাবেন।', 'Pending sync: not on the server yet. It will be sent when the phone is online. This number is provisional; the final number comes after sync.', 'Server-এ এখনো যায়নি — net এলে নিজে sync হবে। এই number টি সাময়িক, sync-এর পরে final number পাবেন।'),
+  synced: L('সার্ভারে সিঙ্ক হয়েছে', 'Synced to the server', 'Server-এ sync হয়েছে'), check: L('জমা হয়েছে কি দেখুন', 'Check sync', 'Sync হয়েছে কি দেখুন'), stillPending: L('এখনো জমা হয়নি', 'Not synced yet', 'এখনো sync হয়নি'),
   loading: L('ইনভয়েস আনা হচ্ছে…', 'Loading the invoice…', 'Invoice আনা হচ্ছে…'), loadFail: L('ইনভয়েস আনা যায়নি। নেট দেখে আবার চেষ্টা করুন।', 'The invoice could not be loaded. Check the connection and try again.', 'Invoice আনা যায়নি। Net দেখে আবার চেষ্টা করুন।'), retry: L('আবার চেষ্টা', 'Try again', 'আবার Try'),
-  voided: L('বাতিল', 'VOID', 'VOID'), date: L('তারিখ', 'Date', 'Date'), cashier: L('বিক্রেতা', 'Cashier', 'Cashier'), customer: L('গ্রাহক', 'Customer', 'Customer'),
-  item: L('আইটেম', 'Item', 'Item'), subtotal: L('মোট (ছাড়ের আগে)', 'Subtotal', 'Subtotal'), discount: L('ডিসকাউন্ট', 'Discount', 'Discount'), total: L('সর্বমোট', 'Total', 'Total'),
-  vat: L('ভ্যাট', 'VAT', 'VAT'), incl: L('অন্তর্ভুক্ত', 'included', 'included'), paid: L('পরিশোধ', 'Paid', 'Paid'), due: L('বাকি', 'Due', 'Due'), change: L('ফেরত', 'Change', 'Change'),
-  thanks: L('ধন্যবাদ', 'Thank you', 'ধন্যবাদ'), m_cash: L('নগদ', 'Cash', 'Cash'), m_mobile: L('মোবাইল', 'Mobile', 'Mobile'), m_card: L('কার্ড', 'Card', 'Card'), m_due: L('বাকি', 'On credit', 'বাকি'),
-  print: L('প্রিন্ট', 'Print', 'Print'), email: L('ইমেইল', 'Email', 'Email'), sms: L('এসএমএস', 'SMS', 'SMS'), wa: L('হোয়াটসঅ্যাপ', 'WhatsApp', 'WhatsApp'),
-  share: L('শেয়ার', 'Share', 'Share'), copy: L('কপি', 'Copy text', 'Text Copy'), dl: L('ডাউনলোড', 'Download', 'Download'), close: L('বন্ধ', 'Close', 'Close'),
-  phone: L('গ্রাহকের মোবাইল নম্বর', 'Customer mobile number', 'Customer এর mobile number'), mail: L('গ্রাহকের ইমেইল ঠিকানা', 'Customer email address', 'Customer এর email address'),
+  voided: L('ভয়েড', 'VOID', 'VOID'), date: L('ডেট', 'Date', 'Date'), cashier: L('ক্যাশিয়ার', 'Cashier', 'Cashier'), customer: L('কাস্টমার', 'Customer', 'Customer'),
+  item: L('আইটেম', 'Item', 'Item'), subtotal: L('সাবটোটাল (ছাড়ের আগে)', 'Subtotal', 'Subtotal (ছাড়ের আগে)'), discount: L('ডিসকাউন্ট', 'Discount', 'Discount'), total: L('টোটাল', 'Total', 'Total'),
+  vat: L('ভ্যাট', 'VAT', 'VAT'), incl: L('অন্তর্ভুক্ত', 'included', 'included'), paid: L('পরিশোধ', 'Paid', 'Paid'), due: L('বাকি', 'Due', 'Due'), change: L('খুচরা ফেরত', 'Change', 'Change ফেরত'),
+  thanks: L('ধন্যবাদ', 'Thank you', 'ধন্যবাদ'), m_cash: L('ক্যাশ', 'Cash', 'Cash'), m_mobile: L('মোবাইল', 'Mobile', 'Mobile'), m_card: L('কার্ড', 'Card', 'Card'), m_due: L('বাকি', 'On credit', 'বাকি'),
+  print: L('প্রিন্ট', 'Print', 'Print'), email: L('ইমেইল', 'Email', 'Email'), sms: L('SMS', 'SMS', 'SMS'), wa: L('WhatsApp', 'WhatsApp', 'WhatsApp'),
+  share: L('শেয়ার', 'Share', 'Share'), copy: L('টেক্সট কপি', 'Copy text', 'Text copy'), dl: L('ডাউনলোড', 'Download', 'Download'), close: L('বন্ধ', 'Close', 'Close'),
+  phone: L('কাস্টমারের মোবাইল নম্বর', 'Customer mobile number', 'Customer-এর mobile number'), mail: L('কাস্টমারের ইমেইল ঠিকানা', 'Customer email address', 'Customer-এর email address'),
   needPhone: L('ঠিক মোবাইল নম্বর লিখুন (যেমন 01XXXXXXXXX)', 'Enter a valid mobile number (like 01XXXXXXXXX)', 'ঠিক mobile number লিখুন (যেমন 01XXXXXXXXX)'),
   needMail: L('ঠিক ইমেইল ঠিকানা লিখুন', 'Enter a valid email address', 'ঠিক email address লিখুন'),
-  masked: L('আপনার ভূমিকায় গ্রাহকের নম্বর দেখানো হয় না — নিজে লিখুন।', 'The customer number is hidden for your role. Type it in.', 'আপনার role এ customer এর number দেখানো হয় না — নিজে লিখুন।'),
+  masked: L('আপনার রোলে কাস্টমারের নম্বর দেখানো হয় না — নিজে লিখুন।', 'The customer number is hidden for your role. Type it in.', 'আপনার role-এ customer-এর number দেখানো হয় না — নিজে লিখুন।'),
   sendNote: L('ইমেইল, এসএমএস ও WhatsApp আপনার ফোনের নিজের অ্যাপ খুলবে; সেখানে Send চাপলে তবেই যাবে। এই অ্যাপ নিজে থেকে কিছু পাঠায় না। অটো পাঠাতে হলে আলাদা প্রোভাইডার অ্যাকাউন্ট লাগবে — তা বানানো হয়নি।',
     'Email, SMS and WhatsApp open your own phone app; the message goes only when you tap Send there. This app sends nothing by itself. Sending automatically would need a provider account, which is not built.',
     'Email, SMS ও WhatsApp আপনার ফোনের নিজের app খুলবে; সেখানে Send চাপলে তবেই যাবে। এই app নিজে থেকে কিছু পাঠায় না। Auto পাঠাতে হলে আলাদা provider account লাগবে — তা বানানো হয়নি।'),
-  printHint: L('প্রিন্টার না থাকলে শেয়ার বা ডাউনলোড ব্যবহার করুন; প্রিন্ট জানালায় "Save as PDF"ও বাছা যায়।', 'No printer? Use Share or Download. The print window also offers "Save as PDF".', 'Printer না থাকলে Share বা Download ব্যবহার করুন; Print window তে "Save as PDF"ও বাছা যায়।'),
-  noPrinter: L('এই ফোনে প্রিন্ট করা গেল না (প্রিন্টার সংযুক্ত নেই বা প্রিন্ট বন্ধ)। চিন্তা নেই — নিচের Share বা Download দিয়ে ইনভয়েস পাঠান বা সেভ করুন।', 'Printing did not work on this phone (no printer connected, or printing is switched off). No problem: use Share or Download below to send or save the invoice.', 'এই ফোনে Print করা গেল না (printer সংযুক্ত নেই বা print বন্ধ)। চিন্তা নেই — নিচের Share বা Download দিয়ে invoice পাঠান বা save করুন।'),
+  printHint: L('প্রিন্টার না থাকলে শেয়ার বা ডাউনলোড ব্যবহার করুন; প্রিন্ট জানালায় "Save as PDF"ও বাছা যায়।', 'No printer? Use Share or Download. The print window also offers "Save as PDF".', 'Printer না থাকলে Share বা Download ব্যবহার করুন; Print window-তে "Save as PDF"ও বাছা যায়।'),
+  noPrinter: L('এই ফোনে প্রিন্ট করা গেল না (প্রিন্টার সংযুক্ত নেই বা প্রিন্ট বন্ধ)। চিন্তা নেই — নিচের শেয়ার বা ডাউনলোড দিয়ে ইনভয়েস পাঠান বা সেভ করুন।', 'Printing did not work on this phone (no printer connected, or printing is switched off). No problem: use Share or Download below to send or save the invoice.', 'এই ফোনে Print করা গেল না (printer সংযুক্ত নেই বা print বন্ধ)। চিন্তা নেই — নিচের Share বা Download দিয়ে invoice পাঠান বা save করুন।'),
   copied: L('টেক্সট কপি হয়েছে', 'Text copied', 'Text copy হয়েছে'), shareFail: L('শেয়ার করা গেল না', 'Could not share', 'Share করা গেল না'),
   dlDone: L('ফাইল নামানো হয়েছে — খুলে প্রিন্ট বা PDF করা যাবে', 'File saved. Open it to print or save as PDF', 'File নামানো হয়েছে — খুলে print বা PDF করা যাবে'),
   opened: L('আপনার ফোনের অ্যাপ খুলেছে — সেখানে Send চাপুন', 'Your phone app opened. Tap Send there', 'আপনার ফোনের app খুলেছে — সেখানে Send চাপুন'),
@@ -107,7 +107,7 @@ function text(d, short) {
   return [...head, '—', ...lines, '—', d.discount > 0 ? `${T('discount')}: -${fmt(d.discount)}` : null,
     d.vat ? `${T('vat')} ${d.vat.rate}%${d.vat.included ? ' (' + T('incl') + ')' : ''}: ${fmt(d.vat.amount)}` : null, `${T('total')}: ${fmt(d.total)}`,
     ...d.pays.map((p) => `${lab(X['m_' + p.mode] || L(p.mode, p.mode, p.mode))}${p.wallet ? ' (' + p.wallet + ')' : ''}: ${fmt(p.amount)}`),
-    d.due > 0 ? `${T('due')}: ${fmt(d.due)}` : null, d.pending ? T('prov') + ' — ' + lab(L('সার্ভারে জমা হলে চূড়ান্ত নম্বর হবে', 'final number after sync', 'final number sync এর পর')) : null, T('thanks')].filter(Boolean).join('\n');
+    d.due > 0 ? `${T('due')}: ${fmt(d.due)}` : null, d.pending ? T('prov') + ' — ' + lab(L('সার্ভারে জমা হলে চূড়ান্ত নম্বর হবে', 'final number after sync', 'final number sync-এর পর')) : null, T('thanks')].filter(Boolean).join('\n');
 }
 
 // ---------- the card (what the customer would see on paper) ----------
@@ -309,8 +309,8 @@ Object.assign(A.H, {
 // ---------- a small page: today's / any day's invoices, to view or send again (#/invoiceview) ----------
 const PG = { day: '' };
 X.pgTitle = L('ইনভয়েস দেখুন ও পাঠান', 'View and send invoices', 'Invoice দেখুন ও পাঠান');
-X.pgIntro = L('একটি তারিখের বিক্রি — যেটায় চাপবেন সেটার ইনভয়েস খুলবে, সেখান থেকে Print, Email, SMS, WhatsApp।', 'The sales of one day. Tap one to open its invoice, with Print, Email, SMS and WhatsApp.', 'একটি তারিখের sale — যেটায় চাপবেন সেটার invoice খুলবে, সেখান থেকে Print, Email, SMS, WhatsApp।');
-X.pgNone = L('এই দিনে কোনো বিক্রি নেই', 'No sales on this day', 'এই দিনে কোনো sale নেই');
+X.pgIntro = L('একটি তারিখের সেল — যেটায় চাপবেন সেটার ইনভয়েস খুলবে, সেখান থেকে প্রিন্ট, Email, SMS, WhatsApp।', 'The sales of one day. Tap one to open its invoice, with Print, Email, SMS and WhatsApp.', 'একটি তারিখের sale — যেটায় চাপবেন সেটার invoice খুলবে, সেখান থেকে Print, Email, SMS, WhatsApp।');
+X.pgNone = L('এই দিনে কোনো সেল নেই', 'No sales on this day', 'এই দিনে কোনো sale নেই');
 async function page() {
   const d0 = PG.day || dhakaDate(new Date().toISOString());
   A.shell(T('pgTitle'), `<p class="muted">${esc(T('pgIntro'))}</p><label for="iv92_day">${esc(T('date'))}</label><input id="iv92_day" type="date" value="${esc(d0)}"><div id="iv92_list"><p class="muted center">${esc(T('loading'))}</p></div>`, true);

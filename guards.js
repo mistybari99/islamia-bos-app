@@ -9,23 +9,23 @@ const L = B.L, lab = B.lab;
 const $ = (s, el = document) => el.querySelector(s);
 const X = {
   title: L('স্টক গার্ড ও প্রস্তাবিত সেটিং', 'Stock guards & recommended settings', 'Stock guard ও recommended setting'),
-  intro: L('প্রতিটি সুইচের বর্তমান মান ও প্রস্তাবিত মান দেখুন। প্রস্তাব মানা বাধ্যতামূলক নয়; চাপলে তবেই বদলায়।', 'See each switch, its current value and the recommended one. Nothing is forced; it changes only when you tap apply.', 'প্রতিটি switch-এর current ও recommended মান দেখুন। কিছু forced নয়; apply চাপলে তবেই বদলায়।'),
-  cur: L('এখন', 'Now', 'Now'), rec: L('প্রস্তাবিত', 'Recommended', 'Recommended'), apply: L('প্রস্তাবিত প্রয়োগ', 'Apply recommended', 'Recommended apply'),
-  ok: L('ঠিক আছে ✓', 'Already set ✓', 'Already set ✓'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
-  unit: L('এককের conversion নেই (tracked পণ্য)', 'Tracked items with no unit conversion', 'Unit conversion নেই (tracked item)'),
-  neg: L('opening ছাড়া negative stock', 'Negative stock that was never opened', 'Opening ছাড়া negative stock'),
+  intro: L('প্রতিটি সুইচের বর্তমান মান ও প্রস্তাবিত মান দেখুন। প্রস্তাব মানা জরুরি নয়; চাপলে তবেই বদলায়।', 'See each switch, its current value and the recommended one. Nothing is forced; it changes only when you tap apply.', 'প্রতিটি switch-এর current ও recommended মান দেখুন। কিছু forced নয়; apply চাপলে তবেই বদলায়।'),
+  cur: L('এখন', 'Now', 'Now'), rec: L('প্রস্তাবিত', 'Recommended', 'Recommended'), apply: L('প্রস্তাবিত অ্যাপ্লাই', 'Apply recommended', 'Recommended apply'),
+  ok: L('ঠিক আছে ✓', 'Already set ✓', 'Already set ✓'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'),
+  unit: L('এককের conversion নেই (tracked আইটেম)', 'Tracked items with no unit conversion', 'Unit conversion নেই (tracked item)'),
+  neg: L('ওপেনিং ছাড়া negative stock', 'Negative stock that was never opened', 'Opening ছাড়া negative stock'),
   nobill: L('বিল-বিহীন রিসিভ (GRN)', 'Receives with no bill (GRN)', 'বিল-বিহীন receive (GRN)'),
-  nogrn: L('GRN-বিহীন bill', 'Bills with no GRN', 'GRN-বিহীন bill'), none: L('কিছু নেই ✓', 'Nothing ✓', 'কিছু নেই ✓'),
+  nogrn: L('GRN-বিহীন বিল', 'Bills with no GRN', 'GRN-বিহীন bill'), none: L('কিছু নেই ✓', 'Nothing ✓', 'কিছু নেই ✓'),
 };
 const T = (k) => lab(X[k]);
 /* error codes of phase82 -> text in the 3 languages (English text has no Bangla letters) */
 const ERR = {
-  grn_link_required: L('GRN source চালু: এই bill-এর সাথে GRN জুড়ুন, তারপর post করুন', 'GRN is the stock source: link this bill to its GRN before posting', 'GRN source চালু: bill-এর সাথে GRN জুড়ে তারপর post করুন'),
-  void_has_return: L('এই bill-এর বিপরীতে return আছে; আগে return বাতিল করুন', 'A posted return refers to this bill; void the return first', 'এই bill-এর return আছে; আগে return void করুন'),
-  void_would_go_negative: L('মাল ব্যবহার/বিক্রি হয়ে গেছে, bill বাতিল করলে stock negative হবে', 'The goods were used or sold; voiding would make stock negative', 'মাল use/sale হয়ে গেছে, void করলে stock negative হবে'),
-  void_has_grn_batch: L('এই bill-এর চালু GRN batch আছে', 'Live GRN batches exist for this bill', 'এই bill-এর live GRN batch আছে'),
+  grn_link_required: L('GRN source চালু: এই বিলের সাথে GRN জুড়ুন, তারপর post করুন', 'GRN is the stock source: link this bill to its GRN before posting', 'GRN source চালু: bill-এর সাথে GRN জুড়ে তারপর post করুন'),
+  void_has_return: L('এই বিলের বিপরীতে return আছে; আগে return ভয়েড করুন', 'A posted return refers to this bill; void the return first', 'এই bill-এর return আছে; আগে return void করুন'),
+  void_would_go_negative: L('মাল ব্যবহার/বিক্রি হয়ে গেছে, বিল ভয়েড করলে stock negative হবে', 'The goods were used or sold; voiding would make stock negative', 'মাল use/sale হয়ে গেছে, void করলে stock negative হবে'),
+  void_has_grn_batch: L('এই বিলের চালু GRN batch আছে', 'Live GRN batches exist for this bill', 'এই bill-এর live GRN batch আছে'),
   unit_unknown: L('এককের conversion জানা নেই; conversion বসান বা base unit-এ বিক্রি করুন', 'The unit conversion is unknown; add it or sell in the base unit', 'Unit conversion জানা নেই; conversion বসান বা base unit-এ sell করুন'),
-  production_negative_reason_needed: L('stock-এর বেশি কাঁচামাল নিতে কারণ লিখুন', 'Write a reason to use more ingredient than the stock on hand', 'Stock-এর বেশি ingredient নিতে reason লিখুন'),
+  production_negative_reason_needed: L('স্টকের বেশি উপকরণ নিতে কারণ লিখুন', 'Write a reason to use more ingredient than the stock on hand', 'Stock-এর বেশি ingredient নিতে reason লিখুন'),
 };
 B.guardMsg = (code) => (ERR[code] ? lab(ERR[code]) : null);
 B.guardErrCodes = Object.keys(ERR);

@@ -18,22 +18,22 @@ const X = {
   edit: L('বোর্ড সাজান', 'Edit board', 'Board সাজান'), done: L('হয়েছে', 'Done', 'Done'), add: L('উইজেট যোগ', 'Add widget', 'Widget যোগ'), reset: L('ডিফল্টে ফেরান', 'Reset to default', 'Default-এ ফেরান'),
   home_off: L('সাধারণ হোম', 'Normal Home', 'Normal Home'), empty: L('বোর্ড খালি — "উইজেট যোগ" চাপুন', 'The board is empty - tap "Add widget"', 'Board খালি — "Widget যোগ" চাপুন'),
   off: L('মালিকের বোর্ড বন্ধ আছে (সুইচবোর্ডে চালু করুন)', 'The owner board is switched off (turn it on in the Switchboard)', 'Owner board বন্ধ (Switchboard-এ চালু করুন)'), onlyOwner: L('শুধু মালিকের জন্য', 'Owner only', 'শুধু Owner-এর জন্য'),
-  local: L('এই ফোনে সংরক্ষিত (সার্ভারে টেবিল নেই)', 'Saved on this phone (the server table is missing)', 'এই phone-এ saved (server table নেই)'), pend: L('ফোনে সংরক্ষিত — নেট এলে পাঠানো হবে', 'Saved on the phone - will sync when online', 'Phone-এ saved — net এলে sync হবে'),
-  saved: L('সংরক্ষিত', 'Saved', 'Saved'), up: L('উপরে', 'Move up', 'Move up'), down: L('নিচে', 'Move down', 'Move down'), top: L('একদম উপরে', 'Move to top', 'Move to top'), bottom: L('একদম নিচে', 'Move to bottom', 'Move to bottom'),
+  local: L('এই ফোনে সেভ হয়েছে (সার্ভারে টেবিল নেই)', 'Saved on this phone (the server table is missing)', 'এই phone-এ saved (server table নেই)'), pend: L('ফোনে সেভ হয়েছে — নেট এলে পাঠানো হবে', 'Saved on the phone - will sync when online', 'Phone-এ saved — net এলে sync হবে'),
+  saved: L('সেভ হয়েছে', 'Saved', 'Saved'), up: L('উপরে', 'Move up', 'Move up'), down: L('নিচে', 'Move down', 'Move down'), top: L('একদম উপরে', 'Move to top', 'Move to top'), bottom: L('একদম নিচে', 'Move to bottom', 'Move to bottom'),
   rename: L('নাম ও সীমা বদলান', 'Rename & limits', 'নাম ও limit'), size_c: L('ছোট করুন', 'Make compact', 'Compact করুন'), size_w: L('চওড়া করুন', 'Make wide', 'Wide করুন'), disable: L('লুকান (বন্ধ)', 'Hide (disable)', 'Hide (disable)'), enable: L('দেখান (চালু)', 'Show (enable)', 'Show (enable)'),
   remove: L('সরান', 'Remove', 'Remove'), more: L('আরও', 'More', 'More'), open: L('খুলুন', 'Open', 'Open'), search: L('খুঁজুন…', 'Search…', 'Search…'), checking: L('দেখা হচ্ছে…', 'Checking…', 'Checking…'),
   nores: L('কিছু পাওয়া যায়নি', 'Nothing found', 'কিছু পাওয়া যায়নি'), na: L('এখানে চালু নেই', 'Not available here', 'এখানে available নেই'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), noload: L('এখন আনা যায়নি', "Couldn't load now", 'এখন load হয়নি'),
   name: L('নাম', 'Name', 'Name'), size: L('আকার', 'Size', 'Size'), compact: L('ছোট', 'Compact', 'Compact'), wide: L('চওড়া', 'Wide', 'Wide'), enabled: L('বোর্ডে দেখান', 'Show on the board', 'Board-এ দেখান'),
   lim: L('সীমা (খালি = কোনো সীমা নেই)', 'Limits (empty = none)', 'Limit (খালি = নেই)'), wgt: L('সংখ্যা এর বেশি হলে হলুদ', 'Yellow when above', 'এর বেশি হলে yellow'), bgt: L('সংখ্যা এর বেশি হলে লাল', 'Red when above', 'এর বেশি হলে red'),
   wlt: L('সংখ্যা এর কম হলে হলুদ', 'Yellow when below', 'এর কম হলে yellow'), blt: L('সংখ্যা এর কম হলে লাল', 'Red when below', 'এর কম হলে red'), badnum: L('সীমার সংখ্যা ঠিক নয়', 'A limit is not a valid number', 'Limit-এর সংখ্যা ঠিক নয়'),
-  days: L('কত দিনের বেশি পুরনো হলে "মেয়াদোত্তীর্ণ"', 'Overdue after this many days', 'কত দিন পরে "overdue"'), text: L('কাজ / মনে করানো', 'Task / reminder', 'কাজ / reminder'), rep: L('আবার শুরু', 'Repeats', 'Repeat'),
+  days: L('কত দিনের বেশি পুরনো হলে "মেয়াদ শেষ"', 'Overdue after this many days', 'কত দিন পরে "overdue"'), text: L('কাজ / মনে করানো', 'Task / reminder', 'কাজ / reminder'), rep: L('আবার শুরু', 'Repeats', 'Repeat'),
   r_daily: L('প্রতিদিন', 'Every day', 'প্রতিদিন'), r_weekly: L('প্রতি সপ্তাহে', 'Every week', 'প্রতি সপ্তাহে'), r_never: L('একবার', 'Once', 'একবার'), report: L('রিপোর্ট', 'Report', 'Report'), period: L('সময়', 'Period', 'Period'),
-  page: L('পাতা', 'Page', 'Page'), preset: L('কী গুনবে', 'What to count', 'কী গুনবে'), pick: L('বেছে নিন', 'Choose', 'Choose'), save: L('সংরক্ষণ', 'Save', 'Save'),
+  page: L('পাতা', 'Page', 'Page'), preset: L('কী গুনবে', 'What to count', 'কী গুনবে'), pick: L('বেছে নিন', 'Choose', 'Choose'), save: L('সেভ', 'Save', 'Save'),
   ticked: L('হয়েছে ✓', 'Done ✓', 'Done ✓'), unticked: L('বাকি — চাপলে টিক', 'To do - tap to tick', 'বাকি — চাপলে tick'), confirm_reset: L('বোর্ড ডিফল্টে ফিরবে। ঠিক আছে?', 'The board goes back to the default set. OK?', 'Board default-এ ফিরবে। ঠিক আছে?'),
   nonum: L('এই উইজেটে সংখ্যার সীমা নেই', 'This widget has no numeric limits', 'এই widget-এ numeric limit নেই'), added: L('যোগ হয়েছে', 'Added', 'Added'),
-  vsy: L('গতকালের তুলনায়', 'vs yesterday', 'গতকালের তুলনায়'), vsw: L('গত সপ্তাহের', 'vs last', 'গত সপ্তাহের'), cust: L('জন গ্রাহক', 'customers', 'customers'), od: L('মেয়াদোত্তীর্ণ', 'overdue', 'overdue'),
-  clear: L('সব ঠিক', 'All clear', 'সব ঠিক'), voids: L('বাতিল বিক্রি', 'voids', 'voids'), disc: L('ডিসকাউন্ট', 'discounts', 'discounts'), wait: L('অপেক্ষায়', 'waiting', 'waiting'), nosales: L('এখনও বিক্রি নেই', 'No sales yet', 'এখনও sale নেই'),
-  g_sales: L('বিক্রি', 'Sales', 'Sales'), g_cash: L('ক্যাশ ও দিনের শেষ', 'Cash & day close', 'Cash ও day close'), g_appr: L('সিদ্ধান্ত ও সমস্যা', 'Decisions & problems', 'Decision ও problem'),
+  vsy: L('গতকালের তুলনায়', 'vs yesterday', 'গতকালের তুলনায়'), vsw: L('গত সপ্তাহের', 'vs last', 'গত সপ্তাহের'), cust: L('জন কাস্টমার', 'customers', 'customers'), od: L('মেয়াদ শেষ', 'overdue', 'overdue'),
+  clear: L('সব ঠিক', 'All clear', 'সব ঠিক'), voids: L('ভয়েড বিক্রি', 'voids', 'voids'), disc: L('ডিসকাউন্ট', 'discounts', 'discounts'), wait: L('অপেক্ষায়', 'waiting', 'waiting'), nosales: L('এখনও সেল নেই', 'No sales yet', 'এখনও sale নেই'),
+  g_sales: L('সেল', 'Sales', 'Sales'), g_cash: L('ক্যাশ ও দিনের শেষ', 'Cash & day close', 'Cash ও day close'), g_appr: L('সিদ্ধান্ত ও সমস্যা', 'Decisions & problems', 'Decision ও problem'),
   g_money: L('বাকি ও পাওনা', 'Dues & payables', 'Due ও payable'), g_stock: L('স্টক', 'Stock', 'Stock'), g_sys: L('সিস্টেম', 'System', 'System'), g_custom: L('নিজের তৈরি', 'Your own', 'নিজের তৈরি'),
 };
 const T = (k) => lab(X[k]);
@@ -75,7 +75,7 @@ const wd = (iso) => new Date(iso + 'T12:00:00Z').toLocaleDateString(S.lang === '
 // ---------- widget catalog (one object: key, labels, group, loader) ----------
 // loader(env, cfg) -> { value, num?, tone: ok|warn|bad|info, sub, route }  (throws Miss when the source is not installed)
 const KINDS = {
-  sales_vs: { g: 'sales', num: true, l: L('আজকের বিক্রি (গতকাল ও গত সপ্তাহের সাথে)', "Today's sales vs yesterday", 'আজকের Sales vs গতকাল'), route: 'biz', async load(env) {
+  sales_vs: { g: 'sales', num: true, l: L('আজকের সেল (গতকাল ও গত সপ্তাহের সাথে)', "Today's sales vs yesterday", 'আজকের Sales vs গতকাল'), route: 'biz', async load(env) {
     const r = await salesRows(env), td = env.td, a = sumDay(r, td, 'done'), y = sumDay(r, addDays(td, -1), 'done'), w = sumDay(r, addDays(td, -7), 'done');
     return { value: money(a), num: a, tone: a >= y ? 'ok' : 'info', sub: `${T('vsy')} ${pctS(pct(a, y))} · ${T('vsw')} ${wd(addDays(td, -7))} ${pctS(pct(a, w))}`, route: 'biz' }; } },
   cash_short: { g: 'cash', num: true, l: L('ক্যাশ কম / বেশি (আজ)', 'Cash short / over today', 'Cash কম / বেশি (আজ)'), route: 'exceptions', async load(env) {
@@ -99,17 +99,17 @@ const KINDS = {
     const q = (lv) => cnt(sb.from('exceptions').select('id', { count: 'exact', head: true }).eq('status', 'open').eq('level', lv));
     const [red, yel] = await Promise.all([q('red'), q('yellow')]);
     return { value: String(red), num: red, tone: red ? 'bad' : yel ? 'warn' : 'ok', sub: `${lab(L('হলুদ', 'yellow', 'yellow'))} ${yel}`, route: 'exceptions' }; } },
-  approvals: { g: 'appr', num: true, l: L('অনুমোদনের অপেক্ষায়', 'Pending approvals', 'Approval-এর অপেক্ষায়'), route: 'pending', async load() {
+  approvals: { g: 'appr', num: true, l: L('অ্যাপ্রুভের অপেক্ষায়', 'Pending approvals', 'Approval-এর অপেক্ষায়'), route: 'pending', async load() {
     const q = (t, st) => cnt(sb.from(t).select('id', { count: 'exact', head: true }).eq('status', st)).catch((e) => { if (e instanceof Miss) return 0; throw e; });
     const [en, rel, itm, em] = await Promise.all([cnt(sb.from('entries').select('id', { count: 'exact', head: true }).eq('status', 'submitted')), q('release_requests', 'pending'), q('item_changes', 'pending'), q('emergency_requests', 'pending')]);
     const tot = en + rel + itm + em; return { value: String(tot), num: tot, tone: tot ? 'warn' : 'ok', sub: tot ? `${lab(L('ফর্ম', 'forms', 'forms'))} ${en} · ${lab(L('ছাড়', 'release', 'release'))} ${rel} · ${lab(L('আইটেম', 'items', 'items'))} ${itm}` : T('clear'), route: 'pending' }; } },
-  cust_dues: { g: 'money', num: true, l: L('গ্রাহকের বাকি (মোট ও মেয়াদোত্তীর্ণ)', 'Customer dues (total & overdue)', 'Customer due (total ও overdue)'), route: 'dues', async load(env, cfg) {
+  cust_dues: { g: 'money', num: true, l: L('কাস্টমারের বাকি (টোটাল ও মেয়াদ শেষ)', 'Customer dues (total & overdue)', 'Customer due (total ও overdue)'), route: 'dues', async load(env, cfg) {
     const rows = arr(await rpc('customer_dues')).filter((c) => N(c.balance) > 0), days = N(cfg.days) > 0 ? N(cfg.days) : 30;
     const tot = rows.reduce((s, c) => s + N(c.balance), 0), od = rows.filter((c) => c.oldest && daysBetween(c.oldest, env.td) > days).reduce((s, c) => s + N(c.balance), 0);
     return { value: money(tot), num: tot, tone: od > 0 ? 'warn' : 'info', sub: `${rows.length} ${T('cust')} · ${T('od')} (>${days}d) ${money(od)}`, route: 'dues' }; } },
-  supp_dues: { g: 'money', num: true, l: L('সরবরাহকারীর পাওনা', 'Supplier dues', 'Supplier-এর পাওনা'), route: 'payables', async load() {
+  supp_dues: { g: 'money', num: true, l: L('সাপ্লায়ারের পাওনা', 'Supplier dues', 'Supplier-এর পাওনা'), route: 'payables', async load() {
     const d = await rpc('payables_summary', { p_loc: null }), r = Array.isArray(d) ? d[0] : d; if (!r) throw new Miss('empty');
-    return { value: money(r.total_payable), num: N(r.total_payable), tone: N(r.overdue) > 0 ? 'warn' : 'info', sub: `${N(r.suppliers_owed)} ${lab(L('সরবরাহকারী', 'suppliers', 'suppliers'))} · ${T('od')} ${money(r.overdue)}`, route: 'payables' }; } },
+    return { value: money(r.total_payable), num: N(r.total_payable), tone: N(r.overdue) > 0 ? 'warn' : 'info', sub: `${N(r.suppliers_owed)} ${lab(L('সাপ্লায়ার', 'suppliers', 'suppliers'))} · ${T('od')} ${money(r.overdue)}`, route: 'payables' }; } },
   stock_low: { g: 'stock', num: true, l: L('ন্যূনতমের নিচে স্টক ও মেয়াদ শেষের কাছে', 'Low stock & expiring soon', 'Low stock ও expiring soon'), route: 'stock', async load() {
     const low = arr(await rpc('stock_levels', { p_loc: null, p_filters: { below_min: true } })).filter((x) => x.below_min !== false).length;
     let soon = 0, exp = 0; try { const e = arr(await rpc('expiry_list', { p_loc: null, p_hours_ahead: 24 })); exp = e.filter((x) => x.expired).length; soon = e.length - exp; } catch (e) { /* expiry not installed */ }
@@ -118,8 +118,8 @@ const KINDS = {
     const rows = arr(await tbl(sb.from('stock_wastage').select('qty,made_at').gte('made_at', env.td + 'T00:00:00+06:00').limit(500)));
     let wait = 0; try { wait = arr(await rpc('wastage_pending', { p_loc: null, p_status: 'pending' })).length; } catch (e) { wait = 0; }
     const q = rows.reduce((s, x) => s + N(x.qty), 0);
-    return { value: String(rows.length), num: rows.length, tone: wait ? 'warn' : 'info', sub: `${lab(L('মোট পরিমাণ', 'total qty', 'total qty'))} ${A.fmt(Math.round(q * 100) / 100)}${wait ? ` · ${wait} ${T('wait')}` : ''}`, route: 'stock' }; } },
-  voids_disc: { g: 'sales', num: true, l: L('আজ বাতিল বিক্রি ও ডিসকাউন্ট', 'Voids & discounts today', 'আজ voids ও discounts'), route: 'discounts', async load(env) {
+    return { value: String(rows.length), num: rows.length, tone: wait ? 'warn' : 'info', sub: `${lab(L('টোটাল Qty', 'total qty', 'total qty'))} ${A.fmt(Math.round(q * 100) / 100)}${wait ? ` · ${wait} ${T('wait')}` : ''}`, route: 'stock' }; } },
+  voids_disc: { g: 'sales', num: true, l: L('আজ ভয়েড বিক্রি ও ডিসকাউন্ট', 'Voids & discounts today', 'আজ voids ও discounts'), route: 'discounts', async load(env) {
     const r = await salesRows(env), v = r.filter((x) => x.d === env.td && x.st === 'void').reduce((s, x) => s + x.n, 0), vt = sumDay(r, env.td, 'void'), d = sumDay(r, env.td, 'done', 'disc');
     return { value: `${v} ${T('voids')}`, num: v, tone: v ? 'warn' : 'ok', sub: `${money(vt)} · ${T('disc')} ${money(d)}`, route: 'discounts' }; } },
   unsent: { g: 'sys', num: true, l: L('ফোনে জমা — পাঠানো হয়নি', 'Unsent forms on this phone', 'Phone-এ জমা — পাঠানো হয়নি'), route: 'outbox', async load() {
@@ -129,7 +129,7 @@ const KINDS = {
     rows.forEach((s) => (Array.isArray(s.lines) ? s.lines : []).forEach((ln) => { const k = String(ln.name || ln.item_id || '?'); const o = m[k] || (m[k] = { k, q: 0, a: 0 }); o.q += N(ln.qty); o.a += N(ln.amount); }));
     const top = Object.values(m).sort((a, b) => b.a - a.a).slice(0, 3);
     return top.length ? { value: top[0].k, tone: 'info', sub: top.map((x) => `${x.k} ×${A.fmt(Math.round(x.q * 100) / 100)}`).join(' · '), route: 'reports' } : { value: '—', tone: 'info', sub: T('nosales'), route: 'reports' }; } },
-  parallel: { g: 'appr', num: true, l: L('পাশাপাশি মাসের সিদ্ধান্ত বাকি', 'Parallel-month decisions waiting', 'Parallel মাসের decision বাকি'), route: 'parallel', async load() {
+  parallel: { g: 'appr', num: true, l: L('পাশাপাশি মাসের সিদ্ধান্ত অপেক্ষায়', 'Parallel-month decisions waiting', 'Parallel মাসের decision অপেক্ষায়'), route: 'parallel', async load() {
     const n = arr(await rpc('parallel_waiting')).length; return { value: String(n), num: n, tone: n ? 'warn' : 'ok', sub: n ? '' : T('clear'), route: 'parallel' }; } },
   rollout: { g: 'sys', num: true, l: L('ফর্ম এখনও কাগজে (রোলআউট)', 'Forms still on paper (rollout)', 'Form এখনও কাগজে (rollout)'), route: 'rollout', async load() {
     const rows = arr(await tbl(sb.from('form_rollout').select('mode').limit(2000))), p = rows.filter((x) => x.mode === 'paper').length, pa = rows.filter((x) => x.mode === 'parallel').length;
@@ -171,14 +171,14 @@ const KINDS = {
   note: { g: 'custom', l: L('নোট / রোজকার চেকলিস্ট', 'Note / daily checklist', 'Note / daily checklist'), route: 'home', cfg: 'note', local: true },
 };
 const COUNTERS = {
-  staff_pending: { t: 'profiles', f: { status: 'pending' }, route: 'staff', l: L('অনুমোদনের অপেক্ষায় স্টাফ', 'Staff waiting for approval', 'Staff approval-এর অপেক্ষায়') },
+  staff_pending: { t: 'profiles', f: { status: 'pending' }, route: 'staff', l: L('অ্যাপ্রুভের অপেক্ষায় স্টাফ', 'Staff waiting for approval', 'Staff approval-এর অপেক্ষায়') },
   exceptions_open: { t: 'exceptions', f: { status: 'open' }, route: 'exceptions', l: L('খোলা গরমিল', 'Open exceptions', 'খোলা exception') },
-  entries_submitted: { t: 'entries', f: { status: 'submitted' }, route: 'pending', l: L('জমা দেওয়া, অনুমোদন বাকি ফর্ম', 'Submitted forms awaiting approval', 'Submitted form (approval বাকি)') },
+  entries_submitted: { t: 'entries', f: { status: 'submitted' }, route: 'pending', l: L('জমা দেওয়া, অ্যাপ্রুভ বাকি ফর্ম', 'Submitted forms awaiting approval', 'Submitted form (approval বাকি)') },
   entries_today: { t: 'entries', f: {}, today: 'entry_date', route: 'pending', l: L('আজকের ফর্ম', 'Forms entered today', 'আজকের form') },
   item_changes: { t: 'item_changes', f: { status: 'pending' }, route: 'itemreq', l: L('আইটেম বদলের অনুরোধ', 'Item change requests', 'Item change request') },
   releases: { t: 'release_requests', f: { status: 'pending' }, route: 'releases', l: L('ছাড়ের অনুরোধ', 'Release requests', 'Release request') },
   emergency: { t: 'emergency_requests', f: { status: 'pending' }, route: 'emergency', l: L('জরুরি অনুরোধ', 'Emergency requests', 'Emergency request') },
-  customers: { t: 'customers', f: {}, route: 'dues', l: L('মোট গ্রাহক', 'Customers', 'Customers') },
+  customers: { t: 'customers', f: {}, route: 'dues', l: L('মোট কাস্টমার', 'Customers', 'Customers') },
   items_active: { t: 'items', f: { is_active: true }, route: 'items', l: L('চালু আইটেম', 'Active items', 'Active items') },
 };
 const DEFAULT_KINDS = ['sales_vs', 'cash_short', 'day_close', 'needs_you', 'exceptions', 'approvals', 'cust_dues', 'supp_dues', 'stock_low', 'wastage', 'voids_disc', 'unsent', 'backup', 'notifications'];

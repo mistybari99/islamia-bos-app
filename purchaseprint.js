@@ -24,7 +24,7 @@ const brandText = () => (S.lang === 'en' ? BRAND.en : BRAND.bn);
 
 const X = {
   title: L('ক্রয় বিল প্রিন্ট ও পাঠান', 'Print and send purchase bills', 'Purchase Bill Print ও পাঠান'),
-  intro: L('একটি বিল বেছে নিন — Print, Share, Download, Email, SMS, WhatsApp।', 'Pick a bill to print, share, download, email, SMS or WhatsApp.', 'একটি Bill বেছে নিন — Print, Share, Download, Email, SMS, WhatsApp।'),
+  intro: L('একটি বিল বেছে নিন — প্রিন্ট, শেয়ার, ডাউনলোড, Email, SMS, WhatsApp।', 'Pick a bill to print, share, download, email, SMS or WhatsApp.', 'একটি Bill বেছে নিন — Print, Share, Download, Email, SMS, WhatsApp।'),
   none: L('কোনো বিল নেই', 'No bills', 'কোনো Bill নেই'), loading: L('আনা হচ্ছে…', 'Loading…', 'আনা হচ্ছে…'),
   noperm: L('এই বিল দেখার অনুমতি নেই', 'You are not allowed to see purchase bills', 'Purchase Bill দেখার অনুমতি নেই'),
   loadFail: L('বিল আনা যায়নি। নেট দেখে আবার চেষ্টা করুন।', 'Could not load the bill. Check the connection and try again.', 'Bill আনা যায়নি। নেট দেখে আবার চেষ্টা করুন।'),
@@ -51,7 +51,7 @@ const dshort = (iso) => (iso ? new Date(String(iso).slice(0, 10) + 'T12:00:00Z')
 const norm = (v) => String(v ?? '').replace(/[০-৯]/g, (d) => '০১২৩৪৫৬৭৮৯'.indexOf(d));
 const normMobile = (v) => { let d = norm(v).replace(/[^0-9+]/g, ''); if (d.startsWith('+880')) d = '0' + d.slice(4); else if (d.startsWith('880') && d.length === 13) d = '0' + d.slice(3); return /^01[3-9][0-9]{8}$/.test(d) ? d : null; };
 function intlNumber(v) { const m = normMobile(v); if (m) return '880' + m.slice(1); const raw = norm(v).trim(); if (raw.startsWith('+')) { const d = raw.replace(/\D/g, ''); if (d.length >= 8 && d.length <= 15) return d; } return null; }
-const okMail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v || '').trim());
+const okMail = (v) => /^[^\s@,;?&#<>"]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(String(v || '').trim());   // bos111 (L2): no ?bcc= / &cc= / list tricks in the address
 const pickName = (o) => !o ? '' : (S.lang === 'en' ? (o.name_en || o.name || o.name_bn) : S.lang === 'mix' ? (o.name_mix || o.name_bn || o.name) : (o.name_bn || o.name || o.name_en)) || '';
 const locObj = (id) => (((B.ENV && B.ENV.locs) || []).find((l) => l.id === id)) || null;
 const locName = (id) => { const l = locObj(id); return l ? (S.lang === 'en' ? (l.name_en || l.code || '') : S.lang === 'mix' ? (l.name_mix || l.name_bn || l.code || '') : (l.name_bn || l.name_en || l.code || '')) : ''; };

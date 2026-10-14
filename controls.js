@@ -16,7 +16,7 @@ const A = window.BOS_APP, B = window.BOS;
 const { S, esc } = A;
 const L = B.L, lab = B.lab;
 const X = {
-  apply: L('প্রয়োগ', 'Apply', 'Apply'), all: L('সব বাছুন', 'Select all', 'Select all'), clear: L('মুছুন', 'Clear', 'Clear'), close: L('বন্ধ', 'Close', 'Close'),
+  apply: L('অ্যাপ্লাই', 'Apply', 'Apply'), all: L('সব বাছুন', 'Select all', 'Select all'), clear: L('মুছুন', 'Clear', 'Clear'), close: L('বন্ধ', 'Close', 'Close'),
   search: L('খুঁজুন', 'Search', 'Search'), none: L('— বাছুন —', '— choose —', '— বাছুন —'), noval: L('(কিছু নয়)', '(none)', '(কিছু নয়)'), more: L('আরও', 'More', 'আরও'),
   nsel: L('টি বাছা', 'selected', 'selected'), nores: L('কিছু পাওয়া যায়নি', 'Nothing found', 'Nothing found'), cur: L('বর্তমান', 'current', 'current'),
 };

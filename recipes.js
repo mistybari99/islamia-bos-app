@@ -18,53 +18,53 @@ const owner = () => !!(S.ctx && S.ctx.is_owner);
 const npMode = () => { let m = 'lock'; try { m = B.rule('ui_noperm_mode', 'lock'); } catch (e) { /* rules not loaded */ } return m === 'hide' ? 'hide' : 'lock'; };
 
 const X = {
-  title: L('রেসিপি', 'Recipes', 'Recipe (রেসিপি)'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), close: L('বন্ধ', 'Close', 'Close'), cancel: L('বাতিল', 'Cancel', 'Cancel'), save: L('সংরক্ষণ', 'Save', 'Save'),
-  saved: L('সংরক্ষিত', 'Saved', 'Saved'), none: L('কোনো রেসিপি নেই', 'No recipes yet', 'কোনো recipe নেই'), search: L('পণ্য বা কোড খুঁজুন', 'Search product or code', 'Product বা code খুঁজুন'),
+  title: L('রেসিপি', 'Recipes', 'Recipe (রেসিপি)'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), close: L('বন্ধ', 'Close', 'Close'), cancel: L('ক্যান্সেল', 'Cancel', 'Cancel'), save: L('সেভ', 'Save', 'Save'),
+  saved: L('সেভ হয়েছে', 'Saved', 'Saved'), none: L('কোনো রেসিপি নেই', 'No recipes yet', 'কোনো recipe নেই'), search: L('পণ্য বা কোড খুঁজুন', 'Search product or code', 'Product বা code খুঁজুন'),
   tRecipes: L('রেসিপি', 'Recipes', 'Recipes'), tMake: L('এখন কী বানানো যায়', 'Can make now', 'এখন কী বানানো যায়'), tPack: L('প্যাকেজিং', 'Packaging', 'Packaging'),
   fActive: L('চালু', 'Active', 'Active'), fOff: L('বন্ধ', 'Inactive', 'Inactive'), fAll: L('সব', 'All', 'All'),
   add: L('নতুন রেসিপি', 'New recipe', 'নতুন recipe'), version: L('ভার্সন', 'Version', 'Version'), yield: L('একবারে তৈরি হয়', 'Yield per batch', 'Yield (প্রতি batch)'),
   used: L('ব্যবহৃত — বদলানো যায় না', 'Used — frozen', 'Used — বদলানো যায় না'), inactive: L('বন্ধ', 'Inactive', 'Inactive'), needData: L('তথ্য দরকার', 'Data needed', 'Data দরকার'),
   nLines: L('উপকরণ', 'ingredients', 'ingredients'), more: L('আরও অপশন', 'More options', 'আরও option'),
   mOpen: L('খুলুন / দেখুন', 'Open / view', 'Open / দেখুন'), mNew: L('নতুন ভার্সন', 'New version', 'নতুন version'), mOn: L('চালু করুন', 'Activate', 'Activate'), mOff: L('বন্ধ করুন', 'Inactivate', 'Inactivate'),
-  mDup: L('অন্য পণ্যে কপি', 'Duplicate to another product', 'অন্য product-এ copy'), mPack: L('প্যাকেজিং', 'Packaging', 'Packaging'), mCost: L('খরচ দেখুন', 'Show cost', 'Cost দেখুন'),
+  mDup: L('অন্য পণ্যে কপি', 'Duplicate to another product', 'অন্য product-এ copy'), mPack: L('প্যাকেজিং', 'Packaging', 'Packaging'), mCost: L('কস্ট দেখুন', 'Show cost', 'Cost দেখুন'),
   mMake: L('উৎপাদন করুন', 'Produce', 'Produce করুন'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'),
   product: L('তৈরি পণ্য', 'Finished product', 'Finished product'), productPh: L('কোড বা নাম', 'Code or name', 'Code বা নাম'), unit: L('একক', 'Unit', 'Unit'), baseUnit: L('— বেস একক —', '— base unit —', '— base unit —'),
-  qty: L('পরিমাণ', 'Quantity', 'Quantity'), waste: L('অপচয় %', 'Waste %', 'Waste %'), note: L('নোট', 'Note', 'Note'), ing: L('উপকরণ', 'Ingredient', 'Ingredient'),
+  qty: L('Qty', 'Quantity', 'Quantity'), waste: L('অপচয় %', 'Waste %', 'Waste %'), note: L('নোট', 'Note', 'Note'), ing: L('উপকরণ', 'Ingredient', 'Ingredient'),
   addLine: L('উপকরণ যোগ', 'Add ingredient', 'Ingredient যোগ'), removeLine: L('সরান', 'Remove', 'Remove'), retireOld: L('আগের ভার্সন বন্ধ করুন', 'Retire the previous version', 'আগের version বন্ধ করুন'),
-  usedHint: L('এই ভার্সন উৎপাদনে ব্যবহৃত হয়েছে। সংরক্ষণ করলে নতুন ভার্সন হবে — পুরনোটি অক্ষত থাকবে।', 'This version has been used in production. Saving makes a NEW version; the old one stays untouched.', 'এই version production-এ use হয়েছে। Save করলে নতুন version হবে — পুরনোটি অক্ষত।'),
+  usedHint: L('এই ভার্সন উৎপাদনে ব্যবহৃত হয়েছে। সেভ করলে নতুন ভার্সন হবে — পুরনোটি অক্ষত থাকবে।', 'This version has been used in production. Saving makes a NEW version; the old one stays untouched.', 'এই version production-এ use হয়েছে। Save করলে নতুন version হবে — পুরনোটি অক্ষত।'),
   wasteHint: L('অপচয় % ফাঁকা থাকলে ০ ধরা হয় ও মালিককে জানানো হয় — আসল % আপনি বসান।', 'An empty waste % counts as 0 and the owner is told — set the real %.', 'Waste % ফাঁকা থাকলে ০ ধরা হয় — আসল % বসান।'),
   needProduct: L('তৈরি পণ্য বাছুন', 'Choose the finished product', 'Finished product বাছুন'), needIng: L('উপকরণ বাছুন', 'Choose the ingredient', 'Ingredient বাছুন'),
-  needQty: L('পরিমাণ ঠিক নয়', 'Quantity is not valid', 'Quantity ঠিক নয়'), needWaste: L('অপচয় % ০–১০০ হতে হবে', 'Waste % must be 0–100', 'Waste % ০–১০০ হতে হবে'), needLines: L('অন্তত একটি উপকরণ লাগবে', 'Add at least one ingredient', 'অন্তত একটি ingredient'),
+  needQty: L('Qty ঠিক নয়', 'Quantity is not valid', 'Quantity ঠিক নয়'), needWaste: L('অপচয় % ০–১০০ হতে হবে', 'Waste % must be 0–100', 'Waste % ০–১০০ হতে হবে'), needLines: L('অন্তত একটি উপকরণ লাগবে', 'Add at least one ingredient', 'অন্তত একটি ingredient'),
   location: L('জায়গা', 'Location', 'Location'), recipe: L('রেসিপি', 'Recipe', 'Recipe'), batches: L('ব্যাচ সংখ্যা', 'Number of batches', 'Batch সংখ্যা'), madeAt: L('তৈরির সময়', 'Made at', 'Made at'),
   pTitle: L('উৎপাদন (রেসিপি দিয়ে)', 'Production (from a recipe)', 'Production (recipe দিয়ে)'), preview: L('কী কী লাগবে', 'What will be used', 'কী কী লাগবে'), need: L('লাগবে', 'Need', 'Need'), have: L('আছে', 'On hand', 'On hand'),
   short: L('কম', 'Short', 'Short'), willMake: L('তৈরি হবে', 'Will make', 'তৈরি হবে'), post: L('উৎপাদন সংরক্ষণ', 'Post production', 'Production post'), nothing: L('রেসিপি বাছুন ও ব্যাচ লিখুন', 'Choose a recipe and the batches', 'Recipe বাছুন, batch লিখুন'),
   shortWarn: L('কাঁচামাল কম — সেটিং অনুযায়ী উৎপাদন আটকে যেতে পারে', 'Raw material is short — the setting may refuse this production', 'Raw material কম — setting অনুযায়ী আটকাতে পারে'),
-  notTracked: L('স্টক ট্র্যাক বন্ধ / একক অজানা', 'Not tracked / unit unknown', 'Track বন্ধ / unit অজানা'), done: L('উৎপাদন সংরক্ষিত — কাঁচামাল বাদ গেছে', 'Production saved — raw material taken out', 'Production saved — raw material বাদ'),
+  notTracked: L('স্টক ট্র্যাক বন্ধ / একক অজানা', 'Not tracked / unit unknown', 'Track বন্ধ / unit অজানা'), done: L('উৎপাদন সেভ হয়েছে — কাঁচামাল বাদ গেছে', 'Production saved — raw material taken out', 'Production saved — raw material বাদ'),
   useRecipe: L('রেসিপি দিয়ে উৎপাদন', 'Produce from a recipe', 'Recipe দিয়ে production'),
   makeHead: L('এই জায়গায় এখন যা বানানো যায়', 'What can be made here now', 'এই location-এ এখন যা বানানো যায়'), maxB: L('সর্বোচ্চ ব্যাচ', 'Max batches', 'Max batch'), limit: L('যার জন্য আটকাবে', 'Limited by', 'Limited by'),
   makeEmpty: L('কোনো চালু রেসিপি নেই', 'No active recipes', 'কোনো active recipe নেই'), unknownMake: L('তথ্য দরকার (ট্র্যাক / একক)', 'Data needed (tracking / unit)', 'Data দরকার (track / unit)'),
-  cHead: L('এক ব্যাচের খরচ', 'Cost of one batch', 'এক batch-এর cost'), cBatch: L('ব্যাচ খরচ', 'Batch cost', 'Batch cost'), cUnit: L('প্রতি একক', 'Per unit', 'Per unit'), cAvg: L('গড় দাম', 'avg cost', 'avg cost'),
-  cPartial: L('কিছু উপকরণের দাম জানা নেই — মোট বসানো হয়নি', 'Some ingredients have no known cost — no total is shown', 'কিছু ingredient-এর cost অজানা — total নেই'),
+  cHead: L('এক ব্যাচের কস্ট', 'Cost of one batch', 'এক batch-এর cost'), cBatch: L('ব্যাচ কস্ট', 'Batch cost', 'Batch cost'), cUnit: L('প্রতি একক', 'Per unit', 'Per unit'), cAvg: L('গড় কস্ট', 'avg cost', 'avg cost'),
+  cPartial: L('কিছু উপকরণের কস্ট জানা নেই — টোটাল বসানো হয়নি', 'Some ingredients have no known cost — no total is shown', 'কিছু ingredient-এর cost অজানা — total নেই'),
   pkTitle: L('প্যাকেজিং নিয়ম', 'Packaging rules', 'Packaging rule'), pkMode: L('প্যাকেজিং কখন কমবে', 'When packaging leaves the stock', 'Packaging কখন কমবে'), pkOff: L('বন্ধ', 'Off', 'Off'), pkSale: L('বিক্রিতে', 'With a sale', 'Sale-এ'), pkProd: L('উৎপাদনে', 'With production', 'Production-এ'),
   pkPer: L('প্রতি ১ বেস এককে', 'per 1 base unit', 'per 1 base unit'), pkItem: L('প্যাকেজিং আইটেম', 'Packaging item', 'Packaging item'), pkApplies: L('কখন', 'Applies to', 'Applies to'), pkAdd: L('প্যাকেজিং যোগ / বদল', 'Add / change packaging', 'Packaging যোগ / বদল'),
   pkNone: L('কোনো প্যাকেজিং নিয়ম নেই', 'No packaging rules', 'কোনো packaging rule নেই'), pkOffHint: L('এখন বন্ধ — প্যাকেজিং নিজে থেকে কমবে না।', 'Currently off — packaging is not taken out automatically.', 'এখন off — packaging নিজে কমবে না।'),
-  pkSaleHint: L('বিক্রিতে কমলে বিক্রি কখনো আটকায় না; কমাতে না পারলে মালিক হলুদ লাইন পান।', 'With a sale it never blocks the sale; if it cannot be taken out the owner gets a yellow line.', 'Sale-এ কমলে sale আটকায় না; না পারলে owner yellow line পান।'),
-  pkSale2: L('বিক্রি', 'Sale', 'Sale'), pkProd2: L('উৎপাদন', 'Production', 'Production'), pkProduct: L('যে পণ্যের জন্য', 'For product', 'For product'),
+  pkSaleHint: L('বিক্রিতে কমলে সেল কখনো আটকায় না; কমাতে না পারলে মালিক হলুদ লাইন পান।', 'With a sale it never blocks the sale; if it cannot be taken out the owner gets a yellow line.', 'Sale-এ কমলে sale আটকায় না; না পারলে owner yellow line পান।'),
+  pkSale2: L('সেল', 'Sale', 'Sale'), pkProd2: L('উৎপাদন', 'Production', 'Production'), pkProduct: L('যে পণ্যের জন্য', 'For product', 'For product'),
   dupTo: L('কোন পণ্যে কপি করবেন', 'Copy to which product', 'কোন product-এ copy'), copyGo: L('কপি', 'Copy', 'Copy'), copied: L('নতুন ভার্সন তৈরি', 'New version created', 'নতুন version তৈরি'),
-  actY: L('প্রকৃত মোট উৎপাদন (ঐচ্ছিক)', 'Actual total output (optional)', 'Actual মোট output (optional)'), actYHint: L('খালি রাখলে রেসিপির হিসাবই ধরা হয়; দিলে সেটাই স্টকে ঢোকে ও পার্থক্য লেখা থাকে।', 'Leave empty to use the recipe figure; if filled, that is what goes into stock and the difference is recorded.', 'খালি রাখলে recipe-র হিসাবই ধরা হয়; দিলে সেটাই stock-এ ঢোকে ও difference লেখা থাকে।'),
+  actY: L('প্রকৃত টোটাল উৎপাদন (ঐচ্ছিক)', 'Actual total output (optional)', 'Actual total output (optional)'), actYHint: L('খালি রাখলে রেসিপির হিসাবই ধরা হয়; দিলে সেটাই স্টকে ঢোকে ও পার্থক্য লেখা থাকে।', 'Leave empty to use the recipe figure; if filled, that is what goes into stock and the difference is recorded.', 'খালি রাখলে recipe-র হিসাবই ধরা হয়; দিলে সেটাই stock-এ ঢোকে ও difference লেখা থাকে।'),
   sqlMissing: L('রেসিপির ডেটাবেস অংশ এখনও চালু হয়নি (phase19)', 'The recipe database part is not installed yet (phase19)', 'Recipe-এর database অংশ চালু হয়নি (phase19)'),
 };
 const T = (k) => lab(X[k]);
 const ERRS = {
-  cost_missing: L('কোনো কাঁচামালের দাম অজানা — আগে দাম বসান, তারপর উৎপাদন করুন', 'An ingredient cost is unknown — set the cost first, then produce', 'কোনো ingredient-এর cost অজানা — আগে cost বসান, তারপর production করুন'),
+  cost_missing: L('কোনো উপকরণের কস্ট অজানা — আগে কস্ট বসান, তারপর উৎপাদন করুন', 'An ingredient cost is unknown — set the cost first, then produce', 'কোনো ingredient-এর cost অজানা — আগে cost বসান, তারপর production করুন'),
   recipe_used: L('এই ভার্সন ব্যবহৃত হয়েছে — নতুন ভার্সন বানান', 'This version is already used — make a new version', 'এই version used — নতুন version বানান'),
   recipe_not_found: L('রেসিপি পাওয়া যায়নি', 'Recipe not found', 'Recipe পাওয়া যায়নি'), recipe_inactive: L('রেসিপি বন্ধ আছে', 'The recipe is inactive', 'Recipe inactive'),
   recipe_required: L('উৎপাদন এখন শুধু রেসিপি দিয়ে — "রেসিপি দিয়ে উৎপাদন" ব্যবহার করুন', 'Production now needs a recipe — use "Produce from a recipe"', 'Production এখন শুধু recipe দিয়ে'),
-  bad_ingredient_type: L('এই আইটেম উপকরণ হতে পারে না (শুধু কাঁচামাল / প্যাকেজিং / রিসেল)', 'This item cannot be an ingredient (raw material / packaging / resale only)', 'এই item ingredient হতে পারে না'),
+  bad_ingredient_type: L('এই আইটেম উপকরণ হতে পারে না (শুধু উপকরণ / প্যাকেজিং / রিসেল)', 'This item cannot be an ingredient (raw material / packaging / resale only)', 'এই item ingredient হতে পারে না'),
   bad_product_type: L('শুধু তৈরি পণ্যের রেসিপি হয়', 'Only a finished product can have a recipe', 'শুধু finished product-এর recipe'), bad_waste: L('অপচয় % ০–১০০ হতে হবে', 'Waste % must be 0–100', 'Waste % ০–১০০'),
   dup_ingredient: L('একই উপকরণ দুবার', 'The same ingredient twice', 'একই ingredient দুবার'), no_lines: L('অন্তত একটি উপকরণ লাগবে', 'Add at least one ingredient', 'অন্তত একটি ingredient'),
   ingredient_is_product: L('পণ্য নিজেই নিজের উপকরণ হতে পারে না', 'A product cannot be its own ingredient', 'Product নিজের ingredient নয়'), ingredient_not_tracked: L('উপকরণের স্টক ট্র্যাক বন্ধ', 'Stock tracking is off for an ingredient', 'Ingredient-এ stock track বন্ধ'),
-  cost_missing: L('কোনো উপকরণের খরচ অজানা — আগে খরচ বসান (বা খরচ সত্যিই শূন্য হলে চিহ্ন দিন)', 'An ingredient cost is unknown - enter the cost first (or mark the item as cost really zero)', 'কোনো ingredient-এর cost অজানা — আগে cost বসান (বা cost সত্যিই শূন্য হলে mark দিন)'),
+  cost_missing: L('কোনো উপকরণের কস্ট অজানা — আগে কস্ট বসান (বা কস্ট সত্যিই শূন্য হলে চিহ্ন দিন)', 'An ingredient cost is unknown - enter the cost first (or mark the item as cost really zero)', 'কোনো ingredient-এর cost অজানা — আগে cost বসান (বা cost সত্যিই শূন্য হলে mark দিন)'),
   waste_needed: L('রেসিপিতে অপচয় % বসানো নেই (সেটিং চালু)', 'A recipe line has no waste % (setting is on)', 'Recipe-এ waste % নেই (setting on)'), too_many_lines: L('১০০-র বেশি উপকরণ হয় না', 'More than 100 ingredients', '১০০-র বেশি ingredient'),
 };
 const ERRKEYS = Object.keys(ERRS);
@@ -320,8 +320,8 @@ async function drawMake() {
 }
 
 // ----- recent runs + void (phase 23) -----
-const XR = { head: L('সাম্প্রতিক উৎপাদন', 'Recent production', 'সাম্প্রতিক Production'), void: L('বাতিল করুন', 'Void', 'Void'), why: L('বাতিলের কারণ (অন্তত ৩ অক্ষর)', 'Why void (3+ letters)', 'Void-এর কারণ (৩+ অক্ষর)'),
-  done: L('উৎপাদন বাতিল, মাল ফিরেছে', 'Run voided, stock put back', 'Production void, stock ফিরেছে'), voided: L('বাতিল', 'Voided', 'Voided'), used: L('এই ব্যাচের কিছু বিক্রি হয়ে গেছে — বাতিল হবে না (অপচয়/কাউন্ট ব্যবহার করুন)', 'Part of this batch is already sold - cannot void (use wastage / count)', 'এই batch-এর কিছু sold - void হবে না (wastage/count ব্যবহার করুন)') };
+const XR = { head: L('সাম্প্রতিক উৎপাদন', 'Recent production', 'সাম্প্রতিক Production'), void: L('ভয়েড করুন', 'Void', 'Void'), why: L('ভয়েডের কারণ (অন্তত ৩ অক্ষর)', 'Why void (3+ letters)', 'Void-এর কারণ (৩+ অক্ষর)'),
+  done: L('উৎপাদন ভয়েড, মাল ফিরেছে', 'Run voided, stock put back', 'Production void, stock ফিরেছে'), voided: L('ভয়েড', 'Voided', 'Voided'), used: L('এই ব্যাচের কিছু বিক্রি হয়ে গেছে — ভয়েড হবে না (অপচয়/কাউন্ট ব্যবহার করুন)', 'Part of this batch is already sold - cannot void (use wastage / count)', 'এই batch-এর কিছু sold - void হবে না (wastage/count ব্যবহার করুন)') };
 async function drawRuns() {
   const box = $('#mk_runs'); if (!box) return;
   const r = await sb.from('production_runs').select('id,item_id,batches,made_at,yield_base,status,note').eq('location_id', D.loc).order('made_at', { ascending: false }).limit(15);

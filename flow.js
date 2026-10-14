@@ -11,9 +11,9 @@ const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dha
 const X = {
   title: L('দিনের কাজ (ধাপে ধাপে)', 'Guided routines', 'দিনের কাজ (ধাপে ধাপে)'), loc: L('জায়গা', 'Place', 'Place'),
   open: L('দোকান খোলা', 'Open shop', 'দোকান খোলা'), close: L('দিন শেষ', 'Close day', 'দিন শেষ'), factory: L('কারখানার দিন', 'Factory day', 'কারখানার দিন'), month: L('মাস শেষ', 'Month-end', 'মাস শেষ'),
-  of: L('এর মধ্যে', 'of', 'এর মধ্যে'), left: L('বাকি', 'left', 'বাকি'), done: L('হয়েছে', 'Done', 'Done'), todo: L('বাকি', 'To do', 'বাকি'), progress: L('খসড়া আছে', 'Draft', 'Draft'), unknown: L('নিজে দেখে নিন', 'Check manually', 'নিজে দেখে নিন'),
+  of: L('এর মধ্যে', 'of', 'এর মধ্যে'), left: L('বাকি', 'left', 'বাকি'), done: L('হয়েছে', 'Done', 'Done'), todo: L('বাকি', 'To do', 'বাকি'), progress: L('ড্রাফট আছে', 'Draft', 'Draft'), unknown: L('নিজে দেখে নিন', 'Check manually', 'নিজে দেখে নিন'),
   skipped: L('বাদ (নোট সহ)', 'Skipped (note)', 'Skipped'), skip: L('বাদ দিন…', 'Skip…', 'Skip…'), why: L('কেন বাদ দিচ্ছেন (অন্তত ৩ অক্ষর)', 'Why skip (3+ letters)', 'কেন skip (৩+ অক্ষর)'), open_: L('খুলুন', 'Open', 'Open'),
-  back: L('সব রুটিন', 'All routines', 'সব routine'), refresh: L('আবার দেখুন', 'Refresh', 'Refresh'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
+  back: L('সব রুটিন', 'All routines', 'সব routine'), refresh: L('আবার দেখুন', 'Refresh', 'Refresh'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'),
   s_drawer: L('ড্রয়ারের ক্যাশ গোনা (14-1)', 'Count the drawer (14-1)', 'Drawer cash গোনা (14-1)'), s_attend: L('হাজিরা (02-1)', 'Attendance (02-1)', 'হাজিরা (02-1)'),
   s_stock: L('স্টক কম / মেয়াদ দেখা', 'Look at low stock and expiry', 'Stock কম / expiry দেখা'), s_exc: L('গতকালের সমস্যা (খোলা গরমিল ০ হলে ঠিক)', 'Yesterday\'s problems (done when none are open)', 'গতকালের সমস্যা'),
   s_pos: L('বিক্রি শুরু (POS)', 'Open the POS', 'POS খুলুন'), s_release: L('লাল নিয়ন্ত্রণ থাকলে ছাড়ের অনুরোধ', 'Release request if a red control is open', 'Red control থাকলে release'),
@@ -21,8 +21,8 @@ const X = {
   s_deposit: L('ব্যাংকে জমা', 'Bank deposit', 'Bank জমা'), s_exp: L('আজকের খরচ (10-2)', 'Today\'s expenses (10-2)', 'আজকের খরচ (10-2)'), s_outbox: L('ফোনে জমা থাকা কিছু নেই', 'Nothing waiting on this phone', 'Phone-এ কিছু জমা নেই'),
   s_summary: L('দিনের খাতা দেখুন', 'Look at the day book', 'Day book দেখুন'), s_daily: L('কারখানার দৈনিক শিট (05-1)', 'Factory daily sheet (05-1)', 'Factory daily sheet (05-1)'), s_grn: L('মাল গ্রহণ (04-1)', 'Goods received (04-1)', 'মাল গ্রহণ (04-1)'),
   s_issue: L('মাল ইস্যু (04-2)', 'Goods issued (04-2)', 'মাল ইস্যু (04-2)'), s_prod: L('উৎপাদন (রেসিপি)', 'Production (recipes)', 'Production (recipe)'), s_dispatch: L('দোকানে চালান (03-1)', 'Dispatch to shops (03-1)', 'দোকানে চালান (03-1)'),
-  s_wastage: L('নষ্ট মাল', 'Wastage', 'Wastage'), s_days: L('সব দোকানের সব দিনের দিন-শেষ জমা', 'Every shop-day closed (14-1)', 'সব দোকানের দিন-শেষ জমা'), s_pending: L('অপেক্ষার অনুমোদন ও গরমিল শূন্য', 'No pending approvals or open exceptions', 'Pending ও exception শূন্য'),
-  s_count: L('এই মাসে স্টক কাউন্ট (04-3)', 'Stock count this month (04-3)', 'এই মাসে stock count (04-3)'), s_pay: L('সরবরাহকারীর বাকি ও ক্রয় মিলানো', 'Supplier payables and purchases', 'Supplier বাকি ও purchase'),
+  s_wastage: L('নষ্ট মাল', 'Wastage', 'Wastage'), s_days: L('সব দোকানের সব দিনের দিন-শেষ জমা', 'Every shop-day closed (14-1)', 'সব দোকানের দিন-শেষ জমা'), s_pending: L('অপেক্ষার অ্যাপ্রুভ ও গরমিল শূন্য', 'No pending approvals or open exceptions', 'Pending ও exception শূন্য'),
+  s_count: L('এই মাসে স্টক কাউন্ট (04-3)', 'Stock count this month (04-3)', 'এই মাসে stock count (04-3)'), s_pay: L('সাপ্লায়ারের বাকি ও ক্রয় মিলানো', 'Supplier payables and purchases', 'Supplier বাকি ও purchase'),
   s_salary: L('বেতনের শিট', 'Salary sheet', 'Salary sheet'), s_reports: L('রিপোর্ট ও লাভ-ক্ষতি', 'Reports and profit & loss', 'Reports ও P&L'), s_lock: L('"হিসাব বন্ধ" তারিখ বসান (মালিক)', 'Set "books closed until" (owner)', '"Books closed" তারিখ (owner)'),
   e_note_required: L('কারণ লিখুন', 'Write a reason', 'কারণ লিখুন'),
 };

@@ -196,17 +196,17 @@ const R = (g) => (me) => (me.reports && me.reports[g]) ? true : 'access';
 const pickOpt = (me, names) => (me.optional || []).find((x) => [].concat(names).includes(x.name));
 const opt = (names) => (me) => (pickOpt(me, names) ? true : 'install');
 
-T('sales_summary', { title: L('বিক্রির সারসংক্ষেপ', 'Sales summary', 'Sales summary'), group: 'today', needs: R('sales'), defPeriod: 'today', report: 'sales_summary',
+T('sales_summary', { title: L('সেলের সারসংক্ষেপ', 'Sales summary', 'Sales summary'), group: 'today', needs: R('sales'), defPeriod: 'today', report: 'sales_summary',
   head: ['net', 'bills', 'avg_bill', 'discount', 'due', 'void_amt'], run: rep1('sales_summary'), link: 'report/sales_summary' });
-T('sales_by_location', { title: L('শাখা অনুযায়ী বিক্রি', 'Sales by branch', 'Branch অনুযায়ী sale'), group: 'money', needs: R('sales'), report: 'sales_combined',
+T('sales_by_location', { title: L('শাখা অনুযায়ী সেল', 'Sales by branch', 'Branch অনুযায়ী sale'), group: 'money', needs: R('sales'), report: 'sales_combined',
   head: ['net', 'bills'], label: 'location', value: 'net', run: rep1('sales_combined', { group: 'location', sort: (p) => (p.worst ? 'net:asc' : 'net:desc') }), link: 'report/sales_combined', params: ['period', 'locs', 'compare', 'worst'] });
-T('sales_trend', { title: L('দিনওয়ারি বিক্রি', 'Sales by day', 'দিনওয়ারি sale'), group: 'money', needs: R('sales'), report: 'sales_trend', head: ['net', 'bills'], label: 'day', value: 'net', chart: 'line',
+T('sales_trend', { title: L('দিনওয়ারি সেল', 'Sales by day', 'দিনওয়ারি sale'), group: 'money', needs: R('sales'), report: 'sales_trend', head: ['net', 'bills'], label: 'day', value: 'net', chart: 'line',
   run: rep1('sales_trend', { group: 'day', sort: () => 'day:asc' }), link: 'report/sales_trend' });
 T('top_items', { title: L('সবচেয়ে বেশি বিক্রি হওয়া আইটেম', 'Top-selling items', 'বেশি বিক্রি হওয়া item'), group: 'stock', needs: R('sales'), report: 'item_sales', head: ['net', 'qty'], label: 'item', value: 'net',
   run: rep1('item_sales', { group: 'item', sort: (p) => (p.worst ? 'net:asc' : 'net:desc') }), link: 'report/item_sales', params: ['period', 'locs', 'topN', 'items', 'compare', 'worst'] });
 T('slow_items', { title: L('ধীর ও অবিক্রীত আইটেম', 'Slow and unsold items', 'ধীর ও unsold item'), group: 'stock', needs: R('sales'), report: 'item_slow', head: ['items', 'unsold_items', 'net'], label: 'item', value: 'net',
   run: rep2('item_slow'), link: 'report/item_slow', params: ['period', 'locs', 'topN'] });
-T('category_sales', { title: L('ক্যাটাগরি অনুযায়ী বিক্রি', 'Sales by category', 'Category অনুযায়ী sale'), needs: R('sales'), report: 'category_sales', head: ['net', 'qty'], label: 'category', value: 'net',
+T('category_sales', { title: L('ক্যাটাগরি অনুযায়ী সেল', 'Sales by category', 'Category অনুযায়ী sale'), needs: R('sales'), report: 'category_sales', head: ['net', 'qty'], label: 'category', value: 'net',
   run: rep1('category_sales', { group: 'category', sort: () => 'net:desc' }), link: 'report/category_sales' });
 T('item_margin', { title: L('আইটেম অনুযায়ী লাভ (মার্জিন)', 'Margin by item', 'Item অনুযায়ী margin'), needs: (me) => (me.cost && me.reports && me.reports.profit ? true : 'access'), report: 'l2_margin', head: [], label: 'item', value: 'margin',
   run: rep2('l2_margin', { sort: (p) => (p.worst ? 'margin:asc' : 'margin:desc') }), link: 'report/l2_margin', params: ['period', 'locs', 'topN', 'worst'], cost: true });
@@ -218,9 +218,9 @@ T('expenses_by_head', { title: L('খরচ (খাত অনুযায়ী)
   run: rep2('expense_by_head', { group: 'head', sort: () => 'amount:desc' }), link: 'report/expense_by_head', params: ['period', 'locs', 'topN'] });
 T('expense_trend', { title: L('খরচ: আগের সময়ের সাথে তুলনা', 'Expenses vs previous period', 'খরচ: আগের সময়ের সাথে'), needs: R('expense'), report: 'e2_expense_trend', head: ['current', 'previous', 'change'], label: 'head', value: 'change',
   run: rep2('e2_expense_trend', { sort: () => 'change:desc' }), link: 'report/e2_expense_trend' });
-T('discounts', { title: L('ছাড় ও দাম বদল', 'Discounts and price overrides', 'ছাড় ও price override'), group: 'control', needs: R('sales'), report: 'discounts', head: ['discount', 'discount_pct', 'disc_bills', 'over_limit_bills', 'override_lines'], label: 'staff', value: 'discount',
+T('discounts', { title: L('ছাড় ও প্রাইস বদল', 'Discounts and price overrides', 'ছাড় ও price override'), group: 'control', needs: R('sales'), report: 'discounts', head: ['discount', 'discount_pct', 'disc_bills', 'over_limit_bills', 'override_lines'], label: 'staff', value: 'discount',
   run: rep1('discounts', { group: 'staff', sort: () => 'discount:desc' }), link: 'report/discounts' });
-T('voids', { title: L('বাতিল বিল', 'Voided bills', 'Void bill'), group: 'control', needs: R('pos'), report: 'voids', head: ['void_bills', 'void_amt', 'void_pct'], label: 'staff', value: 'void_amt',
+T('voids', { title: L('ভয়েড বিল', 'Voided bills', 'Void bill'), group: 'control', needs: R('pos'), report: 'voids', head: ['void_bills', 'void_amt', 'void_pct'], label: 'staff', value: 'void_amt',
   run: rep1('voids', { group: 'staff', sort: () => 'void_amt:desc' }), link: 'report/voids' });
 T('cash_short_over', { title: L('ক্যাশ কম / বেশি', 'Cash short / over', 'Cash কম / বেশি'), group: 'control', needs: R('cash'), report: 'cash_short_over', head: ['net', 'short_amount', 'over_amount', 'short_sheets', 'sheets'], label: 'location', value: 'net',
   run: rep2('cash_short_over', { group: 'location', sort: () => 'net:asc' }), link: 'report/cash_short_over' });
@@ -230,19 +230,19 @@ T('payment_modes', { title: L('পেমেন্টের মাধ্যম', 
   run: rep1('payment_modes', { group: 'mode', sort: () => 'amount:desc' }), link: 'report/payment_modes' });
 T('collections', { title: L('বাকি আদায়', 'Collections', 'Collection'), needs: R('cash'), report: 'collections', head: ['amount', 'payments', 'cash_amount', 'mobile_amount'], label: 'day', value: 'amount', chart: 'line',
   run: rep1('collections', { group: 'day', sort: () => 'day:asc' }), link: 'report/collections' });
-T('receivables', { title: L('গ্রাহকের কাছে পাওনা (বাকি)', 'Due from customers', 'Customer-এর বাকি'), group: 'money', needs: R('customers'), report: 'customer_dues', head: ['balance', 'customers', 'no_limit_set'], label: 'name', value: 'balance',
+T('receivables', { title: L('কাস্টমারের কাছে পাওনা (বাকি)', 'Due from customers', 'Customer-এর বাকি'), group: 'money', needs: R('customers'), report: 'customer_dues', head: ['balance', 'customers', 'no_limit_set'], label: 'name', value: 'balance',
   run: rep1('customer_dues', { sort: () => 'balance:desc' }), link: 'dues', params: ['topN', 'names'], nodate: true });
-T('best_customers', { title: L('সেরা গ্রাহক', 'Best customers', 'সেরা customer'), group: 'people', needs: R('customers'), report: 'best_customers', head: ['net', 'bills'], label: 'customer_name', value: 'net',
+T('best_customers', { title: L('সেরা কাস্টমার', 'Best customers', 'সেরা customer'), group: 'people', needs: R('customers'), report: 'best_customers', head: ['net', 'bills'], label: 'customer_name', value: 'net',
   run: rep1('best_customers', { group: 'customer', sort: () => 'net:desc' }), link: 'report/best_customers', params: ['period', 'locs', 'topN'] });
-T('lapsed_customers', { title: L('নিষ্ক্রিয় ও নতুন-পুরনো গ্রাহক', 'Lapsed, new and repeat customers', 'Lapsed ও নতুন-পুরনো customer'), group: 'people', needs: R('sales'), report: 'd5_lapsed', head: ['orders_period', 'amount_period'], label: 'name', value: 'days_silent',
+T('lapsed_customers', { title: L('বন্ধ ও নতুন-পুরনো কাস্টমার', 'Lapsed, new and repeat customers', 'Lapsed ও নতুন-পুরনো customer'), group: 'people', needs: R('sales'), report: 'd5_lapsed', head: ['orders_period', 'amount_period'], label: 'name', value: 'days_silent',
   run: rep2('d5_lapsed', { sort: () => 'days_silent:desc' }), link: 'report/d5_lapsed' });
-T('payables', { title: L('সরবরাহকারীর পাওনা (দেনা)', 'What we owe suppliers', 'Supplier-এর পাওনা'), group: 'money', needs: (me) => (me.purchase ? true : 'access'), nodate: true, label: 'name', value: 'balance', params: ['locs', 'topN', 'names'],
+T('payables', { title: L('সাপ্লায়ারের পাওনা (দেনা)', 'What we owe suppliers', 'Supplier-এর পাওনা'), group: 'money', needs: (me) => (me.purchase ? true : 'access'), nodate: true, label: 'name', value: 'balance', params: ['locs', 'topN', 'names'],
   run: async (p, X) => { const args = { p_loc: p.locs && p.locs.length === 1 ? Number(p.locs[0]) : null }; const rows = rowsOf(await X.call('supplier_dues', args));
     const sum = (k) => Math.round(rows.reduce((s, r) => s + (Number(r[k]) || 0), 0) * 100) / 100;
     return { ok: true, key: 'payables', columns: [col('name', 'সরবরাহকারী', 'Supplier', 'text'), col('balance', 'পাওনা', 'Balance', 'money'), col('overdue', 'মেয়াদোত্তীর্ণ', 'Overdue', 'money'), col('oldest', 'সবচেয়ে পুরনো বিল', 'Oldest bill', 'date'), col('credit_days', 'বাকির দিন', 'Credit days', 'int')],
       rows: rows.slice().sort((a, b) => (Number(b.balance) || 0) - (Number(a.balance) || 0)), totals: { balance: sum('balance'), overdue: sum('overdue'), suppliers: rows.length }, derived: ['balance', 'overdue'],
       source: { kind: 'rpc', name: 'supplier_dues', params: args }, asOf: new Date().toISOString(), dataNeeded: rows.length === 0 }; }, link: 'payables', head: ['balance', 'overdue', 'suppliers'] });
-T('purchases_by_supplier', { title: L('ক্রয় (সরবরাহকারী অনুযায়ী)', 'Purchases by supplier', 'Purchase (supplier অনুযায়ী)'), needs: (me) => (me.cost && me.reports && me.reports.purchase ? true : 'access'), report: 'purchases_by_supplier', head: ['total', 'paid', 'due', 'bills'], label: 'supplier', value: 'total',
+T('purchases_by_supplier', { title: L('ক্রয় (সাপ্লায়ার অনুযায়ী)', 'Purchases by supplier', 'Purchase (supplier অনুযায়ী)'), needs: (me) => (me.cost && me.reports && me.reports.purchase ? true : 'access'), report: 'purchases_by_supplier', head: ['total', 'paid', 'due', 'bills'], label: 'supplier', value: 'total',
   run: rep2('purchases_by_supplier', { group: 'supplier', sort: () => 'total:desc' }), link: 'report/purchases_by_supplier', cost: true });
 T('stock_low', { title: L('স্টক কম (ন্যূনতমের নিচে)', 'Stock at or below minimum', 'Stock কম'), group: 'stock', needs: R('stock'), report: 'stock_low', head: ['lines', 'at_zero', 'reorder_value'], label: 'item', value: 'short_by', nodate: true,
   run: rep2('stock_low'), link: 'report/stock_low', params: ['locs', 'topN'] });
@@ -295,7 +295,7 @@ T('cash_position', { title: L('ক্যাশ, ব্যাংক ও মোব
   run: async (p, X) => { const t = today(); const args = { p_loc: p.locs && p.locs.length === 1 ? Number(p.locs[0]) : null, p_from: t, p_to: t }; const d = await X.call('day_book', args) || {};
     const tot = d.totals || {}, cl = tot.close && typeof tot.close === 'object' ? tot.close : null;
     return { ok: true, key: 'cash_position', columns: [col('mode', 'কোথায়', 'Where', 'text'), col('amount', 'ব্যালান্স', 'Balance', 'money')],
-      rows: cl ? [['cash', L('নগদ', 'Cash', 'Cash')], ['bank', L('ব্যাংক', 'Bank', 'Bank')], ['mobile', L('মোবাইল', 'Mobile', 'Mobile')]].map(([k, lb]) => ({ mode: lb[lang()] || lb.bn, amount: cl[k] })) : [],
+      rows: cl ? [['cash', L('ক্যাশ', 'Cash', 'Cash')], ['bank', L('ব্যাংক', 'Bank', 'Bank')], ['mobile', L('মোবাইল', 'Mobile', 'Mobile')]].map(([k, lb]) => ({ mode: lb[lang()] || lb.bn, amount: cl[k] })) : [],
       totals: cl ? { total: cl.total } : null, balances: !!d.balances, start: d.start || null, opening_known: !!d.opening_known, salaryHidden: !!d.salary_hidden,
       dataNeeded: !cl, needWhy: !d.start ? 'no_start' : !d.balances ? 'no_opening' : null, source: { kind: 'rpc', name: 'day_book', params: args }, asOf: new Date().toISOString(), period: { from: t, to: t } }; }, link: 'daybook', head: ['total'] });
 T('locations', { title: L('জায়গার তালিকা', 'Locations', 'Location তালিকা'), group: 'setup', nodate: true, params: [],
@@ -314,7 +314,7 @@ T('acc_balance_sheet', { title: L('ব্যালান্স শিট', 'Bala
 T('acc_income_statement', { title: L('আয়-ব্যয় বিবরণী', 'Income statement', 'Income statement'), needs: opt(['acct_income_statement', 'income_statement']), run: optRun(['acct_income_statement', 'income_statement'], 'acc_income_statement'), link: 'accounts' });
 T('acc_trial_balance', { title: L('রেওয়ামিল', 'Trial balance', 'Trial balance'), needs: opt(['acct_trial_balance', 'trial_balance']), run: optRun(['acct_trial_balance', 'trial_balance'], 'acc_trial_balance'), link: 'accounts' });
 T('partners', { title: L('অংশীদারদের সারসংক্ষেপ', 'Partners overview', 'Partner overview'), needs: (me) => (me.is_owner ? opt('partner_overview')(me) : 'access'), run: optRun('partner_overview', 'partners'), link: 'partners', nodate: true, params: [] });
-T('tiers', { title: L('গ্রাহক টিয়ার ব্যবহার', 'Customer tier use', 'Customer tier'), needs: opt('tier_usage_report'), run: optRun('tier_usage_report', 'tiers'), link: 'customers' });
+T('tiers', { title: L('কাস্টমার টিয়ার ব্যবহার', 'Customer tier use', 'Customer tier'), needs: opt('tier_usage_report'), run: optRun('tier_usage_report', 'tiers'), link: 'customers' });
 T('backup', { title: L('ব্যাকআপের অবস্থা', 'Backup status', 'Backup status'), group: 'setup', needs: opt('backup_status'), run: optRun('backup_status', 'backup'), link: 'backup', nodate: true, params: [] });
 
 // composite answers (assistant.js composes them from the tools above; they never compute a figure of their own)
@@ -324,12 +324,12 @@ const COMPOSITE = {
   unusual: { title: L('অস্বাভাবিক কী আছে', 'Unusual things', 'অস্বাভাবিক কী'), group: 'control', parts: ['exceptions_summary', 'cash_short_over', 'voids', 'discounts', 'count_variance', 'wastage', 'number_gaps', 'transfers_gap'] },
   priorities: { title: L('আগে কী দেখবেন', 'What to look at first', 'আগে কী দেখবেন'), group: 'today', parts: ['health', 'needs_you', 'exceptions_summary', 'cash_short_over', 'payables', 'stock_low'] },
   help: { title: L('আমি কী পারি', 'What I can do', 'আমি কী পারি'), group: 'setup', parts: [] },
-  notes: { title: L('মালিকের অনুমোদিত নিয়ম', 'Rules approved by the owner', 'Owner-এর অনুমোদিত নিয়ম'), group: 'setup', parts: [] },
+  notes: { title: L('মালিকের অ্যাপ্রুভড নিয়ম', 'Rules approved by the owner', 'Owner-এর approved নিয়ম'), group: 'setup', parts: [] },
 };
 
 // suggested questions per group (shown only when the tool is available to the person)
 const SUGGEST = [
-  ['today', 'sales_summary', L('আজ বিক্রি কত?', 'How are sales today?', 'আজ sale কত?')],
+  ['today', 'sales_summary', L('আজ সেল কত?', 'How are sales today?', 'আজ sale কত?')],
   ['today', 'needs_you', L('কী আমার অপেক্ষায় আছে?', 'What is waiting for me?', 'কী আমার অপেক্ষায়?')],
   ['today', 'priorities', L('আজ আগে কী দেখব?', 'What should I prioritise today?', 'আজ আগে কী দেখব?')],
   ['today', 'hour_weekday', L('কোন সময়ে বেশি বিক্রি হয়?', 'What are the busiest hours?', 'কোন সময়ে বেশি sale?')],
@@ -346,7 +346,7 @@ const SUGGEST = [
   ['stock', 'unusual', L('অস্বাভাবিক কিছু আছে?', 'Anything unusual?', 'অস্বাভাবিক কিছু?')],
   ['people', 'attendance_summary', L('এই মাসে কে বেশি অনুপস্থিত?', 'Who was absent most this month?', 'কে বেশি absent?')],
   ['people', 'discounts', L('কোন স্টাফের ছাড় বেশি?', 'Which staff give the most discount?', 'কোন staff-এর ছাড় বেশি?')],
-  ['people', 'best_customers', L('সেরা গ্রাহক কারা?', 'Who are the best customers?', 'সেরা customer কারা?')],
+  ['people', 'best_customers', L('সেরা কাস্টমার কারা?', 'Who are the best customers?', 'সেরা customer কারা?')],
   ['setup', 'health', L('সেটআপে কী বাকি বা ভুল?', 'What is incomplete or wrong in the setup?', 'Setup-এ কী বাকি?')],
   ['setup', 'kb', L('নতুন শোরুম কীভাবে চালু করব?', 'How do I set up a new location?', 'নতুন showroom কীভাবে চালু?')],
   ['setup', 'kb', L('ব্লাইন্ড কাউন্ট কীভাবে চালু করব?', 'How do I switch on blind count?', 'Blind count কীভাবে চালু?')],

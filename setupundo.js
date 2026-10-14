@@ -10,9 +10,9 @@ const { sb, S, esc, toast, openSheet, closeSheet } = A;
 const H = A.H || (A.H = {}), L = B.L, lab = B.lab;
 const $ = (s, el = document) => el.querySelector(s);
 const X = {
-  btn: L('এই প্রয়োগ ফিরিয়ে নিন', 'Undo this apply', 'এই apply ফিরিয়ে নিন'),
+  btn: L('এই অ্যাপ্লাই ফিরিয়ে নিন', 'Undo this apply', 'এই apply ফিরিয়ে নিন'),
   title: L('আগের মান ফিরিয়ে আনা', 'Put the earlier values back', 'আগের value ফিরিয়ে আনা'),
-  hint: L('প্রতিটি সেটিং প্রয়োগের আগের মানে ফিরবে। "ডিফল্ট" মানে আপনার নিজের মান মুছে শুরুর মান।', 'Each setting goes back to the value it had before this apply. "Default" clears your own value so the starting value is used.', 'প্রতিটি setting apply-এর আগের value-তে ফিরবে। "Default" মানে আপনার নিজের value মুছে শুরুর value।'),
+  hint: L('প্রতিটি সেটিং অ্যাপ্লাইর আগের মানে ফিরবে। "ডিফল্ট" মানে আপনার নিজের মান মুছে শুরুর মান।', 'Each setting goes back to the value it had before this apply. "Default" clears your own value so the starting value is used.', 'প্রতিটি setting apply-এর আগের value-তে ফিরবে। "Default" মানে আপনার নিজের value মুছে শুরুর value।'),
   now: L('এখন', 'Now', 'এখন'), back: L('ফিরবে', 'Back to', 'ফিরবে'), dflt: L('ডিফল্ট', 'Default', 'Default'), same: L('আগের মানেই আছে', 'already at that value', 'আগের value-তেই আছে'),
   go: L('ফিরিয়ে নিন', 'Undo', 'ফিরিয়ে নিন'), close: L('বন্ধ', 'Close', 'Close'), nothing: L('ফিরিয়ে নেওয়ার কিছু নেই', 'Nothing to put back', 'ফিরিয়ে নেওয়ার কিছু নেই'),
   done: L('ফিরিয়ে আনা হয়েছে', 'Put back', 'ফিরিয়ে আনা হয়েছে'), failed: L('হয়নি', 'failed', 'হয়নি'), owner: L('শুধু মালিক পারবেন', 'Owner only', 'শুধু owner পারবে'),

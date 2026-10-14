@@ -73,7 +73,7 @@ const X = {
   ac_baddate: L('তারিখ YYYY-MM-DD ফরম্যাটে লিখুন', 'Write the date as YYYY-MM-DD', 'Date YYYY-MM-DD ফরম্যাটে লিখুন'), ac_nopeople: L('তথ্য লাগবে — কোনো সক্রিয় স্টাফ পাওয়া যায়নি', 'Data needed — no active staff found', 'Data লাগবে — কোনো active staff পাওয়া যায়নি'), ac_em: L('জরুরি অনুরোধ দেখুন', 'See emergency requests', 'জরুরি Request দেখুন'),
   g_location_manage: L('লোকেশন পরিচালনা (সম্পাদনা, নতুন শোরুম, বিরতি/বন্ধ)', 'Manage locations (edit, add, pause / close)', 'Location পরিচালনা (edit, add, pause/close)'),
   g_head_management: L('হেড ম্যানেজমেন্ট (কন্ট্রোল সেন্টারের অংশ)', 'Head management (part of the Control Center)', 'Head management (Control Center-এর অংশ)'),
-  g_settings_approve: L('সেটিংস শিট (০-১) অনুমোদন', 'Approve the settings sheet (0-1)', 'Settings sheet (0-1) approve'),
+  g_settings_approve: L('সেটিংস শিট (০-১) অ্যাপ্রুভ', 'Approve the settings sheet (0-1)', 'Settings sheet (0-1) approve'),
   g_list_manage: L('তালিকা পরিচালনা (অনুরোধ ও “অন্যান্য”)', 'Manage lists (requests and Other)', 'List পরিচালনা (request ও Other)'),
   g_view_cost: L('ক্রয়মূল্য (কস্ট) দেখা', 'See cost', 'Cost দেখা'), g_view_profit: L('লাভ/ক্ষতি দেখা', 'See profit / loss', 'Profit/Loss দেখা'), g_view_reports: L('রিপোর্ট দেখা', 'See reports', 'Report দেখা'),
   g_export_data: L('ডেটা এক্সপোর্ট', 'Export data', 'Data Export'), g_salary_view: L('বেতন দেখা', 'See salaries', 'Salary দেখা'), g_view_daybook: L('দিনের খাতা দেখা', 'See the day book', 'Day book দেখা'), g_supplier_manage: L('সাপ্লায়ার পরিচালনা', 'Manage suppliers', 'Supplier পরিচালনা'), g_settings_invoice: L('ইনভয়েস সেটিংস', 'Invoice settings', 'Invoice settings'),

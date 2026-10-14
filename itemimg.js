@@ -20,15 +20,15 @@ const L = B.L, lab = B.lab;
 const $ = (s, el) => (el || document).querySelector(s);
 
 const X = {
-  title: L('আইটেমের ছবি', 'Item photos', 'Item এর photo'),
+  title: L('আইটেমের ছবি', 'Item photos', 'Item-এর photo'),
   intro: L('আইটেম কার্ড ও তালিকায় ছবি দেখানো হবে কি না আপনি ঠিক করুন। বন্ধ থাকলে সব আগের মতোই চলে। ছবি না থাকলে নামের প্রথম অক্ষর দেখায়। ছবি না এলেও বিক্রি কখনো আটকায় না।',
     'Choose whether item cards and lists show photos. While Off, everything works as before. An item without a photo shows the first letter of its name. If a photo does not load, selling is never blocked.',
     'Item card ও list এ photo দেখানো হবে কি না আপনি ঠিক করুন। Off থাকলে সব আগের মতোই চলে। Photo না থাকলে নামের প্রথম অক্ষর দেখায়। Photo না এলেও sale কখনো আটকায় না।'),
   mode: L('কোথায় ছবি দেখাবে', 'Where to show photos', 'কোথায় photo দেখাবে'),
   m_off: L('বন্ধ', 'Off', 'Off'), m_pos_only: L('শুধু POS', 'POS only', 'শুধু POS'), m_everywhere: L('সব জায়গায়', 'Everywhere', 'সব জায়গায়'),
-  d_off: L('আগের মতো: ছবি শুধু আইটেমের ফর্মে।', 'As before: photos only in the item form.', 'আগের মতো: photo শুধু item form এ।'),
-  d_pos_only: L('শুধু POS-এর আইটেম কার্ডে ছবি।', 'Photos on the POS item cards only.', 'শুধু POS এর item card এ photo।'),
-  d_everywhere: L('POS, আইটেম তালিকা, stock বাছাই, purchase, recipe, scan ও online order-এ ছবি।', 'Photos on POS, item list, stock pickers, purchase, recipe, scan and online order.', 'POS, item list, stock বাছাই, purchase, recipe, scan ও online order এ photo।'),
+  d_off: L('আগের মতো: ছবি শুধু আইটেমের ফর্মে।', 'As before: photos only in the item form.', 'আগের মতো: photo শুধু item form-এ।'),
+  d_pos_only: L('শুধু POS-এর আইটেম কার্ডে ছবি।', 'Photos on the POS item cards only.', 'শুধু POS-এর item card-এ photo।'),
+  d_everywhere: L('POS, আইটেম তালিকা, স্টক বাছাই, purchase, recipe, স্ক্যান ও online order-এ ছবি।', 'Photos on POS, item list, stock pickers, purchase, recipe, scan and online order.', 'POS, item list, stock বাছাই, purchase, recipe, scan ও online order-এ photo।'),
   rec: L('প্রস্তাবিত', 'Recommended', 'Recommended'),
   recWhy: L('ছবি মোবাইল ডেটা খরচ করে। POS-এ কার্ডের সংখ্যা সীমিত আর ব্যস্ত সময়ে ঠিক আইটেম চেনা সহজ হয়; লম্বা তালিকায় অনেক ছবি লোড হয়। তাই শুরুতে শুধু POS। নেট ভালো হলে পরে সব জায়গায় দিতে পারেন।',
     'Photos use mobile data. On the POS the number of cards is limited and a photo helps to pick the right item in busy hours, while long lists load many pictures. So start with POS only; switch to Everywhere later if your data is good.',
@@ -42,15 +42,15 @@ const X = {
   hoursH: L('আপনি লিখবেন; ফাঁকা = শুধু এই সেশন। ঘণ্টা দিলে ধীর বা অফলাইন নেটেও আগে দেখা ছবি আসে, কিন্তু বদলানো ছবি দেরিতে দেখা যায়।',
     'You type it; blank = this session only. With hours set, pictures already seen also show on slow or offline data, but a changed photo shows later.',
     'আপনি লিখবেন; ফাঁকা = শুধু এই session। Hours দিলে slow বা offline net এও আগে দেখা photo আসে, কিন্তু বদলানো photo দেরিতে দেখা যায়।'),
-  save: L('রাখুন', 'Save', 'Save'), clear: L('ফাঁকা করুন', 'Clear', 'Clear'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
+  save: L('রাখুন', 'Save', 'Save'), clear: L('ফাঁকা করুন', 'Clear', 'Clear'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'),
   clearCache: L('ছবির cache মুছুন', 'Clear image cache', 'Image cache মুছুন'), cleared: L('ছবির cache মোছা হয়েছে', 'Image cache cleared', 'Image cache মোছা হয়েছে'),
-  usage: L('এই সেশনে লোড হওয়া ছবি', 'Pictures loaded this session', 'এই session এ load হওয়া photo'),
+  usage: L('এই সেশনে লোড হওয়া ছবি', 'Pictures loaded this session', 'এই session-এ load হওয়া photo'),
   usageH: L('ডেটা কতটা লাগে তা আপনার নেট ও ছবির সংখ্যার উপর নির্ভর করে, তাই আনুমানিক MB দেখানো হয় না।',
     'Data used depends on your network and the number of pictures, so no estimated MB is shown.', 'Data কতটা লাগে তা আপনার net ও photo র সংখ্যার উপর নির্ভর করে, তাই আনুমানিক MB দেখানো হয় না।'),
   cur: L('এখন', 'Current', 'Current'),
   ownerOnly: L('এটি করতে মালিক লাগবে।', 'Only the owner can do this.', 'এটা করতে owner লাগবে।'),
   bad: L('১ থেকে ৭২০ এর মধ্যে সংখ্যা লিখুন।', 'Type a number from 1 to 720.', '১ থেকে ৭২০ এর মধ্যে number লিখুন।'),
-  err: L('সংরক্ষণ হয়নি', 'Could not save', 'Save হয়নি'),
+  err: L('সেভ হয়নি', 'Could not save', 'Save হয়নি'),
 };
 const T = (k) => (X[k] ? lab(X[k]) : k);
 
@@ -63,7 +63,7 @@ const hours = () => { const n = Number(rule('item_images_cache_hours', null)); r
 
 /* ---------- state ---------- */
 const SIGN_SEC = 3600, MAXPAR = 4, LSK = 'bos_iimg1', CACHE = 'bos-itemimg';
-const st = { paths: new Map(), urls: new Map(), missing: new Set(), blobs: new Map(), loaded: 0, queue: [], active: 0, pending: new Set(), timer: null, io: null,
+const st = { authUid: '', paths: new Map(), urls: new Map(), missing: new Set(), blobs: new Map(), loaded: 0, queue: [], active: 0, pending: new Set(), timer: null, io: null,
   codes: null, codesAt: 0, rpcFailAt: 0, urlFailAt: 0, dirty: false, calls: { rpc: 0, sign: 0 }, saveT: null, restored: false, css: false };
 const now = () => Date.now();
 
@@ -87,12 +87,15 @@ function css() {
 }
 
 /* ---------- persistence (only while item_images_cache_hours is set) ---------- */
+// bos111 (M4): who is signed in (profile id of the screen context, else the last auth event); a different person, or a sign-out, empties every stored link / picture
+const whoami = () => { try { return String((A.S && A.S.ctx && A.S.ctx.profile && A.S.ctx.profile.id) || st.authUid || 'anon'); } catch (e) { return 'anon'; } };
 function restore() {
   if (st.restored) return; st.restored = true; if (!hours()) return;
   try {
     const o = JSON.parse(localStorage.getItem(LSK) || 'null'); if (!o || o.v !== 1) return; const t = now(), ttl = hours() * 3600e3;
+    if (o.uid !== whoami()) { clearCache(); return; }   // bos111 (M4): kept for ONE user only; another person on this device starts empty
     Object.keys(o.p || {}).forEach((id) => { const e = o.p[id]; if (e && t - e[1] < ttl && !st.paths.has(id)) st.paths.set(id, e[0] || null); });
-    Object.keys(o.u || {}).forEach((p) => { const e = o.u[p]; if (e && e[1] > t + 60e3 && !st.urls.has(p)) st.urls.set(p, { url: e[0], exp: e[1] }); });
+    // bos111 (M4): signed links are bearer links - they are never read back from (or written to) storage
   } catch (e) { /* storage blocked: memory only */ }
 }
 function persist() {
@@ -100,15 +103,14 @@ function persist() {
   st.saveT = setTimeout(() => {
     st.saveT = null;
     try {
-      const t = now(), p = {}, u = {}; let n = 0;
-      st.paths.forEach((v, id) => { if (n++ < 400) p[id] = [v || 0, t]; }); n = 0;
-      st.urls.forEach((v, k) => { if (v.exp > t + 60e3 && n++ < 400) u[k] = [v.url, v.exp]; });
-      localStorage.setItem(LSK, JSON.stringify({ v: 1, p, u }));
+      const t = now(), p = {}; let n = 0;
+      st.paths.forEach((v, id) => { if (n++ < 400) p[id] = [v || 0, t]; });
+      localStorage.setItem(LSK, JSON.stringify({ v: 1, uid: whoami(), p }));   // bos111 (M4): paths only, tied to the user; no signed links
     } catch (e) { /* quota or blocked */ }
   }, 400);
 }
 const cacheOK = () => { try { return !!(window.caches && window.caches.open); } catch (e) { return false; } };
-const ckey = (k) => location.origin + '/__itemimg/' + encodeURIComponent(k);
+const ckey = (k) => location.origin + '/__itemimg/' + encodeURIComponent(whoami()) + '/' + encodeURIComponent(k);   // bos111 (M4): the picture cache key carries the user
 async function cacheGet(k) {
   const h = hours(); if (!h || !cacheOK()) return null;
   try { const c = await caches.open(CACHE), r = await c.match(ckey(k)); if (!r) return null; const at = Number(r.headers.get('x-t') || 0); if (!at || now() - at > h * 3600e3) return null; return await r.blob(); } catch (e) { return null; }
@@ -346,6 +348,14 @@ Object.assign(A.H || {}, {
   img_hours_clear: () => guard(() => rpcSet('item_images_cache_hours', null)),
   img_clear: async () => { await clearCache(); toast(T('cleared')); redraw(); },
 });
+// bos111 (M4): sign-out, or a different person signing in on the same device, empties the stored paths, signed links and picture bytes
+try {
+  if (sb.auth && typeof sb.auth.onAuthStateChange === 'function') sb.auth.onAuthStateChange((ev, sess) => {
+    const id = sess && sess.user && sess.user.id ? String(sess.user.id) : '';
+    if (ev === 'SIGNED_OUT') { st.authUid = ''; clearCache(); return; }
+    if (id) { if (st.authUid && st.authUid !== id) clearCache(); st.authUid = id; }
+  });
+} catch (e) { /* no auth events: whoami() + restore() still separate the users */ }
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { itemimg: viewItemImg });
 B.itemimg = { decorate, undecorate, mode, thumbOn, hours, clearCache, stats: () => ({ loaded: st.loaded, rpcCalls: st.calls.rpc, signCalls: st.calls.sign, paths: st.paths.size, urls: st.urls.size }), pickerSync: syncPicker, X };
 })();

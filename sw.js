@@ -1,7 +1,7 @@
 /* Islamia BOS · service worker. Goal: the app opens with no internet after the first visit (the POS and the form outbox already work offline once open).
    Rules: only same-origin GET requests are cached; Supabase (API, auth, storage) and anything else is never touched. Network first (so a new version is picked up at once),
    cache as the fallback; navigations fall back to the cached index.html. Bump VERSION to drop the old cache. */
-const VERSION = 'bos-sw-1ee329c49d';
+const VERSION = 'bos-sw-d92f6e1bd3';
 /* bos110: precache at install. Without it the new cache stayed EMPTY after an update (activate deletes the old cache that held the files the page had just loaded) and after the very first visit
    (the worker is installed after the page already fetched everything), so the phone could not start offline until one more online load. Now install fetches index.html, then every local script,
    stylesheet, manifest and icon it names (cache:'reload' = never from the HTTP cache), so the new version is complete before it takes over. Best effort: any failure still installs, as before. */

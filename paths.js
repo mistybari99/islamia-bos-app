@@ -12,14 +12,14 @@ const X = {
   intro: L('একই কাজ দুই পথে (দ্রুত ট্যাব / কাগজের ফর্ম) করা গেলে একটাই মূল রেকর্ড গোনা হয়; অন্যটি লক করা শ্যাডো কপি।', 'When one job can be entered two ways (quick tab / paper form), only ONE record is counted; the other is a locked shadow copy.', 'একই কাজ দুই পথে করা গেলে একটাই record গোনা হয়; অন্যটা locked shadow copy।'),
   open: L('খোলা', 'Open', 'Open'), locked: L('লক', 'Locked', 'Locked'), primary: L('মূল রেকর্ড', 'Primary record', 'Primary record'),
   pa: L('পথ ক (অ্যাপ/দ্রুত)', 'Path A (app / quick)', 'Path A'), pb: L('পথ খ (ফর্ম)', 'Path B (form)', 'Path B'),
-  pfirst: L('যেটা আগে', 'Whichever is first', 'Whichever first'), save: L('সংরক্ষণ', 'Save', 'Save'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
+  pfirst: L('যেটা আগে', 'Whichever is first', 'Whichever first'), save: L('সেভ', 'Save', 'Save'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'),
   pending: L('শ্যাডো কপি বাকি', 'Shadow copies owed', 'Shadow copy বাকি'), rep: L('রিপোর্ট (শুধু দেখা)', 'Reports (read only)', 'Reports (read only)'),
   dvj: L('ডে-বুক বনাম জার্নাল', 'Day book vs journal', 'Day book vs journal'), dup: L('ডুপ্লিকেট সন্দেহ', 'Duplicate suspects', 'Duplicate suspects'),
   from: L('থেকে', 'From', 'From'), to: L('পর্যন্ত', 'To', 'To'), run: L('দেখুন', 'Show', 'Show'), none: L('কিছু নেই ✓', 'Nothing ✓', 'কিছু নেই ✓'),
   qtitle: L('দ্রুত খরচ এন্ট্রি', 'Quick expense', 'Quick expense'), head: L('খাত', 'Head', 'Head'), to2: L('কাকে / কী বাবদ', 'Paid to / for', 'Paid to / for'),
   amt: L('টাকা', 'Amount', 'Amount'), mode: L('মাধ্যম', 'Mode', 'Mode'), rcpt: L('রসিদ আছে', 'Receipt', 'Receipt'), add: L('যোগ করুন', 'Add', 'Add'),
-  close: L('দিন শেষ — ১০-২ ফর্ম বানান', 'Day end - make the 10-2 form', 'Day end - 10-2 form বানান'), void: L('বাতিল', 'Void', 'Void'),
-  total: L('আজকের মোট', "Today's total", "Today's total"), owed: L('ফর্মে বাকি', 'Not yet in a form', 'ফর্মে বাকি'), place: L('লোকেশন', 'Place', 'Place'),
+  close: L('দিন শেষ — ১০-২ ফর্ম বানান', 'Day end - make the 10-2 form', 'Day end - 10-2 form বানান'), void: L('ভয়েড', 'Void', 'Void'),
+  total: L('আজকের টোটাল', "Today's total", "Today's total"), owed: L('ফর্মে বাকি', 'Not yet in a form', 'ফর্মে বাকি'), place: L('লোকেশন', 'Place', 'Place'),
   made: L('ফর্ম তৈরি', 'Form made', 'Form তৈরি'), why: L('কারণ লিখুন', 'Write the reason', 'কারণ লিখুন'), alo: L('সব জায়গা', 'All places', 'All places'),
 };
 const T = (k) => lab(X[k]);

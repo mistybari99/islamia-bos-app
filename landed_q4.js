@@ -9,12 +9,13 @@ if (!A || !B || !B.landed) return;
 const { sb, esc, toast } = A;
 const H = A.H, L = B.L, lab = B.lab;
 const $ = (s, el = document) => el.querySelector(s);
+const cssq = (v) => (window.CSS && typeof CSS.escape === 'function') ? CSS.escape(String(v)) : String(v).replace(/["\\\]]/g, '\\$&');   // bos111 (L8): ids go into a selector as escaped text
 const X = {
   head: L('GRN থেকে বিল যোগ', 'Add from a GRN', 'GRN থেকে bill যোগ'),
   load: L('GRN-এর তালিকা দেখুন', 'Show GRNs', 'GRN list দেখুন'),
   loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'),
   none: L('কোনো GRN পাওয়া যায়নি', 'No GRNs found', 'কোনো GRN পাওয়া যায়নি'),
-  hint: L('GRN-এ দাম থাকে না; তার সাথে যুক্ত ক্রয় বিলটি যোগ হবে।', 'A GRN has no prices; the purchase bill linked to it is added.', 'GRN-এ price থাকে না; তার সাথে linked purchase bill যোগ হবে।'),
+  hint: L('GRN-এ প্রাইস থাকে না; তার সাথে যুক্ত ক্রয় বিলটি যোগ হবে।', 'A GRN has no prices; the purchase bill linked to it is added.', 'GRN-এ price থাকে না; তার সাথে linked purchase bill যোগ হবে।'),
   add: L('টিক দেওয়া GRN-এর বিল যোগ', 'Add the bills of the ticked GRNs', 'Ticked GRN-এর bill যোগ'),
   tickFirst: L('আগে একটি GRN টিক দিন', 'Tick a GRN first', 'আগে একটি GRN টিক দিন'),
   added: L('বিল যোগ হয়েছে', 'Bill added', 'Bill যোগ হয়েছে'),
@@ -64,10 +65,10 @@ async function addTicked(btn) {
         (r.data || []).forEach((d) => {
           if (!d.bill_id) return;
           if (!D.pick.includes(d.bill_id)) D.pick.push(d.bill_id);
-          const cb = document.querySelector(`[data-lcpk="${d.bill_id}"]`); if (cb) cb.checked = true;
+          const cb = document.querySelector(`[data-lcpk="${cssq(d.bill_id)}"]`); if (cb) cb.checked = true;
           lines.push('✓ ' + T('added') + ' (' + String(d.bill_id).slice(0, 8) + ')');
         });
-        const cb2 = document.querySelector(`#q4_grnlist input[data-q4g="${id}"]`); if (cb2) cb2.checked = false;
+        const cb2 = document.querySelector(`#q4_grnlist input[data-q4g="${cssq(id)}"]`); if (cb2) cb2.checked = false;
       } catch (e) { lines.push('! ' + errTxt(e)); }
     }
   } finally { if (btn) btn.disabled = false; }

@@ -14,20 +14,20 @@ const KINDS = [
   ['bank_withdraw', L('ব্যাংক থেকে তোলা (ব্যাংক → ক্যাশ)', 'Bank withdrawal (bank → cash)', 'Bank থেকে তোলা (bank → cash)'), 0],
   ['owner_topup', L('মালিকের টাকা ব্যবসায় দিলেন', 'Owner put money in', 'Owner-এর টাকা business-এ'), 1],
   ['owner_draw', L('মালিক টাকা নিলেন', 'Owner took money out', 'Owner টাকা নিলেন'), 1],
-  ['cust_advance', L('গ্রাহকের অগ্রিম নিলাম', 'Customer advance received', 'Customer advance নিলাম'), 1],
-  ['cust_advance_refund', L('গ্রাহকের অগ্রিম ফেরত দিলাম', 'Customer advance refunded', 'Customer advance ফেরত'), 1],
+  ['cust_advance', L('কাস্টমারের অগ্রিম নিলাম', 'Customer advance received', 'Customer advance নিলাম'), 1],
+  ['cust_advance_refund', L('কাস্টমারের অগ্রিম ফেরত দিলাম', 'Customer advance refunded', 'Customer advance ফেরত'), 1],
   ['cust_advance_used', L('অগ্রিম বিক্রিতে কাটা হলো (টাকা নড়ে না)', 'Advance used against a sale (no money moves)', 'Advance sale-এ কাটা (টাকা নড়ে না)'), 0],
   ['hub_receipt', L('হাবে ক্যাশ বুঝে পেলাম', 'Hub received cash', 'Hub-এ cash বুঝে পেলাম'), 0],
 ];
 const kl = (k) => { const r = KINDS.find((x) => x[0] === k); return r ? r[1] : k; };
 const X = {
   title: L('ক্যাশ ও ব্যাংকের লেনদেন', 'Cash & bank moves', 'Cash ও Bank লেনদেন'), loc: L('জায়গা', 'Location', 'Location'), kind: L('কী ধরনের', 'What kind', 'কী ধরনের'),
-  mode: L('কোন মাধ্যমে', 'Through', 'কোন মাধ্যমে'), cash: L('নগদ', 'Cash', 'Cash'), bank: L('ব্যাংক', 'Bank', 'Bank'), mobile: L('মোবাইল', 'Mobile', 'Mobile'),
-  amount: L('টাকা', 'Amount', 'Amount'), date: L('তারিখ', 'Date', 'Date'), cust: L('গ্রাহকের মোবাইল', 'Customer mobile', 'Customer mobile'), ref: L('স্লিপ / রেফারেন্স', 'Slip / reference', 'Slip / reference'),
-  note: L('নোট', 'Note', 'Note'), check: L('আগে পরীক্ষা করুন', 'Check first', 'আগে check করুন'), save: L('সংরক্ষণ', 'Save', 'Save'), recent: L('সাম্প্রতিক', 'Recent', 'Recent'),
-  void: L('বাতিল', 'Void', 'Void'), voidWhy: L('বাতিলের কারণ', 'Why void', 'Void-এর কারণ'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), voided: L('বাতিল হয়েছে', 'Voided', 'Voided'),
-  adv: L('গ্রাহকের অগ্রিম বাকি', 'Customer advances held', 'Customer advance বাকি'), none: L('কিছু নেই', 'Nothing yet', 'কিছু নেই'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'),
-  needCust: L('সঠিক মোবাইল দিন (গ্রাহক খুঁজে পাওয়া যায়নি)', 'Enter a known customer mobile', 'Customer mobile দিন'), dry: L('পরীক্ষা: কিছু লেখা হয়নি', 'Check only: nothing was saved', 'Check: কিছু save হয়নি'),
+  mode: L('কোন মাধ্যমে', 'Through', 'কোন মাধ্যমে'), cash: L('ক্যাশ', 'Cash', 'Cash'), bank: L('ব্যাংক', 'Bank', 'Bank'), mobile: L('মোবাইল', 'Mobile', 'Mobile'),
+  amount: L('টাকা', 'Amount', 'Amount'), date: L('ডেট', 'Date', 'Date'), cust: L('কাস্টমারের মোবাইল', 'Customer mobile', 'Customer mobile'), ref: L('স্লিপ / রেফারেন্স', 'Slip / reference', 'Slip / reference'),
+  note: L('নোট', 'Note', 'Note'), check: L('আগে পরীক্ষা করুন', 'Check first', 'আগে check করুন'), save: L('সেভ', 'Save', 'Save'), recent: L('সাম্প্রতিক', 'Recent', 'Recent'),
+  void: L('ভয়েড', 'Void', 'Void'), voidWhy: L('ভয়েডের কারণ', 'Why void', 'Void-এর কারণ'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'), voided: L('ভয়েড হয়েছে', 'Voided', 'Voided'),
+  adv: L('কাস্টমারের অগ্রিম বাকি', 'Customer advances held', 'Customer advance বাকি'), none: L('কিছু নেই', 'Nothing yet', 'কিছু নেই'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'),
+  needCust: L('সঠিক মোবাইল দিন (কাস্টমার খুঁজে পাওয়া যায়নি)', 'Enter a known customer mobile', 'Customer mobile দিন'), dry: L('পরীক্ষা: কিছু লেখা হয়নি', 'Check only: nothing was saved', 'Check: কিছু save হয়নি'),
 };
 const T = (k) => lab(X[k]);
 const D = { loc: null, rows: [], adv: [], client: rid() };

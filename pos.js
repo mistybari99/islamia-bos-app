@@ -38,7 +38,7 @@ const X = {
   custReq: L('বাকি বা পাইকারি সেলে গ্রাহকের মোবাইল নম্বর আর নাম লাগবেই', 'A customer mobile number and name are required for a due or wholesale sale', 'Due বা Wholesale sale এ Customer এর mobile number আর নাম লাগবেই'),
   known: L('পুরনো গ্রাহক', 'Existing customer', 'পুরনো Customer'), newc: L('নতুন গ্রাহক — নাম লিখুন', 'New customer — enter the name', 'নতুন Customer — নাম লিখুন'),
   owes: L('এখন বাকি', 'Owes now', 'এখন Due'), limit: L('বাকির সীমা', 'Credit limit', 'Credit limit'),
-  unit: L('একক', 'Unit', 'Unit'), convHow: L('অন্য এককেও বিক্রি করতে চান? (যেমন ১ পিস = ০.২ কেজি)', 'Sell in another unit too? (e.g. 1 pc = 0.2 kg)', 'অন্য unit-এও বিক্রি? (যেমন ১ pc = ০.২ kg)'), save: L('সংরক্ষণ', 'Save', 'Save'), convSaved: L('এককের হিসাব সংরক্ষিত', 'Unit conversion saved', 'Unit conversion saved'),
+  unit: L('একক', 'Unit', 'Unit'), convHow: L('অন্য এককেও বিক্রি করতে চান? (যেমন ১ পিস = ০.২ কেজি)', 'Sell in another unit too? (e.g. 1 pc = 0.2 kg)', 'অন্য unit-এও বিক্রি? (যেমন ১ pc = ০.২ kg)'), save: L('সেভ', 'Save', 'Save'), convSaved: L('ইউনিট কনভার্সন সেভ হয়েছে', 'Unit conversion saved', 'Unit conversion save হয়েছে'),
   other: L('অন্য আইটেম (তালিকায় নেই)', 'Other item (not in the list)', 'অন্য Item (list এ নেই)'), oname: L('আইটেমের নাম', 'Item name', 'Item এর নাম'), ounit: L('একক (কেজি, পিস…)', 'Unit (kg, piece…)', 'Unit (kg, piece…)'), oprice: L('একক দাম (৳)', 'Unit price (৳)', 'Unit price (৳)'),
   ohint: L('এটা মালিকের কাছে "তালিকায় নেই" হিসেবে যাবে, যাতে তালিকায় যোগ হয়।', 'The owner is told it is not in the list so it can be added.', 'Owner কে "list এ নেই" হিসেবে জানানো হবে, যাতে list এ যোগ হয়।'),
   newitem: L('＋ নতুন আইটেম', '＋ New item', '＋ নতুন Item'), full: L('নগদে সম্পন্ন', 'Done — cash', 'Cash এ Done'), more: L('মোবাইল / বাকি / ভাগ…', 'Mobile / due / split…', 'Mobile / Due / ভাগ…'),
@@ -56,9 +56,9 @@ const ERRS = {
   discount_mode_off: L('এই ধরনের ডিসকাউন্ট বন্ধ আছে (নিয়ম)', 'This kind of discount is switched off (rule)', 'এই ধরনের Discount বন্ধ (নিয়ম)'),
   unlisted_blocked: L('তালিকায় নেই এমন আইটেম বিক্রি বন্ধ আছে (নিয়ম)', 'Selling an item that is not in the list is switched off (rule)', 'List এ নেই এমন item বিক্রি বন্ধ (নিয়ম)'), paper_no_required: L('কাগজের ছাপা নম্বর লাগবে', 'The printed paper number is required', 'কাগজের ছাপা number লাগবে'),
   period_closed: L('এই তারিখের হিসাব বন্ধ — শুধু মালিক বদলাতে পারবেন', 'This date is closed — only the owner can change it', 'এই date এর হিসাব বন্ধ — শুধু Owner বদলাতে পারবেন'),
-  expired_stock_blocked: L('মেয়াদোত্তীর্ণ মাল বিক্রি বন্ধ আছে (মালিকের সেটিং) — বিক্রি হয়নি', 'Selling expired stock is blocked (owner setting) — the sale was not made', 'মেয়াদোত্তীর্ণ মাল বিক্রি বন্ধ (owner setting) — বিক্রি হয়নি'),
+  expired_stock_blocked: L('মেয়াদ শেষ স্টক বিক্রি বন্ধ আছে (মালিকের সেটিং) — সেল হয়নি', 'Selling expired stock is blocked (owner setting) — the sale was not made', 'মেয়াদ শেষ stock বিক্রি বন্ধ (owner setting) — sale হয়নি'),
   insufficient_stock: L('মজুতে এত নেই — বিক্রি করা গেল না', 'Not enough stock on hand — the sale was not made', 'Stock-এ এত নেই — বিক্রি হয়নি'),
-  item_not_sellable: L('এই আইটেম বিক্রির জন্য নয় বা দাম দেওয়া নেই (Data needed)', 'This item is not for sale or has no selling price (Data needed)', 'এই Item বিক্রির জন্য নয় বা দাম নেই (Data needed)'),
+  item_not_sellable: L('এই আইটেম সেলের জন্য নয় বা প্রাইস দেওয়া নেই (তথ্য লাগবে)', 'This item is not for sale or has no selling price (Data needed)', 'এই item sale-এর জন্য নয় বা price নেই (Data লাগবে)'),
   wallet_needed: L('মোবাইল পেমেন্টে বিকাশ/নগদ ইত্যাদি বাছুন', 'Choose bKash / Nagad etc. for a mobile payment', 'Mobile payment এ bKash/Nagad বাছুন'), name_required: L('আইটেমের নাম লিখুন', 'Enter the item name', 'Item এর নাম লিখুন'),
 };
 const T2 = (e) => { const m = (e && e.message) || String(e || ''); for (const k of Object.keys(ERRS)) if (m.includes(k)) return lab(ERRS[k]); return null; };
@@ -105,7 +105,9 @@ async function load() {
   // item master (phase14): only sellable types with a selling price are offered; hidden items stay out of the picker. An older database has no such columns: the plain list is used.
   let it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,sub_category,unit,sell_price,is_active,barcode,sellable,hidden,item_type').eq('is_active', true).order('code'));
   if (it.error) it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,sub_category,unit,sell_price,is_active,barcode').eq('is_active', true).order('code'));
+  if (it.error && B.cs && isNet(it.error)) { const c = B.cs.itemsLoad(); if (c) it = { data: c, error: null }; }   // bos112: no internet: the item list saved by the last good load
   if (it.error) throw it.error;
+  if (B.cs && !it.error && it.data && it.data.length) B.cs.itemsSave(it.data);   // bos112
   try { const cv = await sb.from('unit_conversions').select('item_id,from_unit,to_unit,factor,active').eq('active', true); P.conv = cv.error ? (JSON.parse(store.get('bos_pos_conv') || '[]')) : (cv.data || []); if (!cv.error) store.set('bos_pos_conv', JSON.stringify(P.conv)); } catch (e) { P.conv = []; }
   P.items = it.data.filter((i) => i.sell_price !== null && i.sellable !== false && !i.hidden && i.item_type !== 'asset' && i.item_type !== 'raw_material');
   const all = B.liveLocs ? B.liveLocs(B.ENV.locs) : B.ENV.locs;

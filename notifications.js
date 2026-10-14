@@ -16,7 +16,7 @@ const X = {
   title: L('নোটিফিকেশন', 'Notifications', 'Notification'), all: L('সব', 'All', 'সব'), unread: L('না-পড়া', 'Unread', 'না-পড়া'), lvl: L('গুরুত্ব', 'Level', 'গুরুত্ব'),
   lAll: L('সব স্তর', 'All levels', 'সব level'), lInfo: L('তথ্য', 'Info', 'Info'), lWarn: L('সতর্কতা', 'Warning', 'Warning'), lBad: L('জরুরি', 'Urgent', 'Urgent'),
   readAll: L('সব পড়া হয়েছে', 'Mark all read', 'সব read'), none: L('কোনো নোটিফিকেশন নেই', 'No notifications', 'কোনো notification নেই'), settings: L('কোনটা জানাবে — সুইচবোর্ডে', 'What to be told about - Switchboard', 'কোনটা জানাবে — Switchboard'),
-  backup: L('স্বয়ংক্রিয় ব্যাকআপ', 'Automatic backup', 'Auto backup'), lastOk: L('শেষ সফল', 'Last good one', 'শেষ OK'), never: L('এখনো হয়নি', 'None yet', 'এখনো হয়নি'),
+  backup: L('অটো ব্যাকআপ', 'Automatic backup', 'Auto backup'), lastOk: L('শেষ সফল', 'Last good one', 'শেষ OK'), never: L('এখনো হয়নি', 'None yet', 'এখনো হয়নি'),
   hoursAgo: L('ঘণ্টা আগে', 'hours ago', 'ঘণ্টা আগে'), stale: L('পুরনো হয়ে গেছে', 'Out of date', 'পুরনো'), fresh: L('ঠিক আছে', 'Up to date', 'ঠিক আছে'), notSet: L('এখনো চালু করা হয়নি (OPS_SETUP দেখুন)', 'Not set up yet (see OPS_SETUP)', 'এখনো set up হয়নি (OPS_SETUP দেখুন)'),
   runs: L('সাম্প্রতিক রান', 'Recent runs', 'Recent run'), rows: L('সারি', 'rows', 'row'), loadFail: L('লোড করা যায়নি', 'Could not load', 'Load হয়নি'),
   now: L('এইমাত্র', 'just now', 'এইমাত্র'), min: L('মিনিট আগে', 'min ago', 'মিনিট আগে'), hr: L('ঘণ্টা আগে', 'h ago', 'ঘণ্টা আগে'), day: L('দিন আগে', 'd ago', 'দিন আগে'),

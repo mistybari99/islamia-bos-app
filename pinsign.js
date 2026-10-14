@@ -14,11 +14,11 @@ const SID_RE = /^[a-z0-9]{3,20}$/i, PIN_RE = /^\d{4,6}$/;
 
 const X = {
   title: L('পিন দিয়ে স্বাক্ষর', 'Sign with PIN', 'PIN দিয়ে sign'), who: L('স্বাক্ষরকারী', 'Signer', 'Signer'), pin: L('স্বাক্ষরকারীর নিজের পিন', "Signer's own PIN", 'Signer-এর নিজের PIN'),
-  pick: L('— নাম বেছে নিন —', '- pick a name -', '— নাম বেছে নিন —'), go: L('স্বাক্ষর করুন', 'Sign', 'Sign করুন'), cancel: L('বাতিল', 'Cancel', 'Cancel'),
+  pick: L('— নাম বেছে নিন —', '- pick a name -', '— নাম বেছে নিন —'), go: L('স্বাক্ষর করুন', 'Sign', 'Sign করুন'), cancel: L('ক্যান্সেল', 'Cancel', 'Cancel'),
   done: L('স্বাক্ষর হয়েছে', 'Signed', 'Sign হয়েছে'),
   e_staff: L('স্বাক্ষরকারী বেছে নিন', 'Pick the signer', 'Signer বেছে নিন'), e_pin: L('পিন ৪–৬ সংখ্যার', 'PIN is 4-6 digits', 'PIN ৪–৬ সংখ্যার'),
-  e_self: L('লেখক নিজে স্বাক্ষর করতে পারবেন না', 'The writer cannot sign', 'লেখক নিজে sign করতে পারবেন না'),
-  e_locked: L('এই লগইন ভুল পিনে তালাবদ্ধ — ১০ মিনিট পরে চেষ্টা করুন', 'This login is locked after wrong PINs - try in 10 minutes', 'এই login ভুল PIN-এ locked — ১০ মিনিট পরে চেষ্টা করুন'),
+  e_self: L('এন্ট্রিদাতা নিজে স্বাক্ষর করতে পারবেন না', 'The writer cannot sign', 'লেখক নিজে sign করতে পারবেন না'),
+  e_locked: L('এই লগইন ভুল পিনে লক — ১০ মিনিট পরে চেষ্টা করুন', 'This login is locked after wrong PINs - try in 10 minutes', 'এই login ভুল PIN-এ locked — ১০ মিনিট পরে চেষ্টা করুন'),
   e_login: L('স্টাফ আইডি বা পিন ঠিক নয়', 'Staff ID or PIN is not correct', 'Staff ID বা PIN ঠিক নয়'),
 };
 

@@ -10,11 +10,11 @@ const L = B.L, lab = B.lab;
 const $ = (s, el = document) => el.querySelector(s);
 const X = {
   title: L('টেমপ্লেট', 'Templates', 'Template'),
-  intro: L('প্রতিটি কাগজ বা মেসেজের জন্য ডিজাইন বেছে ডিফল্ট করুন। প্রিভিউতে শুধু নমুনা তথ্য। কিছু না বাছলে আজকের মতোই ছাপা হবে।', 'Pick a design for each paper or message and set it as the default. Previews use sample data only. If you pick nothing, printing stays exactly as it is today.', 'প্রতিটি paper বা message-এর design বেছে default করুন। Preview-তে শুধু sample data। কিছু না বাছলে আজকের মতোই print হবে।'),
-  where: L('কোথায় প্রযোজ্য', 'Applies to', 'Applies to'), allLoc: L('সব লোকেশন', 'All locations', 'সব location'),
+  intro: L('প্রতিটি কাগজ বা মেসেজের জন্য ডিজাইন বেছে ডিফল্ট করুন। প্রিভিউতে শুধু নমুনা তথ্য। কিছু না বাছলে আজকের মতোই প্রিন্ট হবে।', 'Pick a design for each paper or message and set it as the default. Previews use sample data only. If you pick nothing, printing stays exactly as it is today.', 'প্রতিটি paper বা message-এর design বেছে default করুন। Preview-তে শুধু sample data। কিছু না বাছলে আজকের মতোই print হবে।'),
+  where: L('কোথায় খাটে', 'Applies to', 'Applies to'), allLoc: L('সব লোকেশন', 'All locations', 'সব location'),
   now: L('এখন ডিফল্ট', 'Current default', 'Current default'), today: L('আজকের ছাপা (কোনো টেমপ্লেট বাছা নেই)', "Today's output (no template chosen)", 'আজকের print (কোনো template বাছা নেই)'),
   rec: L('প্রস্তাব', 'Suggestion', 'Suggestion'), set: L('ডিফল্ট করুন', 'Set as default', 'Default করুন'), isdef: L('এটাই ডিফল্ট ✓', 'This is the default ✓', 'এটাই default ✓'), clear: L('আজকের ছাপায় ফিরুন', "Back to today's output", 'আজকের print-এ ফিরুন'),
-  prev: L('আগের', 'Previous', 'Previous'), next: L('পরের', 'Next', 'Next'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), cleared: L('আজকের ছাপায় ফিরেছে', "Back to today's output", 'আজকের print-এ ফিরেছে'),
+  prev: L('আগের', 'Previous', 'Previous'), next: L('পরের', 'Next', 'Next'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'), cleared: L('আজকের ছাপায় ফিরেছে', "Back to today's output", 'আজকের print-এ ফিরেছে'),
   sample: L('নমুনা তথ্য', 'Sample data', 'Sample data'), recmark: L('প্রস্তাবিত', 'Suggested', 'Suggested'), of: L('এর', 'of', 'of'),
   sms: L('SMS', 'SMS', 'SMS'), wa: L('WhatsApp', 'WhatsApp', 'WhatsApp'), em: L('Email', 'Email', 'Email'), plain: L('শুধু লেখা, কোনো ছবি বা কোড নেই', 'Plain text only', 'Plain text only'),
   sql: L('এই অংশ চালু করতে নতুন SQL (phase93) চালাতে হবে।', 'The new SQL (phase93) must be run to switch this part on.', 'এই অংশ চালু করতে নতুন SQL (phase93) চালাতে হবে।'),

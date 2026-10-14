@@ -19,9 +19,9 @@ const X = {
   title: L('রিপোর্ট', 'Reports', 'Report'), search: L('রিপোর্ট খুঁজুন…', 'Search reports…', 'Report খুঁজুন…'), all: L('সব', 'All', 'All'),
   g_sales: L('বিক্রি', 'Sales', 'Sales (বিক্রি)'), g_pos: L('POS ও ক্যাশিয়ার', 'POS & cashier', 'POS ও Cashier'), g_cash: L('ক্যাশ ও পেমেন্ট', 'Cash & payments', 'Cash ও Payment'),
   g_customers: L('গ্রাহক ও বাকি', 'Customers & dues', 'Customer ও বাকি'),
-  g_stock: L('স্টক ও অপচয়', 'Stock & wastage', 'Stock ও অপচয়'), g_purchase: L('ক্রয় ও সরবরাহকারী', 'Purchases & suppliers', 'Purchase ও Supplier'), g_expense: L('খরচ', 'Expenses', 'খরচ'),
+  g_stock: L('স্টক ও অপচয়', 'Stock & wastage', 'Stock ও অপচয়'), g_purchase: L('ক্রয় ও সাপ্লায়ার', 'Purchases & suppliers', 'Purchase ও Supplier'), g_expense: L('খরচ', 'Expenses', 'খরচ'),
   g_profit: L('লাভ-ক্ষতি ও বেতন', 'Profit, loss & payroll', 'লাভ-ক্ষতি ও Salary'), g_quality: L('মান ও পরিচ্ছন্নতা', 'Quality & hygiene', 'মান ও hygiene'), g_marketing: L('মার্কেটিং', 'Marketing', 'Marketing'), g_orders: L('অর্ডার ও ডেলিভারি', 'Orders & delivery', 'Order ও delivery'),
-  g_staff: L('কর্মীর হাজিরা', 'Staff attendance', 'Staff হাজিরা'), g_control: L('ব্যতিক্রম', 'Exceptions', 'Exception'),
+  g_staff: L('স্টাফের হাজিরা', 'Staff attendance', 'Staff হাজিরা'), g_control: L('ব্যতিক্রম', 'Exceptions', 'Exception'),
   views: L('আমার ভিউ', 'My views', 'My Views'), views_s: L('সংরক্ষিত ভিউ', 'Saved views', 'Saved Views'), noviews: L('এখনও কোনো ভিউ সংরক্ষণ করা হয়নি', 'No saved views yet', 'এখনও কোনো View save করা হয়নি'),
   shared: L('শেয়ার করা', 'Shared', 'Shared'), mine: L('আমার', 'Mine', 'Mine'),
   pages_s: L('আলাদা পাতা', 'Other pages', 'আলাদা Page'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), nores: L('কিছু পাওয়া যায়নি', 'Nothing found', 'কিছু পাওয়া যায়নি'),
@@ -543,14 +543,14 @@ table.rp-t{border-collapse:collapse;width:100%;font-size:.9rem;font-variant-nume
 const Y = {
   bp_title: L('ব্র্যান্ড অনুযায়ী লাভ-ক্ষতি', 'Brand-level P&L', 'Brand-level P&L'), dc_title: L('ডিসকাউন্ট ও অনুমোদনকারী', 'Discounts and approvers', 'Discounts ও approver'),
   from: L('থেকে', 'From', 'From'), to: L('পর্যন্ত', 'To', 'To'), brand: L('ব্র্যান্ড অনুযায়ী', 'By brand', 'By brand'), comb: L('সব মিলিয়ে', 'Combined', 'Combined'),
-  rev: L('বিক্রি', 'Sales', 'Sales'), disc: L('ডিসকাউন্ট', 'Discount', 'Discount'), voids: L('বাতিল বিক্রি', 'Voided sales', 'Voided sales'), cogs: L('পণ্যের ক্রয়মূল্য', 'Cost of goods', 'Cost of goods'),
-  gp: L('মোট লাভ (খরচ জানা অংশে)', 'Gross profit (costed part)', 'Gross profit (costed part)'), gpp: L('লাভ %', 'GP %', 'GP %'), unc: L('ক্রয়মূল্যহীন বিক্রির অংশ', 'Share of sales without a cost', 'Share without a cost'),
-  places: L('লোকেশন', 'places', 'places'), bills: L('বিল', 'bills', 'bills'), nocost: L('খরচের তথ্য আপনার জন্য বন্ধ', 'Cost figures are hidden for your role', 'Cost figures are hidden'),
+  rev: L('সেল', 'Sales', 'Sales'), disc: L('ডিসকাউন্ট', 'Discount', 'Discount'), voids: L('ভয়েড সেল', 'Voided sales', 'Voided sales'), cogs: L('পণ্যের ক্রয়মূল্য', 'Cost of goods', 'Cost of goods'),
+  gp: L('মোট লাভ (খরচ জানা অংশে)', 'Gross profit (costed part)', 'Gross profit (costed part)'), gpp: L('লাভ %', 'GP %', 'GP %'), unc: L('ক্রয়মূল্যহীন সেলের অংশ', 'Share of sales without a cost', 'Share without a cost'),
+  places: L('লোকেশন', 'places', 'places'), bills: L('বিল', 'bills', 'bills'), nocost: L('কস্টের তথ্য আপনার জন্য বন্ধ', 'Cost figures are hidden for your role', 'Cost figures are hidden'),
   note: L('ব্র্যান্ড ঠিক করা আছে "রিপোর্ট ব্র্যান্ড ম্যাপ"-এ (মালিক বদলাতে পারেন)। কোনো সংখ্যা অনুমান করা হয়নি।', 'The brand of a place comes from the report brand map (the owner can change it). No figure is estimated.', 'Brand comes from the report brand map. Nothing is estimated.'),
   none: L('এই সময়ে কিছু নেই', 'Nothing in this period', 'Nothing in this period'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), place: L('লোকেশন', 'Place', 'Place'), allp: L('সব লোকেশন', 'All places', 'All places'),
-  onlyap: L('শুধু অনুমোদিত', 'Approved only', 'Approved only'), count: L('ডিসকাউন্টের বিক্রি', 'Discounted sales', 'Discounted sales'), total: L('মোট ডিসকাউন্ট', 'Total discount', 'Total discount'),
-  seller: L('বিক্রেতা', 'Seller', 'Seller'), appr: L('অনুমোদনকারী', 'Approver', 'Approver'), k_grant: L('ভূমিকার অনুমতিতে', 'by role right', 'by role right'), k_emergency: L('জরুরি অনুমোদনে', 'by emergency approval', 'by emergency approval'),
-  within: L('সীমার ভেতরে / রেকর্ড নেই', 'within the limit / not recorded', 'within the limit / not recorded'), void: L('বাতিল', 'void', 'void'), recno: L('রসিদ', 'Receipt', 'Receipt'),
+  onlyap: L('শুধু অ্যাপ্রুভড', 'Approved only', 'Approved only'), count: L('ডিসকাউন্টের সেল', 'Discounted sales', 'Discounted sales'), total: L('টোটাল ডিসকাউন্ট', 'Total discount', 'Total discount'),
+  seller: L('বিক্রেতা', 'Seller', 'Seller'), appr: L('অনুমোদনকারী', 'Approver', 'Approver'), k_grant: L('রোলের অনুমতিতে', 'by role right', 'by role right'), k_emergency: L('জরুরি অ্যাপ্রুভে', 'by emergency approval', 'by emergency approval'),
+  within: L('সীমার ভেতরে / রেকর্ড নেই', 'within the limit / not recorded', 'within the limit / not recorded'), void: L('ভয়েড', 'void', 'void'), recno: L('রসিদ', 'Receipt', 'Receipt'),
 };
 const Ty = (k) => lab(Y[k]);
 const dhakaToday = () => new Date(Date.now() + 6 * 3600 * 1000).toISOString().slice(0, 10);

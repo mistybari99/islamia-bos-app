@@ -7,11 +7,11 @@ const { sb, S, esc, toast, fail, shell, H, nm } = A;
 const L = B.L, lab = B.lab;
 const $ = (s, el = document) => el.querySelector(s);
 const X = {
-  title: L('দায়িত্ব বণ্টন (কে কী অধিকার ধরে আছে)', 'Delegation board (who holds what)', 'Delegation board (কে কী অধিকার ধরে)'), search: L('নাম বা অধিকার খুঁজুন', 'Search person or right', 'নাম বা অধিকার খুঁজুন'),
-  allPlaces: L('সব জায়গা', 'All places', 'সব জায়গা'), until: L('শেষ তারিখ', 'Until', 'শেষ তারিখ'), noEnd: L('শেষ তারিখ নেই', 'No end date', 'শেষ তারিখ নেই'), expired: L('মেয়াদ শেষ', 'Expired', 'মেয়াদ শেষ'),
-  soon: L('শিগগির শেষ', 'Ends soon', 'শিগগির শেষ'), remove: L('সরান', 'Remove', 'সরান'), add: L('নতুন দায়িত্ব দিন', 'Give a right', 'নতুন right দিন'), person: L('কাকে', 'To whom', 'কাকে'), right: L('কোন অধিকার', 'Which right', 'কোন right'),
-  place: L('কোন জায়গায়', 'Which place', 'কোন জায়গায়'), give: L('দিন', 'Give', 'দিন'), none: L('কেউ কোনো দায়িত্ব ধরে নেই', 'Nobody holds a delegated right', 'কেউ কোনো right ধরে নেই'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
-  sure: L('এই অধিকার সরাবেন?', 'Remove this right?', 'এই right সরাবেন?'), pick: L('বাছুন', 'Choose', 'বাছুন'), count: L('টি', 'rights', 'টি'),
+  title: L('দায়িত্ব বণ্টন (কে কী অধিকার ধরে আছে)', 'Delegation board (who holds what)', 'Delegation board (কে কী অধিকার ধরে)'), search: L('নাম বা অনুমতি খুঁজুন', 'Search person or right', 'নাম বা অধিকার খুঁজুন'),
+  allPlaces: L('সব জায়গা', 'All places', 'সব জায়গা'), until: L('শেষ তারিখ', 'Until', 'শেষ তারিখ'), noEnd: L('শেষ ডেট নেই', 'No end date', 'শেষ date নেই'), expired: L('মেয়াদ শেষ', 'Expired', 'মেয়াদ শেষ'),
+  soon: L('শিগগির শেষ', 'Ends soon', 'শিগগির শেষ'), remove: L('সরান', 'Remove', 'সরান'), add: L('নতুন দায়িত্ব দিন', 'Give a right', 'নতুন right দিন'), person: L('কাকে', 'To whom', 'কাকে'), right: L('কোন অনুমতি', 'Which right', 'কোন right'),
+  place: L('কোন জায়গায়', 'Which place', 'কোন জায়গায়'), give: L('দিন', 'Give', 'দিন'), none: L('কেউ কোনো দায়িত্ব ধরে নেই', 'Nobody holds a delegated right', 'কেউ কোনো right ধরে নেই'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'),
+  sure: L('এই অনুমতি সরাবেন?', 'Remove this right?', 'এই right সরাবেন?'), pick: L('বাছুন', 'Choose', 'বাছুন'), count: L('টি', 'rights', 'টি'),
 };
 const T = (k) => lab(X[k]);
 const D = { rows: [], defs: [], people: [], q: '', hint: null };

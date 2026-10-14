@@ -11,25 +11,25 @@ const L = B.L, lab = B.lab;
 const isOwner = () => !!(S.ctx && S.ctx.is_owner);
 
 const X = {
-  title: L('কন্ট্রোল সেন্টার', 'Control Center', 'Control Center'), needs: L('আপনার সিদ্ধান্ত দরকার', 'Needs you', 'Needs you (সিদ্ধান্ত)'), nothing: L('এখন কিছু বাকি নেই ✓', 'Nothing is waiting ✓', 'এখন কিছু বাকি নেই ✓'),
+  title: L('কন্ট্রোল সেন্টার', 'Control Center', 'Control Center'), needs: L('আপনার সিদ্ধান্ত দরকার', 'Needs you', 'Needs you (সিদ্ধান্ত)'), nothing: L('এখন কিছু অপেক্ষায় নেই ✓', 'Nothing is waiting ✓', 'এখন কিছু অপেক্ষায় নেই ✓'),
   soon: L('শীঘ্রই আসছে', 'Coming soon', 'Coming soon'), noacc: L('এই পাতা দেখার অনুমতি নেই', 'You cannot open this page', 'এই page দেখার permission নেই'), note: L('সংখ্যাগুলো সার্ভার থেকে; আপনি যা সিদ্ধান্ত নিতে পারেন শুধু তাই দেখায়।', 'Counts come from the server and show only what you can decide.', 'Count server থেকে; শুধু আপনি যা decide করতে পারেন তা দেখায়।'),
   g_places: L('স্থান ও রোলআউট', 'Places and rollout', 'Places ও rollout'), g_lists: L('তালিকা ও আইটেম', 'Lists and items', 'Lists ও items'), g_people: L('মানুষ ও অনুমতি', 'People and access', 'People ও access'), g_rules: L('নিয়ম ও সিস্টেম', 'Rules and system', 'Rules ও system'),
   t_locations: L('লোকেশন', 'Locations', 'Locations'), d_locations: L('শোরুম, কারখানা, গোডাউন; নতুন শোরুম', 'Showrooms, factories, godowns; add a showroom', 'Showroom, factory, godown; নতুন showroom'),
   t_rollout: L('রোলআউট বোর্ড', 'Rollout board', 'Rollout board'), d_rollout: L('কাগজ / সমান্তরাল / অ্যাপ', 'Paper / Parallel / App', 'Paper / Parallel / App'),
   t_locset: L('লোকেশন সেটিংস (সীমা)', 'Location settings (limits)', 'Location settings (limits)'), d_locset: L('সেটিংস শিট ০-১ ও সংস্করণ', 'Settings sheet 0-1 and versions', 'Settings sheet 0-1 ও versions'),
   t_lists: L('তালিকা ও অপশন', 'Lists and options', 'Lists ও options'), d_lists: L('অপশন, যোগের নিয়ম, “অন্যান্য”', 'Options, add rules, Other queue', 'Options, add rules, Other queue'),
-  t_items: L('আইটেম ও দাম', 'Items and prices', 'Items ও prices'), d_items: L('পণ্য, দাম, ধরন', 'Products, prices, types', 'Products, prices, types'),
-  t_staff: L('স্টাফ ও অনুমোদন', 'Staff and approval', 'Staff ও approval'), d_staff: L('স্টাফ, ভূমিকা, লক খোলা', 'Staff, roles, unlock', 'Staff, roles, unlock'),
-  t_matrix: L('ভূমিকা × ফর্ম অনুমতি', 'Role × form permissions', 'Role × form permissions'), d_matrix: L('কে কোন ফর্ম', 'Who may use which form', 'কে কোন form'),
+  t_items: L('আইটেম ও প্রাইস', 'Items and prices', 'Items ও prices'), d_items: L('পণ্য, প্রাইস, ধরন', 'Products, prices, types', 'Products, prices, types'),
+  t_staff: L('স্টাফ ও অ্যাপ্রুভ', 'Staff and approval', 'Staff ও approval'), d_staff: L('স্টাফ, রোল, লক খোলা', 'Staff, roles, unlock', 'Staff, roles, unlock'),
+  t_matrix: L('রোল × ফর্ম অনুমতি', 'Role × form permissions', 'Role × form permissions'), d_matrix: L('কে কোন ফর্ম', 'Who may use which form', 'কে কোন form'),
   t_rules: L('ফর্মের নিয়ম', 'Form rules', 'Form rules'), d_rules: L('আগে গণনা, লাল ব্লক, চালু/বন্ধ', 'Count first, red block, on/off', 'Count first, red block, on/off'),
-  t_printbooks: L('ছাপা ও বই', 'Print and books', 'Print ও books'), d_printbooks: L('সিরিয়াল ও ছাপার নোট', 'Serials and print notes', 'Serials ও print notes'),
+  t_printbooks: L('প্রিন্ট ও বই', 'Print and books', 'Print ও books'), d_printbooks: L('সিরিয়াল ও প্রিন্টের নোট', 'Serials and print notes', 'Serials ও print notes'),
   t_settings: L('সেটিংস', 'Settings', 'Settings'), d_settings: L('সাধারণ সেটিংস ও আরও', 'General settings and more', 'General settings ও more'),
   t_logs: L('পরিবর্তনের লগ', 'Change log', 'Change log'), d_logs: L('কে কী বদলেছে', 'Who changed what', 'কে কী বদলেছে'),
   t_backup: L('ব্যাকআপ', 'Backup', 'Backup'), d_backup: L('ডেটা ডাউনলোড', 'Download the data', 'Data download'),
   n_item_requests: L('আইটেম পরিবর্তনের অনুরোধ', 'Item change requests', 'Item change requests'), n_exceptions: L('খোলা ব্যতিক্রম', 'Open exceptions', 'Open exceptions'), n_releases: L('লাল-নিয়ন্ত্রণ মুক্তির অনুরোধ', 'Red-control release requests', 'Red-control release requests'),
-  n_emergency: L('জরুরি অনুরোধ', 'Emergency requests', 'Emergency requests'), n_staff_pending: L('অনুমোদনের অপেক্ষায় স্টাফ', 'Staff waiting for approval', 'Staff approval-এর অপেক্ষায়'), n_wastage: L('নষ্টের অনুমোদন', 'Wastage approvals', 'Wastage approvals'),
-  n_location_setup: L('নতুন লোকেশনের সেটআপ বাকি', 'New places being set up', 'নতুন Location setup বাকি'), n_settings_drafts: L('সেটিংস শিটের খসড়া', 'Settings sheet drafts', 'Settings sheet drafts'), n_lists: L('তালিকার অনুরোধ ও “অন্যান্য”', 'List requests and Other', 'List requests ও Other'),
-  tier_owner: L('মালিক', 'Owner', 'Owner'), tier_head: L('হেড ম্যানেজমেন্ট', 'Head management', 'Head management'), tier_delegate: L('অনুমতিপ্রাপ্ত', 'Delegate', 'Delegate'),
+  n_emergency: L('জরুরি অনুরোধ', 'Emergency requests', 'Emergency requests'), n_staff_pending: L('অ্যাপ্রুভের অপেক্ষায় স্টাফ', 'Staff waiting for approval', 'Staff approval-এর অপেক্ষায়'), n_wastage: L('নষ্টের অ্যাপ্রুভ', 'Wastage approvals', 'Wastage approvals'),
+  n_location_setup: L('নতুন লোকেশনের সেটআপ বাকি', 'New places being set up', 'নতুন Location setup বাকি'), n_settings_drafts: L('সেটিংস শিটের ড্রাফট', 'Settings sheet drafts', 'Settings sheet drafts'), n_lists: L('তালিকার অনুরোধ ও “অন্যান্য”', 'List requests and Other', 'List requests ও Other'),
+  tier_owner: L('মালিক', 'Owner', 'Owner'), tier_head: L('হেড ম্যানেজমেন্ট', 'Head management', 'Head management'), tier_delegate: L('অনুমতি-পাওয়া', 'Delegate', 'Delegate'),
 };
 const T = (k) => lab(X[k]);
 // need rows: server key -> screen.  Order = what usually matters first.

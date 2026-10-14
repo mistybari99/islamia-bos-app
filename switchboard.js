@@ -9,11 +9,11 @@ const L = B.L, lab = B.lab;
 const $ = (s, el = document) => el.querySelector(s);
 const X = {
   title: L('সুইচবোর্ড — সব চালু/বন্ধ এক জায়গায়', 'Switchboard — every on/off in one place', 'Switchboard — সব on/off এক জায়গায়'),
-  search: L('নাম বা কী দিয়ে খুঁজুন', 'Search by name or key', 'নাম বা key দিয়ে খুঁজুন'), all: L('সব বিভাগ', 'All sections', 'সব section'),
+  search: L('নাম বা কোড দিয়ে খুঁজুন', 'Search by name or key', 'নাম বা key দিয়ে খুঁজুন'), all: L('সব বিভাগ', 'All sections', 'সব section'),
   on: L('চালু', 'ON', 'ON'), off: L('বন্ধ', 'OFF', 'OFF'), changed: L('বদলানো', 'Changed', 'Changed'), onlyChanged: L('শুধু বদলানো', 'Only changed', 'শুধু changed'),
-  reset: L('ডিফল্টে ফেরান', 'Back to default', 'Default-এ ফেরান'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), none: L('কিছু মেলেনি', 'Nothing matches', 'কিছু মেলেনি'),
-  perForm: L('ফর্ম / জায়গা অনুযায়ী সুইচ', 'Per form / place switches', 'Form / place অনুযায়ী switch'), blind: L('অন্ধ গণনা', 'Blind count', 'Blind count'), pin: L('পিন স্বাক্ষর', 'PIN signature', 'PIN signature'),
-  blindOff: L('মূল সুইচ "অন্ধ গণনা" বন্ধ — নিচের সুইচ কাজ করবে না', 'Master "blind count" is OFF - these do nothing', 'Master "blind count" OFF - এগুলো কাজ করবে না'),
+  reset: L('ডিফল্টে ফেরান', 'Back to default', 'Default-এ ফেরান'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'), none: L('কিছু মেলেনি', 'Nothing matches', 'কিছু মেলেনি'),
+  perForm: L('ফর্ম / জায়গা অনুযায়ী সুইচ', 'Per form / place switches', 'Form / place অনুযায়ী switch'), blind: L('ব্লাইন্ড কাউন্ট', 'Blind count', 'Blind count'), pin: L('পিন স্বাক্ষর', 'PIN signature', 'PIN signature'),
+  blindOff: L('মূল সুইচ "ব্লাইন্ড গণনা" বন্ধ — নিচের সুইচ কাজ করবে না', 'Master "blind count" is OFF - these do nothing', 'Master "blind count" OFF - এগুলো কাজ করবে না'),
   pinOff: L('মূল সুইচ "পিন স্বাক্ষর" বন্ধ — নিচের সুইচ কাজ করবে না', 'Master "PIN signature" is OFF - these do nothing', 'Master "PIN signature" OFF - এগুলো কাজ করবে না'),
   more: L('সংখ্যার সীমা সেটিংসে', 'Numbers and limits are in Settings', 'Number/limit Settings-এ'), count: L('টি', 'items', 'টি'),
 };
@@ -25,8 +25,8 @@ const rh = (r) => (r.hint_bn || r.hint_en) ? { bn: r.hint_bn || r.hint_en, mix: 
 const cur = (r) => (r.value !== null && r.value !== undefined ? r.value : r.default_value);
 const isOn = (r) => cur(r) === true || cur(r) === 'true';
 const changed = (r) => r.value !== null && r.value !== undefined && JSON.stringify(r.value) !== JSON.stringify(r.default_value);
-const MOD = { entries: L('ফর্ম ও এন্ট্রি', 'Forms & entries', 'Form ও entry'), stock: L('স্টক', 'Stock', 'Stock'), pos: L('বিক্রি / POS', 'Sales / POS', 'Sales / POS'), lists: L('তালিকা ও অনুমোদন', 'Lists & approvals', 'List ও approval'),
-  settings: L('সেটিংস', 'Settings', 'Settings'), books: L('হিসাবরক্ষণ', 'Accounting', 'Accounting'), customers: L('গ্রাহক ও স্তর', 'Customers & tiers', 'Customer ও Tier'), notify: L('নোটিফিকেশন ও ব্যাকআপ', 'Notifications & backup', 'Notification ও Backup'), partners: L('অংশীদারি ও বিনিয়োগ', 'Partners & investment', 'Partners ও Investment'), people: L('কর্মী, হাজিরা ও বেতন', 'People, attendance & payroll', 'People, হাজিরা ও Payroll'), items: L('আইটেম', 'Items', 'Items'), lists: L('তালিকা', 'Lists', 'Lists'), locations: L('জায়গা', 'Locations', 'Locations'), purchase: L('ক্রয়', 'Purchases', 'Purchases'), reports: L('রিপোর্ট', 'Reports', 'Reports'), emergency: L('জরুরি', 'Emergency', 'Emergency'), ui: L('চেহারা / ব্যবহার', 'Look & feel', 'Look & feel'), cash: L('ক্যাশ', 'Cash', 'Cash') };
+const MOD = { entries: L('ফর্ম ও এন্ট্রি', 'Forms & entries', 'Form ও entry'), stock: L('স্টক', 'Stock', 'Stock'), pos: L('সেল / POS', 'Sales / POS', 'Sales / POS'), lists: L('তালিকা ও অ্যাপ্রুভ', 'Lists & approvals', 'List ও approval'),
+  settings: L('সেটিংস', 'Settings', 'Settings'), books: L('অ্যাকাউন্টিং', 'Accounting', 'Accounting'), customers: L('কাস্টমার ও টিয়ার', 'Customers & tiers', 'Customer ও Tier'), notify: L('নোটিফিকেশন ও ব্যাকআপ', 'Notifications & backup', 'Notification ও Backup'), partners: L('অংশীদারি ও বিনিয়োগ', 'Partners & investment', 'Partners ও Investment'), people: L('স্টাফ, হাজিরা ও পে-রোল', 'People, attendance & payroll', 'Staff, হাজিরা ও Payroll'), items: L('আইটেম', 'Items', 'Items'), lists: L('তালিকা', 'Lists', 'Lists'), locations: L('লোকেশন', 'Locations', 'Locations'), purchase: L('ক্রয়', 'Purchases', 'Purchases'), reports: L('রিপোর্ট', 'Reports', 'Reports'), emergency: L('জরুরি', 'Emergency', 'Emergency'), ui: L('দেখতে কেমন (থিম/রং)', 'Look & feel', 'Look & feel'), cash: L('ক্যাশ', 'Cash', 'Cash') };
 const modName = (m) => (MOD[m] ? lab(MOD[m]) : m);
 
 async function load() {

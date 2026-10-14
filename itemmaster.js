@@ -13,9 +13,9 @@ const isOwner = () => !!(S.ctx && S.ctx.is_owner);
 const CHUNK = 200;
 
 const X = {
-  more: L('আরও অপশন', 'More options', 'আরও Option'), close: L('বন্ধ', 'Close', 'Close'), cancel: L('বাতিল', 'Cancel', 'Cancel'), save: L('সংরক্ষণ', 'Save', 'Save'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'),
-  yes: L('হ্যাঁ', 'Yes', 'Yes'), none: L('কিছু নেই', 'Nothing here', 'কিছু নেই'), on: L('চালু', 'On', 'On'), off: L('বন্ধ', 'Off', 'Off'), sent: L('অনুমোদনের জন্য গেছে', 'Sent for approval', 'Approval-এর জন্য গেছে'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
-  dataNeeded: L('Data needed (দাম নেই)', 'Data needed (no price)', 'Data needed (দাম নেই)'),
+  more: L('আরও অপশন', 'More options', 'আরও Option'), close: L('বন্ধ', 'Close', 'Close'), cancel: L('ক্যান্সেল', 'Cancel', 'Cancel'), save: L('সেভ', 'Save', 'Save'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'),
+  yes: L('হ্যাঁ', 'Yes', 'Yes'), none: L('কিছু নেই', 'Nothing here', 'কিছু নেই'), on: L('চালু', 'On', 'On'), off: L('বন্ধ', 'Off', 'Off'), sent: L('অ্যাপ্রুভের জন্য গেছে', 'Sent for approval', 'Approval-এর জন্য গেছে'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'),
+  dataNeeded: L('Data needed (প্রাইস নেই)', 'Data needed (no price)', 'Data needed (price নেই)'),
   // menu
   m_edit: L('পণ্য বদলান', 'Edit product', 'Product বদলান'), m_lock: L('লক করুন (শুধু মালিক বদলাতে পারবে)', 'Lock (only the owner can edit)', 'Lock করুন (শুধু Owner বদলাতে পারবে)'), m_unlock: L('আনলক করুন', 'Unlock', 'Unlock করুন'),
   m_hide: L('পিকার থেকে লুকান', 'Hide from pickers', 'Picker থেকে লুকান'), m_show: L('আবার দেখান', 'Show again', 'আবার দেখান'),
@@ -25,10 +25,10 @@ const X = {
   m_type: L('ধরন বদলান', 'Change type', 'Type বদলান'), m_dup: L('একই নামের আইটেম আছে কি দেখুন', 'Duplicate check', 'Duplicate check'), m_hist: L('ইতিহাস', 'History', 'History'),
   m_link: L('মাস্টার কোডের সাথে মেলান', 'Link to a master code', 'Master code-এর সাথে মেলান'), m_unlink: L('মাস্টার কোডের সাথে মিল সরান', 'Remove the master link', 'Master link সরান'), m_copy: L('কোড কপি', 'Copy code', 'Code copy'),
   // chips / labels
-  c_locked: L('লক', 'Locked', 'Locked'), c_hidden: L('লুকানো', 'Hidden', 'Hidden'), c_nocount: L('ব্যবসার হিসাবে নেই', 'Not counted', 'Not counted'), c_retired: L('অবসরপ্রাপ্ত', 'Retired', 'Retired'), c_nosell: L('বিক্রি নয়', 'Not for sale', 'Not for sale'),
+  c_locked: L('লক', 'Locked', 'Locked'), c_hidden: L('লুকানো', 'Hidden', 'Hidden'), c_nocount: L('ব্যবসার হিসাবে নেই', 'Not counted', 'Not counted'), c_retired: L('অবসরপ্রাপ্ত', 'Retired', 'Retired'), c_nosell: L('সেল নয়', 'Not for sale', 'Not for sale'),
   f_type: L('আইটেমের ধরন', 'Item type', 'Item type'), f_class: L('ডিকশনারি ক্লাস', 'Dictionary class', 'Dictionary class'), f_flags: L('ফ্ল্যাগ', 'Flags', 'Flags'),
   f_lock: L('লক (শুধু মালিক বদলাবে)', 'Locked (only the owner edits)', 'Lock (শুধু Owner বদলাবে)'), f_hide: L('পিকার থেকে লুকানো', 'Hidden from pickers', 'Picker থেকে লুকানো'),
-  f_count: L('ব্যবসার হিসাবে ধরা (স্টক / COGS / লাভ)', 'Count in business (stock / COGS / profit)', 'Business-এর হিসাবে ধরা'), f_sell: L('বিক্রির জন্য', 'For sale', 'Selling-এর জন্য'),
+  f_count: L('ব্যবসার হিসাবে ধরা (স্টক / COGS / লাভ)', 'Count in business (stock / COGS / profit)', 'Business-এর হিসাবে ধরা'), f_sell: L('সেলের জন্য', 'For sale', 'Selling-এর জন্য'),
   f_code: L('পরবর্তী কোড', 'Next code', 'Next code'), f_codeold: L('এই ক্যাটাগরিতে নম্বর-কোড নেই: পুরনো I- কোড হবে', 'This category has no code number: an I- code will be used', 'এই Category-তে code number নেই: I- code হবে'),
   f_locked: L('এই আইটেম লক করা — শুধু মালিক বদলাতে পারেন', 'This item is locked — only the owner can change it', 'এই Item locked — শুধু Owner বদলাতে পারেন'),
   f_fixed: L('এই ধরনের আইটেম কখনো স্টক বা বিক্রিতে আসে না', 'This type never goes to stock or sales', 'এই type কখনো stock বা sales-এ আসে না'),
@@ -42,16 +42,16 @@ const X = {
   ni_done: L('আইটেম যোগ হয়েছে — কোড', 'Item added — code', 'Item যোগ হয়েছে — code'), ni_pend: L('অনুরোধ মালিকের কাছে গেছে', 'Request sent for approval', 'Request approval-এর জন্য গেছে'),
   // dup / history
   dup_none: L('একই নামের আর কোনো আইটেম নেই ✓', 'No other item has the same name ✓', 'একই নামের আর কোনো item নেই ✓'), dup_found: L('একই নামের আইটেম', 'Items with the same name', 'একই নামের Item'),
-  h_price: L('দামের ইতিহাস', 'Price history', 'Price history'), h_log: L('বদলের লগ', 'Change log', 'Change log'), h_none: L('কোনো ইতিহাস নেই', 'No history', 'কোনো history নেই'),
+  h_price: L('প্রাইসের ইতিহাস', 'Price history', 'Price history'), h_log: L('বদলের লগ', 'Change log', 'Change log'), h_none: L('কোনো ইতিহাস নেই', 'No history', 'কোনো history নেই'),
   // link
   l_title: L('মাস্টার কোড বাছুন', 'Choose the master code', 'Master code বাছুন'), l_ph: L('নাম বা কোড লিখুন', 'Type a name or code', 'নাম বা code লিখুন'), l_ok: L('মেলানো হয়েছে', 'Linked', 'Linked'),
-  l_stay: L('পুরনো আইটেমের কোড ও দাম বদলায় না', 'The old item keeps its own code and price', 'পুরনো Item-এর code ও দাম বদলায় না'),
+  l_stay: L('পুরনো আইটেমের কোড ও প্রাইস বদলায় না', 'The old item keeps its own code and price', 'পুরনো Item-এর code ও price বদলায় না'),
   // import page
   i_title: L('আইটেম মাস্টার ইমপোর্ট', 'Item master import', 'Item master import'), i_load: L('ফাইল লোড', 'Load the file', 'File load'), i_preview: L('প্রিভিউ (কিছু লেখা হয় না)', 'Preview (writes nothing)', 'Preview (কিছু লেখা হয় না)'),
   i_apply: L('ইমপোর্ট করুন', 'Apply the import', 'Import করুন'), i_rows: L('সারি', 'rows', 'rows'), i_total: L('মোট সারি', 'Rows in file', 'File-এ rows'), i_create: L('তৈরি হবে', 'To create', 'তৈরি হবে'),
   i_skip: L('আগেই আছে (বাদ)', 'Already there (skipped)', 'আগেই আছে (skip)'), i_ret: L('অবসরপ্রাপ্ত কোড (বন্ধ অবস্থায়, কোড সংরক্ষিত)', 'Retired codes (inactive, code kept)', 'Retired code (inactive, code reserved)'),
   i_conf: L('সমস্যা (বাদ যাবে)', 'Problems (left out)', 'Problem (বাদ যাবে)'), i_bytype: L('ধরন অনুযায়ী', 'By type', 'Type অনুযায়ী'), i_bycat: L('ক্যাটাগরি অনুযায়ী', 'By category', 'Category অনুযায়ী'),
-  i_note: L('কোনো দাম ইমপোর্ট হয় না — প্রতিটি নতুন আইটেমে দাম "Data needed" থাকবে। আগের আইটেম ও দাম অপরিবর্তিত।', 'No price is imported — every new item shows "Data needed" for the price. Existing items and prices stay as they are.', 'কোনো দাম import হয় না — প্রতিটি নতুন Item-এ দাম "Data needed"। আগের Item ও দাম অপরিবর্তিত।'),
+  i_note: L('কোনো প্রাইস ইমপোর্ট হয় না — প্রতিটি নতুন আইটেমে প্রাইস "Data needed" থাকবে। আগের আইটেম ও প্রাইস অপরিবর্তিত।', 'No price is imported — every new item shows "Data needed" for the price. Existing items and prices stay as they are.', 'কোনো price import হয় না — প্রতিটি নতুন Item-এ price "Data needed"। আগের Item ও price অপরিবর্তিত।'),
   i_confirm: L('ইমপোর্ট শুরু করবেন?', 'Start the import?', 'Import শুরু করবেন?'), i_go: L('হ্যাঁ, ইমপোর্ট', 'Yes, import', 'Yes, import'), i_prog: L('চলছে', 'Working', 'চলছে'),
   i_done: L('ইমপোর্ট শেষ', 'Import finished', 'Import শেষ'), i_resume: L('আবার শুরু করুন (যেখানে থেমেছিল)', 'Resume (where it stopped)', 'Resume (যেখানে থেমেছিল)'), i_stopped: L('থেমে গেছে — আবার চাপলে এগোবে', 'Stopped — press resume to continue', 'থেমে গেছে — resume চাপুন'),
   i_nofile: L('ফাইল পাওয়া যায়নি', 'File not found', 'File পাওয়া যায়নি'), i_map: L('পুরনো আইটেম মেলানো (প্রস্তাব লোড)', 'Load the old-item suggestions', 'পুরনো Item মেলানো (suggestion load)'),
@@ -60,20 +60,20 @@ const X = {
   // map page
   mp_title: L('পুরনো আইটেম → মাস্টার কোড', 'Old items → master codes', 'পুরনো Item → Master code'), mp_pending: L('সিদ্ধান্ত বাকি', 'Needs decision', 'Decision বাকি'), mp_linked: L('মেলানো', 'Linked', 'Linked'), mp_rejected: L('আলাদা থাকবে', 'Kept apart', 'আলাদা থাকবে'),
   mp_sugg: L('প্রস্তাব', 'Suggestion', 'Suggestion'), mp_conf: L('মিল', 'match', 'match'), mp_use: L('প্রস্তাব মানুন', 'Use the suggestion', 'Suggestion মানুন'), mp_other: L('অন্য কোড বাছুন', 'Choose another code', 'অন্য code বাছুন'),
-  mp_rej: L('আলাদা থাকুক', 'Keep it apart', 'আলাদা থাকুক'), mp_undo: L('সিদ্ধান্ত বাতিল', 'Undo the decision', 'Decision বাতিল'), mp_none: L('সিদ্ধান্ত বাকি নেই ✓', 'Nothing waiting ✓', 'Decision বাকি নেই ✓'),
+  mp_rej: L('আলাদা থাকুক', 'Keep it apart', 'আলাদা থাকুক'), mp_undo: L('সিদ্ধান্ত বাতিল', 'Undo the decision', 'Decision বাতিল'), mp_none: L('সিদ্ধান্ত অপেক্ষায় নেই ✓', 'Nothing waiting ✓', 'Decision অপেক্ষায় নেই ✓'),
   mp_empty: L('এখনও প্রস্তাব লোড হয়নি — ইমপোর্ট পাতা থেকে লোড করুন', 'No suggestions loaded yet — load them from the import page', 'এখনও suggestion load হয়নি — import page থেকে load করুন'),
   // types page
   ty_title: L('আইটেমের ধরন ও ডিফল্ট', 'Item types & defaults', 'Item type ও Default'), ty_h: L('প্রতিটি ধরনের নতুন আইটেম এই ফ্ল্যাগ নিয়ে শুরু হয়। আগের আইটেম বদলায় না।', 'New items of each type start with these flags. Existing items do not change.', 'প্রতিটি type-এর নতুন Item এই flag নিয়ে শুরু হয়। আগের Item বদলায় না।'),
-  ty_count: L('ব্যবসার হিসাবে ধরা', 'Count in business', 'Business-এ ধরা'), ty_sell: L('বিক্রির জন্য', 'For sale', 'Selling-এর জন্য'), ty_active: L('সক্রিয়', 'Active', 'Active'), ty_map: L('ডিকশনারি ক্লাস → ধরন', 'Dictionary class → type', 'Dictionary class → type'),
+  ty_count: L('ব্যবসার হিসাবে ধরা', 'Count in business', 'Business-এ ধরা'), ty_sell: L('সেলের জন্য', 'For sale', 'Selling-এর জন্য'), ty_active: L('সক্রিয়', 'Active', 'Active'), ty_map: L('ডিকশনারি ক্লাস → ধরন', 'Dictionary class → type', 'Dictionary class → type'),
   ty_sw: L('সুইচ', 'Switches', 'Switch'), ty_tools: L('যন্ত্রপাতির (নিয়ন্ত্রিত) আলাদা স্টক গণনা', 'Tools (controlled) stock count', 'Tools (controlled) stock count'), ty_reg: L('সম্পদ কিনলে সম্পদ-খাতায় যোগ', 'Buying an asset adds it to the register', 'Asset কিনলে register-এ যোগ'),
-  ty_appr: L('নতুন আইটেমে অনুমোদন লাগবে', 'New items need approval', 'নতুন Item-এ approval লাগবে'), ty_fixed: L('স্থায়ী নিয়ম', 'fixed rule', 'fixed rule'), ty_rules: L('সব নিয়ম: নিয়ম ও অপশন', 'All rules: Rules & options', 'সব rule: Rules ও Option'),
+  ty_appr: L('নতুন আইটেমে অ্যাপ্রুভ লাগবে', 'New items need approval', 'নতুন Item-এ approval লাগবে'), ty_fixed: L('স্থায়ী নিয়ম', 'fixed rule', 'fixed rule'), ty_rules: L('সব নিয়ম: নিয়ম ও অপশন', 'All rules: Rules & options', 'সব rule: Rules ও Option'),
   // assets
   as_title: L('সম্পদ-খাতা', 'Asset register', 'Asset register'), as_add: L('সম্পদ যোগ', 'Add asset', 'Asset যোগ'), as_tag: L('ট্যাগ', 'Tag', 'Tag'), as_loc: L('লোকেশন', 'Location', 'Location'), as_cond: L('অবস্থা', 'Condition', 'Condition'),
-  as_status: L('স্ট্যাটাস', 'Status', 'Status'), as_bought: L('কেনার তারিখ', 'Bought on', 'Bought on'), as_cost: L('দাম ৳', 'Cost ৳', 'Cost ৳'), as_note: L('নোট', 'Note', 'Note'), as_maint: L('মেইনটেন্যান্স রেকর্ড (08-1)', 'Maintenance record (08-1)', 'Maintenance record (08-1)'),
+  as_status: L('স্ট্যাটাস', 'Status', 'Status'), as_bought: L('কেনার তারিখ', 'Bought on', 'Bought on'), as_cost: L('কস্ট ৳', 'Cost ৳', 'Cost ৳'), as_note: L('নোট', 'Note', 'Note'), as_maint: L('মেইনটেন্যান্স রেকর্ড (08-1)', 'Maintenance record (08-1)', 'Maintenance record (08-1)'),
   as_qty: L('কয়টি', 'How many', 'কয়টি'), as_item: L('সম্পদের আইটেম', 'Asset item', 'Asset item'), as_edit: L('বদলান', 'Edit', 'Edit'), as_retire: L('বন্ধ করুন (বিক্রি / হারানো / বাতিল)', 'Retire (sold / lost / scrapped)', 'Retire (sold / lost / scrapped)'),
   as_react: L('আবার চালু', 'Reactivate', 'Reactivate'), as_none: L('কোনো সম্পদ নেই', 'No assets', 'কোনো asset নেই'), as_all: L('সব', 'All', 'All'), as_retired: L('বন্ধগুলোও দেখান', 'Show retired too', 'Retired-ও দেখান'),
   as_noitem: L('আগে "সম্পদ" ধরনের আইটেম যোগ করুন', 'First add an item of type Asset', 'আগে "Asset" type-এর item যোগ করুন'), as_auto: L('ক্রয় বিল থেকে', 'from a purchase bill', 'purchase bill থেকে'),
-  as_reason: L('কারণ', 'Reason', 'Reason'), as_total: L('মোট', 'Total', 'Total'), as_count: L('টি', 'assets', 'assets'), as_costhid: L('দাম শুধু মালিক বা অনুমতিপ্রাপ্তরা দেখেন', 'Cost is visible to the owner and permitted people only', 'Cost শুধু Owner/permitted দেখেন'),
+  as_reason: L('কারণ', 'Reason', 'Reason'), as_total: L('টোটাল', 'Total', 'Total'), as_count: L('টি', 'assets', 'assets'), as_costhid: L('কস্ট শুধু মালিক বা অনুমতি-পাওয়ারা দেখেন', 'Cost is visible to the owner and permitted people only', 'Cost শুধু Owner/permitted দেখেন'),
 };
 const T = (k) => lab(X[k]);
 const STATUS = { in_use: L('ব্যবহারে', 'In use', 'In use'), in_store: L('স্টোরে', 'In store', 'In store'), under_repair: L('মেরামতে', 'Under repair', 'Under repair'), lost: L('হারানো', 'Lost', 'Lost'), sold: L('বিক্রি', 'Sold', 'Sold'), retired: L('বাতিল', 'Retired', 'Retired') };
@@ -133,9 +133,9 @@ css.textContent = `.im-act{display:flex;align-items:center;gap:10px;width:100%;j
 .im-bar{height:10px;border-radius:5px;background:var(--line,#e3e0d8);overflow:hidden}.im-bar>i{display:block;height:100%;background:var(--sig-ok,#3a7d5c);width:0}.im-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.im-grid .stat{padding:8px}`;
 document.head.appendChild(css);
 
-const ERRT = { bad_price: L('দাম ঠিক নয় (০ থেকে ১০০ কোটির মধ্যে সংখ্যা)', 'The price is not valid (a number from 0 to 1,000,000,000)', 'Price ঠিক নয় (০ থেকে ১০০ কোটি)'), bad_unit: L('এই একক তালিকায় নেই', 'This unit is not in the units list', 'এই unit list-এ নেই'),
+const ERRT = { bad_price: L('প্রাইস ঠিক নয় (০ থেকে ১০০ কোটির মধ্যে সংখ্যা)', 'The price is not valid (a number from 0 to 1,000,000,000)', 'Price ঠিক নয় (০ থেকে ১০০ কোটি)'), bad_unit: L('এই একক তালিকায় নেই', 'This unit is not in the units list', 'এই unit list-এ নেই'),
   bad_category: L('এই ক্যাটাগরি তালিকায় নেই', 'This category is not in the list', 'এই category list-এ নেই'), category_inactive: L('এই ক্যাটাগরি বন্ধ — নতুন আইটেম যোগ হবে না', 'This category is switched off — no new items', 'এই category বন্ধ — নতুন item হবে না'),
-  bad_field: L('এই ঘর এই পথে বদলানো যায় না', 'This field cannot be changed this way', 'এই field এই পথে বদলানো যায় না'), item_not_counted: X.m_cnt_off, bill_voided: L('বাতিল বিলের সম্পদ আবার চালু করা যায় না', 'An asset of a voided bill cannot be reactivated', 'Voided bill-এর asset আবার চালু হয় না'),
+  bad_field: L('এই ঘর এই পথে বদলানো যায় না', 'This field cannot be changed this way', 'এই field এই পথে বদলানো যায় না'), item_not_counted: X.m_cnt_off, bill_voided: L('ভয়েড বিলের সম্পদ আবার চালু করা যায় না', 'An asset of a voided bill cannot be reactivated', 'Voided bill-এর asset আবার চালু হয় না'),
   tag_too_long: L('ট্যাগ ৬০ অক্ষরের বেশি হয় না', 'The tag is at most 60 characters', 'Tag ৬০ অক্ষরের বেশি হয় না'), name_required: L('নাম লিখুন', 'Enter the name', 'নাম লিখুন') };
 const errMsg = (e) => { const m = (e && e.message) || ''; for (const k of Object.keys(ERRT)) if (m.includes(k)) return lab(ERRT[k]); return null; };
 const failx = (e) => { const m = errMsg(e); if (m) return toast(m); return fail(e); };
@@ -206,8 +206,8 @@ function drawPick(q) {
 }
 async function linkTo(oldId, code, note, force) {
   const { error } = await sb.rpc('item_mapping_decide', { p_item: oldId, p_dict: code, p_status: 'linked', p_note: note || null, p_force: !!force });
-  if (error && /master_type_mismatch/.test(error.message || '') && isOwner() && !force && window.confirm(lab(L('এই মাস্টার কোডটি বিক্রির পণ্য নয় (কাঁচামাল / সম্পদ / যন্ত্রপাতি …)। তবুও মেলাবেন?', 'That master code is not a product for sale (material / asset / tool …). Link anyway?', 'এই master code বিক্রির product নয়। তবুও link করবেন?')))) return linkTo(oldId, code, note, true);
-  if (error && /master_type_mismatch/.test(error.message || '')) return toast(lab(L('এই মাস্টার কোডটি বিক্রির পণ্য নয় — শুধু মালিক জোর করে মেলাতে পারেন', 'That master code is not a product for sale — only the owner can force the link', 'এই master code বিক্রির product নয় — শুধু Owner force করতে পারেন')));
+  if (error && /master_type_mismatch/.test(error.message || '') && isOwner() && !force && window.confirm(lab(L('এই মাস্টার কোডটি সেলের পণ্য নয় (কাঁচামাল / সম্পদ / যন্ত্রপাতি …)। তবুও মেলাবেন?', 'That master code is not a product for sale (material / asset / tool …). Link anyway?', 'এই master code sale-এর product নয়। তবুও link করবেন?')))) return linkTo(oldId, code, note, true);
+  if (error && /master_type_mismatch/.test(error.message || '')) return toast(lab(L('এই মাস্টার কোডটি সেলের পণ্য নয় — শুধু মালিক জোর করে মেলাতে পারেন', 'That master code is not a product for sale — only the owner can force the link', 'এই master code sale-এর product নয় — শুধু Owner force করতে পারেন')));
   if (error) { if (/master_code_taken/.test(error.message || '')) return toast(lab(L('এই মাস্টার কোড আরেক আইটেমের সাথে মেলানো', 'That master code is already linked to another item', 'এই master code অন্য item-এর সাথে linked'))); return fail(error); }
   toast(T('l_ok'));
 }
@@ -417,8 +417,8 @@ function mpMenu(itemId) {
 }
 async function mpDecide(itemId, code, status, force) {
   const { error } = await sb.rpc('item_mapping_decide', { p_item: itemId, p_dict: code, p_status: status, p_note: null, p_force: !!force });
-  if (error && /master_type_mismatch/.test(error.message || '') && isOwner() && !force && window.confirm(lab(L('এই মাস্টার কোডটি বিক্রির পণ্য নয়। তবুও মেলাবেন?', 'That master code is not a product for sale. Link anyway?', 'এই master code বিক্রির product নয়। তবুও link করবেন?')))) return mpDecide(itemId, code, status, true);
-  if (error && /master_type_mismatch/.test(error.message || '')) return toast(lab(L('এই মাস্টার কোডটি বিক্রির পণ্য নয়', 'That master code is not a product for sale', 'এই master code বিক্রির product নয়')));
+  if (error && /master_type_mismatch/.test(error.message || '') && isOwner() && !force && window.confirm(lab(L('এই মাস্টার কোডটি সেলের পণ্য নয়। তবুও মেলাবেন?', 'That master code is not a product for sale. Link anyway?', 'এই master code sale-এর product নয়। তবুও link করবেন?')))) return mpDecide(itemId, code, status, true);
+  if (error && /master_type_mismatch/.test(error.message || '')) return toast(lab(L('এই মাস্টার কোডটি সেলের পণ্য নয়', 'That master code is not a product for sale', 'এই master code sale-এর product নয়')));
   if (error) { if (/master_code_taken/.test(error.message || '')) return toast(lab(L('এই মাস্টার কোড আরেক আইটেমের সাথে মেলানো', 'That master code is already linked to another item', 'এই master code অন্য item-এর সাথে linked'))); return fail(error); }
   closeSheet(); toast(T('saved')); await viewMap();
 }
@@ -512,7 +512,7 @@ async function assetForm(id) {
 }
 async function assetSave() {
   const id = AS.edit, num = (v) => (norm(v) === '' ? null : Number(norm(v)));
-  const cost = $('#af_cost') ? num($('#af_cost').value) : undefined; if (cost !== undefined && cost !== null && (!Number.isFinite(cost) || cost < 0)) return toast(lab(L('দাম ঠিক নয়', 'Cost is not valid', 'Cost ঠিক নয়')));
+  const cost = $('#af_cost') ? num($('#af_cost').value) : undefined; if (cost !== undefined && cost !== null && (!Number.isFinite(cost) || cost < 0)) return toast(lab(L('কস্ট ঠিক নয়', 'Cost is not valid', 'Cost ঠিক নয়')));
   if (id) {
     const r = AS.rows.find((x) => x.id === id), p = { location_id: Number($('#af_loc').value), condition: $('#af_cond').value || null, status: $('#af_st').value, bought_on: $('#af_date').value || null, note: $('#af_note').value.trim() || null, maintenance_ref: $('#af_maint') ? $('#af_maint').value || null : r.maintenance_ref };
     if (cost !== undefined && cost !== (AS.costs.get(id) === undefined ? null : Number(AS.costs.get(id)))) p.cost = cost;

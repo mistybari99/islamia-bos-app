@@ -12,7 +12,7 @@ const store = {
 // the brand name is fixed in every language: never translated, never re-spelled
 const BRAND = { bn: 'ইসলামিয়া মিষ্টি ঘর', en: 'ISLAMIYA MISTY GHAR' };
 window.BOS = Object.assign(window.BOS || {}, { BRAND: { hub: { bn: 'ইসলামিয়া মিষ্টি ঘর', en: 'ISLAMIYA MISTY GHAR' }, bari: { bn: 'মিষ্টি বাড়ি', en: 'MISTY BARI' }, cakiz: { bn: 'AL-CAKIZ', en: 'AL-CAKIZ' } } });
-const S = { ctx: null, lang: store.get('bos_lang') || 'bn', items: [], itemQ: '', itemCat: '', matrixRole: null, logTable: '' };
+const S = { offline: false, csNeeds: false, ctx: null, lang: store.get('bos_lang') || 'bn', items: [], itemQ: '', itemCat: '', matrixRole: null, logTable: '' };
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const t = (k) => (T[k] && (T[k][S.lang] || T[k].bn)) || k;
@@ -126,9 +126,11 @@ async function doLogin() {
   const sid = val('#a_sid'), pin = val('#a_pin');
   if (!SID_RE.test(sid)) return authErr(t('err_staff_id'));
   if (!PIN_RE.test(pin)) return authErr(t('err_pin'));
+  if (navigator.onLine === false && CS()) return authErr(CS().T('first'));   // bos112: no internet = say so, do not count a wrong PIN
   const pre = await sb.rpc('login_precheck', { p_staff: sid });
   if (pre.data && pre.data.locked) return authErr(t('err_locked'));
   const { error } = await sb.auth.signInWithPassword({ email: emailOf(sid), password: pwOf(pin) });
+  if (error && CS() && CS().isNet(error)) return authErr(CS().T('first'));   // bos112: the server was not reached: not a wrong PIN
   if (error) { await sb.rpc('login_failed', { p_staff: sid }); return authErr(t('err_login')); }
   await sb.rpc('login_success');
   await start();
@@ -143,20 +145,73 @@ async function doRegister() {
   if (!data.session) return authErr(t('err_confirm'));
   await start();
 }
-async function logout() { await sb.auth.signOut(); S.ctx = null; location.hash = ''; viewAuth(); }
+async function logout() {
+  if (CS()) CS().clear();   // bos112: sign-out forgets the saved offline context
+  S.offline = false; csStop(); if (CS()) CS().paint();
+  try { await sb.auth.signOut(); if (CS() && CS().storedUid()) await sb.auth.signOut({ scope: 'local' }); } catch (e) { /* offline: the saved session is dropped on this phone below */ try { await sb.auth.signOut({ scope: 'local' }); } catch (e2) { /* ignore */ } }
+  S.ctx = null; location.hash = ''; viewAuth();
+}
 
 async function loadCtx() {
   const { data, error } = await sb.rpc('my_context');
   if (error) throw error;
-  S.ctx = data;
+  S.ctx = data; if (data && CS()) CS().save(data);   // bos112: remember the last good sign-in (active profiles only) for an offline cold start
   if (data && data.profile && !store.get('bos_lang')) S.lang = data.profile.lang || 'bn';
 }
+// bos112: offline cold start. See coldstart.js for what is kept and why.
+const CS = () => window.BOS_CS;
+let csTimer = null, csBusy = false;
+function csStop() { if (csTimer) clearInterval(csTimer); csTimer = null; }
+function offlineBoot(uid) {
+  const c = CS() ? CS().load(uid) : { refused: 'none' };
+  if (!c.ctx) { viewAuth('login', CS() ? CS().T(c.refused === 'old' ? 'old' : 'first') : ''); return false; }
+  S.ctx = c.ctx; S.offline = true;
+  if (c.ctx.profile && !store.get('bos_lang')) S.lang = c.ctx.profile.lang || 'bn';
+  CS().envApply(); CS().paint();
+  if (!csTimer) csTimer = setInterval(csRecheck, 30000);
+  route(); return true;
+}
+async function csLockout(msg) {
+  CS().clear(); S.ctx = null; S.offline = false; csStop(); CS().paint();
+  try { await sb.auth.signOut(); } catch (e) { /* offline again: the cache is already gone */ }
+  const had = location.hash; location.hash = ''; if (had) await new Promise((r) => setTimeout(r, 60));   // let the hashchange render finish, then show the message
+  viewAuth('login', msg);
+}
+async function csRecheck() {   // background retry: every 30 s and on 'online'. Never reloads the page; a removed / inactive user is signed out here.
+  if (!S.offline || csBusy) return; csBusy = true;
+  try {
+    let r; try { r = await sb.auth.getSession(); } catch (e) { r = { data: {}, error: e }; }
+    const session = r && r.data && r.data.session;
+    if (!session) { if ((r && r.error && CS().isNet(r.error)) || navigator.onLine === false) return; return await csLockout(CS().T('out')); }
+    const { data, error } = await sb.rpc('my_context');
+    if (error) { if (CS().isNet(error)) return; return await csLockout(CS().T('out')); }
+    if (!data || !data.profile || data.profile.status !== 'active') return await csLockout(t('err_disabled'));
+    S.ctx = data; CS().save(data); S.offline = false; csStop(); CS().paint();
+    window.dispatchEvent(new Event('online'));   // the queues (POS sales, outbox) resend now; every resend carries its client id, so nothing is written twice
+    if (S.csNeeds) route();
+  } catch (e) { /* still offline */ } finally { csBusy = false; }
+}
+window.addEventListener('online', () => { if (S.offline) csRecheck(); });
 async function start() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) return viewAuth();
-  try { await loadCtx(); } catch (e) { fail(e); return viewAuth(); }
+  let session = null;
+  try { const r = await sb.auth.getSession(); session = r && r.data && r.data.session; } catch (e) { session = null; }
+  if (!session) {
+    const u = CS() && CS().storedUid();   // bos112: supabase-js gives no session when the token is expired and cannot refresh offline; the stored sign-in is still there
+    if (u) { offlineBoot(u); return; }
+    return viewAuth('login', navigator.onLine === false && CS() ? CS().T('first') : '');
+  }
+  try { await loadCtx(); } catch (e) { if (CS() && CS().isNet(e)) { offlineBoot(session.user.id); return; } fail(e); return viewAuth(); }
   if (!S.ctx) { await sb.auth.signOut(); return viewAuth(); }
   route();
+  if (CS()) setTimeout(() => { try { csWarm(); } catch (e) { /* convenience only */ } }, 4000);
+}
+// keep the offline snapshot of locations / rules / items for POS users (once a day at most; reads what POS reads anyway)
+async function csWarm() {
+  const B = window.BOS, c = S.ctx, p = c && c.perms && c.perms.POS;
+  if (S.offline || !B || !B.loadStatic || !(c.is_owner || (p && (p.view || p.enter)))) return;
+  let last = 0; try { last = Number(store.get('bos_cs_warm_' + c.profile.id) || 0); } catch (e) { /* ignore */ }
+  if (Date.now() - last < 86400000) return;
+  await B.loadStatic(); store.set('bos_cs_warm_' + c.profile.id, String(Date.now()));
 }
 
 // ---------- routing ----------
@@ -189,10 +244,12 @@ async function hasAnyGrant(codes) {
 }
 function route() {
   if (!S.ctx) return viewAuth();
+  S.csNeeds = false; if (CS()) CS().paint();   // bos112
   const st = S.ctx.profile.status;
   if (st === 'pending') return viewPending();
-  if (st === 'disabled') { sb.auth.signOut(); S.ctx = null; return viewAuth('login', t('err_disabled')); }
+  if (st === 'disabled') { if (CS()) CS().clear(); sb.auth.signOut(); S.ctx = null; return viewAuth('login', t('err_disabled')); }
   const page = (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0];
+  if (S.offline && CS() && !CS().allowed(page)) return CS().needsNet(page);   // bos112: server-only screens say "Needs internet" instead of failing
   if (OWNER_ONLY.has(page) && !S.ctx.is_owner) {
     const gs = ROUTE_GRANTS[page];
     if (!gs) return viewHome();
@@ -209,6 +266,7 @@ function dispatch(page) {
   (local[page] || extra[page] || viewHome)();
 }
 window.__navCount = 1; window.addEventListener('hashchange', () => { window.__navCount = (window.__navCount || 1) + 1; route(); });
+try { if (sb.auth.onAuthStateChange) sb.auth.onAuthStateChange((ev) => { if (ev === 'SIGNED_OUT' && window.BOS_CS) window.BOS_CS.clear(); }); } catch (e) { /* bos112: stub or old client */ }
 window.BOS_APP = { hasAnyGrant, sb, S, t, esc, toast, fail, shell, openSheet, closeSheet, nm, fmt, store, ICON, langBar, go, H: null };
 
 function viewPending() {

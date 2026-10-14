@@ -20,17 +20,17 @@ const hm = (x) => (x ? new Date(x).toLocaleTimeString('en-GB', { timeZone: 'Asia
 const dhm = (x) => (x ? new Date(x).toLocaleString('en-GB', { timeZone: 'Asia/Dhaka', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '');
 const mins = (m) => { m = Number(m) || 0; return m >= 60 ? Math.floor(m / 60) + 'h ' + (m % 60 ? (m % 60) + 'm' : '') : m + 'm'; };
 const X = {
-  title: L('হাজিরা', 'Attendance', 'Attendance'), leaveT: L('ছুটি', 'Leave', 'Leave'), place: L('জায়গা', 'Place', 'Place'), date: L('তারিখ', 'Date', 'Date'), month: L('মাস', 'Month', 'Month'),
+  title: L('হাজিরা', 'Attendance', 'Attendance'), leaveT: L('ছুটি', 'Leave', 'Leave'), place: L('জায়গা', 'Place', 'Place'), date: L('ডেট', 'Date', 'Date'), month: L('মাস', 'Month', 'Month'),
   tToday: L('আজকের বোর্ড', 'Today', 'Today'), tMonth: L('মাসের ছক', 'Month grid', 'Month grid'), tImport: L('মেশিনের ফাইল', 'Device file', 'Device file'), tDevices: L('মেশিন', 'Devices', 'Devices'), tSetup: L('শিফট ও ছুটির দিন', 'Shifts & holidays', 'Shift ও holiday'),
   present: L('উপস্থিত', 'Present', 'Present'), absent: L('অনুপস্থিত', 'Absent', 'Absent'), late: L('দেরি', 'Late', 'Late'), half_day: L('অর্ধ দিন', 'Half day', 'Half day'), leave: L('ছুটিতে', 'On leave', 'On leave'),
-  off: L('সাপ্তাহিক ছুটি', 'Weekly off', 'Weekly off'), holiday: L('ছুটির দিন', 'Holiday', 'Holiday'), unpaid: L('বিনা বেতনে', 'Unpaid', 'Unpaid'), pending: L('অনুমোদন বাকি', 'Waiting approval', 'Approval বাকি'),
+  off: L('সাপ্তাহিক ছুটি', 'Weekly off', 'Weekly off'), holiday: L('ছুটির দিন', 'Holiday', 'Holiday'), unpaid: L('বিনা বেতনে', 'Unpaid', 'Unpaid'), pending: L('অ্যাপ্রুভ অপেক্ষায়', 'Waiting approval', 'Approval অপেক্ষায়'),
   inT: L('ঢোকা', 'In', 'In'), outT: L('বের', 'Out', 'Out'), ot: L('ওভারটাইম', 'Overtime', 'Overtime'), lateM: L('দেরি', 'late', 'late'), single: L('একবার আঙুল (বের হওয়া নেই)', 'One punch only (no out)', 'একবার punch (out নেই)'),
   recompute: L('পাঞ্চ থেকে আবার হিসাব', 'Recompute from punches', 'Punch থেকে আবার হিসাব'), recomputed: L('আবার হিসাব হয়েছে', 'Recomputed', 'আবার হিসাব হয়েছে'),
   mark: L('হাতে লিখুন / সংশোধন', 'Mark / correct', 'হাতে লিখুন / সংশোধন'), status: L('অবস্থা', 'Status', 'Status'), reason: L('কারণ (জরুরি)', 'Reason (required)', 'কারণ (জরুরি)'), note: L('নোট', 'Note', 'Note'),
-  otMin: L('ওভারটাইম মিনিট (ফাঁকা = সময় থেকে)', 'Overtime minutes (empty = from the times)', 'OT মিনিট (ফাঁকা = সময় থেকে)'), save: L('সংরক্ষণ', 'Save', 'Save'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
-  approve: L('অনুমোদন', 'Approve', 'Approve'), reject: L('বাতিল (পাঞ্চে ফেরত)', 'Reject (back to punches)', 'Reject (punch-এ ফেরত)'), otApprove: L('ওভারটাইম অনুমোদন', 'Approve overtime', 'OT approve'),
+  otMin: L('ওভারটাইম মিনিট (ফাঁকা = সময় থেকে)', 'Overtime minutes (empty = from the times)', 'OT মিনিট (ফাঁকা = সময় থেকে)'), save: L('সেভ', 'Save', 'Save'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'),
+  approve: L('অ্যাপ্রুভ', 'Approve', 'Approve'), reject: L('বাতিল (পাঞ্চে ফেরত)', 'Reject (back to punches)', 'Reject (punch-এ ফেরত)'), otApprove: L('ওভারটাইম অ্যাপ্রুভ', 'Approve overtime', 'OT approve'),
   monthOf: L('মাসের হাজিরা', 'Month view', 'Month view'), who: L('কর্মচারী', 'Employee', 'Employee'), pick: L('বাছুন', 'Choose', 'বাছুন'), none: L('কেউ নেই', 'Nobody', 'কেউ নেই'), nothing: L('কিছু নেই', 'Nothing yet', 'কিছু নেই'),
-  locked: L('এই মাসের বেতন অনুমোদিত - হাজিরা বন্ধ', 'Payroll approved - this month is locked', 'Payroll approved - মাস lock'), manual: L('হাতে লেখা', 'manual', 'manual'),
+  locked: L('এই মাসের বেতন অ্যাপ্রুভড - হাজিরা বন্ধ', 'Payroll approved - this month is locked', 'Payroll approved - মাস lock'), manual: L('হাতে লেখা', 'manual', 'manual'),
   file: L('ফাইল বাছুন (.dat / .txt / .csv)', 'Choose the file (.dat / .txt / .csv)', 'File বাছুন (.dat / .txt / .csv)'), paste: L('অথবা লেখা পেস্ট করুন', 'or paste the text', 'অথবা text paste করুন'),
   device: L('কোন মেশিনের', 'From which device', 'কোন device'), noDevice: L('উল্লেখ নেই', 'Not given', 'উল্লেখ নেই'), colUser: L('আইডি কলাম', 'ID column', 'ID column'), colTs: L('সময় কলাম', 'Time column', 'Time column'), colDir: L('ঢোকা/বের কলাম', 'In/out column', 'In/out column'),
   preview: L('আগে দেখুন (কিছু লেখা হবে না)', 'Preview (nothing is saved)', 'আগে দেখুন (কিছু save হবে না)'), doImport: L('আমদানি করুন', 'Import', 'Import'), read: L('পড়া হলো', 'Rows read', 'Rows read'),
@@ -49,9 +49,9 @@ const X = {
   hName: L('নাম (বাংলা)', 'Name (Bangla)', 'নাম (বাংলা)'), hNameEn: L('নাম (ইংরেজি)', 'Name (English)', 'Name (English)'), paid: L('বেতনসহ', 'Paid', 'Paid'), allPlaces: L('সব জায়গা', 'All places', 'সব জায়গা'), remove: L('বাদ দিন', 'Remove', 'Remove'),
   checkIn: L('চেক ইন', 'Check in', 'Check in'), checkOut: L('চেক আউট', 'Check out', 'Check out'), punched: L('হাজিরা নেওয়া হয়েছে', 'Punch recorded', 'Punch হয়েছে'),
   // leave
-  tReq: L('আবেদন', 'Requests', 'Requests'), tBal: L('বাকি ছুটি', 'Balances', 'Balances'), newReq: L('＋ ছুটির আবেদন', '＋ Leave request', '＋ Leave request'), type: L('ধরন', 'Type', 'Type'), lReason: L('কারণ', 'Reason', 'Reason'),
-  dayCount: L('দিন', 'days', 'days'), lPending: L('অপেক্ষায়', 'Pending', 'Pending'), lApproved: L('অনুমোদিত', 'Approved', 'Approved'), lRejected: L('নাকচ', 'Rejected', 'Rejected'), lCancelled: L('বাতিল', 'Cancelled', 'Cancelled'),
-  cancelL: L('বাতিল করুন', 'Cancel', 'Cancel'), entitled: L('বছরে প্রাপ্য', 'Per year', 'Per year'), taken: L('নেওয়া', 'Taken', 'Taken'), remaining: L('বাকি', 'Left', 'Left'), year: L('বছর', 'Year', 'Year'),
+  tReq: L('অনুরোধ', 'Requests', 'Requests'), tBal: L('বাকি ছুটি', 'Balances', 'Balances'), newReq: L('＋ ছুটির অনুরোধ', '＋ Leave request', '＋ Leave request'), type: L('ধরন', 'Type', 'Type'), lReason: L('কারণ', 'Reason', 'Reason'),
+  dayCount: L('দিন', 'days', 'days'), lPending: L('অপেক্ষায়', 'Pending', 'Pending'), lApproved: L('অ্যাপ্রুভড', 'Approved', 'Approved'), lRejected: L('নাকচ', 'Rejected', 'Rejected'), lCancelled: L('ক্যান্সেল', 'Cancelled', 'Cancelled'),
+  cancelL: L('ক্যান্সেল করুন', 'Cancel', 'Cancel'), entitled: L('বছরে প্রাপ্য', 'Per year', 'Per year'), taken: L('নেওয়া', 'Taken', 'Taken'), remaining: L('বাকি', 'Left', 'Left'), year: L('বছর', 'Year', 'Year'),
   noLimit: L('সীমা নেই', 'no limit', 'no limit'), decideNote: L('নোট (ঐচ্ছিক)', 'Note (optional)', 'Note (optional)'),
   sun: L('রবি', 'Sun', 'Sun'), mon: L('সোম', 'Mon', 'Mon'), tue: L('মঙ্গল', 'Tue', 'Tue'), wed: L('বুধ', 'Wed', 'Wed'), thu: L('বৃহঃ', 'Thu', 'Thu'), fri: L('শুক্র', 'Fri', 'Fri'), sat: L('শনি', 'Sat', 'Sat'),
 };
@@ -61,11 +61,11 @@ const STATUS = ['present', 'late', 'half_day', 'absent', 'off', 'holiday', 'unpa
 const stCls = (s) => (s === 'present' ? 'ok' : s === 'late' || s === 'half_day' ? 'warn' : s === 'absent' || s === 'unpaid' ? 'bad' : s === 'leave' ? 'info' : '');
 const ERR = {
   'not allowed': L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), attendance_off: L('হাজিরা এখন বন্ধ (সুইচবোর্ড)', 'Attendance is switched off (Switchboard)', 'Attendance বন্ধ (Switchboard)'),
-  reason_required: L('কারণ লিখুন (কমপক্ষে ৩ অক্ষর)', 'Write a reason (3+ letters)', 'কারণ লিখুন'), bad_date: L('তারিখ ঠিক নয়', 'Date is not valid', 'Date ঠিক নয়'), bad_time: L('সময় ঠিক নয় (যেমন 09:05)', 'Time is not valid (e.g. 09:05)', 'Time ঠিক নয় (09:05)'),
-  bad_range: L('সর্বোচ্চ ৬২ দিন একসাথে', 'At most 62 days at a time', 'সর্বোচ্চ ৬২ দিন'), month_locked: X.locked, maker_cannot_approve: L('নিজের লেখা নিজে অনুমোদন করা যায় না', 'You cannot approve your own entry', 'নিজের entry নিজে approve নয়'),
-  leave_overlap: L('এই তারিখে আগেই ছুটির আবেদন আছে', 'There is already a leave request on these dates', 'এই তারিখে আগেই leave আছে'), leave_balance_short: L('যথেষ্ট ছুটি বাকি নেই', 'Not enough leave left', 'যথেষ্ট leave বাকি নেই'),
+  reason_required: L('কারণ লিখুন (কমপক্ষে ৩ অক্ষর)', 'Write a reason (3+ letters)', 'কারণ লিখুন'), bad_date: L('ডেট ঠিক নয়', 'Date is not valid', 'Date ঠিক নয়'), bad_time: L('সময় ঠিক নয় (যেমন 09:05)', 'Time is not valid (e.g. 09:05)', 'Time ঠিক নয় (09:05)'),
+  bad_range: L('সর্বোচ্চ ৬২ দিন একসাথে', 'At most 62 days at a time', 'সর্বোচ্চ ৬২ দিন'), month_locked: X.locked, maker_cannot_approve: L('নিজের লেখা নিজে অ্যাপ্রুভ করা যায় না', 'You cannot approve your own entry', 'নিজের entry নিজে approve নয়'),
+  leave_overlap: L('এই ডেটে আগেই ছুটির অনুরোধ আছে', 'There is already a leave request on these dates', 'এই date-এ আগেই leave আছে'), leave_balance_short: L('যথেষ্ট ছুটি বাকি নেই', 'Not enough leave left', 'যথেষ্ট leave বাকি নেই'),
   leave_no_working_days: L('এই সময়ে কোনো কাজের দিন নেই', 'No working day in these dates', 'কোনো কাজের দিন নেই'), leave_cross_year: L('এক বছরের মধ্যে রাখুন', 'Keep it inside one year', 'এক বছরের মধ্যে রাখুন'),
-  bad_leave_type: L('ছুটির ধরন বাছুন', 'Choose the leave type', 'Leave type বাছুন'), leave_not_pending: L('এই আবেদনের সিদ্ধান্ত হয়ে গেছে', 'This request was already decided', 'আগেই decide হয়েছে'),
+  bad_leave_type: L('ছুটির ধরন বাছুন', 'Choose the leave type', 'Leave type বাছুন'), leave_not_pending: L('এই অনুরোধের সিদ্ধান্ত হয়ে গেছে', 'This request was already decided', 'আগেই decide হয়েছে'),
   too_many_rows: L('ফাইল অনেক বড় (একবারে সর্বোচ্চ ৫০০০ সারি) - ভাগ করুন', 'The file is too big (5000 rows at most) - split it', 'File বড় (৫০০০ সারি) - ভাগ করুন'),
   duplicate_device_id: L('এই মেশিন-আইডি অন্য কারো', 'This device id belongs to someone else', 'এই device ID অন্য কারো'), device_id_in_use: L('এই কর্মীর আগের আইডিতে পাঞ্চ আছে', 'This person already has punches under another id', 'আগের ID-তে punch আছে'),
   bad_user_id: L('আইডি ঠিক নয়', 'The id is not valid', 'ID ঠিক নয়'), app_punch_off: L('অ্যাপ থেকে হাজিরা বন্ধ', 'App check-in is switched off', 'App check-in বন্ধ'), too_soon: L('এক মিনিট পরে আবার চেষ্টা করুন', 'Try again in a minute', 'এক মিনিট পরে'),

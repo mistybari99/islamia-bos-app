@@ -16,12 +16,12 @@ const CAP_MS = () => Number(window.__Q4_CAP_MS) || 2000;
 const TTL_MS = () => (window.__Q4_TTL_MS === 0 ? 0 : Number(window.__Q4_TTL_MS) || 60000);
 const X = {
   region: L('মনোযোগ দরকার', 'Needs attention', 'Attention দরকার'),
-  ledger: L('খাতায় পোস্ট সমস্যা', 'Ledger problems', 'Ledger post সমস্যা'),
-  costwait: L('খরচের অপেক্ষা', 'Waiting for cost', 'Cost-এর অপেক্ষা'),
-  autopost: L('অটো পোস্ট বাকি', 'Pending auto-posts', 'Auto post বাকি'),
-  unmatched: L('স্ক্রিন-রেকর্ডহীন ফর্ম', 'Forms with no screen record', 'Screen record ছাড়া form'),
-  unkcost: L('অজানা খরচের আইটেম', 'Items with unknown cost', 'অজানা cost-এর item'),
-  billpay: L('payment ছাড়া bill', 'Bills without payment', 'Payment ছাড়া bill'),
+  ledger: L('খাতায় পোস্টের সমস্যা', 'Ledger problems', 'Ledger post-এর সমস্যা'),
+  costwait: L('কস্টের অপেক্ষায়', 'Waiting for cost', 'Cost-এর অপেক্ষায়'),
+  autopost: L('অটো পোস্টের অপেক্ষায়', 'Pending auto-posts', 'Auto post-এর অপেক্ষায়'),
+  unmatched: L('স্ক্রিনে রেকর্ড নেই এমন ফর্ম', 'Forms with no screen record', 'Screen-এ record নেই এমন form'),
+  unkcost: L('কস্ট জানা নেই এমন আইটেম', 'Items with unknown cost', 'Cost জানা নেই এমন item'),
+  billpay: L('পেমেন্ট ছাড়া বিল', 'Bills without payment', 'Payment ছাড়া bill'),
   inbox: L('নতুন বার্তা', 'New messages', 'নতুন message'),
 };
 const T = (k) => lab(X[k]);

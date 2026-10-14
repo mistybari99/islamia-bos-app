@@ -16,22 +16,22 @@ const r2 = (n) => Math.round(Number(n) * 100) / 100;
 const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
 
 const X = {
-  title: L('বিক্রি ফেরত', 'Sale returns', 'Sale return'), date: L('তারিখ', 'Date', 'Date'), location: L('জায়গা', 'Location', 'Location'), receipt: L('রসিদ', 'Receipt', 'Receipt'),
-  none: L('এই দিনে কোনো বিক্রি নেই', 'No sales on this day', 'এই দিনে কোনো sale নেই'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), voided: L('বাতিল', 'Voided', 'Void'),
+  title: L('সেল ফেরত', 'Sale returns', 'Sale return'), date: L('ডেট', 'Date', 'Date'), location: L('জায়গা', 'Location', 'Location'), receipt: L('রসিদ', 'Receipt', 'Receipt'),
+  none: L('এই দিনে কোনো সেল নেই', 'No sales on this day', 'এই দিনে কোনো sale নেই'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), voided: L('ভয়েড', 'Voided', 'Void'),
   more: L('আরও অপশন', 'More options', 'আরও option'), doReturn: L('মাল ফেরত নিন', 'Take goods back', 'মাল return নিন'), history: L('এই রসিদের ফেরত', 'Returns of this receipt', 'এই receipt-এর return'),
-  noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), close: L('বন্ধ', 'Close', 'Close'), cancel: L('বাতিল', 'Cancel', 'Cancel'),
-  sold: L('বিক্রি', 'Sold', 'Sold'), returned: L('ফেরত হয়েছে', 'Returned', 'Returned'), left: L('বাকি', 'Left', 'Left'), qty: L('ফেরত পরিমাণ', 'Return quantity', 'Return quantity'),
+  noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), close: L('বন্ধ', 'Close', 'Close'), cancel: L('ক্যান্সেল', 'Cancel', 'Cancel'),
+  sold: L('বিক্রি', 'Sold', 'Sold'), returned: L('ফেরত হয়েছে', 'Returned', 'Returned'), left: L('বাকি', 'Left', 'Left'), qty: L('ফেরত Qty', 'Return quantity', 'Return quantity'),
   reason: L('ফেরতের কারণ', 'Return reason', 'Return reason'), note: L('নোট', 'Note', 'Note'), value: L('ফেরত মূল্য', 'Value of the return', 'Return value'),
-  fromDue: L('গ্রাহকের বাকি থেকে কাটা', 'Taken off what the customer owes', 'Customer-এর due থেকে কাটা'), handBack: L('ফেরত দিতে হবে', 'To hand back', 'ফেরত দিতে হবে'),
-  mode: L('কীভাবে ফেরত দিলেন', 'How it was handed back', 'কীভাবে ফেরত দিলেন'), cash: L('নগদ', 'Cash', 'Cash'), mobile: L('মোবাইল', 'Mobile', 'Mobile'), card: L('কার্ড', 'Card', 'Card'),
+  fromDue: L('কাস্টমারের বাকি থেকে কাটা', 'Taken off what the customer owes', 'Customer-এর due থেকে কাটা'), handBack: L('ফেরত দিতে হবে', 'To hand back', 'ফেরত দিতে হবে'),
+  mode: L('কীভাবে ফেরত দিলেন', 'How it was handed back', 'কীভাবে ফেরত দিলেন'), cash: L('ক্যাশ', 'Cash', 'Cash'), mobile: L('মোবাইল', 'Mobile', 'Mobile'), card: L('কার্ড', 'Card', 'Card'),
   wallet: L('ওয়ালেট (বিকাশ/নগদ…)', 'Wallet (bKash / Nagad…)', 'Wallet (bKash/Nagad…)'), ref: L('রেফারেন্স', 'Reference', 'Reference'),
-  go: L('ফেরত নিন', 'Confirm return', 'Return confirm'), done: L('ফেরত নেওয়া হয়েছে', 'Return recorded', 'Return recorded'), dup: L('আগেই সংরক্ষিত — আবার হয়নি', 'Already saved — nothing was added twice', 'আগেই saved — আবার হয়নি'),
-  needQty: L('অন্তত একটি পণ্যের ফেরত পরিমাণ লিখুন', 'Enter a quantity for at least one item', 'অন্তত একটি item-এর quantity লিখুন'), badQty: L('পরিমাণ বাকির চেয়ে বেশি বা ঠিক নয়', 'Quantity is wrong or more than what is left', 'Quantity ঠিক নয় বা বাকির বেশি'),
+  go: L('ফেরত নিন', 'Confirm return', 'Return confirm'), done: L('ফেরত নেওয়া হয়েছে', 'Return recorded', 'Return recorded'), dup: L('আগেই সেভ হয়েছে — আবার হয়নি', 'Already saved — nothing was added twice', 'আগেই saved — আবার হয়নি'),
+  needQty: L('অন্তত একটি আইটেমের ফেরত Qty লিখুন', 'Enter a quantity for at least one item', 'অন্তত একটি item-এর quantity লিখুন'), badQty: L('Qty বাকির চেয়ে বেশি বা ঠিক নয়', 'Quantity is wrong or more than what is left', 'Quantity ঠিক নয় বা বাকির বেশি'),
   needReason: L('কারণ বাছুন', 'Choose a reason', 'Reason বাছুন'), needMode: L('ফেরতের ধরন বাছুন', 'Choose how it was handed back', 'Refund-এর ধরন বাছুন'), needWallet: L('ওয়ালেট লিখুন', 'Enter the wallet', 'Wallet লিখুন'),
-  voidRet: L('ফেরত বাতিল', 'Void this return', 'Return void'), voidWhy: L('বাতিলের কারণ (আবশ্যক)', 'Reason for voiding (required)', 'Void-এর reason (আবশ্যক)'), voidDone: L('ফেরত বাতিল হয়েছে', 'Return voided', 'Return voided'),
-  noReturns: L('এই রসিদে কোনো ফেরত নেই', 'No returns on this receipt', 'এই receipt-এ কোনো return নেই'), cust: L('গ্রাহক', 'Customer', 'Customer'), owes: L('গ্রাহকের বাকি', 'Customer owes', 'Customer-এর due'),
-  nothingLeft: L('ফেরত নেওয়ার মতো কিছু বাকি নেই', 'Nothing is left to return', 'Return নেওয়ার মতো কিছু বাকি নেই'), sqlMissing: L('বিক্রি ফেরতের ডেটাবেস অংশ এখনও চালু হয়নি (phase12)', 'The sale-return database part is not installed yet (phase12)', 'Sale return-এর database অংশ চালু হয়নি (phase12)'),
-  dueFirstOff: L('সেটিং অনুযায়ী পুরো টাকা ফেরত যাবে', 'By the setting the whole value is handed back', 'Setting অনুযায়ী পুরো টাকা ফেরত'), items: L('পণ্য', 'items', 'items'),
+  voidRet: L('ফেরত ভয়েড', 'Void this return', 'Return void'), voidWhy: L('ভয়েডের কারণ (লাগবেই)', 'Reason for voiding (required)', 'Void-এর reason (লাগবেই)'), voidDone: L('ফেরত ভয়েড হয়েছে', 'Return voided', 'Return voided'),
+  noReturns: L('এই রসিদে কোনো ফেরত নেই', 'No returns on this receipt', 'এই receipt-এ কোনো return নেই'), cust: L('কাস্টমার', 'Customer', 'Customer'), owes: L('কাস্টমারের বাকি', 'Customer owes', 'Customer-এর due'),
+  nothingLeft: L('ফেরত নেওয়ার মতো কিছু বাকি নেই', 'Nothing is left to return', 'Return নেওয়ার মতো কিছু বাকি নেই'), sqlMissing: L('সেল ফেরতের ডেটাবেস অংশ এখনও চালু হয়নি (phase12)', 'The sale-return database part is not installed yet (phase12)', 'Sale return-এর database অংশ চালু হয়নি (phase12)'),
+  dueFirstOff: L('সেটিং অনুযায়ী পুরো টাকা ফেরত যাবে', 'By the setting the whole value is handed back', 'Setting অনুযায়ী পুরো টাকা ফেরত'), items: L('আইটেম', 'items', 'items'),
 };
 const T = (k) => lab(X[k]);
 const D = { loc: undefined, date: today(), rows: [], err: null };

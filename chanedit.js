@@ -13,14 +13,14 @@ const KINDS = [
   ['whatsapp', L('হোয়াটসঅ্যাপ', 'WhatsApp', 'WhatsApp')], ['phone', L('ফোন', 'Phone', 'Phone')], ['walkin', L('সরাসরি দোকানে', 'Walk-in', 'Walk-in')], ['other', L('অন্য', 'Other', 'Other')],
 ];
 const X = {
-  title: L('বিক্রির চ্যানেল', 'Sales channels', 'Sales channel'), add: L('নতুন চ্যানেল', 'New channel', 'নতুন channel'), edit: L('বদলান', 'Edit', 'Edit'),
+  title: L('সেলের চ্যানেল', 'Sales channels', 'Sales channel'), add: L('নতুন চ্যানেল', 'New channel', 'নতুন channel'), edit: L('বদলান', 'Edit', 'Edit'),
   intro: L('অর্ডার কোন পথে আসে তার তালিকা। চ্যানেল মুছে ফেলা যায় না — বন্ধ করা যায়; পুরনো অর্ডার ঠিক থাকে।', 'Where orders come from. A channel is never deleted - switch it off; old orders stay as they are.', 'Order কোন পথে আসে তার list। Channel delete হয় না — বন্ধ করা যায়; পুরনো order ঠিক থাকে।'),
   ownerOnly: L('শুধু মালিক চ্যানেল বদলাতে পারেন', 'Only the owner can change channels', 'শুধু owner channel বদলাতে পারেন'),
   code: L('কোড (ছোট ইংরেজি অক্ষর, সংখ্যা, _)', 'Code (lowercase letters, digits, _)', 'Code (ছোট English letter, digit, _)'), kind: L('ধরন', 'Type', 'Type'), other: L('অন্য হলে কী', 'If other, what', 'Other হলে কী'),
-  name: L('নাম', 'Name', 'Name'), place: L('জায়গা (ফাঁকা = সব)', 'Place (blank = all)', 'Place (ফাঁকা = সব)'), role: L('দায়িত্বপ্রাপ্ত ভূমিকা (ঐচ্ছিক)', 'Role in charge (optional)', 'Role in charge (ঐচ্ছিক)'),
+  name: L('নাম', 'Name', 'Name'), place: L('জায়গা (ফাঁকা = সব)', 'Place (blank = all)', 'Place (ফাঁকা = সব)'), role: L('দায়িত্বপ্রাপ্ত রোল (ঐচ্ছিক)', 'Role in charge (optional)', 'Role in charge (ঐচ্ছিক)'),
   acct: L('অ্যাকাউন্ট রেফারেন্স / পেজ আইডি (ঐচ্ছিক)', 'Account reference / page id (optional)', 'Account reference / page id (ঐচ্ছিক)'), active: L('চালু', 'Active', 'Active'),
   activeHint: L('পরামর্শ: চালু রাখুন; যে পথে আর অর্ডার আসে না শুধু সেটাই বন্ধ করুন — বন্ধ করলেও পুরনো অর্ডার থাকে।', 'Recommendation: keep it active; switch off only a channel that no longer gets orders - old orders stay either way.', 'পরামর্শ: Active রাখুন; যে পথে আর order আসে না শুধু সেটাই বন্ধ করুন — বন্ধ করলেও পুরনো order থাকে।'),
-  save: L('সংরক্ষণ', 'Save', 'Save'), close: L('বন্ধ', 'Close', 'Close'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), none: L('এখনও কোনো চ্যানেল নেই', 'No channels yet', 'এখনও কোনো channel নেই'),
+  save: L('সেভ', 'Save', 'Save'), close: L('বন্ধ', 'Close', 'Close'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'), none: L('এখনও কোনো চ্যানেল নেই', 'No channels yet', 'এখনও কোনো channel নেই'),
   off: L('বন্ধ', 'inactive', 'inactive'), allPlaces: L('সব জায়গা', 'All places', 'সব place'), loading: L('লোড হচ্ছে…', 'Loading...', 'Loading…'), none2: L('— নেই —', '- none -', '— নেই —'),
 };
 const T = (k) => lab(X[k]);
