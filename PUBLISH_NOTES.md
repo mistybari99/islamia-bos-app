@@ -102,3 +102,24 @@ Source repo My-tools, branch `integration/p72-p79`, tip used: `35f8f7dc1c7e9aa3d
 | Phase | Last commit touching file | Bytes | sha256 |
 |---|---|---|---|
 | 103 | 0ecf984 | 111633 | `c99ca18eb9039ab30e57b01e1e1e1473484a544ac6d573ca7bb8d5c4bf0019ed` |
+
+---
+
+# Runs 12-13 (phases 104-109, 111)
+
+Source repo My-tools, `origin/integration/p72-p79` tip used: `b7b2ffa2dd16a82ece6f10a150bbb116ad16ab04`. Every phase sha256 below equals the table in `docs/briefs_p2p3/step_INT4_REPORT.md`. Phase 110 is not included. Chain lock: Run 12 needs Run 11 done, Run 13 needs Run 12 done (key `bos_setup_run_done_v1`). Each page has a read-only CHECK (single SELECT) as a second small Copy button.
+
+| Page | Phases | Payload bytes | Payload sha256 | CHECK bytes | CHECK sha256 |
+|---|---|---|---|---|---|
+| setup-run-12.html | 104, 105, 106, 107, 108 | 123805 | `a77676cda43745a4acb2bfd9dff4fbd45bf7fc547023281ffa7f9f43407fb889` | 3223 | `f20b0068d69a3b1a073d0a1a1787806cd653e7cc5ec7c321bed3d2cb2c8eb8a2` |
+| setup-run-13.html | 109, 111 | 73703 | `35cb10d7b459e953ae0e82acd0f3c35011042b01608527e53bb47941a9f3c125` | 1888 | `ed84f2a0caa667eb64ebd0c6e544ecd1d265abc51b706ab2a1905b8759ff5953` |
+
+| Phase | Last commit touching file | Bytes | sha256 |
+|---|---|---|---|
+| 104 | 3e7db42 | 7284 | `4832bf18b4cd0fc1428368794d23f0b84991f8fedb3e8e925d4c2ba040e3ebbe` |
+| 105 | 09f4eae | 42703 | `f0151974a83824491c8adc4c9d60ff60c63aee17a209e01f93e3fdf2efeff0ec` |
+| 106 | db7dc11 | 7404 | `4d241a03cf80b5b92fc946659a1e2a00bbfd577727a4f40ec29ee0acf4d4a471` |
+| 107 | fe5feba | 27576 | `5285df741bacb3583edc13c9eeaf4c6b6fff018cba8c6edd9403fa3132bd537f` |
+| 108 | 447edb2 | 38713 | `f2a6686ce7966815b0644f241edd1a9aad3e841524d0e7728ccb77be234cfd04` |
+| 109 | 09f4eae | 63402 | `5123cd02eda8362e52da20aff4a2d7e48cbc21305e92412fce4318a87c52540b` |
+| 111 | 09f4eae | 10251 | `d3e824359485c5f7b1e4e927de6c88d0cf002be77933bccb44494ab7eaa06a01` |
