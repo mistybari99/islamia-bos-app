@@ -1,5 +1,9 @@
 # PUBLISH_NOTES: setup-run-1/2/3.html (phases 74-81)
 
+## Web bundle (pages/web-bundle)
+
+The web app files at the repo root (js, css, index.html, sw.js) were refreshed from My-tools `web/` by a script that never touches `config.js`, `setup-*.html`, `audit-a.html` or this file. `index.html` loads each script and style with `?v=<build id>` and `sw.js` has a matching VERSION, so phones never mix old and new files. Details, database phase table and rollback are in `DEPLOY_CHECKLIST.md`.
+
 Source repo: https://github.com/mistybari99/My-tools , branch `integration/p72-p79`, commit used: `fd9590a47969010f0d678f532ccaa8126735f1c6` (integration had not moved; HEAD is still this commit). Phase files 72-81 are unchanged vs the earlier builds (sha256 below). Phases 82+ are NOT included.
 
 Owner already ran phases 72, 73 and the first half of phase 74 (`setup-sql-1.html`, kept as a record). Remaining SQL is three one-paste pages split at whole-phase boundaries (phase files are paste-twice safe, so Run 1 re-running the first half of phase 74 is harmless):

@@ -14,6 +14,7 @@ const X = {
   sell: L('বিক্রি', 'Sell', 'Sell · বিক্রি'), theme: L('থিম', 'Theme', 'Theme'), th_dark: L('প্রিমিয়াম ডার্ক', 'Premium Dark', 'Premium Dark'), th_light: L('প্রিমিয়াম লাইট', 'Premium Light', 'Premium Light'), th_classic: L('ক্লাসিক', 'Classic', 'Classic'),
   menu: L('মেনু', 'Menu', 'Menu'), me: L('আমি', 'Me', 'Me'), search: L('মেনু খুঁজুন…', 'Search menu…', 'Menu খুঁজুন…'), close: L('বন্ধ করুন', 'Close', 'Close'),
   nores: L('কিছু পাওয়া যায়নি', 'Nothing found', 'কিছু পাওয়া যায়নি'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), soon: L('শীঘ্রই আসছে', 'Coming soon', 'Coming soon'),
+  foot_t: L('নিচের অংশ দেখান/লুকান', 'Show or hide menu options', 'Menu options দেখান/লুকান'),
   online: L('অনলাইন', 'Online', 'Online'), offline: L('অফলাইন', 'Offline', 'Offline'), pin: L('প্রিয়তে রাখুন', 'Pin to favourites', 'Favourite-এ রাখুন'), unpin: L('প্রিয় থেকে সরান', 'Unpin', 'Favourite থেকে সরান'),
   g_dash: L('ড্যাশবোর্ড', 'Dashboard', 'Dashboard'), g_acc: L('হিসাব', 'Accounting', 'Accounting (হিসাব)'), g_item: L('আইটেম', 'Items', 'Item'), g_cust: L('কাস্টমার', 'Customers', 'Customer'),
   g_supp: L('সরবরাহকারী', 'Suppliers', 'Supplier'), g_sale: L('বিক্রি', 'Sales', 'Sale (বিক্রি)'), g_purch: L('ক্রয়', 'Purchase', 'Purchase'), g_ops: L('স্টক ও কারখানা', 'Stock & factory', 'Stock ও Factory'),
@@ -91,7 +92,7 @@ function entries() {
     const live = f.code === '0-1' ? isOwner() : !!(B.forms && B.forms[f.code]);
     out.push({ key: 'f:' + f.code, route: 'form/' + f.code, g: AREA_G[f.area], label: f.code + ' · ' + nm(f), icon: 'doc', ok: P(f.code, 'view'), live, kind: 'f', code: f.code, drawer: true });
   });
-  return out;
+  return B.optviews && B.optviews.apply ? B.optviews.apply(out) : out;   // bos91: owner's Hide / Locked choices (no data = unchanged)
 }
 const byKey = (k) => entries().find((e) => e.key === k);
 function keyOfHash() {
@@ -221,6 +222,7 @@ function ensureStatic() {
     if (!FORMS) { const r = await sb.from('forms').select('code,area,name_bn,name_mix,name_en,sort,enabled').order('sort'); FORMS = r && r.data ? r.data : []; }
     try { if (B.rule('ui_calm', true) === false) document.body.removeAttribute('data-ui'); } catch (e) { /* keep calm */ }
     syncFavs();
+    try { if (B.optviews && B.optviews.load) await B.optviews.load(); } catch (e) { /* views unavailable: everything shows as before */ }   // bos91
     await loadGrantFlags();
   })();
   return staticP;
@@ -324,9 +326,18 @@ function dr_shell() {
       <button class="hbtn" style="min-height:48px;min-width:48px;border:0;background:transparent;color:var(--ink)" data-act="nav_close" aria-label="${esc(T('close'))}">${IC.x.replace('<svg', '<svg width="22" height="22"')}</button></div>
     <div class="dr-search"><input id="nav_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" aria-label="${esc(T('search'))}" value="${esc(q)}"></div>
     <div class="dr-body" id="nav_body"></div>
-    <div class="dr-foot"><div id="nav_locbox"></div><div class="me-lang">${A.langBar()}</div>${themeSel('nav_theme')}<div class="row"><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net"></span><span id="nav_nett">${esc(navigator.onLine === false ? T('offline') : T('online'))}</span></span>
-      <button class="lo" data-act="logout">${esc(T('logout'))}</button></div></div>`;
+    <div class="dr-foot${footOpen() ? ' open' : ''}" id="nav_foot"><div class="dr-fbar"><button type="button" class="dr-ftog" data-act="foot_tog" aria-expanded="${footOpen()}" aria-controls="nav_fx" aria-label="${esc(T('foot_t'))}" title="${esc(T('foot_t'))}">${IC.cv.replace('<svg', '<svg class="cv"')}</button><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net2"></span></span></div><div class="dr-fx" id="nav_fx"><div class="dr-fxi"${footOpen() ? '' : ' inert'}><div id="nav_locbox"></div><div class="me-lang">${A.langBar()}</div>${themeSel('nav_theme')}<div class="row"><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net"></span><span id="nav_nett">${esc(navigator.onLine === false ? T('offline') : T('online'))}</span></span>
+      <button class="lo" data-act="logout">${esc(T('logout'))}</button></div></div></div></div>`;
 }
+// bos101: collapsible drawer footer (default collapsed, remembered per device)
+const footOpen = () => { try { return localStorage.getItem('bos_navfoot') === '1'; } catch (e) { return false; } };
+document.addEventListener('click', (ev) => {
+  const b = ev.target && ev.target.closest && ev.target.closest('[data-act=foot_tog]'); if (!b) return;
+  const f = b.closest('.dr-foot'); if (!f) return; const on = !f.classList.contains('open');
+  f.classList.toggle('open', on); b.setAttribute('aria-expanded', String(on));
+  const fi = f.querySelector('.dr-fxi'); if (fi) { if (on) fi.removeAttribute('inert'); else fi.setAttribute('inert', ''); }
+  try { localStorage.setItem('bos_navfoot', on ? '1' : '0'); } catch (e) { /* private mode */ }
+});
 const crumbOf = (e) => B.ia.groupLabel(e.g) + ' › ' + e.label;
 function dr_body() {
   const body = $('#nav_body'); if (!body) return;
@@ -408,7 +419,7 @@ document.addEventListener('keydown', (e) => {
 });
 document.addEventListener('input', (e) => { if (e.target.id === 'nav_q') { q = e.target.value; queueSearch(); dr_body(); } if (e.target.id === 'pk_q') drawPicker(e.target.value); });
 window.addEventListener('online', netDot); window.addEventListener('offline', netDot);
-function netDot() { const d = $('#nav_net'), tx = $('#nav_nett'); if (!d) return; const on = navigator.onLine !== false; d.className = 'dot ' + (on ? 'ok' : 'bad'); tx.textContent = on ? T('online') : T('offline'); }
+function netDot() { const d = $('#nav_net'), tx = $('#nav_nett'); if (!d) return; const on = navigator.onLine !== false; const d2 = $('#nav_net2'); if (d2) d2.className = 'dot ' + (on ? 'ok' : 'bad'); d.className = 'dot ' + (on ? 'ok' : 'bad'); tx.textContent = on ? T('online') : T('offline'); }
 
 // ---------- bottom nav ----------
 function hideBnav() {

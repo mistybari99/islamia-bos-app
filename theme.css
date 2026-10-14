@@ -327,3 +327,8 @@ html[data-skin] body .pos-item { min-height: 96px; }
 html[data-skin] body .pos-item .pp { font-size: 22px; }
 html[data-skin] body .pos-item .pp small { font-size: 13px; }
 .cart-line .nm { font-size: 17px; font-weight: 700; }
+
+/* bos94: iOS Safari zooms the page when a focused field is under 16px. Touch devices only; other browsers keep the compact scale. */
+@supports (-webkit-touch-callout: none) {
+  html[data-skin] body :is(input, select, textarea):not([type=checkbox], [type=radio], [type=range], [type=color]), html[data-skin] body .ctl-q { font-size: 16px; }
+}

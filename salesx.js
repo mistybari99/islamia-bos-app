@@ -10,6 +10,8 @@ const L = B.L, lab = B.lab;
 const $ = (s, el = document) => el.querySelector(s);
 const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
 const addDays = (d, n) => { const x = new Date(d + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
+// only the columns the app role may read (phase61 column grant: sale_client stays server side) - select('*') would be refused
+const OO_COLS = 'id,client_id,order_no,location_id,channel,customer_name,customer_mobile,address,lines,subtotal,discount,delivery_mode,delivery_by,delivery_date,delivery_charge,advance,advance_mode,advance_wallet,note,status,sale_id,cancel_reason,advance_fate,created_by,created_staff,created_at,updated_at';
 const num = (v) => { const s = String(v == null ? '' : v).replace(/[০-৯]/g, (c) => '০১২৩৪৫৬৭৮৯'.indexOf(c)).replace(/,/g, '').trim(); if (s === '') return NaN; const n = Number(s); return Number.isFinite(n) ? n : NaN; };
 const money = (n) => '৳ ' + (Math.round(Number(n || 0) * 100) / 100).toLocaleString('en-US');
 const rid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3) | 8).toString(16); }));
@@ -120,7 +122,7 @@ function orderForm(o) {
 async function openForm(id) {
   await ensureItems();
   O.edit = null; O.lines = [];
-  if (id) { const r = await sb.from('online_orders').select('*').eq('id', id).maybeSingle(); O.edit = r.data; O.lines = ((O.edit && O.edit.lines) || []).map((l) => ({ item_id: l.item_id, qty: l.qty })); }
+  if (id) { const r = await sb.from('online_orders').select(OO_COLS).eq('id', id).maybeSingle(); O.edit = r.data; O.lines = ((O.edit && O.edit.lines) || []).map((l) => ({ item_id: l.item_id, qty: l.qty })); }
   if (!O.lines.length && O.items[0]) O.lines = [{ item_id: O.items[0].id, qty: 1 }];
   O.client = rid(); openSheet(orderForm(O.edit));
 }

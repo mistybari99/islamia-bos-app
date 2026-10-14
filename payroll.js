@@ -204,6 +204,19 @@ function slipHTML(l) {
     <tr><td colspan="2"><b>${esc(T('ded'))}</b></td></tr>${ded}<tr><td><b>${esc(T('ded'))}</b></td><td><b>− ${esc(n2(l.deductions))}</b></td></tr>
     <tr><td><b>${esc(T('net'))}</b></td><td><b>${esc(n2(l.net))}</b></td></tr></table><div class="sig">${esc(T('sign'))}</div></div>`;
 }
+// bos98: the pay slip through the chosen pay_slip template; false (nothing chosen / no B.tpl / any error) = today's slip. Earnings and deductions the employee sees, no cost.
+async function tplSlip(l) {
+  try {
+    await B.tpl.ensure(sb); const r = (k, v) => (Number(v) ? [{ label: k, amount: Number(v) }] : []);
+    const earn = [...r(T('basic'), l.basic_amount), ...(l.allowances || []).flatMap((x) => r(x.name, x.amount)), ...r(T('ot'), l.ot_amount), ...(l.bonus || []).flatMap((x) => r(T('bonus') + ': ' + x.name, x.amount)), ...(l.adjustments || []).filter((x) => Number(x.amount) > 0).flatMap((x) => r(x.name, x.amount))];
+    const ded = [...r(T('notEmp'), l.not_employed_deduction), ...r(T('absent'), l.absent_deduction), ...r(T('unpaidD'), l.unpaid_deduction), ...r(T('late'), l.late_deduction), ...(l.structure_deductions || []).flatMap((x) => r(x.name, x.amount)), ...r(T('advance'), l.advance_recovery),
+      ...(l.other_deductions || []).flatMap((x) => r(x.name, x.amount)), ...(l.adjustments || []).filter((x) => Number(x.amount) < 0).flatMap((x) => r(x.name, -x.amount))];
+    const sum = (a) => a.reduce((t, x) => t + x.amount, 0);
+    const data = { employee: nameOf(l), emp_no: l.employee_no || '', month: P.month, days: l.days_in_month, sections: [{ title: T('earn'), rows: earn, total: sum(earn) }, { title: T('ded'), rows: ded, total: sum(ded) }], net: Number(l.net) };
+    const o = { lang: S.lang, loc: l.location_id, shop: {} };
+    return !!(B.tpl.printHTML('pay_slip', data, undefined, o) && B.tpl.print('pay_slip', data, undefined, o));
+  } catch (e) { return false; }
+}
 function printHTML(html) {
   const old = $('#pr_print'); if (old) old.remove();
   const d = document.createElement('div'); d.id = 'pr_print'; d.innerHTML = html; document.body.appendChild(d);
@@ -250,7 +263,7 @@ Object.assign(H, {
   pr_payall: () => paySheet(null),
   pr_csv: () => csvOut(P.loc == null ? (P.sumLines || []) : P.lines),
   pr_line: (a) => lineSheet(Number(a.dataset.i)),
-  ln_slip: (a) => printHTML(slipHTML(curLines()[Number(a.dataset.i)])),
+  ln_slip: async (a) => { const l = curLines()[Number(a.dataset.i)]; if (B.tpl && B.tpl.ensure && (await tplSlip(l))) return; printHTML(slipHTML(l)); },   // bos98
   ln_pay: (a) => paySheet(Number(a.dataset.i)),
   ln_adj: (a) => { const k = a.dataset.k; openSheet(`<h3>${esc(T(k === 'bonus' ? 'addBonus' : k === 'deduction' ? 'addDed' : 'adjust'))}</h3><div class="stack"><div><label for="aj_n">${esc(T('name'))}</label><input id="aj_n" autocomplete="off"></div>
       <div><label for="aj_a">${esc(T('amount'))}${k === 'adjust' ? ' (+ / −)' : ''}</label><input id="aj_a" inputmode="decimal" autocomplete="off"></div><div><label for="aj_r">${esc(T('reason'))}</label><input id="aj_r" autocomplete="off"></div>

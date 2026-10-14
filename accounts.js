@@ -66,7 +66,7 @@ const X = {
   retired: L('বন্ধ', 'retired', 'বন্ধ'), retire: L('বন্ধ করুন', 'Retire', 'বন্ধ করুন'), reopen: L('আবার চালু', 'Reactivate', 'আবার চালু'), rename: L('নাম বদলান', 'Rename', 'নাম বদলান'),
   sys: L('সিস্টেম', 'system', 'system'), hdr: L('গ্রুপ', 'header', 'group'), noParent: L('(কোনোটিই নয়)', '(none)', '(কোনোটিই নয়)'),
   // new journal
-  nj: L('হাতে জার্নাল এন্ট্রি', 'Manual journal entry', 'Hate Journal entry'), jmemo: L('বিবরণ (কেন এই এন্ট্রি)', 'Memo (why this entry)', 'Memo (কেন)'), addLine: L('+ লাইন যোগ', '+ Add a line', '+ Line যোগ'),
+  nj: L('হাতে জার্নাল এন্ট্রি', 'Manual journal entry', 'Hate Journal entry'), jmemo: L('বিবরণ (কেন এই এন্ট্রি)', 'Memo (why this entry)', 'Memo (কেন)'), jreason: L('কারণ-কোড (পাহারা চালু থাকলে লাগে)', 'Reason code (needed when the guard is on)', 'Reason code (guard চালু থাকলে লাগে)'), addLine: L('+ লাইন যোগ', '+ Add a line', '+ Line যোগ'),
   line: L('লাইন', 'Line', 'Line'), debit: L('ডেবিট', 'Debit', 'Debit'), credit: L('ক্রেডিট', 'Credit', 'Credit'), party: L('পক্ষ', 'Party', 'Party'),
   ptNone: L('(কেউ নয়)', '(none)', '(কেউ নয়)'), ptCust: L('গ্রাহক', 'Customer', 'Customer'), ptSup: L('সরবরাহকারী', 'Supplier', 'Supplier'), ptStaff: L('স্টাফ', 'Staff', 'Staff'), ptPart: L('অংশীদার', 'Partner', 'Partner'),
   custMob: L('গ্রাহকের মোবাইল', 'Customer mobile', 'Customer mobile'), staffId: L('স্টাফ/অংশীদার আইডি', 'Staff / partner id', 'Staff/partner id'),
@@ -88,16 +88,43 @@ const X = {
   mapNote: L('বদলালে শুধু পরের পোস্ট থেকে নতুন হিসাব ব্যবহার হবে; আগের এন্ট্রি বদলায় না।', 'A change only applies to entries posted from now on; old entries never change.', 'বদলালে শুধু পরের post থেকে; আগের entry বদলায় না।'),
   ownerOnly: L('শুধু মালিক বদলাতে পারেন', 'Only the owner can change this', 'শুধু owner বদলাতে পারেন'),
   rcpt: L('উৎস দেখুন', 'Open the source', 'Source দেখুন'),
+  // phase 72: posting status strip, failed postings, provisional profit, stock-vs-books reconcile
+  lastPost: L('শেষ পোস্ট', 'Last post', 'শেষ post'), never: L('এখনও হয়নি', 'not yet', 'এখনও হয়নি'), pending: L('অপেক্ষমাণ', 'Pending', 'অপেক্ষমাণ'),
+  errN: L('ত্রুটি', 'Errors', 'ত্রুটি'), heldN: L('বন্ধ মাসের কারণে আটকে', 'Held by a closed period', 'বন্ধ মাসের কারণে আটকে'),
+  failN: L('টি এন্ট্রি পোস্ট হয়নি', 'entries were not posted', 'টি entry post হয়নি'), openPost: L('এখন পোস্ট প্যানেল খুলুন', 'Open the Post now panel', 'Post now panel খুলুন'),
+  unkCost: L('সাময়িক: খরচহীন বিক্রি', 'Provisional: sales with no known cost', 'সাময়িক: খরচহীন বিক্রি'), provis: L('সাময়িক', 'provisional', 'সাময়িক'),
+  estMiss: L('বইয়ের খরচ থেকে অনুমান', 'estimate from the typed cost', 'বইয়ের খরচ থেকে অনুমান'),
+  invH: L('মিলানো: মজুত বনাম খতিয়ান', 'Reconcile: stock vs books', 'মিলানো: মজুত vs খতিয়ান'),
+  invNote: L('পার্থক্য = খতিয়ানে − মজুতের মূল্য। এখানে কিছু পোস্ট হয় না, শুধু দেখানো হয়।', 'Difference = books − stock value. Nothing is posted here, it is only shown.', 'পার্থক্য = খতিয়ানে − মজুতের মূল্য। এখানে কিছু post হয় না।'),
+  invGl: L('খতিয়ানে', 'In the books', 'খতিয়ানে'), invVal: L('মজুতের মূল্য', 'Stock value', 'মজুতের মূল্য'), invDiff: L('পার্থক্য', 'Difference', 'পার্থক্য'),
+  invUnexpl: L('ব্যাখ্যাহীন', 'Unexplained', 'ব্যাখ্যাহীন'), invOk: L('মজুত ও খতিয়ান মিলেছে ✓', 'Stock and books agree ✓', 'মজুত ও খতিয়ান মিলেছে ✓'),
+  invReplay: L('আগের তারিখ: মূল্য লেজার থেকে হিসাব করা (গড় খরচ নয়)', 'Earlier date: value replayed from the ledger (not the average cost)', 'আগের তারিখ: মূল্য ledger থেকে'),
+  invT_inv_finished: L('তৈরি পণ্য', 'Finished goods', 'তৈরি পণ্য'), invT_inv_raw: L('কাঁচামাল', 'Raw materials', 'কাঁচামাল'), invT_inv_pack: L('প্যাকেজিং', 'Packaging', 'প্যাকেজিং'),
+  rs_valuation_basis: L('গড় খরচ বনাম লেজারের মান (পূর্ণসংখ্যার হিসাবের তফাত)', 'Average cost vs ledger value', 'গড় খরচ vs ledger মান'),
+  rs_count_adjust: L('গণনায় সমন্বয় (খতিয়ানে ওঠেনি)', 'Stock-count adjustment (not in the books)', 'গণনায় সমন্বয় (খতিয়ানে ওঠেনি)'),
+  rs_opening: L('শুরুর মজুত (খতিয়ানে জের দেওয়া হয়নি)', 'Opening stock (not in the opening balances)', 'শুরুর মজুত (জের দেওয়া হয়নি)'),
+  rs_transfer: L('ট্রান্সফার (পথে বা কম পাওয়া সহ)', 'Transfers (in transit or short receipt)', 'ট্রান্সফার (পথে/কম পাওয়া সহ)'),
+  rs_issue_out: L('হাতে ইস্যু / ফর্মে ইস্যু', 'Manual or form issue', 'হাতে/ফর্মে ইস্যু'),
+  rs_manual_in: L('হাতে বা ফর্মে তোলা মাল', 'Stock added by hand or form', 'হাতে/ফর্মে তোলা মাল'),
+  rs_purchase_before_start: L('শুরুর তারিখের আগের কেনা', 'Purchases before the start date', 'শুরুর তারিখের আগের কেনা'),
+  rs_purchase_return_variance: L('কেনা ফেরতে দামের পার্থক্য', 'Purchase-return price variance', 'কেনা ফেরতে দামের পার্থক্য'),
+  rs_production_cost_missing: L('খরচ অজানা উৎপাদন (আংশিক পোস্ট)', 'Production with an unknown cost (partly posted)', 'খরচ অজানা উৎপাদন'),
+  rs_manual_journal: L('হাতে জার্নাল', 'Manual journal on the inventory account', 'হাতে জার্নাল'),
 };
 const T = (k) => lab(X[k]);
 const SRC = { sale: L('বিক্রি', 'Sale', 'Sale'), sale_return: L('বিক্রি ফেরত', 'Sale return', 'Sale return'), collection: L('বাকি আদায়', 'Collection', 'Collection'), purchase: L('ক্রয়', 'Purchase', 'Purchase'),
   supplier_payment: L('সরবরাহকারীকে দেওয়া', 'Supplier payment', 'Supplier payment'), supplier_refund: L('সরবরাহকারীর ফেরত', 'Supplier refund', 'Supplier refund'), expense_voucher: L('ব্যয় ভাউচার', 'Expense voucher', 'Expense voucher'),
-  cash_move: L('ক্যাশ/ব্যাংক', 'Cash move', 'Cash move'), wastage: L('নষ্ট মাল', 'Wastage', 'Wastage'), production: L('উৎপাদন', 'Production', 'Production'), manual: L('হাতে লেখা', 'Manual', 'Manual'), opening: L('শুরুর জের', 'Opening', 'Opening') };
+  cash_move: L('ক্যাশ/ব্যাংক', 'Cash move', 'Cash move'), wastage: L('নষ্ট মাল', 'Wastage', 'Wastage'), production: L('উৎপাদন', 'Production', 'Production'), manual: L('হাতে লেখা', 'Manual', 'Manual'), opening: L('শুরুর জের', 'Opening', 'Opening'),
+  stock_adjust: L('স্টক গণনার পার্থক্য', 'Stock count adjustment', 'Stock count adjustment'), stock_opening: L('Opening stock', 'Opening stock', 'Opening stock'), stock_issue: L('নিজের কাজে stock', 'Stock issued for own use', 'Stock issued for own use'),
+  stock_transfer: L('Stock transfer', 'Stock transfer', 'Stock transfer'), transit_loss: L('পথে কম পৌঁছানো stock', 'Stock short in transit', 'Stock short in transit'), purchase_variance: L('ক্রয় ফেরতের দামের পার্থক্য', 'Purchase price variance', 'Purchase price variance'),
+  card_settlement: L('কার্ড settlement', 'Card settlement', 'Card settlement') };
 const sl = (k) => (SRC[k] ? lab(SRC[k]) : k);
 const LINKS = { sale: '#/pos', sale_return: '#/salereturn', collection: '#/dues', purchase: '#/purchase', supplier_payment: '#/payables', supplier_refund: '#/payables', expense_voucher: '#/daybook', cash_move: '#/cashmoves' };
 const link = (st, sid) => (LINKS[st] ? `<a href="${LINKS[st]}" class="ac-src">${esc(sl(st))}</a> <span class="ac-id">${esc(String(sid).slice(0, 8))}</span>` : `<span class="ac-src">${esc(sl(st))}</span>`);
 
 const ERR = {
+  reason_required: L('কারণ-কোড বেছে নিন (পাহারা চালু আছে)', 'Pick a reason code (the guard is on)', 'Reason code বেছে নিন (guard চালু)'), bad_reason: L('কারণ-কোড ঠিক নয়', 'That reason code is not valid', 'Reason code ঠিক নয়'),
+  party_required: L('payable / receivable লাইনে পক্ষ (party) লাগবে', 'A payable / receivable line needs a party', 'Payable / receivable line এ party লাগবে'),
   not_allowed: L('অনুমতি নেই', 'Not allowed', 'অনুমতি নেই'), data_needed: X.needH, accounting_off: L('হিসাবরক্ষণ বন্ধ — আগে চালু করুন', 'Accounting is off - switch it on first', 'Accounting off — আগে on করুন'),
   unbalanced: L('ডেবিট আর ক্রেডিট সমান নয়', 'Debit and credit are not equal', 'Debit আর Credit সমান নয়'), line_debit_xor_credit: L('প্রতি লাইনে ডেবিট বা ক্রেডিট — একটিই', 'Each line is either debit or credit, not both', 'প্রতি line-এ Debit বা Credit — একটিই'),
   need_two_lines: L('কমপক্ষে দুটি লাইন লাগবে', 'At least two lines are needed', 'কমপক্ষে দুটি line'), memo_required: L('বিবরণ লিখুন', 'Write a memo', 'Memo লিখুন'), bad_amount: L('অঙ্ক ঠিক নয়', 'An amount is not valid', 'অঙ্ক ঠিক নয়'),
@@ -160,6 +187,7 @@ const warnHtml = (bs) => {
   let h = '';
   if (bs && bs.unbalanced) h += `<div class="ac-warn" role="alert"><b>${esc(T('unbal'))}: ${esc(fm(bs.difference))}</b></div>`;
   if (bs && Number(bs.cogs_missing) > 0) h += `<div class="ac-note">${esc(String(bs.cogs_missing))} ${esc(T('cogsM'))}</div>`;
+  if (bs && Number(bs.unknown_cost_rev) > 0) h += `<div class="ac-note">${esc(T('unkCost'))}: ${esc(money(bs.unknown_cost_rev))}${Number(bs.cogs_estimate_missing) > 0 ? ' · ' + esc(T('estMiss')) + ': ' + esc(money(bs.cogs_estimate_missing)) : ''}</div>`;
   return h;
 };
 
@@ -180,7 +208,7 @@ async function tOverview() {
   const [ov, bs, is] = await Promise.all([rpc('acct_overview', { p_loc: locP() }), rpc('acct_balance_sheet', { p_as_of: D.asof, p_loc: locP() }), rpc('acct_income_statement', { p_from: D.from, p_to: D.to, p_loc: locP() })]);
   if (ov && ov.data_needed) return noData();
   let h = bar('asof');
-  h += warnHtml(bs);
+  h += warnHtml(bs) + warnHtml({ unknown_cost_rev: is.unknown_cost_rev, cogs_estimate_missing: is.cogs_estimate_missing });
   if (!ov.on) h += `<div class="ac-note">${esc(T('off'))}</div>`;
   h += `<div class="ac-sum">
     <div class="card stat"><div class="muted">${esc(T('totA'))}</div><b>${esc(money(bs.total_assets))}</b></div>
@@ -206,7 +234,7 @@ function bsTables(bs) {
 function plTables(p) {
   return table(`<th>${esc(T('income'))}</th><th class="n"></th>`, sectionRows(p.income) + `<tr class="tot"><td>${esc(T('totI'))}</td>${amtCell(p.total_income)}</tr>`)
     + table(`<th>${esc(T('expense'))}</th><th class="n"></th>`, sectionRows(p.expense) + `<tr class="tot"><td>${esc(T('totX'))}</td>${amtCell(p.total_expense)}</tr>`)
-    + table('<th></th><th class="n"></th>', `<tr><td>${esc(T('cogs'))}</td>${amtCell(p.cogs)}</tr><tr><td>${esc(T('gross'))}</td>${amtCell(p.gross_profit)}</tr><tr class="tot"><td>${esc(T('net'))}</td>${amtCell(p.net_profit)}</tr>`);
+    + table('<th></th><th class="n"></th>', `<tr><td>${esc(T('cogs'))}</td>${amtCell(p.cogs)}</tr><tr><td>${esc(T('gross'))}${p.provisional ? ' (' + esc(T('provis')) + ')' : ''}</td>${amtCell(p.gross_profit)}</tr><tr class="tot"><td>${esc(T('net'))}</td>${amtCell(p.net_profit)}</tr>`);
 }
 async function tBs() {
   const bs = await rpc('acct_balance_sheet', { p_as_of: D.asof, p_loc: locP() });
@@ -218,7 +246,7 @@ async function tPl() {
   const p = await rpc('acct_income_statement', { p_from: D.from, p_to: D.to, p_loc: locP() });
   if (p.data_needed) return noData();
   setCsv(`profit-loss-${D.from}_${D.to}.csv`, [['section', 'code', 'name', 'amount'], ...csvSec(p.income, 'income'), ...csvSec(p.expense, 'expense'), ['cogs', '', 'Cost of goods sold', p.cogs], ['gross', '', 'Gross profit', p.gross_profit], ['net', '', 'Net profit', p.net_profit]]);
-  return bar('range') + warnHtml({ cogs_missing: p.cogs_missing }) + `<div id="ac_rep">${repHead(T('t_pl'))}${plTables(p)}</div>` + exportBar();
+  return bar('range') + warnHtml({ cogs_missing: p.cogs_missing, unknown_cost_rev: p.unknown_cost_rev, cogs_estimate_missing: p.cogs_estimate_missing }) + `<div id="ac_rep">${repHead(T('t_pl'))}${plTables(p)}</div>` + exportBar();
 }
 async function tCf() {
   const c = await rpc('acct_cash_flow', { p_from: D.from, p_to: D.to, p_loc: locP() });
@@ -297,6 +325,22 @@ async function reco() {
       rows.map((x) => `<tr><td>${esc(x.name || x.party_id)}</td>${amtCell(x.journal)}${amtCell(x.existing)}${amtCell(x.unexplained)}</tr>`).join('')) : `<p class="ac-ok">${esc(T('recoOk'))}</p>`);
     out.innerHTML = one(T('custs'), r.customers || []) + one(T('sups'), r.suppliers || []) + (Number(r.unattributed_receivable) ? `<p>${esc(T('unattr'))}: ${esc(fm(r.unattributed_receivable))}</p>` : '') + `<div class="ac-note">${esc(T('recoNote'))}</div>`;
   } catch (e) { out.innerHTML = `<div class="ac-warn">${esc(eText(e))}</div>`; }
+  // phase 72: stock vs books ("মিলানো"), read only
+  try { out.insertAdjacentHTML('beforeend', invHtml(await rpc('inventory_vs_gl', { p_date: D.asof || today(), p_loc: locP() }))); }
+  catch (e) { out.insertAdjacentHTML('beforeend', `<h4>${esc(T('invH'))}</h4><div class="ac-note">${esc(eText(e))}</div>`); }
+}
+function invHtml(iv) {
+  if (!iv || iv.data_needed) return '';
+  let h = `<hr><h4>${esc(T('invH'))}</h4><p class="muted">${esc(T('invNote'))}</p>`;
+  if (iv.valuation_basis === 'ledger_replay') h += `<div class="ac-note">${esc(T('invReplay'))}</div>`;
+  (iv.rows || []).forEach((r) => {
+    const rs = (r.reasons || []).map((x) => `<tr><td class="ac-ind1">${esc(X['rs_' + x.code] ? T('rs_' + x.code) : x.code)}</td>${amtCell(x.amount)}</tr>`).join('');
+    const un = Number(r.unexplained) ? `<tr><td class="ac-ind1">${esc(T('invUnexpl'))}</td>${amtCell(r.unexplained)}</tr>` : '';
+    h += table(`<th>${esc(T('invT_' + r.key))} · ${esc(r.code)}</th><th class="n"></th>`,
+      `<tr><td>${esc(T('invGl'))}</td>${amtCell(r.gl)}</tr><tr><td>${esc(T('invVal'))}</td>${amtCell(r.valuation)}</tr><tr class="tot"><td>${esc(T('invDiff'))}</td>${amtCell(r.diff)}</tr>${rs}${un}`);
+  });
+  h += iv.agree ? `<p class="ac-ok">${esc(T('invOk'))}</p>` : '';
+  return h;
 }
 async function tChart() {
   await loadAccounts();
@@ -355,12 +399,14 @@ async function tNew() {
   if (!D.accounts.length) await loadAccounts();
   if (D.sups === null) { const r = await sb.from('suppliers').select('id,name').order('name'); D.sups = r.data || []; }
   if (!isMgr()) return `<p class="muted">${esc(T('noacc'))}</p>`;
+  if (D.reasons === undefined) { try { D.reasons = (await rpc('manual_reasons85')).filter((x) => x.active); } catch (e) { D.reasons = []; } }   // bos85: reason codes for the manual-journal guard (empty when phase85 is not pasted)
   if (!D.lines.length) D.lines = [newLine(), newLine()];
   const ls = locs();
   return `<div class="card stack"><h3>${esc(T('nj'))}</h3>
     <div><label for="ac_jdate">${esc(T('date'))}</label><input id="ac_jdate" type="date" value="${esc(D.jdate || today())}"></div>
     <div><label for="ac_jloc">${esc(T('place'))}</label><select id="ac_jloc"><option value="">${esc(T('company'))}</option>${ls.map((l) => `<option value="${l.id}" ${String(l.id) === String(D.jloc || '') ? 'selected' : ''}>${esc(locName(l.id))}</option>`).join('')}</select></div>
     <div><label for="ac_jmemo">${esc(T('jmemo'))}</label><input id="ac_jmemo" autocomplete="off" value="${esc(D.jmemo || '')}"></div>
+    ${D.reasons && D.reasons.length ? `<div><label for="ac_jreason">${esc(T('jreason'))}</label><select id="ac_jreason"><option value="">—</option>${D.reasons.map((x) => `<option value="${esc(x.code)}">${esc(lab(L(x.label_bn, x.label_en, x.label_mix || x.label_bn)))}</option>`).join('')}</select></div>` : ''}
     <div id="ac_lines">${D.lines.map(lineHtml).join('')}</div>
     <button class="full" data-act="ac_addline">${esc(T('addLine'))}</button>
     <div id="ac_tot" role="status"></div>
@@ -429,10 +475,24 @@ async function tSettings() {
 
 const RENDER = { overview: tOverview, bs: tBs, pl: tPl, cf: tCf, tb: tTb, ledger: tLedger, journal: tJournal, parties: tParties, chart: tChart, new: tNew, opening: tOpening, settings: tSettings };
 const needsBar = (tab) => !['chart', 'new', 'opening', 'settings'].includes(tab);
+// phase 72: one line at the top: last post, pending, errors (+ a banner with a way to the Post now panel when something failed to post)
+function strip() {
+  const st = D.st; if (!st || !st.start) return '';
+  const lp = st.last_post_at || st.last_post;
+  const when = lp ? new Date(lp).toLocaleString('en-GB', { timeZone: 'Asia/Dhaka', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }) : T('never');
+  const pend = Number(st.pending) || 0, errs = Math.max(Number(st.errors) || 0, Number(D.autoErr) || 0), held = Number(st.locked) || 0;
+  let h = `<div class="${errs > 0 ? 'ac-warn' : 'ac-note'}" role="status" id="ac_strip">${esc(T('lastPost'))}: ${esc(when)} · ${esc(T('pending'))} ${pend} · ${esc(T('errN'))} ${errs}${held ? ' · ' + esc(T('heldN')) + ' ' + held : ''}</div>`;
+  if (D.hint) h += `<div class="ac-warn" role="alert" id="ac_hint">${esc(D.hint)}</div>`;
+  if (errs > 0) {
+    h += `<div class="ac-warn" role="alert" id="ac_failbanner"><b>${errs} ${esc(T('failN'))}</b>${(st.error_list || []).slice(0, 3).map((e) => `<div class="ac-id">${esc(sl(e.source_type))} ${esc(String(e.source_id).slice(0, 8))}: ${esc(e.error)}</div>`).join('')}`
+      + `${isMgr() ? `<button class="full" data-act="ac_post">${esc(T('openPost'))}</button>` : ''}</div>`;
+  }
+  return h;
+}
 async function draw() {
   const body = $('#ac_body'); if (!body) return;
   const tabSel = `<div><label for="ac_tab">${esc(T('title'))}</label><select id="ac_tab">${TABS.map((t) => `<option value="${t}" ${t === D.tab ? 'selected' : ''}>${esc(T('t_' + t))}</option>`).join('')}</select></div>`;
-  body.innerHTML = tabSel + '<div id="ac_main"><p class="muted">' + esc(T('loading')) + '</p></div>';
+  body.innerHTML = strip() + tabSel + '<div id="ac_main"><p class="muted">' + esc(T('loading')) + '</p></div>';
   const main = $('#ac_main');
   try {
     const html = await RENDER[D.tab]();
@@ -444,10 +504,13 @@ async function draw() {
 }
 async function autopost() {
   if (!(D.st && D.st.can_manage && D.st.on && D.st.autopost && D.st.start)) return;
+  D.hint = '';
   try {
-    let posted = 0, rev = 0, more = true, n = 0;
-    while (more && n < 5) { const r = await rpc('acct_post_pending', { p_dry: false }); posted += r.posted || 0; rev += r.reversed || 0; more = !!r.more && ((r.posted || 0) + (r.reversed || 0)) > 0; n++; }
+    let posted = 0, rev = 0, more = true, n = 0, errs = 0;
+    while (more && n < 5) { const r = await rpc('acct_post_pending', { p_dry: false }); posted += r.posted || 0; rev += r.reversed || 0; errs = (r.errors || []).length; more = !!r.more && ((r.posted || 0) + (r.reversed || 0)) > 0; n++; }
+    D.autoErr = errs;   // phase 72: failed postings are no longer swallowed; the strip shows them with a link to the Post now panel
     if (posted + rev > 0) toast(T('posted') + ': ' + posted + (rev ? ' + ' + rev : ''));
+    if (errs > 0) toast(errs + ' ' + T('failN'));
   } catch (e) { D.hint = eText(e); }
 }
 async function view() {
@@ -492,7 +555,7 @@ async function postNow() {
 async function postGo() {
   try {
     const r = await rpc('acct_post_pending', { p_dry: false });
-    closeSheet(); toast(T('posted') + ': ' + (r.posted || 0) + (r.reversed ? ' + ' + r.reversed : '') + (r.more ? ' · ' + T('more') : ''));
+    D.autoErr = (r.errors || []).length; closeSheet(); toast(T('posted') + ': ' + (r.posted || 0) + (r.reversed ? ' + ' + r.reversed : '') + (r.more ? ' · ' + T('more') : ''));
     D.st = await rpc('acct_status'); await draw();
   } catch (e) { toast(eText(e)); }
 }
@@ -514,7 +577,7 @@ async function jSubmit(dry) {
     D.jdate = ($('#ac_jdate') || {}).value; D.jloc = ($('#ac_jloc') || {}).value; D.jmemo = (($('#ac_jmemo') || {}).value || '').trim();
     const t = totals();
     if (t.diff !== 0) return toast(lab(ERR.unbalanced) + ' (' + fm(t.d) + ' / ' + fm(t.c) + ')');
-    const r = await rpc('acct_journal_post', { p_date: D.jdate, p_loc: D.jloc ? Number(D.jloc) : null, p_memo: D.jmemo, p_lines: lines, p_client: dry ? null : D.client, p_photo: D.jphoto || null, p_dry: !!dry });
+    const r = await rpc('acct_journal_post', { p_date: D.jdate, p_loc: D.jloc ? Number(D.jloc) : null, p_memo: D.jmemo, p_lines: lines, p_client: dry ? null : D.client, p_photo: D.jphoto || null, p_dry: !!dry, ...(($('#ac_jreason') || {}).value ? { p_reason: $('#ac_jreason').value } : {}) });
     if (dry) { $('#ac_jout').textContent = T('dryOk') + ` (${fm(r.total_debit)} = ${fm(r.total_credit)})`; return; }
     toast(T('saved')); D.client = rid(); D.lines = []; D.jmemo = ''; D.jphoto = ''; D.tab = 'journal'; D.st = await rpc('acct_status'); await draw();
   } catch (e) { toast(eText(e)); }

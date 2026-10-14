@@ -37,7 +37,8 @@ B.forms['10-2'] = {
       CALC('limit_text', L('সীমা যাচাই', 'Limit check'), 'text'),
       ST('approved_by', L('সীমার উপরে হলে অনুমোদনকারী', 'Approved by (when over the limit)'), { show: (x) => x.v.over_limit, req: (x) => x.v.over_limit }),
       TA('no_receipt_reason', L('রসিদ না থাকলে কারণ', 'Reason if a receipt is missing'), { show: (x) => x.v.no_receipt, req: (x) => x.v.no_receipt }),
-      CK('drawer_untouched', L('বিক্রয় ড্রয়ার থেকে কিছু নেওয়া হয়নি', 'Nothing was taken from the sales drawer'), { req: true })] },
+      CK('drawer_untouched', L('বিক্রয় ড্রয়ার থেকে কিছু নেওয়া হয়নি', 'Nothing was taken from the sales drawer'), { req: true }),
+      SEL('pay_mode', L('কীভাবে দেওয়া হয়েছে (ফাঁকা = cash)', 'Paid how (empty = cash)'), [['cash', L('নগদ', 'Cash')], ['bank', L('ব্যাংক', 'Bank')], ['mobile', L('মোবাইল', 'Mobile')], ['card', L('কার্ড', 'Card')]])] },
     { title: L('ইমপ্রেস্টের হিসাব', 'Imprest (petty cash) check'), fields: [
       NOTE(L('নগদ ও রসিদের যোগফল সবসময় নির্ধারিত টাকার সমান থাকবে। পুনঃপূরণ হবে শুধু রসিদের বিপরীতে।', 'Cash plus receipts must always equal the fixed amount. Replenishment only against receipts.'), 'ok'),
       M('cash_morning', L('সকালে নগদ', 'Cash in the morning')),

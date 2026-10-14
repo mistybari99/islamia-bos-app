@@ -98,10 +98,20 @@ async function goReturn(btn) {
   const mode = ($('#sr_mode') || {}).value || null; if (c.refund > 0 && !mode) return toast(T('needMode'));
   const wallet = (($('#sr_wallet') || {}).value || '').trim(); if (mode === 'mobile' && !wallet) return toast(T('needWallet'));
   const lines = []; (C.d.lines || []).forEach((l, i) => { const el = $(`[data-rq="${i}"]`); if (el && el.value.trim()) lines.push({ item_id: l.item_id, qty: nnum(el.value) }); });
-  const d = C.d;
+  const d = C.d, slip = B.tpl ? slipData(d, lines, c, reason) : null;   // bos98
   await U.submit(btn, () => sb.rpc('sale_return', { p_client: C.client, p_sale: d.sale_id, p_lines: lines, p_reason: reason, p_note: (($('#sr_note') || {}).value || '').trim() || null,
     p_refund_mode: c.refund > 0 ? mode : null, p_wallet: wallet || null, p_ref: (($('#sr_ref') || {}).value || '').trim() || null }),
-    () => { toast(T('done')); if ($('#sr_list')) listView(); }, { grant: 'sale_return', loc: d.location_id, context: { sale: d.sale_id } });
+    () => { toast(T('done')); if ($('#sr_list')) listView(); if (slip) tplSlip(slip, d.location_id); }, { grant: 'sale_return', loc: d.location_id, context: { sale: d.sale_id } });
+}
+// bos98: the return slip, only when the owner chose a sale_return template (B.tpl absent or nothing chosen: nothing printed, as before). Customer-facing numbers only, no cost.
+function slipData(d, lines, c, reasonCode) {
+  try {
+    const items = lines.map((x) => { const l = (d.lines || []).find((z) => z.item_id === x.item_id) || {}; const f = Number(d.factor || 1); return { name: l.name || '', qty: x.qty, price: Number(l.price), amount: r2(x.qty * Number(l.price) * f) }; });
+    return { no: '', date: today(), orig_no: String(d.receipt), reason: rLabel(reasonCode), customer: d.customer ? { name: d.customer } : null, items, subtotal: c.amt, vat: 0, refund: c.refund };
+  } catch (e) { return null; }
+}
+async function tplSlip(data, loc) {
+  try { if (!B.tpl || !B.tpl.ensure) return; await B.tpl.ensure(sb); const o = { lang: S.lang, loc, shop: {} }; if (B.tpl.printHTML('sale_return', data, undefined, o)) B.tpl.print('sale_return', data, undefined, o); } catch (e) { /* keep today's behaviour: nothing printed */ }
 }
 
 Object.assign(H, {

@@ -14,7 +14,7 @@ const X = {
   sure: L('এই অধিকার সরাবেন?', 'Remove this right?', 'এই right সরাবেন?'), pick: L('বাছুন', 'Choose', 'বাছুন'), count: L('টি', 'rights', 'টি'),
 };
 const T = (k) => lab(X[k]);
-const D = { rows: [], defs: [], people: [], q: '' };
+const D = { rows: [], defs: [], people: [], q: '', hint: null };
 const locName = (id) => id ? nm(((B.ENV && B.ENV.locs) || []).find((l) => l.id === id) || { name_bn: '#' + id }) : T('allPlaces');
 const gl = (d) => lab({ bn: d.label_bn, en: d.label_en || d.label_bn, mix: d.label_mix || d.label_bn });
 async function load() {
@@ -36,15 +36,17 @@ function draw() {
     <select id="dg_c"><option value="">${esc(T('right'))} — ${esc(T('pick'))}</option>${D.defs.map((d) => `<option value="${esc(d.grant_code)}">${esc(gl(d))}</option>`).join('')}</select>
     <select id="dg_l"><option value="">${esc(T('allPlaces'))}</option>${((B.ENV && B.ENV.locs) || []).map((l) => `<option value="${l.id}">${esc(nm(l))}</option>`).join('')}</select>
     <div><label for="dg_u">${esc(T('until'))}</label><input id="dg_u" type="date"></div><button class="primary" data-act="dg_add">${esc(T('give'))}</button></div></details>`;
-  el.innerHTML = `<div class="card"><input id="dg_q" type="search" placeholder="${esc(T('search'))}" value="${esc(D.q)}" autocomplete="off"><div class="muted">${rows.length} ${esc(T('count'))}</div></div>${add}${list}`;
+  el.innerHTML = `${D.hint ? `<div class="notice warn" id="dg_hint">${esc(D.hint)}</div>` : ''}<div class="card"><input id="dg_q" type="search" placeholder="${esc(T('search'))}" value="${esc(D.q)}" autocomplete="off"><div class="muted">${rows.length} ${esc(T('count'))}</div></div>${add}${list}`;
 }
 Object.assign(H, {
   dg_remove: async (a) => { if (!window.confirm(T('sure'))) return; const r = await sb.rpc('set_user_grant', { p_user: a.dataset.u, p_code: a.dataset.c, p_loc: a.dataset.l === '' ? null : Number(a.dataset.l), p_until: null, p_allowed: false, p_note: null });
     if (r.error) return fail(r.error); toast(T('saved')); await load(); draw(); },
   dg_add: async () => { const u = $('#dg_p').value, c = $('#dg_c').value, l = $('#dg_l').value, d = $('#dg_u').value; if (!u || !c) return toast(T('pick'));
-    const r = await sb.rpc('set_user_grant', { p_user: u, p_code: c, p_loc: l ? Number(l) : null, p_until: d ? d + 'T23:59:59+06:00' : null, p_allowed: true, p_note: null }); if (r.error) return fail(r.error); toast(T('saved')); await load(); draw(); },
+    const r = await sb.rpc('set_user_grant', { p_user: u, p_code: c, p_loc: l ? Number(l) : null, p_until: d ? d + 'T23:59:59+06:00' : null, p_allowed: true, p_note: null }); if (r.error) return fail(r.error); toast(T('saved'));
+    D.hint = null; try { const h = await sb.rpc('grant_separation_hint', { p_user: u, p_grant: c }); if (h && h.data && h.data.suggest) D.hint = lab({ bn: h.data.message_bn, mix: h.data.message_bn, en: h.data.message_en }); } catch (e) { /* the hint is advice only (phase78); never blocks */ } /* bos78 */
+    await load(); draw(); },
 });
 document.addEventListener('input', (e) => { if (e.target.id === 'dg_q') { D.q = e.target.value; const pos = e.target.selectionStart; draw(); const q = $('#dg_q'); if (q) { q.focus(); try { q.setSelectionRange(pos, pos); } catch (x) { /* ignore */ } } } });
-async function view() { shell(T('title'), '<div id="dg_body"><p class="muted">…</p></div>', true); try { if (B.loadStatic) await B.loadStatic(); await load(); draw(); } catch (e) { fail(e); } }
+async function view() { D.hint = null; shell(T('title'), '<div id="dg_body"><p class="muted">…</p></div>', true); try { if (B.loadStatic) await B.loadStatic(); await load(); draw(); } catch (e) { fail(e); } }
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { delegation: view });
 })();

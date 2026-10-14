@@ -72,7 +72,7 @@ const queue = () => jget(QK(), []);
 const setQueue = (q) => store.set(QK(), JSON.stringify(q));
 const failedQ = () => jget(XK(), []);
 const setFailed = (q) => store.set(XK(), JSON.stringify(q));
-const BUSINESS = /^(no_lines|bad_mode|bad_qty|bad_price|bad_amount|bad_discount|bad_discount_kind|discount_mode_off|no_price|item_not_found|due_needs_customer|not allowed|customer_required|customer_name_required|bad_mobile|overpaid|over_credit_limit|override_needs_approval|discount_needs_approval|customer_inactive|bad_sale_type|bad_payments|name_required|period_closed|unlisted_blocked|paper_no_required|insufficient_stock|expired_stock_blocked|item_not_sellable)/;
+const BUSINESS = /^(no_lines|bad_mode|bad_qty|bad_price|bad_amount|bad_discount|bad_discount_kind|discount_mode_off|no_price|item_not_found|due_needs_customer|not allowed|customer_required|customer_name_required|bad_mobile|overpaid|over_credit_limit|override_needs_approval|discount_needs_approval|customer_inactive|bad_sale_type|bad_payments|name_required|period_closed|unlisted_blocked|paper_no_required|insufficient_stock|expired_stock_blocked|item_not_sellable|unit_unknown|production_negative_reason_needed|client_id_taken)/;
 const freq = () => jget(FKEY, {});
 const bump = (id) => { const f = freq(); f[id] = (f[id] || 0) + 1; store.set(FKEY, JSON.stringify(f)); };
 const perms = () => S.ctx.perms.POS || {};
@@ -308,8 +308,8 @@ function build(o) {
 }
 const clean = (p) => { const { _t, _total, _paid, ...r } = p; return r; };
 const NOFN = /record_sale2|Could not find the function|PGRST202|schema cache/i;
-async function send(p) {
-  let r = await sb.rpc('record_sale2', clean(p));
+async function send(p, replay) {
+  let r = await ((replay && B.posfail) ? B.posfail.sendOffline(clean(p)) : sb.rpc('record_sale2', clean(p)));   // bos83: a queue replay goes through record_sale_offline when posfail.js is loaded
   if (r.error && NOFN.test(r.error.message || '') && 'p_discount_kind' in p) { const { p_discount_kind, p_discount_input, ...old } = clean(p); r = await sb.rpc('record_sale2', old); }   // database without the new pair: same sale, old shape
   if (r.error && NOFN.test(r.error.message || '')) {
     // database not updated yet: only a full single-mode payment can still be recorded the old way
@@ -325,9 +325,10 @@ async function submitSale(p, change) {
   if (P.busy) return; P.busy = true;
   const btn = $('#cart_ok') || $('[data-act="pos_qs_cash"]'); if (btn) btn.disabled = true;
   try {
+    if (B.drawer) B.drawer.beforeSale(p);   // bos95: cash drawer (rule cash_drawer_mode; off = nothing happens; never blocks the sale)
     const { data, error } = await send(p);
     if (error) {
-      if (isNet(error)) { setQueue([...queue(), p]); closeSheet(); resetCart(); toast(T('queued')); return afterSale(); }
+      if (isNet(error)) { setQueue([...queue(), p]); closeSheet(); resetCart(); toast(T('queued')); if (B.invoiceview) B.invoiceview.afterSale({ p, pending: true }); /* bos92 */ if (B.drawer) B.drawer.afterSale(p); /* bos95 */ return afterSale(); }
       if (btn) btn.disabled = false;
       const m = T2(error);
       if (m) { const g = B.emergency && B.emergency.grantFor(error.message); if (g) return B.emergency.offer({ grant: g, loc: P.loc, context: g === 'discount_over_limit' ? { amount: p.p_discount, total: p._total } : g === 'credit_over_limit' ? { amount: Math.max(0, Math.round((p._total - p._paid) * 100) / 100), total: p._total } : { total: p._total }, message: m }); return toast(m); }
@@ -337,6 +338,8 @@ async function submitSale(p, change) {
     closeSheet(); resetCart();
     toast(`${T('done')} · ${T('receipt')} ${data.receipt} · ${money(data.total)}${change > 0 ? ' · ' + lab(L('ফেরত', 'Change', 'Change')) + ' ' + money(change) : ''}${data.due > 0 ? ' · ' + T('dueword') + ' ' + money(data.due) : ''}`);
     if (B.invoice && B.invoice.offer) B.invoice.offer(data.id, p.p_loc);
+    if (B.invoiceview) B.invoiceview.afterSale({ p, data, change });   // bos92: invoice on screen (rule pos_show_invoice_after_sale; never = nothing happens)
+    if (B.drawer) B.drawer.afterSale(p);   // bos95
     afterSale();
   } finally { P.busy = false; }
 }
@@ -350,7 +353,7 @@ async function flush() {
   const done = new Set(), bad = [], tried = new Map();
   try {
     for (const p of q) {
-      const { error } = await send(p);
+      const { error } = await send(p, true);   // bos83: replay flag
       if (!error) { done.add(p.p_client); continue; }
       const m = (error && error.message) || '';
       if (BUSINESS.test(m)) { done.add(p.p_client); bad.push({ ...p, _err: T2(error) || m }); continue; }   // refused by the rules: kept visible, never lost
@@ -360,7 +363,7 @@ async function flush() {
     }
   } finally {
     setQueue(queue().filter((x) => !done.has(x.p_client)).map((x) => tried.get(x.p_client) || x));
-    if (bad.length) { setFailed([...failedQ(), ...bad]); toast(T('failedmsg')); }
+    if (bad.length) { setFailed([...failedQ(), ...bad]); toast(T('failedmsg')); if (B.posfail) B.posfail.report(bad); /* bos83 */ }
     flushing = false;
   }
   if (bad.length && location.hash.startsWith('#/pos')) drawPos();
@@ -384,7 +387,8 @@ async function drawToday() {
   $('#pos_body').innerHTML = `<div class="card"><div class="row between"><span>${esc(T('day'))}</span><b style="font-size:1.5rem">${money(tot)}</b></div>
     <div class="muted">${ok.length} ${esc(T('count'))}</div>
     <div class="row wrap" style="margin-top:6px">${['cash', 'mobile', 'card'].map((m) => `<span class="chip">${esc(lab(MODEL[m]))} ${money(by(m))}</span>`).join('')}<span class="chip warn">${esc(T('dueword'))} ${money(dueT)}</span>${coll ? `<span class="chip ok">${esc(T('collect'))} ${money(coll)}</span>` : ''}</div></div>
-    ${failedQ().filter((x) => x.p_loc === P.loc).map((x) => `<div class="notice bad"><b>${esc(T('failed'))}</b> · ${money(x._total || 0)} · ${esc(x._err || '')}<div class="row" style="margin-top:6px"><button class="full" data-act="pos_discard" data-v="${esc(x.p_client)}">${esc(T('discard'))}</button></div></div>`).join('')}
+    ${failedQ().filter((x) => x.p_loc === P.loc).map((x) => `<div class="notice bad"><b>${esc(T('failed'))}</b> · ${money(x._total || 0)} · ${esc(x._err || '')}<div class="row" style="margin-top:6px"><button class="full" data-act="pos_discard" data-v="${esc(x.p_client)}">${esc(T('discard'))}</button>${B.posfail ? B.posfail.buttons(x) : ''/* bos83 */}</div></div>`).join('')}
+    ${B.drawer ? B.drawer.noSaleButton(P.loc) : ''/* bos95 */}
     ${pend.length ? `<div class="notice warn">${pend.length} ${esc(T('pending'))}: ${money(pend.reduce((a, p) => a + (p._total || 0), 0))}</div>` : ''}
     ${P.day.length ? P.day.map((s) => `<div class="card item" data-act="pos_open" data-v="${s.id}" style="${s.status === 'void' ? 'opacity:.55' : ''}"><div><div class="nm">#${s.receipt} · ${hhmm(s.sold_at)} ${s.quick ? '⚡' : ''}${s.sale_type === 'wholesale' ? ' ◆' : ''}</div>
         <div class="muted" style="font-size:.85rem">${esc(lab(MODEL[s.pay_mode]))} · ${esc(s.created_staff || '')}${s.customer ? ' · ' + esc(s.customer) : ''}</div></div>
@@ -411,6 +415,7 @@ async function saleSheet(id) {
       ${Number(s.due_amount) > 0 && s.status === 'done' ? `<div class="notice warn">${esc(T('dueword'))}: <b>${money(s.due_amount)}</b></div>` : ''}
       <div class="muted">${esc(T('by'))}: ${esc(s.created_staff || '')}${cu.data ? ' · ' + esc(cu.data.name) + ' ' + esc(cu.data.mobile) : s.customer ? ' · ' + esc(s.customer) : ''}${s.note ? ' · ' + esc(s.note) : ''}</div>
       ${s.status === 'void' ? `<div class="notice bad">${esc(T('voided'))}: ${esc(s.void_note || '')} (${esc(s.void_staff || '')})</div>` : ''}
+      ${B.invoiceview ? `<button class="full" data-act="iv92_open" data-v="${s.id}">${esc(B.invoiceview.T('openHist'))}</button>` : ''}   <!-- bos92 -->
       <button class="full" data-act="pos_share">${esc(T('share'))}</button>
       ${B.invoice && B.invoice.printSaleId ? `<button class="full" data-act="pos_print" data-v="${s.id}">${esc(T('print'))}</button>` : ''}
       ${B.saleReturn && s.status === 'done' ? `<button class="full" data-act="pos_return" data-v="${s.id}">${esc(lab(L('মাল ফেরত নিন', 'Return goods', 'মাল return নিন')))}</button>` : ''}
@@ -477,7 +482,7 @@ Object.assign(A.H, {
   pos_open: (a) => saleSheet(a.dataset.v),
   pos_share: async () => { const txt = P.shareText || ''; try { if (navigator.share) await navigator.share({ text: txt }); else { await navigator.clipboard.writeText(txt); toast('✓'); } } catch (e) { /* cancelled */ } },
   pos_print: (a) => B.invoice.printSaleId(a.dataset.v, P.loc),
-  pos_discard: (a) => { setFailed(failedQ().filter((x) => x.p_client !== a.dataset.v)); drawToday(); },
+  pos_discard: (a) => { setFailed(failedQ().filter((x) => x.p_client !== a.dataset.v)); if (B.posfail) B.posfail.discarded(a.dataset.v); /* bos83 */ drawToday(); },
   pos_return: (a) => { closeSheet(); B.saleReturn.open(a.dataset.v); },
   pos_void: async (a) => { const n = ($('#void_note').value || '').trim(); if (!n) return toast(T('needNote'));
     const { error } = await sb.rpc('void_sale', { p_id: a.dataset.v, p_note: n }); if (error) return fail(error); closeSheet(); toast(T('voided')); drawToday(); },

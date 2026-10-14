@@ -324,6 +324,7 @@ function pickLogo(file) {
 // ----- barcode label sheet -----
 const LB = { tpl: null, sel: {}, q: '', items: [], tpls: [] };
 async function labelsPage() {
+  try { if (B.tpl && B.tpl.ensure) B.tpl.ensure(sb); } catch (e) { /* bos98: warm the template choice cache; offline = today's labels */ }
   await loadAll(); if (V.err) return shell(T('title'), `<div class="notice bad">${esc(T('sql'))}</div>`, true);
   const ir = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,sell_price,barcode,is_active').eq('is_active', true).order('code'));
   LB.items = (ir.data || []); LB.tpls = V.tpls.filter((x) => x.kind === 'label' && x.active);
@@ -331,6 +332,19 @@ async function labelsPage() {
   drawLabels();
 }
 const labTpl = () => LB.tpl || BUILTIN('label');
+// bos98: barcode labels through the chosen barcode_label template (cached owner choice; nothing chosen / B.tpl absent / any problem = today's label sheet). Name, barcode and SELLING price only.
+function tplLabels(items) {
+  try {
+    const o = { lang: S.lang, shop: {} }; if (B.tpl.ensure) B.tpl.ensure(sb);
+    const uniq = []; items.forEach((x) => { const u = uniq.find((z) => z.code === String(x.barcode ?? '') && z.name === x.name); if (u) u.copies++; else uniq.push({ name: x.name, code: String(x.barcode ?? ''), price: x.price, copies: 1 }); });
+    const parts = uniq.map((u) => B.tpl.render('barcode_label', u, undefined, o)); if (!parts.length || parts.some((h) => !h)) return false;   // null = nothing chosen
+    const f = document.createElement('iframe'); f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0'; document.body.appendChild(f);
+    f.srcdoc = `<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#fff}</style></head><body>${parts.join('')}</body></html>`;
+    f.onload = () => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { /* print blocked */ } setTimeout(() => f.remove(), 2000); };
+    return true;
+  } catch (e) { return false; }
+}
+
 const labItems = () => LB.items.filter((i) => LB.sel[i.id]).flatMap((i) => Array.from({ length: Math.max(1, Math.floor(Number(($('#lb_copies') || {}).value) || 1)) }, () => ({ name: nm(i), barcode: i.barcode || i.code, price: i.sell_price })));
 function drawLabels() {
   const q = LB.q.toLowerCase(), list = LB.items.filter((i) => !q || [i.code, i.name_bn, i.name_en, i.name_mix].some((x) => (x || '').toLowerCase().includes(q))).slice(0, 80);
@@ -374,7 +388,7 @@ Object.assign(A.H, {
     const row = { name, location_id: val('#pf_loc') === '' ? null : Number(val('#pf_loc')), device_key: val('#pf_dev').trim() || null, printer_type: val('#pf_type'), paper_size: val('#pf_size').trim() || null, paper_width_mm: w, template_id: val('#pf_tpl') === '' ? null : Number(val('#pf_tpl')), active: $('#pf_active').classList.contains('on'), updated_by: S.ctx.profile.id };
     const r = a.dataset.id ? await sb.from('print_profiles').update(row).eq('id', idv(a.dataset.id)) : await sb.from('print_profiles').insert(row); if (r.error) return denied(r.error); closeSheet(); toast(T('saved')); listPage(); },
   iv_prof_del: async (a) => { const { error } = await sb.from('print_profiles').update({ active: false }).eq('id', idv(a.dataset.id)); if (error) return denied(error); closeSheet(); listPage(); },
-  iv_lb_print: () => { const items = labItems(); if (!items.length) return toast(T('lb_none')); const tp = labTpl(); printHtml(renderLabels(tp, items, S.lang), Number(tp.paper_width_mm) || 210, false); },
+  iv_lb_print: () => { const items = labItems(); if (!items.length) return toast(T('lb_none')); if (B.tpl && tplLabels(items)) return; const tp = labTpl(); printHtml(renderLabels(tp, items, S.lang), Number(tp.paper_width_mm) || 210, false); },
 });
 document.addEventListener('input', (e) => {
   const id = e.target.id || '';

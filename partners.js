@@ -43,6 +43,7 @@ const ERR = {
   'not allowed': L('শুধু মালিক এটা করতে পারেন', 'Only the owner can do this'), module_off: L('এই মডিউল বন্ধ (সুইচবোর্ডে চালু করুন)', 'This module is switched off (turn it on in the Switchboard)'),
   name_required: L('নাম লিখুন', 'A name is needed'), split_not_100: L('ভাগের যোগফল ঠিক ১০০% হতে হবে', 'The shares must add up to exactly 100%'), slab_order: L('ধাপগুলো ছোট থেকে বড় হতে হবে, শেষটা ফাঁকা (বাকি সব)', 'Slabs must go up, and only the last may be open-ended'),
   bad_config: L('এই ধাপের তথ্য ঠিক নয়', 'This step is not filled in correctly'), period_overlap: L('এই সময়ের মধ্যে আগেই হিসাব হয়ে গেছে', 'This period overlaps an earlier settlement'),
+  base_estimated: L('লাভের ভিত্তিতে অনুমানের খরচ আছে (সেটিং: আটকানো) - নিজে ভিত্তি অঙ্ক লিখুন', 'The profit base contains an estimated cost (setting: refuse) - type a manual base', 'Profit base-এ অনুমানের cost আছে (setting: refuse) - নিজে base লিখুন'),
   calc_incomplete: L('হিসাব অসম্পূর্ণ - হাতে ভিত্তি অঙ্ক লিখুন', 'The calculation is incomplete - type a manual base'), outside_deed_dates: L('সময়টা চুক্তির তারিখের বাইরে', 'The period is outside the deed dates'),
   bad_date: L('তারিখ ঠিক নয়', 'The date is not valid'), bad_range: L('তারিখের সীমা ঠিক নয়', 'The date range is not valid'), bad_amount: L('অঙ্ক ঠিক নয়', 'The amount is not valid'),
   exceeds_capital: L('ফেরত দেওয়া অঙ্ক পুঁজির বেশি', 'More than the capital held'), overpay: L('পাওনার চেয়ে বেশি দেওয়া যায় না', 'Cannot pay more than is due'), not_approved: L('আগে অনুমোদন করুন', 'Approve it first'),

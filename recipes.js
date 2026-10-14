@@ -51,10 +51,12 @@ const X = {
   pkSaleHint: L('বিক্রিতে কমলে বিক্রি কখনো আটকায় না; কমাতে না পারলে মালিক হলুদ লাইন পান।', 'With a sale it never blocks the sale; if it cannot be taken out the owner gets a yellow line.', 'Sale-এ কমলে sale আটকায় না; না পারলে owner yellow line পান।'),
   pkSale2: L('বিক্রি', 'Sale', 'Sale'), pkProd2: L('উৎপাদন', 'Production', 'Production'), pkProduct: L('যে পণ্যের জন্য', 'For product', 'For product'),
   dupTo: L('কোন পণ্যে কপি করবেন', 'Copy to which product', 'কোন product-এ copy'), copyGo: L('কপি', 'Copy', 'Copy'), copied: L('নতুন ভার্সন তৈরি', 'New version created', 'নতুন version তৈরি'),
+  actY: L('প্রকৃত মোট উৎপাদন (ঐচ্ছিক)', 'Actual total output (optional)', 'Actual মোট output (optional)'), actYHint: L('খালি রাখলে রেসিপির হিসাবই ধরা হয়; দিলে সেটাই স্টকে ঢোকে ও পার্থক্য লেখা থাকে।', 'Leave empty to use the recipe figure; if filled, that is what goes into stock and the difference is recorded.', 'খালি রাখলে recipe-র হিসাবই ধরা হয়; দিলে সেটাই stock-এ ঢোকে ও difference লেখা থাকে।'),
   sqlMissing: L('রেসিপির ডেটাবেস অংশ এখনও চালু হয়নি (phase19)', 'The recipe database part is not installed yet (phase19)', 'Recipe-এর database অংশ চালু হয়নি (phase19)'),
 };
 const T = (k) => lab(X[k]);
 const ERRS = {
+  cost_missing: L('কোনো কাঁচামালের দাম অজানা — আগে দাম বসান, তারপর উৎপাদন করুন', 'An ingredient cost is unknown — set the cost first, then produce', 'কোনো ingredient-এর cost অজানা — আগে cost বসান, তারপর production করুন'),
   recipe_used: L('এই ভার্সন ব্যবহৃত হয়েছে — নতুন ভার্সন বানান', 'This version is already used — make a new version', 'এই version used — নতুন version বানান'),
   recipe_not_found: L('রেসিপি পাওয়া যায়নি', 'Recipe not found', 'Recipe পাওয়া যায়নি'), recipe_inactive: L('রেসিপি বন্ধ আছে', 'The recipe is inactive', 'Recipe inactive'),
   recipe_required: L('উৎপাদন এখন শুধু রেসিপি দিয়ে — "রেসিপি দিয়ে উৎপাদন" ব্যবহার করুন', 'Production now needs a recipe — use "Produce from a recipe"', 'Production এখন শুধু recipe দিয়ে'),
@@ -62,6 +64,7 @@ const ERRS = {
   bad_product_type: L('শুধু তৈরি পণ্যের রেসিপি হয়', 'Only a finished product can have a recipe', 'শুধু finished product-এর recipe'), bad_waste: L('অপচয় % ০–১০০ হতে হবে', 'Waste % must be 0–100', 'Waste % ০–১০০'),
   dup_ingredient: L('একই উপকরণ দুবার', 'The same ingredient twice', 'একই ingredient দুবার'), no_lines: L('অন্তত একটি উপকরণ লাগবে', 'Add at least one ingredient', 'অন্তত একটি ingredient'),
   ingredient_is_product: L('পণ্য নিজেই নিজের উপকরণ হতে পারে না', 'A product cannot be its own ingredient', 'Product নিজের ingredient নয়'), ingredient_not_tracked: L('উপকরণের স্টক ট্র্যাক বন্ধ', 'Stock tracking is off for an ingredient', 'Ingredient-এ stock track বন্ধ'),
+  cost_missing: L('কোনো উপকরণের খরচ অজানা — আগে খরচ বসান (বা খরচ সত্যিই শূন্য হলে চিহ্ন দিন)', 'An ingredient cost is unknown - enter the cost first (or mark the item as cost really zero)', 'কোনো ingredient-এর cost অজানা — আগে cost বসান (বা cost সত্যিই শূন্য হলে mark দিন)'),
   waste_needed: L('রেসিপিতে অপচয় % বসানো নেই (সেটিং চালু)', 'A recipe line has no waste % (setting is on)', 'Recipe-এ waste % নেই (setting on)'), too_many_lines: L('১০০-র বেশি উপকরণ হয় না', 'More than 100 ingredients', '১০০-র বেশি ingredient'),
 };
 const ERRKEYS = Object.keys(ERRS);
@@ -255,6 +258,7 @@ async function openProduction(pre) {
     <div><label for="pr_b">${esc(T('batches'))}</label><input id="pr_b" inputmode="decimal" value="${esc(PS.batches)}"></div>
     <div><label for="pr_made">${esc(T('madeAt'))}</label><input id="pr_made" type="datetime-local" value="${now}"></div>
     <div><label for="pr_note">${esc(T('note'))}</label><input id="pr_note" autocomplete="off"></div>
+    <div><label for="pr_ay">${esc(T('actY'))}</label><input id="pr_ay" inputmode="decimal" autocomplete="off"><div class="muted" style="font-size:.85rem">${esc(T('actYHint'))}</div></div>
     <div id="pr_pv"><p class="muted">${esc(T('nothing'))}</p></div></div>
     <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" id="pr_go" data-act="rc_post">${esc(T('post'))}</button></div>`);
   runPreview();
@@ -283,7 +287,9 @@ async function postProduction(btn) {
   const m = ($('#pr_made') || {}).value, note = (($('#pr_note') || {}).value || '').trim() || null;
   PS.busy = true; if (btn) btn.disabled = true;
   try {
-    const r = await sb.rpc('production_post', { p_loc: PS.loc, p_recipe: PS.recipe, p_batches: b, p_client: PS.client, p_made_at: m ? m + ':00+06:00' : null, p_note: note });
+    const ay = nnum((($('#pr_ay') || {}).value || '').trim()), args = { p_loc: PS.loc, p_recipe: PS.recipe, p_batches: b, p_client: PS.client, p_made_at: m ? m + ':00+06:00' : null, p_note: note };
+    if (ay > 0) args.p_actual_yield = ay;   // the 7-argument form (phase74) only when the user typed an actual output; otherwise the 6-argument call as before
+    const r = await sb.rpc('production_post', args);
     if (r.error) return errMsg(r.error, { grant: 'stock_production', loc: PS.loc, context: { recipe: PS.recipe } });
     closeSheet(); toast(r.data && r.data.dup ? lab(X.saved) : T('done')); PS = null;
     await load(); if ($('#rc_main')) { if (D.tab === 'make') drawMake(); }

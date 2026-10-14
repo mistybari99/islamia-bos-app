@@ -27,6 +27,7 @@ const X = {
   stActive: L('চালু গ্রাহক', 'Active customers', 'Active customer'), stInactive: L('বন্ধ গ্রাহক', 'Switched-off customers', 'বন্ধ customer'), stAll: L('সব', 'All', 'সব'),
   count: L('জন', 'customers', 'জন'), more: L('আরও দেখান', 'Show more', 'আরও দেখান'), none: L('কোনো গ্রাহক মেলেনি', 'No customer matches', 'কোনো customer মেলেনি'),
   due: L('বাকি', 'Due', 'Due'), spent: L('মোট কেনা', 'Spent', 'মোট কেনা'), last: L('শেষ কেনা', 'Last purchase', 'শেষ কেনা'), orders: L('অর্ডার', 'Orders', 'Order'), avg: L('গড় বিল', 'Average bill', 'গড় bill'),
+  lnBn: L('বাংলা', 'Bangla', 'Bangla'),   // bos94: the Bangla-name label follows the language mode
   mobile: L('মোবাইল নম্বর', 'Mobile number', 'Mobile নম্বর'), name: L('নাম', 'Name', 'নাম'), tier: L('স্তর', 'Tier', 'Tier'), type: L('ধরন', 'Type', 'ধরন'),
   birthday: L('জন্মদিন', 'Birthday', 'Birthday'), anniv: L('বার্ষিকী', 'Anniversary', 'Anniversary'), address: L('ঠিকানা', 'Address', 'ঠিকানা'), notes: L('নোট', 'Notes', 'Note'),
   source: L('কীভাবে এলো', 'How they came', 'কীভাবে এলো'), wa: L('হোয়াটসঅ্যাপ নম্বর', 'WhatsApp number', 'WhatsApp নম্বর'), limit: L('বাকির সীমা (৳)', 'Credit limit (৳)', 'Due limit (৳)'),
@@ -371,7 +372,7 @@ function tierForm(id) {
   const f = (k, label, extra) => `<div><label for="tf_${k}">${esc(label)}</label><input id="tf_${k}" value="${t[k] === null || t[k] === undefined ? '' : esc(t[k])}" ${extra || ''}></div>`;
   openSheet(`<h2>${esc(id ? tn(t) : T('tNew'))}</h2><div class="stack" id="tf_form" data-id="${esc(id || '')}">
     ${id ? '' : f('code', T('tCode'), 'autocapitalize="off"')}
-    <div class="row"><div style="flex:1"><label for="tf_name_bn">${esc(T('name'))} (বাংলা)</label><input id="tf_name_bn" value="${esc(t.name_bn || '')}"></div><div style="flex:1"><label for="tf_name_en">${esc(T('name'))} (English)</label><input id="tf_name_en" value="${esc(t.name_en || '')}"></div></div>
+    <div class="row"><div style="flex:1"><label for="tf_name_bn">${esc(T('name'))} (${esc(T('lnBn'))})</label><input id="tf_name_bn" value="${esc(t.name_bn || '')}"></div><div style="flex:1"><label for="tf_name_en">${esc(T('name'))} (English)</label><input id="tf_name_en" value="${esc(t.name_en || '')}"></div></div>
     <div class="row"><div style="flex:1"><label for="tf_badge">${esc(T('tBadge'))}</label><input id="tf_badge" value="${esc(t.badge || '')}"></div><div style="flex:1"><label for="tf_color">${esc(T('tColor'))}</label><input id="tf_color" type="color" value="${esc(t.color || '#64748b')}"></div></div>
     ${f('discount_percent', T('tDisc'), 'inputmode="decimal"')}${f('discount_cap_amount', T('tCap'), 'inputmode="decimal"')}${f('credit_limit_default', T('tCredit'), 'inputmode="decimal"')}${f('points_multiplier', T('tMult'), 'inputmode="decimal"')}
     ${f('perks', T('tPerks'))}${f('birthday_gift', T('tBgift'))}
