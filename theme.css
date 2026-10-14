@@ -343,3 +343,34 @@ html.kbd-open .sheet .notice.ok:not(:focus-within), html.kbd-open .sheet details
 html.kbd-open .bnav { display: none !important; }
 html.kbd-open .pos-bar, html.kbd-open .actionbar { bottom: auto; top: calc(var(--vvt, 0px) + var(--vvh, 100%)); transform: translateY(-100%); padding-bottom: 10px; }
 html.kbd-open #toast { bottom: auto; top: calc(var(--vvt, 0px) + var(--vvh, 100%) - 70px); }
+
+/* bos108 (phase Pol): visual QA fixes. Every rule below is scoped to the screens named in it; nothing here restyles an old screen except the two shell bugs (bottom bar width, drawer language buttons). */
+/* (1) bottom bar must fit 320-412px in every language: equal flexible tabs, long labels shorten with an ellipsis */
+body .bnav button { flex: 1 1 0; min-width: 0; padding-inline: 1px; overflow: hidden; }
+body .bnav button > span:not(.orb) { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body .bnav button.sell { flex: 0 0 84px; overflow: visible; }
+body .bnav button.sell .orb { overflow: visible; }
+@media (max-width: 359px) { body .bnav button.sell { flex-basis: 72px; } }
+/* (10) drawer footer language buttons: 44px tap target */
+html body #nav_foot .lang button, html[data-skin] body #nav_foot .lang button { min-height: 44px; }
+/* (2) main actions on the NEW screens: at least 44px high (old screens keep their 36px mini buttons) */
+html body :is(#cs_body, #cb_body, #ca_body, #wcb_body, #s1_body, #sc_body, #ib_body, #sadv_body, #d23_body, #opx_body, #ov_body, #rb_body, #wfg_body, #wpf_body, #gd_body) :is(button.mini, a.mini, button.primary),
+html body #dg_body button.mini:not([data-act="dg_add"], [data-act="dg_remove"]),
+html body button.mini:is([data-act^="opx_"], [data-act^="ib_"], [data-act^="s1_"], [data-act^="scan_"], [data-act^="sadv_"], [data-act^="cb_"], [data-act^="ca_"], [data-act^="d23_"]),
+html body a.mini[href="#/switchboard"] { min-height: 44px; }
+html body :is(#opx_body, #d23_body, #dg_body, #sc_body) :is(button.mini, a.mini) { min-width: 44px; }
+html body #sadv_body a.mini, html body a.mini[href="#/switchboard"] { display: inline-flex; align-items: center; justify-content: center; padding-inline: 12px; }
+/* (4) link strip on the form-rule pages and the Options links: centred, 44px, current page marked */
+html body .wxlinks > a.btn.wxl { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 14px; text-decoration: none; }
+html body .wxlinks > a.btn.wxl[aria-current="page"] { background: var(--grad-brand, var(--ruby)); color: var(--on-brand, #fff); }
+html body a.btn.opx-lnk { display: flex; align-items: center; justify-content: center; min-height: 44px; margin-top: 8px; text-decoration: none; }
+/* (5) Classic: .mini had zero side padding, labels touched the border */
+:root[data-theme="classic"] body button.mini:not(.ph *) { padding-inline: 12px; }
+/* (8) fields on the NEW screens are 16px on touch phones (no zoom, readable) */
+@media (pointer: coarse) {
+  html body :is(#cs_body, #cb_body, #ca_body, #wcb_body, #s1_body, #sc_body, #ib_body, #sadv_body, #d23_body, #opx_body, #ov_body, #rb_body, #wfg_body, #wpf_body, #gd_body, #dg_body) :is(input, select, textarea):not([type=checkbox], [type=radio], [type=range], [type=color]),
+  html body :is(#wfg_f, #wfg_t, #wcb_f, #wcb_t, #cb_month, #iv92_day, #d23_acct, #opx_dc, [id^="dg_c"], [id^="opx_n_"], [id^="d23_"]):not([type=checkbox], [type=radio], [type=range], [type=color]) { font-size: 16px; }
+}
+/* (9) contrast: Premium Light primary button top stop (was 3.95-4.41:1 with white text) and Classic ok chip (was 4.45:1) */
+:root[data-theme="light"] { --grad-brand: linear-gradient(180deg, color-mix(in srgb, var(--brand) 98%, #fff) 0%, var(--brand) 45%, var(--brand-2) 100%); }
+@media not (prefers-color-scheme: dark) { :root[data-theme="classic"] .chip.ok { color: #1a5f3e; } }

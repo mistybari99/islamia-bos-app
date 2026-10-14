@@ -86,7 +86,7 @@ function drawHist() {
   const d = D.hist; if (!d) return D.err.hist ? errBox('hist') : `<p class="muted">${esc(T('loading'))}</p>`;
   if (!d.length) return `<div class="card"><p class="muted">${esc(T('histNone'))}</p></div>`;
   return d.map((b) => `<div class="card stack"><div class="muted">${esc(String(b.applied_at || '').slice(0, 16).replace('T', ' '))}</div>
-    ${(b.lines || []).map((l) => `<div class="row between wrap"><span>${esc(l.rule_key)}</span><span class="muted">${esc(fmt(l.old))} → ${esc(fmt(l.new))}${l.overwrote ? ' *' : ''}</span></div>`).join('')}</div>`).join('');
+    ${(b.lines || []).map((l) => `<div class="row between wrap"><span>${esc(l.rule_key)}</span><span class="muted">${esc(fmt(l.old))} → ${esc(fmt(l.new))}${l.overwrote ? ' *' : ''}</span></div>`).join('')}${B.setupundo ? B.setupundo.btn(b) : ''}</div>`).join('');   // bos107 q4: Undo button comes from setupundo.js
 }
 function draw() {
   const el = $('#sadv_body'); if (!el) return;
@@ -125,6 +125,6 @@ async function view() {
   shell(T('title'), '<div id="sadv_body" class="stack"></div>', true);
   draw(); await load(D.tab);
 }
-B.setupadvisor = { pick, fmt, tone, canApplyRow, skipTxt, msg };
+B.setupadvisor = { pick, fmt, tone, canApplyRow, skipTxt, msg, _hist: () => D.hist, _reload: () => { D.hist = null; D.rec = null; return load(D.tab); } };   // bos107 q4: _hist/_reload for setupundo.js
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { setupadvisor: view });
 })();

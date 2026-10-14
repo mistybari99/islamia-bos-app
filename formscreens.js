@@ -29,6 +29,8 @@ const X = {
   toRules: L('নিয়ম ও পরামর্শ', 'Rules and recommendations', 'Rule ও পরামর্শ'),
   fgIntro: L('প্রতিটি সুইচের পাশে সিস্টেমের পরামর্শ আছে। পরামর্শ মানা বাধ্যতামূলক নয়।', 'Each switch shows the system recommendation next to it. Following it is optional.', 'প্রতিটি switch-এর পাশে system-এর পরামর্শ আছে। মানা বাধ্যতামূলক নয়।'),
   k_form_051_mode: L('ফর্ম 05-1 stock-এ গেলে', 'When form 05-1 posts to stock', 'Form 05-1 stock-এ গেলে'),
+  k_expense_link_mode: L('খরচ দুবার গোনা ঠেকানোর নিয়ম', 'Rule against counting an expense twice', 'Expense দুবার গোনা ঠেকানোর rule'), /* bos108 */
+  k_rule_other: L('আরেকটি নিয়ম', 'Another rule', 'আরেকটি rule'),
   k_transit_short_mode: L('কম পৌঁছানো মাল', 'Goods that arrive short', 'কম পৌঁছানো মাল'),
   k_transit_open_hours: L('ট্রানজিট কত ঘণ্টা খোলা থাকলে সতর্কতা', 'Hours in transit before an alert', 'Transit কত ঘণ্টা খোলা থাকলে alert'),
   k_offline_soft_stock: L('অফলাইন sale-এ stock কম হলেও গ্রহণ', 'Accept an offline sale even if stock is short', 'Offline sale-এ stock কম হলেও গ্রহণ'),
@@ -88,7 +90,7 @@ const CH = {
 };
 const KIND = { form_051_mode: 'choice', transit_short_mode: 'choice', transit_open_hours: 'number', offline_soft_stock: 'switch' };
 function recCards(recs, only) {
-  return (recs || []).filter((r) => !only || only.indexOf(r.key) >= 0).map((r) => W.recCard({ key: r.key, kind: KIND[r.key] || 'switch', label: X['k_' + r.key] ? T('k_' + r.key) : r.key, current: r.current, recommended: r.recommended,
+  return (recs || []).filter((r) => !only || only.indexOf(r.key) >= 0).map((r) => W.recCard({ key: r.key, kind: KIND[r.key] || 'switch', label: X['k_' + r.key] ? T('k_' + r.key) : T('k_rule_other'), current: r.current, recommended: r.recommended,
     reason: pick(r, 'reason'), choices: CH[r.key], unit: r.key === 'transit_open_hours' ? T('hours') : '' })).join('');
 }
 async function viewGuard() {

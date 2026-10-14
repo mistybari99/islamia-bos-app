@@ -40,6 +40,7 @@ const ERRS = [
   [/location_not_found/i, L('জায়গা পাওয়া যায়নি', 'Place not found', 'Place পাওয়া যায়নি')],
   [/role_not_found/i, L('ভূমিকা পাওয়া যায়নি', 'Role not found', 'Role পাওয়া যায়নি')],
   [/cost_missing/i, L('কোনো উপকরণের দাম অজানা (ফাঁকা বা ০) — আগে দাম বসান, তারপর উৎপাদন', 'An ingredient cost is unknown (empty or 0) - fill the cost first, then produce', 'কোনো ingredient-এর cost অজানা (ফাঁকা বা ০) — আগে cost বসান, তারপর production')],
+  [/Cannot read propert|is not a function|is not defined|of undefined|of null/i, L('ডেটা পাওয়া যায়নি, আবার চেষ্টা করুন', 'No data came back. Try again.', 'Data পাওয়া যায়নি, আবার চেষ্টা করুন')], /* bos108 */
   [/not_found|not found/i, L('রেকর্ড পাওয়া যায়নি', 'Record not found', 'Record পাওয়া যায়নি')],
   [/bad_value/i, L('মান ঠিক নয়', 'Value is not valid', 'Value ঠিক নয়')],
   [/not allowed/i, L('অনুমতি নেই', 'Not allowed', 'Permission নেই')],
@@ -105,6 +106,6 @@ Object.assign(A.H, {
   wx_set_num: (a) => { const n = num(($('#wx_n_' + a.dataset.k) || {}).value); if (n === null) return setRule(a.dataset.k, null); if (Number.isNaN(n) || n < 0) return toast(T('badNum')); return setRule(a.dataset.k, n); },
 });
 // a one-line "back to" link row used by the boards
-const links = (arr) => `<div class="row wrap" style="margin:6px 0">${arr.map(([r, t]) => `<a class="btn" href="#/${r}">${esc(lab(t))}</a>`).join('')}</div>`;
+const links = (arr) => { const cur = String((typeof location !== 'undefined' && location.hash) || '').replace(/^#\//, '').split(/[?\/]/)[0]; return `<div class="row wrap wxlinks" style="margin:6px 0">${arr.map(([r, t]) => `<a class="btn wxl"${r === cur ? ' aria-current="page"' : ''} href="#/${r}">${esc(lab(t))}</a>`).join('')}</div>`; };
 B.w = { X, T, ERRS, errText, err, own, nm, nmItem, num, q, day, today, locs, locName, locOpts, shown, recCard, setRule, setRedraw, links };
 })();

@@ -104,6 +104,7 @@ async function initBulk() {
 function applyFilters(q) {
   const f = BK.f;
   if (f.cat) q = q.eq('category', f.cat);
+  if (f.sub) q = q.eq('sub_category', f.sub);   // bos100
   if (f.type) q = q.eq('item_type', f.type);
   if (f.batch) q = q.eq('import_batch', f.batch);
   if (f.fg) { q = q.in('item_type', ['finished_good', 'resale']).is('sell_price', null).eq('is_active', true).eq('hidden', false); }
@@ -114,7 +115,7 @@ function applyFilters(q) {
   if (s) q = q.or(['code', 'name_bn', 'name_en', 'name_mix'].map((c) => c + '.ilike.%' + s + '%').join(','));
   return q;
 }
-const COLS = 'id,code,name_bn,name_en,unit,sell_price,wholesale_price,tracked,min_stock,count_in_business,sellable,is_active,hidden,locked,item_type,category,import_batch';
+const COLS = 'id,code,name_bn,name_en,unit,sell_price,wholesale_price,tracked,min_stock,count_in_business,sellable,is_active,hidden,locked,item_type,category,sub_category,import_batch';   // bos100: sub_category
 async function loadPage() {
   const from = BK.page * PAGE;
   const r = await applyFilters(sb.from('items').select(COLS, { count: 'exact' })).order('code').range(from, from + PAGE - 1);
@@ -150,7 +151,7 @@ function catChoices() {
 function drawGridShell() {
   const f = BK.f, chk = (id, on, l) => `<label class="row" style="gap:6px;align-items:center"><input type="checkbox" id="${id}" ${on ? 'checked' : ''}> <span>${esc(l)}</span></label>`;
   $('#bk_body').innerHTML = `<div class="card stack"><input id="bk_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" value="${esc(f.q)}" aria-label="${esc(T('search'))}">
-    <div class="row wrap" style="gap:8px">${sel('bk_cat', catChoices(), f.cat, T('f_cat'))}${BK.types.length ? sel('bk_type', BK.types.map((x) => [x.code, B.itemMaster.typeLabel(x.code)]), f.type, T('f_type')) : ''}
+    <div class="row wrap" style="gap:8px">${sel('bk_cat', catChoices(), f.cat, T('f_cat'))}${/* bos100 */ B.catpick ? B.catpick.subSelect('bk_sub', f.cat, f.sub, 'bk_cat') : ''}${BK.types.length ? sel('bk_type', BK.types.map((x) => [x.code, B.itemMaster.typeLabel(x.code)]), f.type, T('f_type')) : ''}
       <select id="bk_active"><option value="yes" ${f.active === 'yes' ? 'selected' : ''}>${esc(T('f_active'))}</option><option value="no" ${f.active === 'no' ? 'selected' : ''}>${esc(T('f_inactive'))}</option><option value="" ${f.active === '' ? 'selected' : ''}>${esc(T('f_any'))}</option></select>
       ${BK.batches.length ? sel('bk_batch', BK.batches.map((b) => [b, b]), f.batch, T('f_batch')) : ''}</div>
     <div class="row wrap" style="gap:12px">${chk('bk_unpriced', f.unpriced, T('f_unpriced'))}${chk('bk_untracked', f.untracked, T('f_untracked'))}${chk('bk_fg', f.fg, T('f_fg'))}${isOwner() ? chk('bk_cost', BK.showCost, T('cost_show')) : ''}</div></div>
@@ -169,7 +170,7 @@ function drawGrid() {
   const head = ['', 'c_code', 'c_bn', 'c_en', 'c_unit', 'c_price', 'c_whs', 'c_trk', 'c_min', 'c_cnt', 'c_sell', 'c_act'].concat(showCost ? ['c_cost'] : []);
   el.innerHTML = BK.rows.length ? `<div class="bk-wrap"><table class="bk-tbl"><thead><tr>${head.map((h) => `<th>${h ? esc(T(h)) : `<label class="bk-hit"><input type="checkbox" id="bk_selall" aria-label="${esc(T('sel_page'))}"></label>`}</th>`).join('')}</tr></thead><tbody>${BK.rows.map((r) => `<tr class="${BK.edits.has(r.id) ? 'chg' : ''}" data-row="${esc(r.id)}">
     <td><label class="bk-hit"><input type="checkbox" class="bk-sel" data-id="${esc(r.id)}" ${BK.sel.has(r.id) ? 'checked' : ''} aria-label="select ${esc(r.code)}"></label></td>
-    <td class="bk-code"><b>${esc(r.code)}</b>${r.locked ? ` <span class="chip warn">${esc(T('locked'))}</span>` : ''}${r.hidden ? ` <span class="chip">${esc(T('hidden'))}</span>` : ''}</td>
+    <td class="bk-code"><b>${esc(r.code)}</b>${/* bos100 */ B.catpick && B.catpick.label(r) ? `<div class="muted" style="font-size:.75rem">${esc(B.catpick.label(r))}</div>` : ''}${r.locked ? ` <span class="chip warn">${esc(T('locked'))}</span>` : ''}${r.hidden ? ` <span class="chip">${esc(T('hidden'))}</span>` : ''}</td>
     <td>${txt(r, 'name_bn')}</td><td>${txt(r, 'name_en')}</td><td>${un(r)}</td><td>${inp(r, 'sell_price', 'n')}</td><td>${inp(r, 'wholesale_price', 'n')}</td><td class="c">${ck(r, 'tracked')}</td><td>${inp(r, 'min_stock', 'n')}</td>
     <td class="c">${ck(r, 'count_in_business')}</td><td class="c">${ck(r, 'sellable')}</td><td class="c">${ck(r, 'is_active')}</td>${showCost ? `<td>${inp({ id: r.id, locked: r.locked, code: r.code, cost_price: BK.costs.get(r.id) }, 'cost_price', 'n')}</td>` : ''}</tr>`).join('')}</tbody></table></div>`
     : `<p class="muted center">${esc(T('none'))}</p>`;
@@ -183,7 +184,7 @@ function drawBar() {
   const n = BK.edits.size, s = BK.sel.size;
   el.innerHTML = (n || s) ? `<div class="card stack bk-bar"><div class="row between"><b id="bk_n">${n} ${esc(T('changed'))}</b><span class="muted">${s} ${esc(T('sel'))}</span></div>
     <div class="row wrap" style="gap:8px">${n ? `<button class="primary" data-act="bk_preview">${esc(T('preview'))}</button><button data-act="bk_discard">${esc(T('discard'))}</button>` : ''}
-    ${s && BK.direct ? `<button data-act="bk_hide_sel">${esc(T('hide_sel'))}</button><button data-act="bk_inact_sel">${esc(T('inact_sel'))}</button>` : ''}</div></div>` : '';
+    ${/* bos100 */ s && BK.direct && B.catpick ? `<button data-act="bk_cat_sel">${esc(B.catpick.T('setFor'))}</button>` : ''}${s && BK.direct ? `<button data-act="bk_hide_sel">${esc(T('hide_sel'))}</button><button data-act="bk_inact_sel">${esc(T('inact_sel'))}</button>` : ''}</div></div>` : '';
 }
 const css = document.createElement('style'); css.id = 'bkcss';
 css.textContent = `.bk-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}.bk-tbl{border-collapse:collapse;font-size:.9rem;min-width:880px}.bk-tbl th,.bk-tbl td{padding:4px;border-bottom:1px solid var(--line,#e3e0d8);text-align:start;vertical-align:middle;white-space:nowrap}
@@ -311,6 +312,7 @@ Object.assign(H, {
   bk_preview: () => startPreview(collectChanges(), 'grid', null), bk_apply: applyPending,
   bk_discard: () => { BK.edits.clear(); drawGrid(); },
   bk_export: exportCsv,
+  bk_cat_sel: () => B.catpick.bulkSheet([...BK.sel], () => { BK.sel.clear(); reloadGrid(); }),   // bos100
   bk_hide_sel: () => startPreview([...BK.sel].map((id) => ({ item_id: id, hidden: true })), 'hide', null),
   bk_inact_sel: () => openSheet(`<h2>${esc(T('inact_sel'))}</h2><div class="stack"><div><label for="bk_reason">${esc(T('reason'))} *</label><input id="bk_reason" autocomplete="off"></div><div class="row"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" data-act="bk_inact_go">${esc(T('preview'))}</button></div></div>`),
   bk_inact_go: () => { const r = ($('#bk_reason').value || '').trim(); if (!r) return toast(T('reason_need')); startPreview([...BK.sel].map((id) => ({ item_id: id, is_active: false, reason: r })), 'inactive', r); },
@@ -336,7 +338,7 @@ document.addEventListener('change', (e) => {
   if (el.classList && el.classList.contains('bk-cell') && (el.type === 'checkbox' || el.tagName === 'SELECT')) { setEdit(el.dataset.id, el.dataset.f, el.type === 'checkbox' ? el.checked : el.value); el.classList.toggle('ed', el.dataset.f in (BK.edits.get(el.dataset.id) || {})); const tr = el.closest('tr'); if (tr) tr.classList.toggle('chg', BK.edits.has(el.dataset.id)); drawBar(); return; }
   if (el.classList && el.classList.contains('bk-sel')) { if (el.checked) BK.sel.add(el.dataset.id); else BK.sel.delete(el.dataset.id); drawBar(); return; }
   if (id === 'bk_selall') { BK.rows.forEach((r) => { if (el.checked) BK.sel.add(r.id); else BK.sel.delete(r.id); }); drawGrid(); return; }
-  if (['bk_cat', 'bk_type', 'bk_active', 'bk_batch'].includes(id)) { BK.sel.clear(); BK.f[{ bk_cat: 'cat', bk_type: 'type', bk_active: 'active', bk_batch: 'batch' }[id]] = el.value; BK.page = 0; reloadGrid(); return; }
+  if (['bk_cat', 'bk_sub', 'bk_type', 'bk_active', 'bk_batch'].includes(id)) { BK.sel.clear(); if (id === 'bk_cat') BK.f.sub = ''; /* bos100 */ BK.f[{ bk_cat: 'cat', bk_sub: 'sub', bk_type: 'type', bk_active: 'active', bk_batch: 'batch' }[id]] = el.value; BK.page = 0; reloadGrid(); return; }
   if (['bk_unpriced', 'bk_untracked', 'bk_fg'].includes(id)) { BK.sel.clear(); BK.f[{ bk_unpriced: 'unpriced', bk_untracked: 'untracked', bk_fg: 'fg' }[id]] = el.checked; BK.page = 0; reloadGrid(); return; }
   if (id === 'bk_cost') { BK.showCost = el.checked; reloadGrid(); }
 });

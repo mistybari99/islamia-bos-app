@@ -106,7 +106,7 @@ async function view() {
   const nmLoc = (id) => { const l = locs.find((z) => z.id === id); return l ? lab({ bn: l.name_bn || l.code, en: l.name_en || l.code, mix: l.name_bn || l.code }) : '#' + id; };
   let trail = [];
   try { const r = await sb.from('pos_replay_log').select('client_id,location_id,reason,result,at').order('at', { ascending: false }).limit(20); trail = r.data || []; } catch (e) { /* not allowed = empty */ }
-  el.innerHTML = `<p class="muted">${esc(T('intro'))}</p><div class="card"><b style="font-size:1.4rem">${esc(String(b.open))}</b> ${esc(T('open'))}</div>
+  el.innerHTML = `<p class="muted">${esc(T('intro'))}</p><div class="card"><b style="font-size:1.4rem">${esc(String(b.open ?? 0))}</b> ${esc(T('open'))}</div>
     ${(b.by_location || []).length ? (b.by_location || []).map((z) => `<div class="card row between"><span>${esc(T('place'))}: ${esc(nmLoc(z.location_id))}</span><span>${esc(String(z.n))} · ${esc(T('total'))} ${esc(String(z.total))}</span></div>`).join('') : `<p class="muted">${esc(T('none'))}</p>`}
     ${trail.length ? `<h3>${esc(T('trail'))}</h3>${trail.map((z) => `<div class="card"><div class="muted">${esc(String(z.at).slice(0, 16).replace('T', ' '))} · ${esc(nmLoc(z.location_id))}</div><div>${esc(T('why'))}: ${esc(z.reason)}</div></div>`).join('')}` : ''}`;
 }

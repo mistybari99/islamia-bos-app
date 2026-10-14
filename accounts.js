@@ -143,7 +143,7 @@ const ERR = {
   bad_location: L('জায়গা ঠিক নয়', 'The place is not valid', 'Place ঠিক নয়'), bad_range: L('তারিখের সীমা ঠিক নয়', 'The date range is not valid', 'Date range ঠিক নয়'), too_many_lines: L('লাইন বেশি হয়ে গেছে', 'Too many lines', 'Line বেশি'),
   bad_photo: L('ছবির পথ ঠিক নয়', 'The photo path is not valid', 'Photo ঠিক নয়'), account_fixed: L('কোড/ধরন বদলানো যায় না', 'Code and type cannot change', 'Code/type বদলায় না'),
 };
-const eText = (e) => { const m = String((e && e.message) || e || ''); const k = Object.keys(ERR).find((x) => m.includes(x)); let s = k ? lab(ERR[k]) : m || 'error'; if (k === 'unbalanced' && e && e.details) s += ' (' + e.details + ')'; else if (k === 'unbalanced') { const d = m.match(/debit ([\d.]+) credit ([\d.]+)/); if (d) s += ' (' + d[1] + ' / ' + d[2] + ')'; } if (k === 'mapping_missing') { const d = m.match(/mapping_missing:(\S+)/); if (d) s += ': ' + d[1]; } return s; };
+const eText = (e) => { const m = String((e && e.message) || e || ''); if (/Cannot read propert|is not a function|is not defined|of undefined|of null/.test(m)) return lab(L('ডেটা পাওয়া যায়নি, আবার চেষ্টা করুন', 'No data came back. Try again.', 'Data পাওয়া যায়নি, আবার চেষ্টা করুন')); /* bos108: a JS error is never shown to the user */ const k = Object.keys(ERR).find((x) => m.includes(x)); let s = k ? lab(ERR[k]) : m || 'error'; if (k === 'unbalanced' && e && e.details) s += ' (' + e.details + ')'; else if (k === 'unbalanced') { const d = m.match(/debit ([\d.]+) credit ([\d.]+)/); if (d) s += ' (' + d[1] + ' / ' + d[2] + ')'; } if (k === 'mapping_missing') { const d = m.match(/mapping_missing:(\S+)/); if (d) s += ': ' + d[1]; } return s; };
 
 const D = { tab: 'overview', st: null, loc: '', from: '', to: '', asof: '', acc: null, accounts: [], maps: [], accId: '', csv: null, rep: '', client: rid(), lines: [], op: { rows: {}, plug: true }, party: { type: 'customer', id: '', mobile: '' },
   sups: null, jl: 0, jlimit: 100, loaded: false, hint: '' };
@@ -205,8 +205,10 @@ const repHead = (title, period) => `<h3>${esc(title)}</h3><div class="muted">${e
 
 // ---------- tabs ----------
 async function tOverview() {
-  const [ov, bs, is] = await Promise.all([rpc('acct_overview', { p_loc: locP() }), rpc('acct_balance_sheet', { p_as_of: D.asof, p_loc: locP() }), rpc('acct_income_statement', { p_from: D.from, p_to: D.to, p_loc: locP() })]);
-  if (ov && ov.data_needed) return noData();
+  let [ov, bs, is] = await Promise.all([rpc('acct_overview', { p_loc: locP() }), rpc('acct_balance_sheet', { p_as_of: D.asof, p_loc: locP() }), rpc('acct_income_statement', { p_from: D.from, p_to: D.to, p_loc: locP() })]);
+  bs = bs || {}; is = is || {}; /* bos108: a report that returns nothing must not throw a raw JS error */
+  if (!ov || ov.data_needed) return noData(); /* bos108 */
+  ov.income_month = ov.income_month || {};
   let h = bar('asof');
   h += warnHtml(bs) + warnHtml({ unknown_cost_rev: is.unknown_cost_rev, cogs_estimate_missing: is.cogs_estimate_missing });
   if (!ov.on) h += `<div class="ac-note">${esc(T('off'))}</div>`;

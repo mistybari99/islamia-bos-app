@@ -18,7 +18,7 @@ const fm = (n) => { const v = Number(n); if (!Number.isFinite(v)) return '-'; re
 const money = (n) => '৳ ' + fm(n);
 
 const X = {
-  title: L('হিসাব ৮৫: কার্ড, অটো পোস্ট, সুইচ', 'Books 85: cards, auto post, switches', 'Books 85: Card, Auto post, Switch'),
+  title: L('কার্ড, অটো পোস্ট, সুইচ', 'Cards, auto post, switches', 'Card, Auto post, Switch'),
   t_card: L('কার্ড সেটেলমেন্ট', 'Card settlement', 'Card settlement'), t_auto: L('অটো পোস্ট', 'Auto posting', 'Auto post'), t_sw: L('হিসাবের সুইচ', 'Books switches', 'Books switch'),
   loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), retry: L('আবার চেষ্টা করুন', 'Try again', 'আবার Try করুন'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
   place: L('জায়গা', 'Place', 'Place'), show: L('দেখান', 'Show', 'Show'), date: L('তারিখ', 'Date', 'Date'), note: L('নোট', 'Note', 'Note'), none: L('কিছু নেই', 'Nothing here', 'কিছু নেই'),

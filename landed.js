@@ -142,7 +142,8 @@ async function settingsGo(a) {
 // ---------- pick bills ----------
 async function pickSheet(add) {
   D.pick = add ? D.bills.slice() : []; D.pickRows = null; D.pickAdd = !!add;
-  openSheet(`<h2>${esc(add ? T('addBill') : T('pickBills'))}</h2><div class="hint">${esc(T('pickHint'))}</div><div id="lc_pk"><p class="muted center pad">${esc(T('loading'))}</p></div>`);
+  openSheet(`<h2>${esc(add ? T('addBill') : T('pickBills'))}</h2><div class="hint">${esc(T('pickHint'))}</div><div id="lc_pk"><p class="muted center pad">${esc(T('loading'))}</p></div><div id="q4_grn"></div>`);   // bos107 q4: GRN picker slot (landed_q4.js fills it)
+  try { if (B.landedQ4) B.landedQ4.mount(); } catch (e) { /* the GRN picker is optional */ }   // bos107 q4
   const r = await sb.rpc('purchase_list', { p_loc: null, p_from: null, p_to: null, p_supplier: null, p_status: 'posted', p_limit: 100 });
   D.pickRows = (r.data || []).filter((x) => x.kind === 'bill'); drawPick();
 }

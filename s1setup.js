@@ -19,7 +19,7 @@ const X = {
   freeNote: L('যে আইটেমের খরচ সত্যিই ০ (যেমন নিজেদের পানি), সেটা এখানে চিহ্নিত করুন। চিহ্ন না দিলে ০ বা ফাঁকা খরচ "অজানা" ধরা হয় এবং রিপোর্ট "সাময়িক" থাকে।',
     'Mark an item whose cost is really 0 (for example your own water). Without the mark, a blank or 0 cost counts as unknown and the reports stay provisional.',
     'যে item-এর cost সত্যিই ০ (যেমন নিজেদের পানি), সেটা এখানে mark করুন। mark না দিলে ০ বা ফাঁকা cost "অজানা" ধরা হয়, report "সাময়িক" থাকে।'),
-  marked: L('চিহ্ন দেওয়া আইটেম', 'Marked items', 'Mark করা item'), unknown: L('খরচ অজানা (cost_missing)', 'Cost unknown (cost_missing)', 'Cost অজানা (cost_missing)'),
+  marked: L('চিহ্ন দেওয়া আইটেম', 'Marked items', 'Mark করা item'), unknown: L('খরচ অজানা', 'Cost unknown', 'Cost অজানা'),
   costMissing: L('খরচ অজানা', 'Cost missing', 'Cost অজানা'), place: L('জায়গা', 'Place', 'Place'), all: L('সব জায়গা', 'All places', 'সব জায়গা'),
   markFree: L('খরচ শূন্য চিহ্ন দিন', 'Mark cost as zero', 'Cost শূন্য mark দিন'), unmark: L('চিহ্ন তুলুন', 'Remove the mark', 'Mark তুলুন'),
   askReason: L('কেন খরচ শূন্য? (কমপক্ষে ৩ অক্ষর)', 'Why is the cost zero? (at least 3 characters)', 'কেন cost শূন্য? (কমপক্ষে ৩ অক্ষর)'), qty: L('পরিমাণ', 'Qty', 'Qty'),

@@ -250,8 +250,9 @@ function unitLine(itemId, base) {
 }
 // one search for the list: code, Bangla / English / Bng-Eng name, category label (Bangla digits accepted)
 function rowsFor() {
-  const q = norm(D.q).toLowerCase(); if (!q) return D.rows;
-  return D.rows.filter((r) => { const it = (ITEMS || []).find((i) => i.id === r.item_id) || {}; return [r.code, r.name_bn, r.name_en, it.name_mix, catLabel(r.category), it.barcode].some((x) => String(x || '').toLowerCase().includes(q)); });
+  const base = D.f.sub && B.catfilter ? B.catfilter(D.rows, { cat: D.f.category, sub: D.f.sub }) : D.rows;   // bos100: Sub-category filter
+  const q = norm(D.q).toLowerCase(); if (!q) return base;
+  return base.filter((r) => { const it = (ITEMS || []).find((i) => i.id === r.item_id) || {}; return [r.code, r.name_bn, r.name_en, it.name_mix, catLabel(r.category), it.barcode].some((x) => String(x || '').toLowerCase().includes(q)); });
 }
 function draw() {
   const locs = LOCS(), filters = (D.f.category ? 1 : 0) + (D.f.below ? 1 : 0) + (D.f.zero ? 1 : 0);
@@ -339,6 +340,7 @@ async function loadTransit() {
 function filterSheet() {
   openSheet(`<h2>${esc(T('filter'))}</h2><div class="stack">
     <div><label for="sf_cat">${esc(T('category'))}</label><select id="sf_cat"><option value="">${esc(T('all'))}</option>${optHTML(D.cats.map((c) => [c, catLabel(c)]), D.f.category)}</select></div>
+    ${B.catpick ? B.catpick.subSelect('sf_sub', D.f.category, D.f.sub, 'sf_cat') : ''}<!-- bos100 -->
     ${LOCS().length > 1 || allLocs() ? `<div><label for="sf_loc">${esc(T('location'))}</label><select id="sf_loc">${allLocs() ? `<option value="">${esc(T('allLoc'))}</option>` : ''}${optHTML(LOCS().map((l) => [l.id, nm(l)]), D.loc)}</select></div>` : ''}
     <button class="tog ${D.f.below ? 'on' : ''}" id="sf_below" data-act="sheettog" style="width:100%;justify-content:flex-start">${esc(T('belowMin'))}</button>
     <button class="tog ${D.f.zero ? 'on' : ''}" id="sf_zero" data-act="sheettog" style="width:100%;justify-content:flex-start">${esc(T('showZero'))}</button>
@@ -526,7 +528,7 @@ Object.assign(H, {
   s2_more: () => { D.shown += 50; paintRows(rowsFor()); },
   s2_filter: filterSheet,
   s2_freset: () => { D.f = { category: '', below: false, zero: false }; closeSheet(); loadLevels(); },
-  s2_fapply: () => { D.f.category = ($('#sf_cat') || {}).value || ''; D.f.below = $('#sf_below').classList.contains('on'); D.f.zero = $('#sf_zero').classList.contains('on');
+  s2_fapply: () => { D.f.sub = ($('#sf_sub') || {}).value || ''; /* bos100 */ D.f.category = ($('#sf_cat') || {}).value || ''; D.f.below = $('#sf_below').classList.contains('on'); D.f.zero = $('#sf_zero').classList.contains('on');
     const l = $('#sf_loc'); closeSheet(); if (l) { D.loc = l.value === '' ? null : Number(l.value); const s = $('#s2_loc'); if (s) s.value = l.value; refreshActs(); } loadLevels(); },
   s2_item: (a) => { const r = D.rows[Number(a.dataset.i)]; if (r) drill(r); },
   s2_actions: actionsSheet,

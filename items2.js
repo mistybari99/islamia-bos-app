@@ -311,6 +311,7 @@ async function addImage(file) {
   try {
     const blob = await shrink(file), path = `ITEMS/${locId()}/${rid()}.jpg`;
     const up = await sb.storage.from('photos').upload(path, blob, { contentType: 'image/jpeg' }); if (up.error) throw up.error;
+    try { await sb.storage.from('photos').upload(path + '.t.jpg', await shrink(file, 160, 0.7), { contentType: 'image/jpeg' }); } catch (e2) { /* bos103: the small copy is optional */ }
     F.images.push(path); drawImgs();
   } catch (e) { fail(e); }
 }

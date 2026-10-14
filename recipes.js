@@ -70,7 +70,7 @@ const ERRS = {
 const ERRKEYS = Object.keys(ERRS);
 function errMsg(e, ctx) {
   const m = String((e && e.message) || '');
-  for (const k of ERRKEYS) if (new RegExp('\\b' + k + '\\b').test(m)) return toast(lab(ERRS[k]));
+  for (const k of ERRKEYS) if (new RegExp('\\b' + k + '\\b').test(m)) return toast(lab(ERRS[k]) + (k === 'cost_missing' && e && e.details ? ' (' + String(e.details).slice(0, 120) + ')' : ''));   // bos107 q4: name the ingredient(s) whose cost is unknown (the server puts them in details)
   if (/could not find the function|schema cache|does not exist/i.test(m)) return toast(T('sqlMissing'));
   if (S2().errToast) return S2().errToast(e, ctx);
   return fail(e);
@@ -148,14 +148,15 @@ function draw() {
 function drawList() {
   const box = $('#rc_main'); if (!box) return;
   const q = norm(D.q).toLowerCase();
-  const list = D.recipes.filter((r) => (D.f === 'all' || (D.f === 'active') === !!r.active) && (!q || [itemById(r.item_id)?.code, itemById(r.item_id)?.name_bn, itemById(r.item_id)?.name_en].some((x) => String(x || '').toLowerCase().includes(q))))
+  const list = D.recipes.filter((r) => (D.f === 'all' || (D.f === 'active') === !!r.active) && (!D.cs || !B.catfilter || B.catfilter([itemById(r.item_id) || { id: r.item_id }], D.cs).length) /* bos100 */ && (!q || [itemById(r.item_id)?.code, itemById(r.item_id)?.name_bn, itemById(r.item_id)?.name_en].some((x) => String(x || '').toLowerCase().includes(q))))
     .sort((a, b) => (itemById(a.item_id)?.code || '').localeCompare(itemById(b.item_id)?.code || '') || b.version - a.version);
   box.innerHTML = `<div class="p2-bar"><input id="rc_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" value="${esc(D.q)}" aria-label="${esc(T('search'))}"></div>
     <div class="row wrap" style="margin:8px 0">${[['active', 'fActive'], ['off', 'fOff'], ['all', 'fAll']].map(([k, l]) => `<button class="tog ${D.f === k ? 'on' : ''}" data-act="rc_f" data-v="${k}">${esc(T(l))}</button>`).join('')}</div>
+    ${B.catpick ? B.catpick.filterRow('rc_cs', D.cs, 'rc_cat') : ''}<!-- bos100 -->
     <div id="rc_list">${list.map((r) => {
       const it = itemById(r.item_id) || { name_bn: '?', code: '' }, n = linesOf(r.id).length, wm = wasteMissing(r);
       return `<div class="card item rc-row mk ${r.active ? (wm ? 'warn' : '') : ''}" data-act="rc_open" data-id="${r.id}" role="button" tabindex="0"><div><div class="nm">${esc(nm(it))} · ${esc(T('version'))} ${r.version}</div>
-        <div class="sub">${esc(it.code)} · ${esc(T('yield'))} ${q4(r.yield_qty)} ${esc(unitLabel(r.yield_unit || baseU(it)))} · ${n} ${esc(T('nLines'))}</div>
+        <div class="sub">${esc(it.code)} · ${esc(T('yield'))} ${q4(r.yield_qty)} ${esc(unitLabel(r.yield_unit || baseU(it)))} · ${n} ${esc(T('nLines'))}${B.catpick && B.catpick.label(it) ? ' · ' + esc(B.catpick.label(it)) : ''/* bos100 */}</div>
         <div>${r.used_at ? `<span class="chip">${LOCKI} ${esc(T('used'))}</span>` : ''}${r.active ? '' : `<span class="chip bad">${esc(T('inactive'))}</span>`}${wm ? `<span class="chip warn">${esc(T('waste'))}: ${esc(T('needData'))}</span>` : ''}</div></div>
         <div class="pr"><button type="button" class="rc-dots" data-act="rc_menu" data-id="${r.id}" aria-label="${esc(T('more'))}">${DOTS}</button></div></div>`; }).join('')
       || `<div class="card center"><p class="muted">${esc(T('none'))}</p></div>`}</div>`;
@@ -379,6 +380,7 @@ Object.assign(H, {
     if (r.error) return toast(/batch_partly_used/.test(r.error.message || '') ? lab(XR.used) : errMsg(r.error)); toast(lab(XR.done)); drawMake(); },
   rc_tab: (a) => { D.tab = a.dataset.v; draw(); },
   rc_f: (a) => { D.f = a.dataset.v; drawList(); },
+  rc_cat: (a) => { D.cs = a.dataset.cat || a.dataset.sub ? { cat: a.dataset.cat, sub: a.dataset.sub } : null; drawList(); },   // bos100
   rc_new: () => { location.hash = '#/recipes/new'; },
   rc_open: (a) => { closeSheet(); const r = rec(a); if (r) location.hash = '#/recipes/' + r.id; },
   rc_menu: (a) => { const r = rec(a); if (r) menu(r); },

@@ -223,6 +223,7 @@ function newItemSheet(o = {}) {
     <div><label for="ni_en">${esc(T('ni_en'))}</label><input id="ni_en" autocomplete="off"></div>
     <div><label for="ni_type">${esc(T('f_type'))}</label><select id="ni_type">${types.map((x) => sopt(x.code, ty, typeLabel(x.code))).join('')}</select></div>
     <div><label for="ni_cat">${esc(T('ni_cat'))}</label><select id="ni_cat"><option value=""></option>${cats.map((r) => sopt(r.value_code, o.category || '', r.extra.cat_no + ' · ' + lab(rl(r)))).join('')}</select><div class="hint" id="ni_code"></div></div>
+    ${B.catpick ? B.catpick.subSelect('ni_sub', o.category || '', '', 'ni_cat') : ''}<!-- bos100 -->
     <div><label for="ni_unit">${esc(T('ni_unit'))}</label><select id="ni_unit">${unitOpts().map(([v, l]) => sopt(v, o.unit || 'pc', lab(l))).join('')}</select></div>
     <div class="row"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" id="ni_go" data-act="im_ni_go">${esc(T('ni_go'))}</button></div></div>`);
   showNext('ni_cat', 'ni_code');
@@ -239,6 +240,7 @@ async function niGo() {
   const bn = ($('#ni_bn').value || '').trim(); if (!bn) return toast(T('ni_need'));
   const patch = { name_bn: bn, item_type: $('#ni_type').value, unit: $('#ni_unit').value || null };
   const en = ($('#ni_en').value || '').trim(); if (en) patch.name_en = en; const cat = $('#ni_cat').value; if (cat) patch.category = cat;
+  { const sc = $('#ni_sub'); if (cat && sc && sc.value) patch.sub_category = sc.value; }   // bos100
   const btn = $('#ni_go'); if (btn) btn.disabled = true;
   const { data, error } = await sb.rpc('item_new', { p_patch: patch, p_note: null });
   if (btn) btn.disabled = false;

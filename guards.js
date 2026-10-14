@@ -37,7 +37,7 @@ function list(arr, f) { return arr.length ? arr.map(f).join('') : `<div class="m
 function draw() {
   const el = $('#gd_body'); if (!el) return;
   el.innerHTML = `<p class="muted">${esc(T('intro'))}</p>` + D.rec.map((r) => {
-    const same = JSON.stringify(r.current) === JSON.stringify(r.recommended), n = NAMES[r.key] || [r.key, r.key];
+    const same = JSON.stringify(r.current) === JSON.stringify(r.recommended), n = NAMES[r.key] || [lab(L('নিয়ম', 'Rule', 'Rule')) + ' #' + (D.rec.indexOf(r) + 1), lab(L('নিয়ম', 'Rule', 'Rule')) + ' #' + (D.rec.indexOf(r) + 1)]; /* bos108: no raw key as a title */
     return `<div class="card stack"><b>${esc(lab({ bn: n[0], mix: n[0], en: n[1] }))}</b><div class="row wrap"><span class="chip">${esc(T('cur'))}: ${esc(val(r.current))}</span><span class="chip ${same ? '' : 'warn'}">${esc(T('rec'))}: ${esc(val(r.recommended))}</span></div>
       <div class="muted" style="font-size:.85rem">${esc(lab({ bn: r.reason_bn, mix: r.reason_mix, en: r.reason_en }))}</div>
       ${same ? `<span class="chip">${esc(T('ok'))}</span>` : `<button type="button" class="btn primary" data-act="gd_apply" data-k="${esc(r.key)}">${esc(T('apply'))}</button>`}</div>`;

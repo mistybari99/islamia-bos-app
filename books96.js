@@ -20,7 +20,7 @@ const fm = (n) => { const v = Number(n); if (!Number.isFinite(v)) return '-'; re
 const money = (n) => '৳ ' + fm(n);
 
 const X = {
-  title: L('হিসাব ৯৬: শুরুর স্টক ও খরচের অপেক্ষা', 'Books 96: Opening stock and cost waiting', 'Books 96: Opening stock ও cost-এর অপেক্ষা'),
+  title: L('শুরুর স্টক ও খরচের অপেক্ষা', 'Opening stock and cost waiting', 'Opening stock ও cost-এর অপেক্ষা'),
   t_ob: L('শুরুর স্টক', 'Opening stock', 'Opening stock'), t_cw: L('খরচের অপেক্ষা', 'Cost waiting', 'Cost-এর অপেক্ষা'),
   loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), retry: L('আবার চেষ্টা করুন', 'Try again', 'আবার Try করুন'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
   place: L('জায়গা', 'Place', 'Place'), allPlaces: L('সব জায়গা', 'All places', 'সব place'), show: L('দেখান', 'Show', 'Show'), none: L('কিছু নেই', 'Nothing here', 'কিছু নেই'),
@@ -34,7 +34,7 @@ const X = {
   openVal: L('শুরুর স্টকের মূল্য', 'Opening stock value', 'Opening stock-এর value'), inJournal: L('শুরুর জের এ আগেই আছে', 'Already in the opening journal', 'Opening journal-এ আগেই আছে'),
   glInv: L('খাতায় stock', 'Stock in the books (GL)', 'Books-এ stock (GL)'), valuation: L('stock এর মূল্য', 'Stock valuation', 'Stock valuation'), diff: L('পার্থক্য', 'Difference', 'Difference'),
   rows: L('সারি', 'rows', 'row'), uncosted: L('খরচ ছাড়া সারি', 'rows without cost', 'cost ছাড়া row'), byswitch: L('সুইচ দিয়ে আগেই তোলা', 'Already posted by the switch', 'Switch দিয়ে আগেই তোলা'),
-  decided: L('সিদ্ধান্ত নেওয়া হয়েছে', 'Decision taken', 'Decision নেওয়া হয়েছে'), switchL: L('সুইচ acct_stock_opening', 'Switch acct_stock_opening', 'Switch acct_stock_opening'), on: L('চালু', 'On', 'On'), off: L('বন্ধ', 'Off', 'Off'),
+  decided: L('সিদ্ধান্ত নেওয়া হয়েছে', 'Decision taken', 'Decision নেওয়া হয়েছে'), switchL: L('শুরুর স্টক পোস্টিং সুইচ', 'Opening stock posting switch', 'Opening stock posting switch'), on: L('চালু', 'On', 'On'), off: L('বন্ধ', 'Off', 'Off'),
   risk: L('দুইবার গোনার ঝুঁকি আছে', 'Double count risk', 'Double count-এর ঝুঁকি আছে'), noRisk: L('দুইবার গোনার ঝুঁকি দেখা যায়নি ✓', 'No double count risk found ✓', 'Double count-এর ঝুঁকি পাওয়া যায়নি ✓'),
   recL: L('সিস্টেমের প্রস্তাব', 'System recommendation', 'System-এর recommendation'), why: L('কেন', 'Why', 'কেন'),
   o_owner_capital: L('মালিকের মূলধনের বিপরীতে', 'Against owner capital', 'Owner capital-এর against-এ'), o_existing_account: L('আগের একটি শুরুর জের খাতের বিপরীতে', 'Against an existing opening balance account', 'আগের একটা opening balance account-এর against-এ'),
@@ -50,12 +50,12 @@ const X = {
   applyWarn: L('এটি খাতায় একটি এন্ট্রি লেখে (বা সিদ্ধান্ত রাখে), নিজে নিজে ফেরানো যায় না। এক জায়গায় একবারই হয়।', 'This writes a journal entry (or keeps a decision) and cannot be undone here. It happens once per place.', 'এটা খাতায় একটা entry লেখে (বা decision রাখে), এখানে থেকে ফেরানো যায় না। এক place-এ একবারই হয়।'),
   amount: L('অংক', 'Amount', 'Amount'), lines: L('লাইন', 'Lines', 'Lines'), debit: L('ডেবিট', 'Debit', 'Debit'), credit: L('ক্রেডিট', 'Credit', 'Credit'),
   w_opening_journal_has_inventory: L('শুরুর জের এ stock আগেই ধরা আছে।', 'The opening journal already carries stock.', 'Opening journal-এ stock আগেই ধরা আছে।'),
-  w_switch_would_double_count: L('এই অবস্থায় acct_stock_opening চালালে একই stock দুইবার গোনা হবে।', 'Turning acct_stock_opening on now would count the same stock twice.', 'এখন acct_stock_opening চালালে একই stock দুইবার গোনা হবে।'),
-  w_switch_on_double_count: L('acct_stock_opening চালু, আর শুরুর জের এ stock আছে: দুইবার গোনার ঝুঁকি!', 'acct_stock_opening is ON and the opening journal carries stock: double count risk!', 'acct_stock_opening ON, আর opening journal-এ stock আছে: double count-এর ঝুঁকি!'),
+  w_switch_would_double_count: L('এই অবস্থায় শুরুর স্টক পোস্টিং সুইচ চালালে একই stock দুইবার গোনা হবে।', 'Turning the opening stock posting switch on now would count the same stock twice.', 'এখন opening stock posting switch চালালে একই stock দুইবার গোনা হবে।'),
+  w_switch_on_double_count: L('শুরুর স্টক পোস্টিং সুইচ চালু, আর শুরুর জের এ stock আছে: দুইবার গোনার ঝুঁকি!', 'The opening stock posting switch is ON and the opening journal carries stock: double count risk!', 'Opening stock posting switch ON, আর opening journal-এ stock আছে: double count-এর ঝুঁকি!'),
   w_opening_journal_not_split_by_place: L('শুরুর জের জায়গা অনুযায়ী ভাগ করা নেই; তাই "পার্থক্য" পুরো কোম্পানির হিসাবে করুন।', 'The opening journal is not split by place; use "difference" for the whole company.', 'Opening journal place অনুযায়ী ভাগ করা নেই; তাই "difference" পুরো company-তে করুন।'),
   w_uncosted_openings: L('কিছু শুরুর স্টকের খরচ জানা নেই; সেগুলো ধরা হয়নি, খরচ দিলে আলাদা করে উঠবে।', 'Some opening stock has no cost; it is left out and can be posted once its cost is supplied.', 'কিছু opening stock-এর cost জানা নেই; সেগুলো ধরা হয়নি, cost দিলে আলাদা করে উঠবে।'),
   w_skip_but_not_in_opening_journal: L('বাদ দিলেন, কিন্তু শুরুর জের এ এই stock পুরোটা নেই; খাতায় stock কম থাকতে পারে।', 'You skip it, but the opening journal does not carry all of this stock; the books may show less stock.', 'Skip করছেন, কিন্তু opening journal-এ এই stock পুরোটা নেই; books-এ stock কম থাকতে পারে।'),
-  w_switch_on: L('acct_stock_opening চালু আছে; এই সিদ্ধান্তের পর ঢাকা stock সুইচ আর তুলবে না।', 'acct_stock_opening is on; after this decision the switch no longer posts the covered stock.', 'acct_stock_opening on আছে; এই decision-এর পর covered stock switch আর post করবে না।'),
+  w_switch_on: L('শুরুর স্টক পোস্টিং সুইচ চালু আছে; এই সিদ্ধান্তের পর ঢাকা stock সুইচ আর তুলবে না।', 'The opening stock posting switch is on; after this decision the switch no longer posts the covered stock.', 'Opening stock posting switch on আছে; এই decision-এর পর covered stock switch আর post করবে না।'),
   // cost waiting
   cwIntro: L('যে stock movement এর খরচ জানা নেই সেগুলো এখানে অপেক্ষায় থাকে। খরচ দিলে কাগজটি একবারই খাতায় উঠবে। কিছু ধরে নেওয়া হয় না।',
     'Stock movements with no known cost wait here. Once a cost is supplied the document posts once. Nothing is assumed.',

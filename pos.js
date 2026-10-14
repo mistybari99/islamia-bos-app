@@ -103,8 +103,8 @@ const netTotal = () => Math.max(0, r2(cartSub() - discVal()));
 async function load() {
   await B.loadStatic();
   // item master (phase14): only sellable types with a selling price are offered; hidden items stay out of the picker. An older database has no such columns: the plain list is used.
-  let it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,unit,sell_price,is_active,barcode,sellable,hidden,item_type').eq('is_active', true).order('code'));
-  if (it.error) it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,unit,sell_price,is_active,barcode').eq('is_active', true).order('code'));
+  let it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,sub_category,unit,sell_price,is_active,barcode,sellable,hidden,item_type').eq('is_active', true).order('code'));
+  if (it.error) it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,sub_category,unit,sell_price,is_active,barcode').eq('is_active', true).order('code'));
   if (it.error) throw it.error;
   try { const cv = await sb.from('unit_conversions').select('item_id,from_unit,to_unit,factor,active').eq('active', true); P.conv = cv.error ? (JSON.parse(store.get('bos_pos_conv') || '[]')) : (cv.data || []); if (!cv.error) store.set('bos_pos_conv', JSON.stringify(P.conv)); } catch (e) { P.conv = []; }
   P.items = it.data.filter((i) => i.sell_price !== null && i.sellable !== false && !i.hidden && i.item_type !== 'asset' && i.item_type !== 'raw_material');
@@ -139,12 +139,13 @@ function drawPos() {
 // ---------- sell ----------
 function drawSell(can) {
   const cats = [...new Set(P.items.map((i) => i.category).filter(Boolean))];
-  const cn = (c) => lab(CATS[c]) || (P.items.find((i) => i.category === c) || {}).category_bn || c;
+  const cn = (c) => (B.catpick && B.catpick.nameIfKnown(c)) /* bos100 */ || lab(CATS[c]) || (P.items.find((i) => i.category === c) || {}).category_bn || c;
   const canNew = S.ctx.is_owner || (S.ctx.perms.ITEMS && S.ctx.perms.ITEMS.enter);
   $('#pos_body').innerHTML = `
     <div class="row"><input id="pos_q" placeholder="${esc(T('search'))}" value="${esc(P.q)}" style="flex:1"><button data-act="pos_scan" aria-label="${esc(T('scan'))}" ${can ? '' : 'disabled'}>▮▮</button><button class="primary" data-act="pos_quick" ${can ? '' : 'disabled'}>⚡ ${esc(T('quick'))}</button></div>
     <div class="row wrap" style="margin:10px 0" id="pos_cats" data-ctl="select" data-title="${esc(lab(L('ক্যাটাগরি', 'Category', 'Category')))}">${[['', T('all')], ['_f', T('freq')], ...cats.map((c) => [c, cn(c)])].map(([c, l]) =>
       `<button class="tog ${P.cat === c ? 'on' : ''}" data-act="pos_cat" data-v="${esc(c)}">${esc(l)}</button>`).join('')}</div>
+    ${B.catpick ? B.catpick.subChips(P.items, P.cat, P.sub, 'pos_sub') : ''}<!-- bos100: Sub-category chips -->
     <div class="row wrap" style="margin-bottom:10px"><button class="tog" data-act="pos_other" ${can ? '' : 'disabled'}>${esc(T('other'))}</button>${canNew ? `<button class="tog" data-act="pos_newitem">${esc(T('newitem'))}</button>` : ''}</div>
     <div class="pos-grid" id="pos_items"></div><div style="height:96px"></div>
     <div class="pos-bar" id="pos_bar"></div>`;
@@ -152,7 +153,7 @@ function drawSell(can) {
 }
 function visibleItems() {
   const q = P.q.trim().toLowerCase(), f = freq();
-  let l = P.items.filter((i) => (!P.cat || P.cat === '_f' || i.category === P.cat) && (!q || [i.name_bn, i.name_en, i.name_mix, i.code].some((x) => (x || '').toLowerCase().includes(q))));
+  let l = P.items.filter((i) => (!P.cat || P.cat === '_f' || i.category === P.cat) && (!P.sub || P.cat === '_f' || i.sub_category === P.sub) /* bos100 */ && (!q || [i.name_bn, i.name_en, i.name_mix, i.code].some((x) => (x || '').toLowerCase().includes(q))));
   if (P.cat === '_f') l = l.filter((i) => f[i.id]).sort((a, z) => f[z.id] - f[a.id]).slice(0, 24);
   return l;
 }
@@ -426,7 +427,8 @@ async function saleSheet(id) {
 // ---------- handlers ----------
 Object.assign(A.H, {
   pos_tab: (a) => { P.tab = a.dataset.v; drawPos(); },
-  pos_cat: (a) => { P.cat = a.dataset.v; drawSell(true); },
+  pos_cat: (a) => { P.cat = a.dataset.v; P.sub = ''; /* bos100 */ drawSell(true); },
+  pos_sub: (a) => { P.sub = a.dataset.v; drawSell(true); },   // bos100
   pos_add: (a) => { const i = itemById(a.dataset.v); bump(i.id); if (i.unit === 'pc') addItem(i.id, 1); else qtySheet(i.id); },
   pos_q_set: (a) => { $('#pos_qty').value = a.dataset.n; },
   pos_q_unit: (a) => qtySheet(a.dataset.v, a.dataset.u),
