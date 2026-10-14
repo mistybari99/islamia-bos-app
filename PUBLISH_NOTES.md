@@ -1,11 +1,17 @@
-# PUBLISH_NOTES: setup-sql2.html (phases 72-81)
+# PUBLISH_NOTES: setup-sql-1..4.html (phases 72-81)
 
 Source repo: https://github.com/mistybari99/My-tools , branch `integration/p72-p79` (worktree /home/user/wt-int), HEAD commit used: `049dce47c75a850aaf07aa5798a384e463c8b176`.
 Files copied byte-for-byte from `supabase/phaseNN.sql` (working tree clean at that commit). Phases 82+ are NOT included.
 
-Page: `setup-sql2.html` (English UI, 17 parts + 1 read-only CHECK). Old `setup-sql.html` only got one link line at the top.
-Parts are split only at top-level statement boundaries (never inside a $$ body, string or comment); max part size 50,000 bytes. Concatenating a phase's parts equals the source file (sha256 below).
-Paste order is enforced in the UI (part N locked until part N-1 is marked done; marks kept in localStorage key `bos_setup2_done_v1`).
+Four pages (English UI), 17 SQL parts in order, shared progress key `bos_setup72_81_done_v1` in localStorage so the order lock works across pages. A part is locked until every earlier part (also on earlier pages) is marked done; the lock text links to the page to open. A read-only CHECK (single SELECT) is on page 4 only. `setup-sql.html` has one added line linking to the four pages.
+Parts are split only at top-level statement boundaries (never inside a $$ body, string or comment); max part 50,000 bytes. Concatenating a phase's parts equals the source file (sha256 below).
+
+| Page | File | Parts | Bytes |
+|---|---|---|---|
+| 1 | setup-sql-1.html | 1-4 | 132068 (SQL) |
+| 2 | setup-sql-2.html | 5-9 | 167718 (SQL) |
+| 3 | setup-sql-3.html | 10-13 | 137562 (SQL) |
+| 4 | setup-sql-4.html | 14-17 | 160284 (SQL) |
 
 ## Source files (sha256 of the whole phase file)
 
@@ -24,23 +30,23 @@ Paste order is enforced in the UI (part N locked until part N-1 is marked done; 
 
 ## Every part (sha256 of the exact text the Copy button writes)
 
-| Part | Phase | Bytes | sha256 |
-|---|---|---|---|
-| 1 | 72 (1/2) | 46721 | `f4659595c16e708ebcfcb440f611f6d5eb70627cd51af4be2aa6ad37851f5c83` |
-| 2 | 72 (2/2) | 32272 | `e0fb5a8c018048347f8360a806305aaed62a151f77789240d306ebf69590a6db` |
-| 3 | 73 (1/2) | 25620 | `ff44b00cf4fef76716a698659b24f3eaef9ce8212059d5366fa487f5f8e71754` |
-| 4 | 73 (2/2) | 27455 | `cbfda0555e93cc1fd02670e69dbd12158a6818432c220ffda967974f006b2388` |
-| 5 | 74 (1/2) | 42275 | `18f0fcd551b8c87461c3c5d039e366c827406c716e1fb16cfd85c8151a817da3` |
-| 6 | 74 (2/2) | 35162 | `522be38235eeaae7203dbb4222adb48703ea8bd49ceeabe93b871d0478b1edec` |
-| 7 | 75 (1/2) | 26643 | `9f5a9437c0b4ba9f511d6d1ef8a835d8fc7f56e0d468e1612b7c20d9b621e5e8` |
-| 8 | 75 (2/2) | 28826 | `fc1f603c71a6c6422284621e18304ae35e27c465c995d6cde93e33e5c48149f1` |
-| 9 | 76 (1/2) | 34812 | `c32b1f7cfd932e2006ffa665fca3fd951a71c7a092383f764bbb1ba6ea626e02` |
-| 10 | 76 (2/2) | 33133 | `d0dc480d6beb9ca6ca4d43801a7747706aebdc0bf21c5998c770c44f5b65b265` |
-| 11 | 77 | 20754 | `5938a8a5cf343d605f864e737a5c9786a7432b4b71ec132efece0b13278a63ae` |
-| 12 | 78 | 37377 | `5a8c2f306fdc3aa4f2c7c0879f5a03c3c34a9f99fa0dc716e5fcd60368e2fbb4` |
-| 13 | 79 | 46298 | `7a1a5d4dd3ac9f2491c248021b8dadb9af3d5551eb791df3d5d0318c05e65dd5` |
-| 14 | 80 (1/2) | 47286 | `3eaad7916ffa45af203ef044ba7e2cae408aaece6f3843011776c0eaf967a5a7` |
-| 15 | 80 (2/2) | 46804 | `7b6c4c26fbdca16219c9041c1b2dbe46987fe07c35badcd66455c3f2043c4a16` |
-| 16 | 81 (1/2) | 23449 | `e513267ea06160637904d2e8e356e1d6e66233e9714d6af64c3f6f0fcb50bd4f` |
-| 17 | 81 (2/2) | 42745 | `574615ff9ac90cc0658cbcc0bb9d0e0e17b8109c07837516979416d12e6b0b95` |
-| CHECK | 72-81 (read-only SELECT) | 4085 | `475bc343e0a3b25c645f22580466f89fa17cdbd81ca7843c25b71dc0a8db685b` |
+| Part | Page | Phase | Bytes | sha256 |
+|---|---|---|---|---|
+| 1 | 1 | 72 (1/2) | 46721 | `f4659595c16e708ebcfcb440f611f6d5eb70627cd51af4be2aa6ad37851f5c83` |
+| 2 | 1 | 72 (2/2) | 32272 | `e0fb5a8c018048347f8360a806305aaed62a151f77789240d306ebf69590a6db` |
+| 3 | 1 | 73 (1/2) | 25620 | `ff44b00cf4fef76716a698659b24f3eaef9ce8212059d5366fa487f5f8e71754` |
+| 4 | 1 | 73 (2/2) | 27455 | `cbfda0555e93cc1fd02670e69dbd12158a6818432c220ffda967974f006b2388` |
+| 5 | 2 | 74 (1/2) | 42275 | `18f0fcd551b8c87461c3c5d039e366c827406c716e1fb16cfd85c8151a817da3` |
+| 6 | 2 | 74 (2/2) | 35162 | `522be38235eeaae7203dbb4222adb48703ea8bd49ceeabe93b871d0478b1edec` |
+| 7 | 2 | 75 (1/2) | 26643 | `9f5a9437c0b4ba9f511d6d1ef8a835d8fc7f56e0d468e1612b7c20d9b621e5e8` |
+| 8 | 2 | 75 (2/2) | 28826 | `fc1f603c71a6c6422284621e18304ae35e27c465c995d6cde93e33e5c48149f1` |
+| 9 | 2 | 76 (1/2) | 34812 | `c32b1f7cfd932e2006ffa665fca3fd951a71c7a092383f764bbb1ba6ea626e02` |
+| 10 | 3 | 76 (2/2) | 33133 | `d0dc480d6beb9ca6ca4d43801a7747706aebdc0bf21c5998c770c44f5b65b265` |
+| 11 | 3 | 77 | 20754 | `5938a8a5cf343d605f864e737a5c9786a7432b4b71ec132efece0b13278a63ae` |
+| 12 | 3 | 78 | 37377 | `5a8c2f306fdc3aa4f2c7c0879f5a03c3c34a9f99fa0dc716e5fcd60368e2fbb4` |
+| 13 | 3 | 79 | 46298 | `7a1a5d4dd3ac9f2491c248021b8dadb9af3d5551eb791df3d5d0318c05e65dd5` |
+| 14 | 4 | 80 (1/2) | 47286 | `3eaad7916ffa45af203ef044ba7e2cae408aaece6f3843011776c0eaf967a5a7` |
+| 15 | 4 | 80 (2/2) | 46804 | `7b6c4c26fbdca16219c9041c1b2dbe46987fe07c35badcd66455c3f2043c4a16` |
+| 16 | 4 | 81 (1/2) | 23449 | `e513267ea06160637904d2e8e356e1d6e66233e9714d6af64c3f6f0fcb50bd4f` |
+| 17 | 4 | 81 (2/2) | 42745 | `574615ff9ac90cc0658cbcc0bb9d0e0e17b8109c07837516979416d12e6b0b95` |
+| CHECK | 4 | 72-81 (read-only SELECT) | 4085 | `475bc343e0a3b25c645f22580466f89fa17cdbd81ca7843c25b71dc0a8db685b` |
