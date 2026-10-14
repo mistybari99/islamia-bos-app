@@ -1,19 +1,18 @@
-# PUBLISH_NOTES: setup-run-1.html / setup-run-2.html (phases 74-81)
+# PUBLISH_NOTES: setup-run-1/2/3.html (phases 74-81)
 
-Source repo: https://github.com/mistybari99/My-tools , branch `integration/p72-p79`, commit used: `fd9590a47969010f0d678f532ccaa8126735f1c6`. Phase files 72-81 are unchanged vs the earlier setup-sql-1..4 build (sha256 identical, listed below). Phases 82+ are NOT included.
+Source repo: https://github.com/mistybari99/My-tools , branch `integration/p72-p79`, commit used: `fd9590a47969010f0d678f532ccaa8126735f1c6` (integration had not moved; HEAD is still this commit). Phase files 72-81 are unchanged vs the earlier builds (sha256 below). Phases 82+ are NOT included.
 
-Owner already ran phases 72, 73 and phase 74 part 1 (`setup-sql-1.html`, kept as a record). Remaining SQL is two one-paste pages (phase files are paste-twice safe, so Run 1 re-runs the first half of phase 74 harmlessly):
+Owner already ran phases 72, 73 and the first half of phase 74 (`setup-sql-1.html`, kept as a record). Remaining SQL is three one-paste pages split at whole-phase boundaries (phase files are paste-twice safe, so Run 1 re-running the first half of phase 74 is harmless):
 
 | Page | Phases | Payload bytes | Payload sha256 |
 |---|---|---|---|
-| setup-run-1.html | 74, 75, 76 | 200923 | `56b1c76792918c5b211cd277cd4e420e13c7019b9b3b1d244298f0f22a939495` |
-| setup-run-2.html | 77, 78, 79, 80, 81 | 264833 | `b6d1febd0103e7521fd1a2ae67981360f9470ad95edbe5d18fdef02e4ac4b618` |
+| setup-run-1.html | 74, 75 | 132954 | `2f12335a35f58e6bd4e9ddb2899dc25d9af831764c9f635a62534242b477966d` |
+| setup-run-2.html | 76, 77, 78, 79 | 172470 | `b584c7b620a1338fd15e712934019245efbd1b35d6dd35da9f640fa41c1ec094` |
+| setup-run-3.html | 80, 81 | 160332 | `e19f84f461bc2325abb3f9ccd798e4dc80b8dc68ea4c0cb866baa630e09f06ac` |
 
-Payload = for each phase: the line `-- ===== phase NN =====` + newline, then the exact bytes of `supabase/phaseNN.sql`; nothing else added, statements unaltered.
-Run 2 lists a read-only CHECK (single SELECT, 4085 bytes, sha256 `475bc343e0a3b25c645f22580466f89fa17cdbd81ca7843c25b71dc0a8db685b`) as a second small Copy button.
-Order lock: Run 2 is locked until Run 1 is marked done (localStorage key `bos_setup_run_done_v1`, try/catch with in-memory fallback). Undoing Run 1 clears Run 2.
-
-WARNING: Run 2 payload is 264833 bytes (> 250 KB): possible Supabase editor / phone clipboard risk. A prepared, NOT linked alternative (Run 2 split by phase boundaries into 3 pages) is in `alt/`: setup-run-2a.html (phases 77-79, 104501 B), setup-run-2b.html (phase 80, 94114 B), setup-run-2c.html (phase 81 + CHECK, 66218 B), with `alt/setup-run-1.html` chaining to them. To use it, link `alt/setup-run-1.html`.
+Payload = for each phase: the line `-- ===== phase NN =====` + newline, then the exact bytes of `supabase/phaseNN.sql`; nothing else added, statements unaltered. All three payloads are under 250 KB.
+Run 3 also has a read-only CHECK (single SELECT, 4085 bytes, sha256 `475bc343e0a3b25c645f22580466f89fa17cdbd81ca7843c25b71dc0a8db685b`) as a second small Copy button.
+Order lock (chain): Run 2 needs Run 1 done, Run 3 needs Run 2 done. Shared localStorage key `bos_setup_run_done_v1` (try/catch, in-memory fallback). Undoing a run clears the later ones.
 
 ## Source files (sha256 of each whole phase file)
 
@@ -29,11 +28,3 @@ WARNING: Run 2 payload is 264833 bytes (> 250 KB): possible Supabase editor / ph
 | 79 | dbecc25 | 46298 | `7a1a5d4dd3ac9f2491c248021b8dadb9af3d5551eb791df3d5d0318c05e65dd5` |
 | 80 | c23e82d | 94090 | `c5143b460a0fb2e8d7171644b8963b2dcf8c8b04896838199128d159eeee90d3` |
 | 81 | bb8913d | 66194 | `5985766b48667d68c565fe26ae5b8523257b5ad7fa141e044896bf0fdac6691d` |
-
-## Alternative pages (alt/, not linked)
-
-| Page | Phases | Payload bytes | Payload sha256 |
-|---|---|---|---|
-| alt/setup-run-2a.html | 77, 78, 79 | 104501 | `2696e73ba87eddf8dad2b2272749f29f3d1dd5f868b0e01fe73b13f5fade7045` |
-| alt/setup-run-2b.html | 80 | 94114 | `d26be09d032b51a2ba9277c5681f8f5391391a0db383c57d298b82630c50f04e` |
-| alt/setup-run-2c.html | 81 | 66218 | `c9f11cf032b443811d42c6ca07ea68c222e51658cf2e6807e67d38b8a375113d` |
