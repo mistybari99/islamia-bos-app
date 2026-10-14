@@ -71,3 +71,20 @@ Run 9 also has a read-only CHECK (single SELECT, 4421 bytes, sha256 `e7434058860
 | 96 | 101854 | `944c8c1cc8484895754771d8b89dfa23f562bd1efc04665a744261d0c1dc217d` |
 | 97 | 151589 | `e5966fb62ae9bdc02e504b4169c1b3141496b4475e7a9faeed9c0620882cca6a` |
 | 98 | 47058 | `d18772a45739a45747b553afd5b53ca34be6249497f513ea6ba6b4f1c0ebc5ac` |
+
+---
+
+# Run 10 (phases 99-102)
+
+Source repo My-tools, branch `integration/p72-p79`, tip used: `994584b0749f5b2146add07500c88e9538c95cf0`. Order: 99, 100, 101, 102. Chain lock: Run 10 needs Run 9 done (key `bos_setup_run_done_v1`). Read-only CHECK (single SELECT, 2648 bytes, sha256 `c792d6ad85b545658aa4061d4f82b46ad3a179c9d02d4c13f0bf485e0114015e`) as a second small Copy button.
+
+| Page | Phases | Payload bytes | Payload sha256 |
+|---|---|---|---|
+| setup-run-10.html | 99, 100, 101, 102 | 189204 | `516019cda3dc18ae4375b976e81e56629e7f312ed30654221486bd06cd5012e3` |
+
+| Phase | Last commit touching file | Bytes | sha256 |
+|---|---|---|---|
+| 99 | 53396ec | 80341 | `da4f4b90fb57e243f67f7a30fb00b6d1c36fdedd5c4d0cebb7032f267d5a10c6` |
+| 100 | 40b4c01 | 41429 | `1c30b9dd3ad986479468114e52cbc8136b21feb347857780031ebcdd812cec09` |
+| 101 | 0a797e0 | 57272 | `6c4385bf422d2938874ddc9695f79ec04f9290cceaaf17f1bd8cd69bf9ac8c88` |
+| 102 | 84c08a6 | 10063 | `14733ee7d3da5237ad39643eb7d807b089f81b7048a7e80f3dc518dcab5e3199` |
