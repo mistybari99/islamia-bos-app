@@ -1,5 +1,5 @@
 {
- "build": "1a9e6c6b70",
+ "build": "b7f8b844b1",
  "order": [
   "theme_glass.js",
   "pager.js",
@@ -8,6 +8,7 @@
   "app.js",
   "lazy.js",
   "entry.js",
+  "bizctx.js",
   "errlog.js",
   "kbdfix.js",
   "a11yfix.js",
@@ -48,6 +49,12 @@
   "salereturn.js",
   "daybook.js",
   "cashmoves.js",
+  "org122.js",
+  "impexp124.js",
+  "variants125.js",
+  "cheques127.js",
+  "schemes128.js",
+  "tinting129.js",
   "switchboard.js",
   "paths.js",
   "restoredrill.js",
@@ -113,7 +120,8 @@
   "dashx_metrics.js",
   "dashx.js",
   "cost116.js",
-  "recon118.js"
+  "recon118.js",
+  "reports131.js"
  ],
  "core": [
   "theme_glass.js",
@@ -123,6 +131,7 @@
   "app.js",
   "lazy.js",
   "entry.js",
+  "bizctx.js",
   "errlog.js",
   "kbdfix.js",
   "a11yfix.js",
@@ -156,6 +165,7 @@
   "stock2.js",
   "salereturn.js",
   "daybook.js",
+  "cheques127.js",
   "swreg.js",
   "salary.js",
   "recipes.js",
@@ -180,6 +190,7 @@
   "app.js",
   "lazy.js",
   "entry.js",
+  "bizctx.js",
   "errlog.js",
   "kbdfix.js",
   "a11yfix.js",
@@ -213,6 +224,7 @@
   "stock2.js",
   "salereturn.js",
   "daybook.js",
+  "cheques127.js",
   "swreg.js",
   "salary.js",
   "recipes.js",
@@ -246,6 +258,11 @@
   "control.js",
   "purchase.js",
   "cashmoves.js",
+  "org122.js",
+  "impexp124.js",
+  "variants125.js",
+  "schemes128.js",
+  "tinting129.js",
   "switchboard.js",
   "paths.js",
   "restoredrill.js",
@@ -289,7 +306,8 @@
   "setupundo.js",
   "purchaseprint.js",
   "whatsnew.js",
-  "cost116.js"
+  "cost116.js",
+  "reports131.js"
  ],
  "routes": {
   "dues": [
@@ -318,6 +336,21 @@
   ],
   "cashmoves": [
    "cashmoves.js"
+  ],
+  "organization": [
+   "org122.js"
+  ],
+  "impexp": [
+   "impexp124.js"
+  ],
+  "variants": [
+   "variants125.js"
+  ],
+  "schemes": [
+   "schemes128.js"
+  ],
+  "tinting": [
+   "tinting129.js"
   ],
   "switchboard": [
    "switchboard.js"
@@ -511,6 +544,9 @@
   ],
   "cost116stage": [
    "cost116.js"
+  ],
+  "reports131": [
+   "reports131.js"
   ]
  },
  "corePages": [
@@ -551,6 +587,7 @@
   "stock",
   "salereturn",
   "daybook",
+  "cheques",
   "salary",
   "recipes",
   "owner",
@@ -567,6 +604,11 @@
   "netprofit"
  ],
  "pulled": {
+  "bizctx.js": [
+   "B.loadStatic<-app.js",
+   "B.loadStatic<-entry.js",
+   "B.loadStatic<-pos.js"
+  ],
   "forms.js": [
    "B.forms<-app.js",
    "B.forms<-entry.js",
@@ -639,6 +681,9 @@
   "daybook.js": [
    "B.reportLinks<-forms_stock.js",
    "B.reportLinks<-reports.js"
+  ],
+  "cheques127.js": [
+   "H.ch_tab<-rollout.js"
   ],
   "salary.js": [
    "B.reportLinks<-forms_stock.js",
