@@ -1,5 +1,5 @@
 {
- "build": "6983e2b5e0",
+ "build": "610e0641de",
  "order": [
   "theme_glass.js",
   "pager.js",
@@ -50,6 +50,7 @@
   "daybook.js",
   "cashmoves.js",
   "org122.js",
+  "places135.js",
   "profile134.js",
   "impexp124.js",
   "variants125.js",
@@ -260,6 +261,7 @@
   "purchase.js",
   "cashmoves.js",
   "org122.js",
+  "places135.js",
   "profile134.js",
   "impexp124.js",
   "variants125.js",
@@ -340,7 +342,8 @@
    "cashmoves.js"
   ],
   "organization": [
-   "org122.js"
+   "org122.js",
+   "places135.js"
   ],
   "profile": [
    "profile134.js"
