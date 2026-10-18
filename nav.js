@@ -1,1 +1,861 @@
-(()=>{"use strict";const e=window.BOS_APP,t=window.BOS,{sb:a,S:n,t:s,esc:o,nm:i,fmt:r,store:l,openSheet:c,closeSheet:d,fail:u}=e,p=()=>{try{return t.rule&&"on"===t.rule("dues_net_advance","off")?"customer_dues_net113":"customer_dues"}catch(e){return"customer_dues"}},m=e.H,h=(e,t=document)=>t.querySelector(e),v=t.L,f=t.lab,_={bn:"ইসলামিয়া মিষ্টি ঘর",en:"ISLAMIYA MISTY GHAR"},b={sell:v("বিক্রি","Sell","Sell · বিক্রি"),theme:v("থিম","Theme","Theme"),th_dark:v("প্রিমিয়াম ডার্ক","Premium Dark","Premium Dark"),th_light:v("প্রিমিয়াম লাইট","Premium Light","Premium Light"),th_classic:v("ক্লাসিক","Classic","Classic"),th_glass_light:v("লিকুইড গ্লাস লাইট","Liquid Glass Light","Liquid Glass Light"),th_glass_dark:v("লিকুইড গ্লাস ডার্ক","Liquid Glass Dark","Liquid Glass Dark"),menu:v("মেনু","Menu","Menu"),me:v("আমি","Me","Me"),search:v("মেনু খুঁজুন…","Search menu…","Menu খুঁজুন…"),close:v("বন্ধ করুন","Close","Close"),nores:v("কিছু পাওয়া যায়নি","Nothing found","কিছু পাওয়া যায়নি"),noperm:v("অনুমতি নেই","Not allowed","Permission নেই"),soon:v("শীঘ্রই আসছে","Coming soon","Coming soon"),foot_t:v("নিচের অংশ দেখান/লুকান","Show or hide menu options","Menu options দেখান/লুকান"),online:v("অনলাইন","Online","Online"),offline:v("অফলাইন","Offline","Offline"),pin:v("প্রিয়তে রাখুন","Pin to favourites","Favourite-এ রাখুন"),unpin:v("প্রিয় থেকে সরান","Unpin","Favourite থেকে সরান"),g_dash:v("ড্যাশবোর্ড","Dashboard","Dashboard"),g_acc:v("হিসাব","Accounting","Accounting (হিসাব)"),g_item:v("আইটেম","Items","Item"),g_cust:v("কাস্টমার","Customers","Customer"),g_supp:v("সরবরাহকারী","Suppliers","Supplier"),g_sale:v("বিক্রি","Sales","Sale (বিক্রি)"),g_purch:v("ক্রয়","Purchase","Purchase"),g_ops:v("স্টক ও কারখানা","Stock & factory","Stock ও Factory"),g_people:v("মানুষ ও স্টাফ","People & staff","Staff ও মানুষ"),g_reports:v("রিপোর্ট","Reports","Report"),g_settings:v("সেটিংস","Settings","Settings"),pending:v("অনুমোদনের অপেক্ষায়","Awaiting approval","Approval-এর অপেক্ষায়"),hi:v("স্বাগতম","Welcome","স্বাগতম"),biz:v("ব্যবসা","Business","Business"),acc:v("হিসাব","Accounting","Accounting"),p_day:v("আজ","Today","Today"),p_week:v("সপ্তাহ","Week","Week"),p_month:v("মাস","Month","Month"),p_year:v("বছর","Year","Year"),attn:v("সিদ্ধান্ত দরকার","Needs your decision","Decision দরকার"),attn_ok:v("এখন কোনো সিদ্ধান্ত বাকি নেই ✓","Nothing waiting for a decision ✓","এখন কোনো Decision বাকি নেই ✓"),fav:v("প্রিয় ও বেশি ব্যবহৃত","Favourites & most used","Favourite ও Most-used"),fav_empty:v('যেকোনো মেনু বা ফর্মের ⋮ চেপে "প্রিয়তে রাখুন" দিন। বেশি ব্যবহার করলে নিজে থেকেই উঠে আসবে।','Tap ⋮ on any menu item or form and choose "Pin to favourites". The ones you use most also show up by themselves.','যেকোনো Menu বা Form-এর ⋮ চেপে "Favourite-এ রাখুন" দিন। Most-used নিজে থেকেই উঠে আসবে।'),add:v("যোগ করুন","Add","Add"),pick:v("প্রিয়তে যোগ করুন","Add to favourites","Favourite-এ যোগ করুন"),done:v("হয়েছে","Done","Done"),tiles_biz:v("ব্যবসার কাজ","Business work","Business-এর কাজ"),tiles_acc:v("হিসাবের কাজ","Accounting work","Accounting-এর কাজ"),forms:v("আপনার সব ফর্ম","All your forms","আপনার সব Form"),detail:v("আজকের বিস্তারিত সমস্যা ও সংখ্যা","Details: problems and numbers","Details: Problem ও সংখ্যা"),sales:v("বিক্রি","Sales","Sales"),cnt:v("টি সেল","sales","sales"),disc:v("ডিসকাউন্ট","Discount","Discount"),due_p:v("বাকিতে বিক্রি","Sold on credit","Due-তে বিক্রি"),perloc:v("শাখা অনুযায়ী","By location","Location অনুযায়ী"),total:v("মোট","Total","Total"),cash:v("নগদ গ্রহণ","Cash received","Cash গ্রহণ"),digital:v("মোবাইল ও কার্ড","Mobile & card","Mobile ও Card"),due_all:v("গ্রাহকের কাছে মোট বাকি","Total owed by customers","Customer-এর কাছে মোট Due"),salary:v("বেতন রিপোর্ট","Salary report","Salary report"),payables:v("সরবরাহকারীর পাওনা","Supplier payables","Supplier-এর Payable"),pl:v("লাভ-ক্ষতি","Profit & loss","Profit-Loss"),daybook:v("দিনের খাতা","Day book","Day book"),stockbal:v("স্টক ব্যালেন্স","Stock balance","Stock Balance"),today_sheet:v("শোরুমের দৈনিক শিট","Showroom daily sheet","Showroom-এর Daily Sheet"),period_note:v("বছর = অর্থবছরের শুরু থেকে (সেটিংসের নিয়ম; না থাকলে ১ জানুয়ারি)","Year = from the fiscal-year start (a setting; 1 January when none is set)","Year = fiscal year শুরু থেকে (setting; না থাকলে ১ জানুয়ারি)"),sheets:v("আজ যে শিটগুলো পূরণ করতে হবে","Today's sheets to fill","আজ যে Sheet পূরণ করতে হবে"),sheets_none:v("আপনার জন্য কোনো শিট নেই","No sheets for you here","আপনার জন্য কোনো Sheet নেই"),st_done:v("জমা হয়েছে","Done","Done"),st_pending:v("অপেক্ষায়","Pending","Pending"),st_draft:v("ড্রাফট","Draft","Draft"),st_rej:v("ফেরত — ঠিক করুন","Sent back — fix","ফেরত — ঠিক করুন"),st_paper:v("কাগজে","On paper","কাগজে"),sheets_of:v("জমা","done","done"),sheets_hint:v('মালিক চাইলে সেটিংসে "হোমে দৈনিক শিট" নিয়মে শুধু দৈনিক শিটগুলো বেছে দিতে পারেন','The owner can narrow this to the daily sheets with the rule "Daily sheets on home"',"Owner চাইলে rule-এ শুধু দৈনিক Sheet বেছে দিতে পারেন"),locsw:v("লোকেশন","Location","Location"),all_loc:v("সব লোকেশন","All locations","সব Location"),s_screens:v("পাতা ও ফর্ম","Screens & forms","Page ও Form"),s_items:v("আইটেম","Items","Item"),s_cust:v("কাস্টমার","Customers","Customer"),s_more:v("আইটেম ও কাস্টমার খোঁজা হচ্ছে…","Searching items and customers…","Item ও Customer খোঁজা হচ্ছে…"),reset:v("প্রিয় ও ব্যবহারের হিসাব মুছুন","Clear my favourites & usage","Favourite ও Usage মুছুন"),logout:v("লগআউট","Log out","Logout"),roles:v("ভূমিকা","Roles","Role"),modules:v("সব মডিউল","All modules","সব Module"),recent:v("সাম্প্রতিক","Recent","Recent"),refresh:v("নতুন করে দেখুন","Refresh","Refresh"),s_do:v("করুন","Do","Do (করুন)"),s_set:v("সেটিংস","Settings","Settings"),find_off:v("অফলাইন — আইটেম আর কাস্টমার খোঁজা যাবে না; মেনু ও কাজ খোঁজা চলবে","Offline - items and customers cannot be searched; menu and actions still work","Offline — Item ও Customer খোঁজা যাবে না; Menu ও Do চলবে"),n_pend:v("অ্যাপ্রুভের অপেক্ষায় এন্ট্রি","Entries waiting for your approval","Approval-এর অপেক্ষায় Entry"),n_low:v("ন্যূনতমের নিচে আইটেম","Items below minimum","Minimum-এর নিচে Item"),all_clear:v("সব ঠিক আছে — এখন কিছু করার নেই","All clear. Nothing needs you now.","সব ঠিক আছে — এখন কিছু করার নেই"),see_all:v("সব দেখুন","See all","See all"),recent_empty:v("এখনও কিছু খোলা হয়নি","Nothing opened yet","এখনও কিছু খোলা হয়নি"),cats:v("ক্যাটাগরি অনুযায়ী","By category","Category অনুযায়ী"),all_in:v("এই ক্যাটাগরির সব","Everything in this category","এই Category-র সব"),qa:v("দ্রুত কাজ","Quick actions","Quick action"),emptyg:v("এই বিভাগে আপনার জন্য কিছু নেই","Nothing here for you","এই Category-তে আপনার জন্য কিছু নেই"),more:v("আরও","More","More"),fav_edit:v("সাজান","Edit","Edit"),fav_done:v("হয়েছে","Done","Done"),m_up:v("উপরে নিন","Move up","Move up"),m_down:v("নিচে নিন","Move down","Move down"),m_top:v("একদম উপরে","Move to top","Move to top"),m_bottom:v("একদম নিচে","Move to bottom","Move to bottom"),m_rename:v("নিজের নাম দিন","Rename label","নিজের নাম দিন"),m_hide:v("হোম থেকে লুকান","Hide from Home","Home থেকে লুকান"),m_open:v("খুলুন","Open","Open"),m_copy:v("লিংক কপি করুন","Copy link","Link copy করুন"),m_reset:v("প্রিয়র ক্রম আগের মতো করুন","Reset order","Favourite-এর order reset করুন"),m_unhide:v("লুকানো সব আবার দেখান","Show hidden again","Hidden সব আবার দেখান"),m_refresh:v("হোম নতুন করে দেখুন","Refresh Home","Home refresh"),copied:v("লিংক কপি হয়েছে","Link copied","Link copied"),rn_t:v("নিজের নাম (শুধু আপনার জন্য)","Your own label (only for you)","নিজের নাম (শুধু আপনার জন্য)"),rn_h:v("খালি রাখলে আসল নাম ফিরবে","Leave empty to use the original name","খালি রাখলে আসল নাম ফিরবে"),rn_save:v("সেভ","Save","Save"),added:v("যোগ করা হয়েছে","Added","Added"),omode:v("মালিকের বোর্ড","Owner mode","Owner mode"),omode_d:v("আজ যা দেখা দরকার","What to check today","আজ যা দেখা দরকার"),omode_on:v("হোমে মালিকের বোর্ড দেখান","Show the owner board as Home","Home-এ Owner board দেখান"),omode_off:v("সাধারণ হোমে ফিরুন","Back to the normal Home","Normal Home-এ ফিরুন"),omode_open:v("মালিকের বোর্ড খুলুন","Open the owner board","Owner board খুলুন"),em:v("জরুরি অনুরোধ","Emergency requests","জরুরি Request"),addprod:v("নতুন পণ্য যোগ","Add product","নতুন Product যোগ"),unitconv:v("একক রূপান্তর","Unit conversions","Unit conversion"),ctl:v("কন্ট্রোল সেন্টার","Control Center","Control Center"),ctl_d:v("লোকেশন, সীমা, তালিকা ও সেটিংস এক জায়গায়","Places, limits, lists and settings in one place","Location, limit, list ও settings এক জায়গায়"),locs:v("লোকেশন","Locations","Location"),n_loc:v("নতুন লোকেশনের সেটআপ বাকি","New places still being set up","নতুন Location-এর setup বাকি"),n_sd:v("সেটিংস শিটের ড্রাফট অনুমোদনের অপেক্ষায়","Settings sheet drafts waiting","Settings sheet draft approval-এর অপেক্ষায়"),n_wst:v("নষ্টের অ্যাপ্রুভ অপেক্ষায়","Wastage approvals waiting","Wastage approval অপেক্ষায়"),set2:v("সেটিংস (সব অপশন)","Settings (all options)","Settings (সব Option)"),inv:v("ইনভয়েস ও প্রিন্ট","Invoice & print","Invoice ও Print")},g=e=>f(b[e]),y=(e,t="")=>`<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" ${t}>${e}</svg>`,$={menu:y('<path d="M5 9h22M5 16h22M5 23h22"/>'),home:y('<path d="M4 15L16 5l12 10M7 13v14h18V13"/><path d="M13 27v-8h6v8"/>'),me:y('<circle cx="16" cy="11" r="5.5"/><path d="M5 28c1-6 5.5-9 11-9s10 3 11 9"/>'),pos:y('<rect x="6" y="3" width="20" height="26" rx="3"/><path d="M10 9h12M10 15h3M16 15h3M10 21h3M16 21h3"/>'),doc:y('<path d="M8 3h11l6 6v20H8z"/><path d="M19 3v6h6M12 15h9M12 20h9M12 25h5"/>'),lock:y('<rect x="6" y="14" width="20" height="14" rx="3"/><path d="M10 14V9a6 6 0 0 1 12 0v5"/>'),x:y('<path d="M8 8l16 16M24 8L8 24"/>'),cv:y('<path d="M12 6l10 10-10 10"/>'),plus:y('<path d="M16 6v20M6 16h20"/>')},w=()=>document.documentElement.hasAttribute("data-skin"),k=(a,n,s)=>{if(w()&&t.icon){const e=t.icon(n||a,s||22);if(e)return e}return e.ICON&&e.ICON[a]||$[a]||$.doc},x=(e,a)=>w()&&t.icon&&t.icon(e,a||22)||$[e]||"",S=()=>n.ctx&&n.ctx.perms||{},L=()=>!(!n.ctx||!n.ctx.is_owner),M=(e,t)=>L()||!(!S()[e]||!S()[e][t]),E=()=>L()||Object.values(S()).some(e=>e.approve),q=()=>L()||!(!S().POS||!S().POS.enter&&!S().POS.view),C=()=>n.ctx&&n.ctx.profile&&n.ctx.profile.id||"anon",O=()=>{let e="lock";try{e=t.rule("ui_noperm_mode","lock")}catch(e){}return"hide"===e?"hide":"lock"},T=()=>L()||!0===N.rollout_manage||!0===N.head_management||!0===N.location_manage||!0===N.settings_approve||!0===N.list_manage;let N={};const A=t.ia.GID,H=()=>L()||(n.ctx.roles||[]).includes("management")||(n.ctx.locations||[]).length>0,P=t.ia.AREA_G,j=e=>"0-1"===e?L():!(!t.forms||!t.forms[e]),D=()=>({own:L(),roles:n.ctx&&n.ctx.roles||[],P:M,GF:N,locOk:H,canPos:q,anyApprove:E,ctlOk:T,formLive:j}),B=()=>{let e=!0;try{e=!1!==t.rule("ia_home_v2",!0)}catch(t){e=!0}try{"off"===l.get("bos_ia_home_v2")&&(e=!1)}catch(e){}return e};let I=null;function z(){const e=D(),a=t.IA.filter(e=>"live"===e.status).map(a=>({key:"r:"+a.route,route:a.route,g:a.group,label:t.ia.label(a),icon:a.icon,ok:t.ia.visible(a,e),live:!0,cnt:a.cnt,tone:a.tone,kind:"r",drawer:!1!==a.drawer,rec:a}));return(I||[]).filter(e=>"master"!==e.area&&"POS"!==e.code&&P[e.area]).forEach(e=>{const n="0-1"===e.code?L():!(!t.forms||!t.forms[e.code]);a.push({key:"f:"+e.code,route:"form/"+e.code,g:P[e.area],label:e.code+" · "+i(e),icon:"doc",ok:M(e.code,"view"),live:n,kind:"f",code:e.code,drawer:!0})}),t.optviews&&t.optviews.apply?t.optviews.apply(a):a}const F=e=>z().find(t=>t.key===e);function R(){const e=location.hash.replace(/^#\/?/,"").split("/"),a=e[0]||"home";if("form"===a&&e[1])return"f:"+e[1];if("entry"===a&&"new"===e[1]&&e[2])return"f:"+e[2];const n=t.ia.resolve(e.join("/"));return n?"r:"+(n.alias||n.route):"r:"+a}const J=(e,t)=>{try{const a=JSON.parse(l.get(e)||"null");return a??t}catch(e){return t}},G=()=>J("bos_pins_"+C(),[]),W=()=>J("bos_use_"+C(),{}),U=e=>l.set("bos_pins_"+C(),JSON.stringify(e)),V=()=>J("bos_hide_"+C(),[]),Y=e=>l.set("bos_hide_"+C(),JSON.stringify(e)),K=e=>V().includes(e),Q=()=>J("bos_lbl_"+C(),{}),Z=e=>l.set("bos_lbl_"+C(),JSON.stringify(e)),X=e=>Q()[e.key]||e.label;function ee(e){if(!e||"r:home"===e||!n.ctx)return;const t=W();t[e]=(t[e]||0)+1,l.set("bos_use_"+C(),JSON.stringify(t)),function(e){if(!n.ctx||!1===navigator.onLine)return;const t=ne(e);re(a.rpc("touch_favourite",{p_kind:t.kind,p_key:t.key})).catch(()=>{})}(e)}let te=null;function ae(){const e=location.hash;if(e===te)return;te=e;const a=R();a&&F(a)&&(ee(a),n.ctx&&a.startsWith("r:")&&t.ia.pushRecent(C(),a.slice(2)))}const ne=e=>e.startsWith("f:")?{kind:"form",key:e.slice(2)}:{kind:"route",key:e.replace(/^r:/,"")},se=e=>("form"===e.kind?"f:":"r:")+e.key,oe=()=>J("bos_favq_"+C(),[]),ie=e=>l.set("bos_favq_"+C(),JSON.stringify(e)),re=e=>Promise.resolve(e).then(e=>e&&e.error?Promise.reject(e.error):e),le=/does not exist|could not find|schema cache|42883|PGRST20[1-5]/i;let ce=[],de=null;function ue(){n.ctx&&re(a.rpc("fav_order_set",{p_items:G().map(ne)})).then(()=>l.set("bos_favdirty_"+C(),"0")).catch(e=>{le.test(String(e&&e.message))||l.set("bos_favdirty_"+C(),"1")})}const pe=()=>J("bos_favmq_"+C(),[]);function me(e){if(!n.ctx)return;const t=ne(e);re(a.rpc("fav_meta_set",{p_kind:t.kind,p_key:t.key,p_label:Q()[e]||null,p_hidden:K(e)})).then(()=>l.set("bos_favmq_"+C(),JSON.stringify(pe().filter(t=>t!==e)))).catch(t=>{le.test(String(t&&t.message))||l.set("bos_favmq_"+C(),JSON.stringify([...new Set([...pe(),e])]))})}async function he(){if(!n.ctx||de===C())return;const e=C();de=e;try{for(const e of oe()){const t=ne(e.key);await re(a.rpc("set_pin",{p_kind:t.kind,p_key:t.key,p_pinned:e.pinned}))}if(ie([]),"1"!==l.get("bos_favmig_"+e)){for(const e of G()){const t=ne(e);await re(a.rpc("set_pin",{p_kind:t.kind,p_key:t.key,p_pinned:!0}))}l.set("bos_favmig_"+e,"1")}const t="1"===l.get("bos_favdirty_"+e);if(t)try{await re(a.rpc("fav_order_set",{p_items:G().map(ne)})),l.set("bos_favdirty_"+e,"0")}catch(e){}for(const t of pe()){const n=ne(t);try{await re(a.rpc("fav_meta_set",{p_kind:n.kind,p_key:n.key,p_label:Q()[t]||null,p_hidden:K(t)})),l.set("bos_favmq_"+e,JSON.stringify(pe().filter(e=>e!==t)))}catch(e){}}let[n,s]=await Promise.all([a.from("user_favourites").select("kind,key,pinned,uses,sort,label,hidden"),a.from("role_favourites").select("role_code,kind,key,sort")]),o=!0;if(n&&n.error&&(o=!1,n=await a.from("user_favourites").select("kind,key,pinned,uses")),s&&!s.error&&(ce=s.data||[]),n&&!n.error){const a=n.data||[],s=a.filter(e=>e.pinned),i=G(),r=W(),c=(o&&s.some(e=>null!==e.sort&&void 0!==e.sort)&&!t?[...s].sort((e,t)=>(null===e.sort||void 0===e.sort?1e9:e.sort)-(null===t.sort||void 0===t.sort?1e9:t.sort)):s).map(se);if(U(o&&!t&&s.some(e=>null!==e.sort&&void 0!==e.sort)?[...c,...i.filter(e=>!c.includes(e))]:[...i.filter(e=>c.includes(e)),...c.filter(e=>!i.includes(e))]),o){const e=pe(),t=a.filter(e=>e.hidden).map(se),n=Q();Y([...new Set([...t,...V().filter(t=>e.includes(t))])]),a.forEach(t=>{const a=se(t);e.includes(a)||(t.label?n[a]=t.label:delete n[a])}),Z(n)}a.forEach(e=>{const t=se(e);r[t]=Math.max(r[t]||0,Number(e.uses)||0)}),l.set("bos_use_"+e,JSON.stringify(r))}lt()}catch(e){de=null}}const ve=()=>{const e=new Set(n.ctx&&n.ctx.roles||[]);return[...new Set(ce.filter(t=>e.has(t.role_code)).sort((e,t)=>e.sort-t.sort).map(se))]},fe=()=>{const e=G();return e.length?e:ve()},_e=e=>fe().includes(e);let be=null,ge=0;async function ye(e){if(!n.ctx)return{};if(be&&!e&&Date.now()-ge<45e3)return be;const s=L(),o=E(),i=s||M("ITEMS","approve"),r=(e,t)=>a.from(e).select("id",{count:"exact",head:!0}).eq("status",t).then(e=>e&&!e.error&&e.count||0,()=>0),[l,c,d,u,p]=await Promise.all([o?r("exceptions","open"):0,s?r("release_requests","pending"):0,s?r("emergency_requests","pending"):0,s?r("profiles","pending"):0,i?r("item_changes","pending"):0]);let m=0;if(s)try{const e=await a.rpc("list_queue_counts");e&&!e.error&&e.data&&(m=(Number(e.data.requests)||0)+(Number(e.data.other)||0))}catch(e){}let h=0,v=0,f=0;if(s||T())try{const e=await a.rpc("control_counts");e&&!e.error&&e.data&&(h=Number(e.data.location_setup)||0,v=Number(e.data.settings_drafts)||0,f=Number(e.data.wastage)||0,s||(m=Number(e.data.lists)||0))}catch(e){}let _=0;if(s||N.change_approve)try{const e=await a.rpc("entry_change_counts");e&&!e.error&&e.data&&(_=Number(e.data.pending)||0)}catch(e){}let b=0,g=null,y=0;if(o)try{const e=await a.from("entries").select("form_code,entry_date").eq("status","submitted").order("entry_date",{ascending:!0}).limit(200),t=(e&&!e.error&&e.data||[]).filter(e=>s||M(e.form_code,"approve"));b=t.length,g=t.length?t[0].entry_date:null}catch(e){}if(H())try{const e=Se(),t=await a.rpc("stock_levels",{p_loc:void 0===e?null:e,p_filters:{below_min:!0}});y=t&&!t.error&&Array.isArray(t.data)?t.data.filter(e=>!1!==e.below_min).length:0}catch(e){y=0}const $=t.outbox&&t.outbox.count?t.outbox.count():0;return be={ex:l,rel:c,em:d,stf:u,itm:p,lq:m,loc:h,sd:v,wst:f,chg:_,obx:$,pend:b,pendOld:g,low:y,ctl:(s?l+c+d+u+p+m+f:0)+h+v+(s?0:m)},ge=Date.now(),be}let $e=null;function we(){return $e||($e=(async()=>{try{await t.loadStatic()}catch(e){}if(!I){const e=await a.from("forms").select("code,area,name_bn,name_mix,name_en,sort,enabled").order("sort");I=e&&e.data?e.data:[]}try{!1===t.rule("ui_calm",!0)&&document.body.removeAttribute("data-ui")}catch(e){}he();try{t.optviews&&t.optviews.load&&await t.optviews.load()}catch(e){}await async function(){if(!n.ctx||L())return;const e=(n.ctx.locations||[]).length?[null,...n.ctx.locations]:[null],t=H()?["view_daybook","cash_move","production_void","release_decide","print_books","employee_view","employee_manage","deed_manage","attendance_manage","payroll_manage","accounts_view","accounts_manage","customer_manage","assistant_use","view_reports","salary_view","item_create","item_bulk","head_management","location_manage","settings_approve","list_manage","rollout_manage","change_approve","view_cost","view_stock_recon","view_branch_statement","view_net_profit","export_data"]:["head_management","location_manage","settings_approve","list_manage","rollout_manage","change_approve","employee_view","attendance_manage","accounts_view","customer_manage","assistant_use"];await Promise.all(t.map(async t=>{let n=!1;for(const s of e)try{const e=await a.rpc("has_grant",{p_code:t,p_loc:s});if(e&&!e.error&&!0===e.data){n=!0;break}}catch(e){}N[t]=n}));try{h("#hv_tiles")&&St(),h("#hv_ctl")&&Mt(),Te&&Re()}catch(e){}}()})()),$e}const ke=()=>L()||(n.ctx.roles||[]).includes("management");function xe(){const e=(t.ENV&&t.ENV.locs||[]).filter(e=>!1!==e.is_active&&"closed"!==e.status);return ke()?e:e.filter(e=>(n.ctx.locations||[]).includes(e.id))}function Se(){if(!n.ctx)return null;const e=xe();if(1===e.length)return e[0].id;let t=null;try{t=l.get("bos_curloc_"+C())}catch(e){t=null}const a=null===t||""===t||"all"===t?null:Number(t);return null!==a&&e.some(e=>e.id===a)?a:null}function Le(e){try{l.set("bos_curloc_"+C(),null==e?"all":String(e))}catch(e){}if(null!=e)try{l.set("bos_pos_loc",String(e))}catch(e){}try{window.dispatchEvent(new CustomEvent("bos:loc",{detail:{id:void 0===e?null:e}}))}catch(e){}}document.addEventListener("change",e=>{e.target&&"nav_loc"===e.target.id&&(Le("all"===e.target.value?null:Number(e.target.value)),Je(!1),dt.data=null,"home"===(location.hash.replace(/^#\/?/,"")||"home").split("/")[0]?yt():window.dispatchEvent(new HashChangeEvent("hashchange")),h("#hv_sheets")&&bt())});const Me={q:"",items:[],cust:[],busy:!1,tm:null};let Ee=null,qe=0;const Ce=e=>String(e||"").toLowerCase().trim();async function Oe(e){const t=Ce(e);if(t.length<2)return Me.items=[],Me.cust=[],Me.busy=!1,void(Me.q=t);Me.busy=!0;const n=[];if(M("ITEMS","view")&&window.BOS_ALL?n.push(async function(){if(Ee&&Date.now()-qe<3e5)return Ee;const e=await window.BOS_ALL(a.from("items").select("id,code,name_bn,name_en,name_mix,barcode,is_active").order("code"));return Ee=e&&!e.error?e.data||[]:Ee||[],qe=Date.now(),Ee}().then(e=>e.filter(e=>[e.code,e.name_bn,e.name_en,e.name_mix,e.barcode].some(e=>Ce(e).includes(t))).slice(0,8),()=>[])):n.push(Promise.resolve([])),q()){const e=t.replace(/[^\p{L}\p{M}\p{N} ]/gu," ").trim();n.push(e.length<2?Promise.resolve([]):(async()=>{try{const t=await a.from("customers").select("id,name,mobile").or(`name.ilike.%${e}%,mobile.ilike.%${e}%`).order("name").limit(6);return t&&!t.error&&t.data||[]}catch(e){return[]}})())}else n.push(Promise.resolve([]));const[s,o]=await Promise.all(n);Ce(Pe)===t&&(Me.q=t,Me.items=s,Me.cust=o,Me.busy=!1)}let Te=!1,Ne=null,Ae=null,He="",Pe="";const je={};function De(){if(je.drawer)return;const e=document.createElement("div");e.className="scrim",e.id="navScrim",e.dataset.act="nav_close";const t=document.createElement("aside");t.className="drawer",t.id="navDrawer",t.setAttribute("role","dialog"),t.setAttribute("aria-modal","true");const a=document.createElement("nav");a.className="bnav",a.id="bnav",document.body.append(e,t,a),je.scrim=e,je.drawer=t,je.bnav=a,document.body.dataset.ui||"off"===l.get("bos_ui")||(document.body.dataset.ui="calm")}const Be=()=>(Ae||(Ae=J("bos_navg_"+C(),null),Ae||(Ae={dash:!0})),Ae),Ie=e=>{const t=window.BOS_THEME;if(!t)return"";const a=t.get();return`<div class="th-row"><label for="${e}">${o(g("theme"))}</label><select id="${e}" data-theme-pick aria-label="${o(g("theme"))}">${[["dark","th_dark"],["light","th_light"],["classic","th_classic"],["glass-light","th_glass_light"],["glass-dark","th_glass_dark"]].map(([e,t])=>`<option value="${e}" ${a===e?"selected":""}>${o(g(t))}</option>`).join("")}</select></div>`};function ze(){je.drawer&&n.ctx&&(!function(){const a=t.biz?t.biz.sig():"",s=n.lang+"|"+C()+"|"+(window.BOS_THEME?window.BOS_THEME.get():"")+"|"+a;if(s===He&&je.drawer.firstChild)return;He=s,je.drawer.setAttribute("aria-label",g("menu")),je.drawer.innerHTML=`<div class="dr-head"><img src="mark.svg" alt=""><div class="nm"><b>${o((t.biz&&t.biz.brand()||_).bn)}</b><i>${o((t.biz&&t.biz.brand()||_).en)}</i></div>\n      <button class="hbtn" style="min-height:48px;min-width:48px;border:0;background:transparent;color:var(--ink)" data-act="nav_close" aria-label="${o(g("close"))}">${$.x.replace("<svg",'<svg width="22" height="22"')}</button></div>\n    ${t.biz?t.biz.switcherHTML():""}\n    <div class="dr-search"><input id="nav_q" type="search" autocomplete="off" placeholder="${o(g("search"))}" aria-label="${o(g("search"))}" value="${o(Pe)}"></div>\n    <div class="dr-body" id="nav_body"></div>\n    <div class="dr-foot${Fe()?" open":""}" id="nav_foot"><div class="dr-fbar"><button type="button" class="dr-ftog" data-act="foot_tog" aria-expanded="${Fe()}" aria-controls="nav_fx" aria-label="${o(g("foot_t"))}" title="${o(g("foot_t"))}">${$.cv.replace("<svg",'<svg class="cv"')}</button><span class="on-s"><span class="dot ${!1===navigator.onLine?"bad":"ok"}" id="nav_net2"></span></span></div><div class="dr-fx" id="nav_fx"><div class="dr-fxi"${Fe()?"":" inert"}><div id="nav_locbox"></div><div class="me-lang">${e.langBar()}</div>${Ie("nav_theme")}<div class="row"><span class="on-s"><span class="dot ${!1===navigator.onLine?"bad":"ok"}" id="nav_net"></span><span id="nav_nett">${o(!1===navigator.onLine?g("offline"):g("online"))}</span></span>\n      <button class="lo" data-act="logout">${o(g("logout"))}</button></div></div></div></div>`}(),Re())}document.addEventListener("change",e=>{const t=e.target;if(t&&t.matches&&t.matches("[data-theme-pick]")&&window.BOS_THEME){window.BOS_THEME.set(t.value),He="";try{ze(),Ve()}catch(e){}window.dispatchEvent(new HashChangeEvent("hashchange")),document.querySelectorAll("[data-theme-pick]").forEach(e=>{e.value=window.BOS_THEME.get()})}});const Fe=()=>{try{return"1"===localStorage.getItem("bos_navfoot")}catch(e){return!1}};document.addEventListener("click",e=>{const t=e.target&&e.target.closest&&e.target.closest("[data-act=foot_tog]");if(!t)return;const a=t.closest(".dr-foot");if(!a)return;const n=!a.classList.contains("open");a.classList.toggle("open",n),t.setAttribute("aria-expanded",String(n));const s=a.querySelector(".dr-fxi");s&&(n?s.removeAttribute("inert"):s.setAttribute("inert",""));try{localStorage.setItem("bos_navfoot",n?"1":"0")}catch(e){}});function Re(){const e=h("#nav_body");if(!e)return;!function(){const e=h("#nav_locbox");if(!e)return;const t=xe();if(t.length<2)return void(e.innerHTML="");const a=Se();e.innerHTML=`<label for="nav_loc" style="font-size:.85rem;color:var(--muted)">${o(g("locsw"))}</label>\n    <select id="nav_loc" aria-label="${o(g("locsw"))}" style="width:100%;min-height:44px"><option value="all" ${null===a?"selected":""}>${o(g("all_loc"))}</option>${t.map(e=>`<option value="${e.id}" ${a===e.id?"selected":""}>${o(i(e))}</option>`).join("")}</select>`}();const a=z(),n=O(),s=R(),r=be||{},l=Be(),c=Pe.trim().toLowerCase(),d=(e,a,n="dr-it")=>{const i=e.key===s,l=e.cnt&&r[e.cnt];return`<div class="dr-i ${i?"on":""}"><button class="rb ${n}" data-act="nav_go" data-v="${o(e.route)}" ${i?'aria-current="page"':""}>${k(e.icon,e.rec&&e.rec.i3)}<span class="lb">${o(X(e))}${a?`<small class="muted" style="display:block;font-weight:400">${o(t.ia.groupLabel(e.g))}</small>`:""}</span>${l?`<span class="ct">${l}</span><span class="dot ${e.tone||"warn"}"></span>`:""}</button>\n      ${Ke(e.key,"drawer")}</div>`};if(c){const n=new Map(a.map(e=>[e.key,e])),s=t.ia.searchSections(Pe,D()),r=e=>n.get("r:"+e.route),l=(B()?s.go:t.ia.search(Pe,D()).filter(Boolean)).map(r).filter(e=>e&&e.ok&&e.live),u=B()?s.settings.map(r).filter(e=>e&&e.ok&&e.live):[],p=a.filter(e=>"f"===e.kind&&e.ok&&e.live&&(e.label.toLowerCase().includes(c)||e.route.toLowerCase().includes(c))),m=B()?s.do.filter(e=>!l.some(t=>t.route===e.route)&&!p.some(t=>t.route===e.route)).map(e=>({key:"do:"+e.route,route:e.route,label:e.label,icon:e.icon,g:"",ok:!0,live:!0,kind:"d"})):[],h=a.filter(e=>"f"===e.kind&&e.ok&&e.live&&(e.label.toLowerCase().includes(c)||e.route.toLowerCase().includes(c))),v=[...l,...h],f=Me.q!==c,_=f?[]:Me.items.map(e=>`<div class="dr-i"><button class="rb dr-it" data-act="nav_go" data-v="${o(M("ITEMS","enter")?"items/edit/"+e.id:"items")}">${k("items")}<span class="lb">${o(e.code)} · ${o(i(e))}${!1===e.is_active?" ·":""}<small class="muted" style="display:block;font-weight:400">${o(t.ia.groupLabel("item"))}</small></span></button></div>`),b=f?[]:Me.cust.map(e=>`<div class="dr-i"><button class="rb dr-it" data-act="nav_go" data-v="dues">${k("dues")}<span class="lb">${o(e.name||"")}${e.mobile?" · "+o(e.mobile):""}<small class="muted" style="display:block;font-weight:400">${o(t.ia.groupLabel("cust"))}</small></span></button></div>`),y=(e,t)=>t.length?`<div class="hsec">${o(e)}<small>${t.length}</small></div>${t.join("")}`:"",$=v.map(e=>d(e,!0)),w=m.map(e=>`<div class="dr-i"><button class="rb dr-it" data-act="nav_go" data-v="${o(e.route)}" data-do="1">${k(e.icon,e.rec&&e.rec.i3)}<span class="lb">${o(e.label)}</span></button></div>`),x=u.map(e=>d(e,!0)),S=!1===navigator.onLine?`<p class="muted center pad" data-state="offline">${o(g("find_off"))}</p>`:"";return void(e.innerHTML=(B()?y(g("s_do"),w):"")+($.length||_.length||b.length||x.length?y(g("s_screens"),$)+y(g("s_set"),x)+y(g("s_items"),_)+y(g("s_cust"),b):"")+(B()?S:"")+(Me.busy&&c.length>=2?t.ui.state("loading",g("s_more")):"")+($.length||_.length||b.length||w.length||x.length||Me.busy?"":t.ui.state("empty",g("nores"))))}let u=0;e.innerHTML=A.map(e=>{const i=a.filter(t=>t.g===e&&t.live&&t.drawer),c=i.filter(e=>e.ok),p=i.filter(e=>!e.ok);if(!c.length)return"";const m=!!l[e]||c.some(e=>e.key===s),h=c.some(e=>e.cnt&&r[e.cnt]),v="lock"===n&&p.length&&u++<8?[(f=g("noperm")+" ("+p.length+")",`<div class="dr-i lock">${$.lock}<span>${o(f)}</span></div>`)]:[];var f;return`<div class="dr-grp"><button class="rb dr-g" data-act="nav_grp" data-v="${e}" aria-expanded="${m}"><span class="gl">${w()?k("doc","g:"+e,20):""}${o(t.ia.groupLabel(e))}${h?'<span class="dot warn"></span>':""}${c.length?"":$.lock.replace("<svg",'<svg width="16" height="16"')}</span>${$.cv.replace("<svg",'<svg class="cv"')}</button>\n      <div class="dr-list" ${m?"":"hidden"}>${c.map(e=>d(e)).join("")}${c.length?`<div class="dr-i"><button class="rb dr-rc" data-act="go_group" data-v="${e}" data-grp="${e}" style="opacity:.8"><span class="lb"><small>${o(g("all_in"))} ›</small></span></button></div>`:""}${v.join("")}</div></div>`}).join("")}function Je(e){De(),Te=e,je.scrim.classList.toggle("on",e),je.drawer.classList.toggle("on",e),Ve()}async function Ge(){if(!Te&&n.ctx){De(),await we(),Pe="",He="",ze();try{history.pushState({bosNav:1},"",location.href)}catch(e){}Je(!0),requestAnimationFrame(()=>{const e=h(".dr-head button",je.drawer);e&&e.focus()}),ye().then(e=>(Te&&Re(),e),()=>{})}}function We(){if(Te){Je(!1);try{history.state&&history.state.bosNav&&history.back()}catch(e){}}}function Ue(){const e=h("#nav_net"),t=h("#nav_nett");if(!e)return;const a=!1!==navigator.onLine,n=h("#nav_net2");n&&(n.className="dot "+(a?"ok":"bad")),e.className="dot "+(a?"ok":"bad"),t.textContent=g(a?"online":"offline")}function Ve(){if(!je.bnav)return;const e=!(!n.ctx||!n.ctx.profile||"active"!==n.ctx.profile.status)&&!function(){const e=(location.hash.replace(/^#\/?/,"")||"home").split("/")[0];return"pos"===e||"entry"===e}();if(document.body.classList.toggle("has-bnav",e),!e)return;const a=(location.hash.replace(/^#\/?/,"")||"home").split("/")[0],i=q(),r=O(),l=Te?"menu":"home"===a?"home":"pos"===a?"pos":R(),c=(e,t,a,n,s="")=>`<button data-act="${e}" ${l===n?'aria-current="page"':""} ${s}>${t}<span>${o(a)}</span></button>`,d=i?c("go",k("pos"),s("pos"),"pos",'data-v="pos"'):"lock"===r?`<button disabled aria-label="${o(s("pos")+" · "+g("noperm"))}">${$.lock}<span>${o(s("pos"))}</span></button>`:"";if(je.bnav.setAttribute("aria-label",g("menu")),B()){const e=Te?"menu":"home"===a?"home":R(),n=t=>"home"===t.kind?`<button data-act="go" data-v="home" ${"home"===e?'aria-current="page"':""}>${x("home")}<span>${o(s("home"))}</span></button>`:"menu"===t.kind?`<button data-act="nav_open" ${"menu"===e?'aria-current="page"':""}>${x("menu")}<span>${o(g("menu"))}</span></button>`:"me"===t.kind?`<button data-act="nav_me">${x("me")}<span>${o(g("me"))}</span></button>`:`<button data-act="go" data-v="${o(t.route)}" data-slot="${o(t.route)}" ${e==="r:"+t.route||location.hash==="#/"+t.route?'aria-current="page"':""}>${k(t.icon,t.i3)}<span>${o(t.label)}</span></button>`,i=t.ia.barSlots(D()),r=i.centre?`<button class="sell" data-act="go" data-v="pos" data-slot="pos" aria-label="${o(g("sell"))}" ${"#/pos"===location.hash?'aria-current="page"':""}><span class="orb">${x("sell",28)||k("pos")}</span><span class="sl">${o(g("sell"))}</span></button>`:"";return je.bnav.setAttribute("aria-label",g("menu")),void(je.bnav.innerHTML=i.left.map(n).join("")+r+i.right.map(n).join(""))}const u=t.ia.bottom(D()).map(e=>c("go",k(e.icon,e.i3),t.ia.label(e),"r:"+e.route,`data-v="${o(e.route)}"`)).join("");je.bnav.innerHTML=c("go",x("home"),s("home"),"home",'data-v="home"')+d+u+c("nav_open",x("menu"),g("menu"),"menu")+c("nav_me",x("me"),g("me"),"me")}window.addEventListener("popstate",()=>{if(Te&&Je(!1),Ne){const e=Ne;Ne=null,location.hash="#/"+e}}),window.addEventListener("hashchange",()=>{ae(),Te&&Je(!1),Ve()}),document.addEventListener("keydown",e=>{if(Te)if("Escape"!==e.key){if("Tab"===e.key){const t=[...je.drawer.querySelectorAll("button:not([disabled]),input")].filter(e=>null!==e.offsetParent||e===document.activeElement);if(!t.length)return;const a=t[0],n=t[t.length-1];e.shiftKey&&document.activeElement===a?(e.preventDefault(),n.focus()):e.shiftKey||document.activeElement!==n||(e.preventDefault(),a.focus())}}else We()}),document.addEventListener("input",e=>{"nav_q"===e.target.id&&(Pe=e.target.value,function(){clearTimeout(Me.tm);const e=Ce(Pe);if(e.length<2)return Me.items=[],Me.cust=[],Me.busy=!1,void(Me.q="");Me.busy=Me.q!==e,Me.tm=setTimeout(()=>{Oe(Pe).then(()=>{Te&&Ce(Pe)===e&&Re()},()=>{Me.busy=!1})},250)}(),Re()),"pk_q"===e.target.id&&ct(e.target.value)}),window.addEventListener("online",Ue),window.addEventListener("offline",Ue);let Ye=null;const Ke=(e,t)=>`<button class="st dots" data-act="nav_menu" data-v="${o(e)}" data-w="${t}" aria-haspopup="menu" aria-label="${o(g("more"))}">⋮</button>`;function Qe(e){let t=G();if(!t.length){const e=ve();e.length&&(t=e.slice(),U(t),ue())}const s=t.indexOf(e);s>=0?t.splice(s,1):t.push(e),U(t),lt(),function(e,t){if(!n.ctx)return;const s=ne(e);re(a.rpc("set_pin",{p_kind:s.kind,p_key:s.key,p_pinned:t})).catch(()=>{ie([...oe().filter(t=>t.key!==e),{key:e,pinned:t}])})}(e,s<0)}const Ze=()=>fe().filter(e=>{const t=F(e);return t&&t.ok&&t.live&&!K(e)});function Xe(e,t){const a=fe().slice(),n=Ze(),s=n.indexOf(e);if(s<0)return;const o=Math.max(0,Math.min(n.length-1,"top"===t?0:"bottom"===t?n.length-1:s+Number(t)));if(o===s)return;const i=n.slice();i.splice(s,1),i.splice(o,0,e),U([...i,...a.filter(e=>!n.includes(e))]),lt(),ue()}function et(){const e=new Map(z().map((e,t)=>[e.key,t])),t=fe().slice().sort((t,a)=>(e.has(t)?e.get(t):1e9)-(e.has(a)?e.get(a):1e9));U(t),lt(),ue()}function tt(e,t){const a=V().filter(t=>t!==e);t&&a.push(e),Y(a),lt(),me(e)}function at(t,a){const n=F(t);if(!n)return[];const s=_e(t),i=Ze(),r=i.indexOf(t),l=[];return l.push({label:g(s?"unpin":"pin"),onClick:()=>Qe(t)}),s&&r>=0&&l.push({label:g("m_up"),disabled:0===r,onClick:()=>Xe(t,-1)},{label:g("m_down"),disabled:r===i.length-1,onClick:()=>Xe(t,1)},{label:g("m_top"),disabled:0===r,onClick:()=>Xe(t,"top")},{label:g("m_bottom"),disabled:r===i.length-1,onClick:()=>Xe(t,"bottom")}),l.push({label:g("m_rename"),onClick:()=>function(e){const t=F(e);t&&(c(`<h2>${o(g("m_rename"))}</h2><div class="stack"><label for="rn_in">${o(g("rn_t"))}</label><input id="rn_in" maxlength="40" autocomplete="off" value="${o(Q()[e]||"")}" placeholder="${o(t.label)}"><p class="muted" style="margin:0;font-size:.85rem">${o(g("rn_h"))}</p>\n    <button class="primary full" data-act="nav_rn_save" data-v="${o(e)}">${o(g("rn_save"))}</button></div>`),setTimeout(()=>{const e=h("#rn_in");e&&e.focus()},30))}(t)}),"header"!==a&&(l.push({label:K(t)?g("m_unhide"):g("m_hide"),onClick:()=>tt(t,!K(t))}),l.push({label:g("m_open"),onClick:()=>m.nav_go({dataset:{v:n.route}})})),l.push({label:g("m_copy"),onClick:()=>function(t){const a=location.origin+location.pathname+"#/"+t,n=()=>e.toast(g("copied"));try{if(navigator.clipboard&&navigator.clipboard.writeText)return void navigator.clipboard.writeText(a).then(n,()=>e.toast(a))}catch(e){}e.toast(a)}(n.route)},{label:g("m_reset"),onClick:et}),l}function nt(e,a){const n=document.getElementById("nav_pop");if(n&&n.remove(),t.ctl&&t.ctl.menu){const n=t.ctl.menu({label:e,items:a});return n.id="nav_pop",n.style.cssText="position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0",document.body.appendChild(n),void n.click()}st=a,c(`<h2>${o(e)}</h2><div class="stack">${a.map((e,t)=>`<button class="full" data-act="nav_pick" data-i="${t}" ${e.disabled?"disabled":""}>${o(e.label)}</button>`).join("")}</div>`)}let st=[];const ot=()=>L()&&!!t.ia.byRoute("owner")&&!1!==t.rule("owner_board_on",!0),it=()=>{try{return ot()&&!!t.ownerboard&&"1"===l.get("bos_ownermode_"+C())}catch(e){return!1}};function rt(e){try{l.set("bos_ownermode_"+C(),e?"1":"0")}catch(e){}"home"===(location.hash.replace(/^#\/?/,"")||"home").split("/")[0]?window.dispatchEvent(new HashChangeEvent("hashchange")):location.hash="#/home"}function lt(){h("#nav_body")&&Re(),h("#hv_fav")&&Lt(),h("#hv_tiles")&&St(),h("#pk_list")&&ct((h("#pk_q")||{}).value||"")}function ct(e){const t=(e||"").trim().toLowerCase(),a=h("#pk_list");if(!a)return;const n=z().filter(e=>e.ok&&e.live&&"r:home"!==e.key&&(!t||e.label.toLowerCase().includes(t)));a.innerHTML=n.map(e=>{const t=_e(e.key);return`<div class="pk-row" data-ctl="off"><span class="lb">${o(X(e))}</span>\n    <button class="mini pkb" data-act="nav_pin" data-v="${o(e.key)}" aria-pressed="${t}" style="min-height:44px;min-width:76px">${o(t?"✓ "+g("added"):"+ "+g("add"))}</button></div>`}).join("")||`<p class="muted center">${o(g("nores"))}</p>`}const dt={mode:null,period:null,data:null,dataFrom:null,favEdit:!1},ut=(e=new Date)=>e.toLocaleDateString("en-CA",{timeZone:"Asia/Dhaka"}),pt=(e,t)=>{const a=new Date(e+"T12:00:00Z");return a.setUTCDate(a.getUTCDate()+t),a.toISOString().slice(0,10)};function mt(e){const a=(e,a,n)=>{const s=Number(t.rule(e,null));return null!==t.rule(e,null)&&Number.isInteger(s)&&s>=a&&s<=n?s:1},n=a("fiscal_year_start_month",1,12),s=a("fiscal_year_start_day",1,31),o=Number(e.slice(0,4)),i=e=>{const t=new Date(Date.UTC(e,n,0)).getUTCDate();return e+"-"+String(n).padStart(2,"0")+"-"+String(Math.min(s,t)).padStart(2,"0")},r=i(o);return e<r?i(o-1):r}function ht(e){const t=ut();return"day"===e?t:"week"===e?pt(t,-6):"month"===e?t.slice(0,8)+"01":mt(t)}const vt=e=>"৳ "+r(e),ft=(e,t="total")=>e.reduce((e,a)=>e+Number(a[t]||0),0);async function _t(){const r=n.ctx.profile,c=L(),d=E();if(dt.mode||(dt.mode="acc"===l.get("bos_hmode_"+C())?"acc":"biz"),dt.period||(dt.period=["day","week","month","year"].includes(l.get("bos_hper_"+C()))?l.get("bos_hper_"+C()):"day"),De(),it())return t.ownerboard.view({home:!0});if(e.shell(s("app"),`<div class="hgreet"><b>${o(g("hi"))}, ${o(r.full_name||r.staff_id)}</b><span>${o(r.staff_id)}</span></div>\n    <div id="hv_main"><p class="muted">${o(s("loading"))}</p></div>`),await we(),!h("#hv_main"))return;const u=await ye().catch(()=>({}));if(!h("#hv_main"))return;const p=[];c&&p.push(["em",u.em,"warn",s("emergency"),"emergency"]),d&&p.push(["ex",u.ex,"bad",s("exceptions"),"exceptions"]),c&&p.push(["rel",u.rel,"warn",s("releases"),"releases"],["stf",u.stf,"info",s("staff"),"staff"]),M("ITEMS","approve")&&p.push(["itm",u.itm,"info",s("item_req"),"itemreq"]),(c||N.list_manage)&&p.push(["lq",u.lq,"info",s("lists"),"lists"]),(c||T())&&p.push(["loc",u.loc,"info",g("n_loc"),"locations"],["sd",u.sd,"info",g("n_sd"),"locset"]),c&&p.push(["wst",u.wst,"warn",g("n_wst"),"stock"]),(c||N.change_approve)&&p.push(["chg",u.chg,"info",f(v("বদলের অনুরোধ","Change requests","Change request")),"changes"]),p.push(["obx",u.obx,"warn",f(v("ফোনে জমা (পাঠানো হয়নি)","Not sent yet","Phone-এ জমা")),"outbox"]);const m=B();m&&d&&p.push(["pend",u.pend,"info",g("n_pend")+(u.pendOld?" · "+u.pendOld:""),"pending"]),m&&H()&&p.push(["low",u.low,"warn",g("n_low"),"stock"]);const _=p.filter(e=>e[1]).slice(0,m?5:8),b=d||c||T()?`<div class="hsec">${o(g("attn"))}${_.length?`<small>${_.reduce((e,t)=>e+t[1],0)}</small>`:""}${m?`<button class="mini" data-act="hv_refresh" aria-label="${o(g("refresh"))}">↻</button>`:""}</div>\n    <div class="card" style="padding:4px 12px">${_.length?_.map(e=>`<button class="hrow mk ${e[2]}" data-act="go" data-v="${e[4]}"><span>${o(e[3])}</span><span class="n">${e[1]}</span><span class="cv">›</span></button>`).join(""):`<div class="dash-ok">${o(g(m?"all_clear":"attn_ok"))}</div>`}${m&&p.filter(e=>e[1]).length>5?`<button class="hrow" data-act="go" data-v="${c||T()?"control":"pending"}"><span>${o(g("see_all"))}</span><span class="cv">›</span></button>`:""}</div>`:m&&_.length?`<div class="hsec">${o(g("attn"))}<small>${_.reduce((e,t)=>e+t[1],0)}</small></div><div class="card" style="padding:4px 12px">${_.map(e=>`<button class="hrow mk ${e[2]}" data-act="go" data-v="${e[4]}"><span>${o(e[3])}</span><span class="n">${e[1]}</span><span class="cv">›</span></button>`).join("")}</div>`:"",y=M("POS","enter")?`<button class="primary hbig sellbig" data-act="go" data-v="pos" data-sell="1">${x("sell",34)}<span class="sb-t"><b>${o(g("sell"))}</b><small>${o(s("pos"))}</small></span></button>`:"",w=ot()?`<button class="hbig ownbig" data-act="go" data-v="owner" data-owner="1">${k("control","sliders",34)}<span class="sb-t"><b>${o(g("omode"))}</b><small>${o(g("omode_d"))}</small></span></button>`:"",P=y||w?`<div class="hbigrow">${y}${w}</div>`:"";m&&setTimeout(()=>async function(){const e=h("#hv_oldest");if(!e)return;let t;try{t=await a.rpc("needs_you_oldest",{p_limit:5})}catch(e){return}const s=t&&!t.error&&Array.isArray(t.data)?t.data:[];if(!s.length||!h("#hv_oldest"))return;const i={entry:v("ফর্ম","Form","Form"),release:v("ছাড়ের অনুরোধ","Release request","Release request"),emergency:v("জরুরি অনুরোধ","Emergency request","Emergency request"),item_change:v("আইটেম বদল","Item change","Item change"),staff:v("নতুন স্টাফ","New staff","নতুন staff"),wastage:v("নষ্ট মাল","Wastage","Wastage"),parallel:v("পাশাপাশি মাসের সিদ্ধান্ত","Parallel month decision","Parallel মাসের সিদ্ধান্ত")},r=e=>{const t=Math.max(0,Math.round((Date.now()-new Date(e).getTime())/36e5));return t>=48?Math.floor(t/24)+("en"===n.lang?" d":" দিন"):t+("en"===n.lang?" h":" ঘণ্টা")};e.innerHTML=`<div class="hsec">${o(f(v("পুরনো আগে","Oldest first","পুরনো আগে")))}</div><div class="card" style="padding:4px 12px">${s.map(e=>`<button class="hrow mk warn" ${"entry"===e.kind?`data-act="openentry" data-v="${o(e.id)}"`:`data-act="go" data-v="${o(e.route)}"`}><span>${o(f(i[e.kind]||i.entry))} · ${o(e.label||"")}</span><span class="n">${o(r(e.since))}</span><span class="cv">›</span></button>`).join("")}</div>`}(),0),h("#hv_main").innerHTML=`${P}${b}${m?'<div id="hv_oldest"></div>':""}${m?'<div id="hv_sheets"></div><div id="hv_qa"></div><div class="hsec">'+o(g("fav"))+xt()+'</div><div id="hv_fav"></div>':""}\n    <div class="seg" role="group" aria-label="${o(g("biz")+" / "+g("acc"))}"><button data-act="hv_mode" data-v="biz" aria-pressed="${"biz"===dt.mode}">${o(g("biz"))}</button><button data-act="hv_mode" data-v="acc" aria-pressed="${"acc"===dt.mode}">${o(g("acc"))}</button></div>\n    <div class="ptabs" role="tablist" id="hv_pt"></div><div id="hv_stats"></div>\n    ${m?"":'<div id="hv_sheets"></div><div class="hsec">'+o(g("fav"))+xt()+'</div><div id="hv_fav"></div>'}\n    <div class="hsec" id="hv_th"></div><div class="qgrid" id="hv_tiles"></div>\n    <div class="hsec">${o(g("modules"))}</div><div class="grid" id="hv_mods"></div><div id="hv_ctl"></div>\n    <div class="hsec">${o(g("cats"))}</div><div class="grid" id="hv_cats"></div>\n    <details class="acc" id="hv_forms"><summary>${o(g("forms"))}</summary><div class="accb" id="hv_formsb"></div></details>\n    ${d||q()?`<details class="acc" id="hv_dt"><summary>${o(g("detail"))}</summary><div class="accb"><div id="dash"></div></div></details>`:""}`,gt(),St(),Lt(),function(){const e=h("#hv_mods");if(!e)return;const a=be||{},n=O(),s=t.ia.modules().map(e=>e.route),i=new Set(["pos","dues","biz","items"]);e.innerHTML=s.map(e=>{const t=F("r:"+e);if(!t)return"";if(!t.ok)return"lock"===n&&i.has(e)?`<div class="lockcard">${$.lock}<span>${o(t.label)} · ${o(g("noperm"))}</span></div>`:"";const s=t.cnt&&a[t.cnt];return`<button class="tile" data-act="go" data-v="${o(t.route)}">${k(t.icon,t.rec&&t.rec.i3)}<span>${o(t.label)}</span>${s?`<span class="badge">${s}</span>`:""}</button>`}).join("")}(),Mt(),function(){const e=h("#hv_formsb");if(!e)return;const a=(I||[]).filter(e=>"master"!==e.area&&"POS"!==e.code&&M(e.code,"view")&&!Et(e)),n=["showroom","cash","stock","purchase","factory","sales","staff","assets","owner","settings"].map(e=>[e,a.filter(t=>t.area===e)]).filter(([,e])=>e.length);e.innerHTML=n.length?n.map(([e,a])=>`<h3 style="margin:12px 0 4px">${o(s("area_"+e))}</h3>${a.map(e=>{const a=S()[e.code]||{},n="0-1"===e.code?L():t.forms&&t.forms[e.code];return`<div class="perm"><div class="row between" ${n?`data-act="openform" data-v="${e.code}" style="cursor:pointer;min-height:44px"`:'style="opacity:.6"'}><span><b>${o(e.code)}</b> · ${o(i(e))}</span><span class="row">${n?"":`<span class="chip">${o(s("soon"))}</span>`}${a.enter?`<span class="chip ok">${o(s("can_enter"))}</span>`:`<span class="chip">${o(s("can_view"))}</span>`}${a.approve?`<span class="chip warn">${o(s("can_approve"))}</span>`:""}</span></div></div>`}).join("")}`).join(""):`<p class="muted">${o(s("no_forms"))}</p>`}(),function(){const e=h("#hv_qa");if(!e||!B())return;const a=t.ia.quickActions(D());e.innerHTML=a.length?`<div class="hsec">${o(g("qa"))}</div><div class="qgrid" id="hv_qgrid">${a.map(e=>`<div class="qt"><button class="qm" data-act="go" data-v="${o(e.route)}" data-quick="${o(e.route)}">${k(e.icon,e.i3)}<span class="lb">${o(e.label)}</span></button></div>`).join("")}</div>`:""}(),function(){const e=h("#hv_cats");if(!e)return;const a=z().filter(e=>e.live&&e.ok&&e.drawer),n=be||{};e.innerHTML=A.filter(e=>"dash"!==e).map(e=>{const s=a.filter(t=>t.g===e);if(!s.length)return"";const i=s.reduce((e,t)=>e+(t.cnt&&n[t.cnt]&&"ctl"!==t.cnt?n[t.cnt]:0),0);return`<button class="tile" data-act="go_group" data-v="${e}" data-cat="${e}">${k(s[0].icon,"g:"+e)}<span>${o(t.ia.groupLabel(e))}</span>${i?`<span class="badge">${i}</span>`:""}</button>`}).join("")}();const j=h("#hv_dt");j&&j.addEventListener("toggle",()=>{j.open&&t.dash&&t.dash.render().catch(()=>{})}),yt(),bt()}async function bt(){const e=h("#hv_sheets");if(!e)return;if(L()||!I)return void(e.innerHTML="");const n=String(t.rule("home_daily_forms","")||"").split(/[\s,;]+/).filter(Boolean);let s=I.filter(e=>!1!==e.enabled&&"master"!==e.area&&"POS"!==e.code&&"0-1"!==e.code&&M(e.code,"enter")&&t.forms&&t.forms[e.code]);if(n.length&&(s=s.filter(e=>n.includes(e.code))),!s.length)return void(e.innerHTML="");const r=Se(),l=xe().map(e=>e.id),c=null!==r?[r]:l;if(!c.length)return void(e.innerHTML="");const d=ut(),u=d+"|"+c.join(",");let p=[],m=[];try{const e=await a.from("entries").select("form_code,location_id,status").eq("entry_date",d).in("location_id",c).limit(1e3);p=e&&!e.error&&e.data||[]}catch(e){p=[]}try{const e=await a.from("form_rollout").select("form_code,location_id,mode").in("location_id",c);m=e&&!e.error&&e.data||[]}catch(e){m=[]}if(!h("#hv_sheets")||u!==d+"|"+(null!==r?[r]:xe().map(e=>e.id)).join(","))return;const v=[];s.forEach(e=>c.forEach(t=>{const a=(m.find(a=>a.form_code===e.code&&a.location_id===t)||{}).mode||"app",n=p.filter(a=>a.form_code===e.code&&a.location_id===t);let s="paper"===a?"paper":"pending";"paper"!==a&&(n.some(e=>"submitted"===e.status||"approved"===e.status)?s="done":n.some(e=>"draft"===e.status)?s="draft":n.some(e=>"rejected"===e.status)&&(s="rej")),v.push({f:e,id:t,st:s})})),v.sort((e,t)=>("done"===e.st)-("done"===t.st)||("paper"===e.st)-("paper"===t.st)||String(e.f.code).localeCompare(String(t.f.code),"en",{numeric:!0}));const f=v.filter(e=>"done"===e.st).length,_=v.filter(e=>"paper"!==e.st).length,b={done:"ok",pending:"warn",draft:"info",rej:"bad",paper:""};e.innerHTML=`<div class="hsec">${o(g("sheets"))}<small>${f}/${_} ${o(g("sheets_of"))}</small></div>\n    <div class="card" style="padding:4px 12px">${v.map(e=>`<button class="hrow" data-act="openform" data-v="${o(e.f.code)}" ${"paper"===e.st?'style="opacity:.7"':""}><span><b>${o(e.f.code)}</b> · ${o(i(e.f))}${c.length>1?` <small class="muted">${o((e=>{const a=(t.ENV&&t.ENV.locs||[]).find(t=>t.id===e);return a?i(a):""})(e.id))}</small>`:""}</span><span class="chip ${b[e.st]}">${o(g("st_"+e.st))}</span><span class="cv">›</span></button>`).join("")}\n    ${n.length?"":`<p class="muted" style="font-size:.85rem;margin:6px 0">${o(g("sheets_hint"))}</p>`}</div>`}function gt(){const e=h("#hv_pt");e&&(e.innerHTML=[["day","p_day"],["week","p_week"],["month","p_month"],["year","p_year"]].map(([e,t])=>`<button role="tab" data-act="hv_period" data-v="${e}" aria-selected="${dt.period===e}">${o(g(t))}</button>`).join(""))}async function yt(){const e=h("#hv_stats");if(!e)return;if(!q())return void(e.innerHTML="");const t=ht(dt.period),n=t+"|"+C();if(e.innerHTML=`<p class="muted">${o(s("loading"))}</p>`,!dt.data||dt.dataFrom!==n){const e=e=>e.then(e=>e&&!e.error&&e.data||[],()=>[]),[s,o,i]=await Promise.all([e(a.rpc("sales_summary",{p_from:t})),e(a.rpc("payments_summary",{p_from:t})),e(a.rpc(p()))]);dt.data={s,pay:o,dues:i},dt.dataFrom=n}$t()}function $t(){const e=h("#hv_stats");if(!e||!dt.data)return;const a=ht(dt.period),s=ut(),r=(dt.data.s||[]).map(e=>({...e,total:Number(e.total||0),discount:Number(e.discount||0),n:Number(e.n||0),due:Number(e.due||0)})).filter(e=>"done"===e.status&&e.sale_date>=a&&e.sale_date<=s&&(null===Se()||e.location_id===Se())),l=(e,t,a,n="",s="")=>`<div class="stat ${n?"mk "+n:""} ${s}"><div class="k">${o(e)}</div><div class="v">${t}</div>${a?`<div class="s">${o(a)}</div>`:""}</div>`;if("biz"===dt.mode){const a=(t.ENV&&t.ENV.locs||[]).filter(e=>L()||(n.ctx.roles||[]).includes("management")||(n.ctx.locations||[]).includes(e.id));let s=l(g("sales"),vt(ft(r)),r.reduce((e,t)=>e+t.n,0)+" "+g("cnt"),"","wide")+l(g("disc"),vt(ft(r,"discount")),"")+l(g("due_p"),vt(ft(r,"due")),"",ft(r,"due")>0?"warn":"");a.length>1&&(s+=`<div class="stat wide"><div class="k">${o(g("perloc"))}</div>${a.map(e=>`<div class="row" style="justify-content:space-between;min-height:36px"><span>${o(i(e))}</span><b>${vt(ft(r.filter(t=>t.location_id===e.id)))}</b></div>`).join("")}\n      <div class="row" style="justify-content:space-between;border-top:1px solid var(--hair);min-height:36px"><b>${o(g("total"))}</b><b>${vt(ft(r))}</b></div></div>`),e.innerHTML=`<div class="stats">${s}</div>`}else{const t=e=>(dt.data.pay||[]).filter(t=>t.mode===e&&(!t.pay_date||t.pay_date>=a)).reduce((e,t)=>e+Number(t.total||0),0),n=(dt.data.dues||[]).reduce((e,t)=>e+Number(t.balance||0),0);e.innerHTML=`<div class="stats">${l(g("cash"),vt(t("cash")),"")}${l(g("digital"),vt(t("mobile")+t("card")),"")}\n      ${l(g("due_all"),`<span class="${n>0?"amt-bad":""}">${vt(n)}</span>`,"",n>0?"bad":"","wide")}</div>`}}function wt(){const e=t.ia.HOME_LABEL,a=dt.mode;return t.ia.homeKeys(a).map(t=>e[t]&&e[t][a]?{key:t,label:()=>g(e[t][a])}:{key:t})}function kt(e,t={}){const a=e.cnt&&be&&be[e.cnt],n=t.fav&&dt.favEdit&&_e(e.key);return`<div class="qt ${n?"edit":""}"><button class="qm" data-act="go" data-v="${o(e.route)}">${k(e.icon,e.rec&&e.rec.i3)}<span class="lb">${o(Q()[e.key]||t.label||e.label)}</span>${a?`<span class="dot ${e.tone||"warn"}"></span>`:""}</button>\n    ${Ke(e.key,"tile")}${n?`<div class="fedit" data-ctl="off"><button data-act="fav_mv" data-v="${o(e.key)}" data-d="-1" aria-label="${o(g("m_up"))}">↑</button><button data-act="fav_mv" data-v="${o(e.key)}" data-d="1" aria-label="${o(g("m_down"))}">↓</button><button data-act="fav_rm" data-v="${o(e.key)}" aria-label="${o(g("unpin"))}">✕</button></div>`:""}</div>`}const xt=()=>`<button class="mini" id="hv_favedit" data-act="fav_edit" aria-pressed="${dt.favEdit}">${o(dt.favEdit?g("fav_done"):g("fav_edit"))}</button>`;function St(){const e=h("#hv_tiles"),a=h("#hv_th");if(!e)return;a.textContent=g("biz"===dt.mode?"tiles_biz":"tiles_acc");const n=O();e.innerHTML=wt().map(e=>{if(e.soon)return`<div class="qt soon"><div class="qm" aria-disabled="true"><span class="lb">${o(g(e.soon))}</span><span class="chip">${o(g("soon"))}</span></div></div>`;if(K(e.key))return"";const t=F(e.key);return t?t.live?t.ok?kt(t,e.label?{label:e.label()}:{}):"lock"===n?`<div class="qt lock"><div class="qm" aria-disabled="true">${$.lock}<span class="lb">${o(e.label?e.label():t.label)}</span><span class="chip">${o(g("noperm"))}</span></div></div>`:"":`<div class="qt soon"><div class="qm" aria-disabled="true"><span class="lb">${o(t.label)}</span><span class="chip">${o(g("soon"))}</span></div></div>`:("lock"===n&&e.key.startsWith("f:"),"")}).join("")+function(){const e=wt().filter(e=>{const t=F(e.key);return t&&t.ok&&t.live}).length;return t.ia.topUp(dt.mode,D(),e,8).map(e=>{const t=F(e);return t&&t.ok&&t.live&&!K(e)?kt(t):""}).join("")}()}function Lt(){const e=h("#hv_fav");if(!e)return;const t=Ze().map(F),a=W(),n=new Set(fe()),s=Object.keys(a).filter(e=>!n.has(e)&&!K(e)).sort((e,t)=>a[t]-a[e]).map(F).filter(e=>e&&e.ok&&e.live&&"r:home"!==e.key).slice(0,Math.max(4,8-t.length)),i=`<div class="qt"><button class="qm" data-act="nav_picker">${$.plus}<span class="lb">${o(g("add"))}</span></button></div>`,r=h("#hv_favedit");r&&(r.textContent=dt.favEdit?g("fav_done"):g("fav_edit"),r.setAttribute("aria-pressed",dt.favEdit)),e.innerHTML=(t.length||s.length?"":`<p class="muted" style="margin:0 0 10px">${o(g("fav_empty"))}</p>`)+`<div class="qgrid">${t.map(e=>kt(e,{fav:!0})).join("")}${s.map(e=>kt(e,{fav:!0})).join("")}${i}</div>`}function Mt(){const e=h("#hv_ctl");if(!e)return;const t=F("r:control");if(!t||!t.ok)return void(e.innerHTML="");const a=be&&be.ctl||0;e.innerHTML=`<button class="tile t-ink" data-act="go" data-v="control" style="width:100%;margin-top:12px;min-height:76px;flex-direction:row;align-items:center;justify-content:flex-start">${k("control","sliders",30)}<span style="flex:1;text-align:start"><b>${o(g("ctl"))}</b><br><small>${o(g("ctl_d"))}</small></span>${a?`<span class="badge">${a}</span>`:""}</button>`}const Et=()=>!1;window.BOS_PAGES=Object.assign(window.BOS_PAGES||{},{group:async function(){De();const a=location.hash.replace(/^#\/?/,"").split("/")[1]||"",n=t.ia.groupOf(a),s=n?t.ia.groupLabel(a):g("menu");e.shell(s,t.ui.state("loading"),!0),await we();const r=await ye().catch(()=>({}));if(!h("#app")||!n)return n?null:e.shell(s,t.ui.state("empty",g("emptyg")),!0);const l=O(),c=z().filter(e=>e.live&&"r"===e.kind&&(e.g===a||(e.rec.also||[]).includes(a))),d=c.filter(e=>e.ok),u=c.filter(e=>!e.ok),p=d.filter(e=>void 0===e.rec.parent),m=d.filter(e=>void 0!==e.rec.parent),_=D(),b=e=>{const t=e.cnt&&r[e.cnt];return`<div class="row between"><button class="hrow ${t?"mk "+(e.tone||"warn"):""}" style="flex:1" data-act="go" data-v="${o(e.route)}" data-ia="${o(e.route)}"><span>${o(e.label)}</span>${t?`<span class="n">${t}</span>`:""}<span class="cv">›</span></button></div>`+(e.rec.qa||[]).filter(e=>!e.ok||e.ok(_)).map(e=>`<button class="tog" style="margin:0 0 6px 12px" data-act="go" data-v="${o(e.route)}">＋ ${o(f(v(e.label[0],e.label[1],e.label[2])))}</button>`).join("")},y=(I||[]).filter(e=>"master"!==e.area&&"POS"!==e.code&&P[e.area]===a&&M(e.code,"view")&&("0-1"===e.code?L():!(!t.forms||!t.forms[e.code]))),w=p.map(b).join("")+(m.length?`<div class="hsec">${o(g("set2"))}</div>${m.map(b).join("")}`:"")+(y.length?`<div class="hsec">${o(g("forms"))}</div>${y.map(e=>`<button class="hrow" data-act="openform" data-v="${o(e.code)}"><span><b>${o(e.code)}</b> · ${o(i(e))}</span><span class="cv">›</span></button>`).join("")}`:"")+("lock"===l&&u.length?u.map(e=>`<div class="dr-i lock">${$.lock}<span>${o(e.label)} · ${o(g("noperm"))}</span></div>`).join(""):"");e.shell(s,w?`<div class="card" style="padding:4px 12px">${w}</div>`:t.ui.state("empty",g("emptyg")),!0)}}),Object.assign(m,{nav_open:()=>Ge(),nav_close:()=>We(),nav_go:e=>{const t=e.dataset.v;history.state&&history.state.bosNav?(Ne=t,We()):(Je(!1),location.hash="#/"+t)},nav_grp:e=>{const t=Be(),a=e.dataset.v;t[a]=!t[a],l.set("bos_navg_"+C(),JSON.stringify(t)),Re()},nav_pin:e=>Qe(e.dataset.v),nav_menu:e=>{const t=F(e.dataset.v);nt(t?X(t):g("more"),at(e.dataset.v,e.dataset.w))},nav_hmenu:()=>{const e=function(){const e=R(),t="r:home"===e,a=t?null:F(e),n=a&&a.ok?at(e,"header"):[];return t&&(n.push({label:dt.favEdit?g("fav_done"):g("fav_edit")+" · "+g("fav"),onClick:()=>{dt.favEdit=!dt.favEdit,h("#hv_fav")?Lt():m.nav_open()}}),V().length&&n.push({label:g("m_unhide")+" ("+V().length+")",onClick:()=>{const e=V();Y([]),e.forEach(me),lt(),St()}}),n.push({label:g("m_reset"),onClick:et},{label:g("m_refresh"),onClick:()=>m.hv_refresh()})),ot()&&n.push({label:it()?g("omode_off"):g("omode_on"),onClick:()=>rt(!it())}),n}();e.length&&nt(g("more"),e)},nav_pick:e=>{d();const t=st[Number(e.dataset.i)];t&&t.onClick&&t.onClick()},nav_rn_save:e=>{const t=e.dataset.v,a=((h("#rn_in")||{}).value||"").trim().slice(0,40),n=Q();a?n[t]=a:delete n[t],Z(n),d(),me(t),lt()},fav_edit:()=>{dt.favEdit=!dt.favEdit,Lt()},fav_mv:e=>Xe(e.dataset.v,e.dataset.d),fav_rm:e=>Qe(e.dataset.v),go_group:e=>{const t="group/"+e.dataset.v;Te?m.nav_go({dataset:{v:t}}):location.hash="#/"+t},hv_refresh:()=>{be=null,dt.data=null,_t()},ia_retry:()=>window.dispatchEvent(new HashChangeEvent("hashchange")),nav_picker:function(){c(`<h2>${o(g("pick"))}</h2><input id="pk_q" type="search" autocomplete="off" placeholder="${o(g("search"))}" aria-label="${o(g("search"))}"><div id="pk_list" style="margin:8px 0"></div>\n    <button class="full" data-act="closesheet">${o(g("done"))}</button>`),ct("")},nav_me:function(){const t=n.ctx.profile;c(`<h2>${o(t.full_name||t.staff_id)} <span class="muted">· ${o(t.staff_id)}</span></h2>\n    <div class="me-lang" style="margin:10px 0">${e.langBar()}</div>${Ie("me_theme")}\n    <div class="stack"><button class="full" data-act="nav_reset">${o(g("reset"))}</button>\n    <button class="full" data-act="logout">${o(g("logout"))}</button><button class="full" data-act="closesheet">${o(g("done"))}</button></div>`)},nav_reset:()=>{l.set("bos_pins_"+C(),"[]"),l.set("bos_use_"+C(),"{}"),Y([]),Z({}),ie([]),re(a.from("user_favourites").delete().eq("user_id",C())).catch(()=>{}),d(),lt()},hv_mode:e=>{dt.mode=e.dataset.v,l.set("bos_hmode_"+C(),dt.mode),document.querySelectorAll(".seg button").forEach(e=>e.setAttribute("aria-pressed",e.dataset.v===dt.mode)),St(),$t()},hv_period:e=>{dt.period=e.dataset.v,l.set("bos_hper_"+C(),dt.period),gt(),yt()}});const qt=m.lang;m.lang=e=>(He="",qt(e)),(()=>{if(document.getElementById("nav_e_css"))return;const e=document.createElement("style");e.id="nav_e_css",e.textContent=".st.dots{font-size:1.35rem;font-weight:700;line-height:1;color:var(--muted)}.hbtn.dots{font-size:1.5rem;font-weight:700;min-width:44px;min-height:44px}\n  .hbigrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:0 0 4px}body .hbigrow>.hbig.hbig{margin:0}.hbigrow:empty{display:none}\n  .hbig.ownbig{display:flex;align-items:center;justify-content:center;gap:12px;min-height:68px;width:100%;background:var(--card);color:var(--ink);border:1px solid var(--hair)}.hbig.ownbig svg{width:34px;height:34px;flex:none;color:var(--ink-2)}.hbig.ownbig .sb-t{display:flex;flex-direction:column;align-items:flex-start;line-height:1.3;text-align:start}.hbig.ownbig .sb-t b{font-size:1.05rem}.hbig.ownbig .sb-t small{opacity:.85}\n  .qt.edit{flex-direction:column}.qt.edit>.qm{padding-inline-end:38px}.qt .fedit{display:flex;border:1px solid var(--hair);border-top:0;border-radius:0 0 14px 14px;background:var(--card)}\n  .qt .fedit button{flex:1;min-height:44px;border:0;background:transparent;color:var(--ink);font-size:1.1rem}.pk-row{display:flex;align-items:center;gap:8px;min-height:48px}.pk-row .lb{flex:1;min-width:0;overflow-wrap:anywhere}",document.head.appendChild(e)})(),t.curLoc=Se,t.setCurLoc=Le,t.fyStart=mt,window.BOS_NAV={afterBiz:function(){Je(!1),dt.data=null;try{He="",Te&&Re()}catch(e){}"home"===(location.hash.replace(/^#\/?/,"")||"home").split("/")[0]?yt():window.dispatchEvent(new HashChangeEvent("hashchange")),h("#hv_sheets")&&bt()},loadSheets:bt,curLoc:Se,fyStart:mt,grantFlags:()=>N,ctlOk:T,menuBtn:function(){return`<button class="hbtn" data-act="nav_open" aria-label="${o(g("menu"))}" aria-haspopup="dialog">${x("menu",24)}</button>`},headExtra:function(){const e=R(),a="r:home"!==e?F(e):null;return"r:home"===e||a&&a.ok||ot()?`${t.notifications&&t.notifications.badge?t.notifications.badge():""}<button class="hbtn pin dots" id="hd_dots" data-act="nav_hmenu" aria-haspopup="menu" aria-label="${o(g("more"))}">⋮</button>`:""},crumb:function(){if(!n.ctx||!n.ctx.profile||"active"!==n.ctx.profile.status)return"";const e=(location.hash.replace(/^#\/?/,"")||"home").split("/")[0];if("home"===e||"group"===e)return"";const a=F(R());return a&&a.ok?`<nav class="crumb muted" aria-label="breadcrumb" style="font-size:.82rem;margin:2px 0 8px;display:flex;flex-wrap:wrap;gap:4px;align-items:center"><button data-act="go_group" data-v="${o(a.g)}" style="background:none;border:0;padding:0 2px;min-height:44px;color:inherit;text-decoration:underline">${o(t.ia.groupLabel(a.g))}</button><span aria-hidden="true">›</span><span>${o(a.label)}</span></nav>`:""},sync:function(e){De();const t=e?C():null;if(t!==Ye&&(Ye=t,Ee=null,qe=0,Me.items=[],Me.cust=[],Me.q="",be=null),!e)return Je(!1),void document.body.classList.remove("has-bnav");ae(),I||we().then(()=>{ze()},()=>{}),Te?(He="",ze()):He="",Ve()},home:_t,open:Ge,close:We,pins:G,usage:W,togglePin:Qe,reorderFav:Xe,resetOrder:et,hideKey:tt,hidden:V,labels:Q,menuItems:at,setOwnerMode:rt,ownerModeOn:it,entries:()=>z().filter(e=>e.live),syncFavs:he}})();
+/* Islamia BOS · UI v2: left drawer, bottom nav, Home v2 (business / accounting, period tabs, favourites).
+   Additive: hash routes and data-act handlers are untouched; every page stays reachable. Loaded after rules.js. */
+(() => {
+'use strict';
+const A = window.BOS_APP, B = window.BOS;
+const { sb, S, t, esc, nm, fmt, store, openSheet, closeSheet, fail } = A;
+const H = A.H;
+const $ = (s, el = document) => el.querySelector(s);
+const L = B.L, lab = B.lab;
+const BRAND = { bn: 'ইসলামিয়া মিষ্টি ঘর', en: 'ISLAMIYA MISTY GHAR' };   // fixed in every language, never translated
+
+// ---------- labels (3 modes) ----------
+const X = {
+  sell: L('বিক্রি', 'Sell', 'Sell · বিক্রি'), theme: L('থিম', 'Theme', 'Theme'), th_dark: L('প্রিমিয়াম ডার্ক', 'Premium Dark', 'Premium Dark'), th_light: L('প্রিমিয়াম লাইট', 'Premium Light', 'Premium Light'), th_classic: L('ক্লাসিক', 'Classic', 'Classic'),
+  menu: L('মেনু', 'Menu', 'Menu'), me: L('আমি', 'Me', 'Me'), search: L('মেনু খুঁজুন…', 'Search menu…', 'Menu খুঁজুন…'), close: L('বন্ধ করুন', 'Close', 'Close'),
+  nores: L('কিছু পাওয়া যায়নি', 'Nothing found', 'কিছু পাওয়া যায়নি'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), soon: L('শীঘ্রই আসছে', 'Coming soon', 'Coming soon'),
+  online: L('অনলাইন', 'Online', 'Online'), offline: L('অফলাইন', 'Offline', 'Offline'), pin: L('প্রিয়তে রাখুন', 'Pin to favourites', 'Favourite-এ রাখুন'), unpin: L('প্রিয় থেকে সরান', 'Unpin', 'Favourite থেকে সরান'),
+  g_dash: L('ড্যাশবোর্ড', 'Dashboard', 'Dashboard'), g_acc: L('হিসাব', 'Accounting', 'Accounting (হিসাব)'), g_item: L('আইটেম', 'Items', 'Item'), g_cust: L('কাস্টমার', 'Customers', 'Customer'),
+  g_supp: L('সরবরাহকারী', 'Suppliers', 'Supplier'), g_sale: L('বিক্রি', 'Sales', 'Sale (বিক্রি)'), g_purch: L('ক্রয়', 'Purchase', 'Purchase'), g_ops: L('স্টক ও কারখানা', 'Stock & factory', 'Stock ও Factory'),
+  g_people: L('মানুষ ও স্টাফ', 'People & staff', 'Staff ও মানুষ'), g_reports: L('রিপোর্ট', 'Reports', 'Report'), g_settings: L('সেটিংস', 'Settings', 'Settings'),
+  pending: L('অনুমোদনের অপেক্ষায়', 'Awaiting approval', 'Approval-এর অপেক্ষায়'),
+  hi: L('স্বাগতম', 'Welcome', 'স্বাগতম'), biz: L('ব্যবসা', 'Business', 'Business'), acc: L('হিসাব', 'Accounting', 'Accounting'),
+  p_day: L('আজ', 'Today', 'Today'), p_week: L('সপ্তাহ', 'Week', 'Week'), p_month: L('মাস', 'Month', 'Month'), p_year: L('বছর', 'Year', 'Year'),
+  attn: L('সিদ্ধান্ত দরকার', 'Needs your decision', 'Decision দরকার'), attn_ok: L('এখন কোনো সিদ্ধান্ত বাকি নেই ✓', 'Nothing waiting for a decision ✓', 'এখন কোনো Decision বাকি নেই ✓'),
+  fav: L('প্রিয় ও বেশি ব্যবহৃত', 'Favourites & most used', 'Favourite ও Most-used'), fav_empty: L('যেকোনো মেনু বা ফর্মের ⋮ চেপে "প্রিয়তে রাখুন" দিন। বেশি ব্যবহার করলে নিজে থেকেই উঠে আসবে।', 'Tap ⋮ on any menu item or form and choose "Pin to favourites". The ones you use most also show up by themselves.', 'যেকোনো Menu বা Form-এর ⋮ চেপে "Favourite-এ রাখুন" দিন। Most-used নিজে থেকেই উঠে আসবে।'),
+  add: L('যোগ করুন', 'Add', 'Add'), pick: L('প্রিয়তে যোগ করুন', 'Add to favourites', 'Favourite-এ যোগ করুন'), done: L('হয়েছে', 'Done', 'Done'),
+  tiles_biz: L('ব্যবসার কাজ', 'Business work', 'Business-এর কাজ'), tiles_acc: L('হিসাবের কাজ', 'Accounting work', 'Accounting-এর কাজ'),
+  forms: L('আপনার সব ফর্ম', 'All your forms', 'আপনার সব Form'), detail: L('আজকের বিস্তারিত সমস্যা ও সংখ্যা', 'Details: problems and numbers', 'Details: Problem ও সংখ্যা'),
+  sales: L('বিক্রি', 'Sales', 'Sales'), cnt: L('টি সেল', 'sales', 'sales'), disc: L('ডিসকাউন্ট', 'Discount', 'Discount'), due_p: L('বাকিতে বিক্রি', 'Sold on credit', 'Due-তে বিক্রি'),
+  perloc: L('শাখা অনুযায়ী', 'By location', 'Location অনুযায়ী'), total: L('মোট', 'Total', 'Total'),
+  cash: L('নগদ গ্রহণ', 'Cash received', 'Cash গ্রহণ'), digital: L('মোবাইল ও কার্ড', 'Mobile & card', 'Mobile ও Card'), due_all: L('গ্রাহকের কাছে মোট বাকি', 'Total owed by customers', 'Customer-এর কাছে মোট Due'),
+  salary: L('বেতন রিপোর্ট', 'Salary report', 'Salary report'),
+  payables: L('সরবরাহকারীর পাওনা', 'Supplier payables', 'Supplier-এর Payable'), pl: L('লাভ-ক্ষতি', 'Profit & loss', 'Profit-Loss'), daybook: L('দিনের খাতা', 'Day book', 'Day book'), stockbal: L('স্টক ব্যালেন্স', 'Stock balance', 'Stock Balance'),
+  today_sheet: L('শোরুমের দৈনিক শিট', 'Showroom daily sheet', 'Showroom-এর Daily Sheet'),
+  period_note: L('বছর = অর্থবছরের শুরু থেকে (সেটিংসের নিয়ম; না থাকলে ১ জানুয়ারি)', 'Year = from the fiscal-year start (a setting; 1 January when none is set)', 'Year = fiscal year শুরু থেকে (setting; না থাকলে ১ জানুয়ারি)'),
+  sheets: L('আজ যে শিটগুলো পূরণ করতে হবে', "Today's sheets to fill", 'আজ যে Sheet পূরণ করতে হবে'), sheets_none: L('আপনার জন্য কোনো শিট নেই', 'No sheets for you here', 'আপনার জন্য কোনো Sheet নেই'),
+  st_done: L('জমা হয়েছে', 'Done', 'Done'), st_pending: L('বাকি', 'Pending', 'Pending'), st_draft: L('খসড়া', 'Draft', 'Draft'), st_rej: L('ফেরত — ঠিক করুন', 'Sent back — fix', 'ফেরত — ঠিক করুন'), st_paper: L('কাগজে', 'On paper', 'কাগজে'),
+  sheets_of: L('জমা', 'done', 'done'), sheets_hint: L('মালিক চাইলে সেটিংসে "হোমে দৈনিক শিট" নিয়মে শুধু দৈনিক শিটগুলো বেছে দিতে পারেন', 'The owner can narrow this to the daily sheets with the rule "Daily sheets on home"', 'Owner চাইলে rule-এ শুধু দৈনিক Sheet বেছে দিতে পারেন'),
+  locsw: L('লোকেশন', 'Location', 'Location'), all_loc: L('সব লোকেশন', 'All locations', 'সব Location'),
+  s_screens: L('পাতা ও ফর্ম', 'Screens & forms', 'Page ও Form'), s_items: L('আইটেম', 'Items', 'Item'), s_cust: L('গ্রাহক', 'Customers', 'Customer'), s_more: L('আইটেম ও গ্রাহক খোঁজা হচ্ছে…', 'Searching items and customers…', 'Item ও Customer খোঁজা হচ্ছে…'),
+  reset: L('প্রিয় ও ব্যবহারের হিসাব মুছুন', 'Clear my favourites & usage', 'Favourite ও Usage মুছুন'), logout: L('লগআউট', 'Log out', 'Logout'), roles: L('ভূমিকা', 'Roles', 'Role'),
+  modules: L('সব মডিউল', 'All modules', 'সব Module'), recent: L('সাম্প্রতিক', 'Recent', 'Recent'), refresh: L('নতুন করে দেখুন', 'Refresh', 'Refresh'), s_do: L('করুন', 'Do', 'Do (করুন)'), s_set: L('সেটিংস', 'Settings', 'Settings'), find_off: L('অফলাইন — আইটেম আর গ্রাহক খোঁজা যাবে না; মেনু ও কাজ খোঁজা চলবে', 'Offline - items and customers cannot be searched; menu and actions still work', 'Offline — Item ও Customer খোঁজা যাবে না; Menu ও Do চলবে'), n_pend: L('অনুমোদনের অপেক্ষায় এন্ট্রি', 'Entries waiting for your approval', 'Approval-এর অপেক্ষায় Entry'), n_low: L('ন্যূনতমের নিচে আইটেম', 'Items below minimum', 'Minimum-এর নিচে Item'), all_clear: L('সব ঠিক আছে — এখন কিছু করার নেই', 'All clear. Nothing needs you now.', 'সব ঠিক আছে — এখন কিছু করার নেই'), see_all: L('সব দেখুন', 'See all', 'See all'), recent_empty: L('এখনও কিছু খোলা হয়নি', 'Nothing opened yet', 'এখনও কিছু খোলা হয়নি'), cats: L('বিভাগ অনুযায়ী', 'By category', 'Category অনুযায়ী'), all_in: L('এই বিভাগের সব', 'Everything in this category', 'এই Category-র সব'), qa: L('দ্রুত কাজ', 'Quick actions', 'Quick action'), emptyg: L('এই বিভাগে আপনার জন্য কিছু নেই', 'Nothing here for you', 'এই Category-তে আপনার জন্য কিছু নেই'),
+  more: L('আরও', 'More', 'More'), fav_edit: L('সাজান', 'Edit', 'Edit'), fav_done: L('হয়েছে', 'Done', 'Done'), m_up: L('উপরে নিন', 'Move up', 'Move up'), m_down: L('নিচে নিন', 'Move down', 'Move down'), m_top: L('একদম উপরে', 'Move to top', 'Move to top'), m_bottom: L('একদম নিচে', 'Move to bottom', 'Move to bottom'),
+  m_rename: L('নিজের নাম দিন', 'Rename label', 'নিজের নাম দিন'), m_hide: L('হোম থেকে লুকান', 'Hide from Home', 'Home থেকে লুকান'), m_open: L('খুলুন', 'Open', 'Open'), m_copy: L('লিংক কপি করুন', 'Copy link', 'Link copy করুন'), m_reset: L('প্রিয়র ক্রম আগের মতো করুন', 'Reset order', 'Favourite-এর order reset করুন'),
+  m_unhide: L('লুকানো সব আবার দেখান', 'Show hidden again', 'Hidden সব আবার দেখান'), m_refresh: L('হোম নতুন করে দেখুন', 'Refresh Home', 'Home refresh'), copied: L('লিংক কপি হয়েছে', 'Link copied', 'Link copied'), rn_t: L('নিজের নাম (শুধু আপনার জন্য)', 'Your own label (only for you)', 'নিজের নাম (শুধু আপনার জন্য)'),
+  rn_h: L('খালি রাখলে আসল নাম ফিরবে', 'Leave empty to use the original name', 'খালি রাখলে আসল নাম ফিরবে'), rn_save: L('সংরক্ষণ', 'Save', 'Save'), added: L('যোগ করা হয়েছে', 'Added', 'Added'), omode: L('মালিকের বোর্ড', 'Owner mode', 'Owner mode'), omode_d: L('আজ যা দেখা দরকার', 'What to check today', 'আজ যা দেখা দরকার'),
+  omode_on: L('হোমে মালিকের বোর্ড দেখান', 'Show the owner board as Home', 'Home-এ Owner board দেখান'), omode_off: L('সাধারণ হোমে ফিরুন', 'Back to the normal Home', 'Normal Home-এ ফিরুন'), omode_open: L('মালিকের বোর্ড খুলুন', 'Open the owner board', 'Owner board খুলুন'),
+  em: L('জরুরি অনুরোধ', 'Emergency requests', 'জরুরি Request'), addprod: L('নতুন পণ্য যোগ', 'Add product', 'নতুন Product যোগ'), unitconv: L('একক রূপান্তর', 'Unit conversions', 'Unit conversion'),
+  ctl: L('কন্ট্রোল সেন্টার', 'Control Center', 'Control Center'), ctl_d: L('লোকেশন, সীমা, তালিকা ও সেটিংস এক জায়গায়', 'Places, limits, lists and settings in one place', 'Location, limit, list ও settings এক জায়গায়'), locs: L('লোকেশন', 'Locations', 'Location'),
+  n_loc: L('নতুন লোকেশনের সেটআপ বাকি', 'New places still being set up', 'নতুন Location-এর setup বাকি'), n_sd: L('সেটিংস শিটের খসড়া অনুমোদনের অপেক্ষায়', 'Settings sheet drafts waiting', 'Settings sheet draft approval-এর অপেক্ষায়'), n_wst: L('নষ্টের অনুমোদন বাকি', 'Wastage approvals waiting', 'Wastage approval বাকি'),
+  set2: L('সেটিংস (সব অপশন)', 'Settings (all options)', 'Settings (সব Option)'), inv: L('ইনভয়েস ও প্রিন্ট', 'Invoice & print', 'Invoice ও Print'),
+};
+const T = (k) => lab(X[k]);
+
+// ---------- icons ----------
+const sv = (d, extra = '') => `<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" ${extra}>${d}</svg>`;
+const IC = {
+  menu: sv('<path d="M5 9h22M5 16h22M5 23h22"/>'), home: sv('<path d="M4 15L16 5l12 10M7 13v14h18V13"/><path d="M13 27v-8h6v8"/>'),
+  me: sv('<circle cx="16" cy="11" r="5.5"/><path d="M5 28c1-6 5.5-9 11-9s10 3 11 9"/>'), pos: sv('<rect x="6" y="3" width="20" height="26" rx="3"/><path d="M10 9h12M10 15h3M16 15h3M10 21h3M16 21h3"/>'),
+  doc: sv('<path d="M8 3h11l6 6v20H8z"/><path d="M19 3v6h6M12 15h9M12 20h9M12 25h5"/>'), lock: sv('<rect x="6" y="14" width="20" height="14" rx="3"/><path d="M10 14V9a6 6 0 0 1 12 0v5"/>'),
+  x: sv('<path d="M8 8l16 16M24 8L8 24"/>'), cv: sv('<path d="M12 6l10 10-10 10"/>'), plus: sv('<path d="M16 6v20M6 16h20"/>'),
+};
+const skin = () => document.documentElement.hasAttribute('data-skin');   // Premium themes: 3D glass icons (icons3d.js); Classic keeps the old icons
+const ico = (k, i3, size) => { if (skin() && B.icon) { const s3 = B.icon(i3 || k, size || 22); if (s3) return s3; } return (A.ICON && A.ICON[k]) || IC[k] || IC.doc; };
+const ic3 = (k, size) => (skin() && B.icon && B.icon(k, size || 22)) || IC[k] || '';   // fixed shell icons (home / menu / me ...)
+
+// ---------- permission helpers ----------
+const ctx = () => S.ctx, perms = () => (S.ctx && S.ctx.perms) || {};
+const isOwner = () => !!(S.ctx && S.ctx.is_owner);
+const P = (c, k) => isOwner() || !!(perms()[c] && perms()[c][k]);
+const anyApprove = () => isOwner() || Object.values(perms()).some((p) => p.approve);
+const canPos = () => isOwner() || !!(perms().POS && (perms().POS.enter || perms().POS.view));
+const uid = () => (S.ctx && S.ctx.profile && S.ctx.profile.id) || 'anon';
+const npMode = () => { let m = 'lock'; try { m = B.rule('ui_noperm_mode', 'lock'); } catch (e) { /* rules not loaded yet */ } return m === 'hide' ? 'hide' : 'lock'; };
+
+// ---------- registry: routes + forms ----------
+const ctlOk = () => isOwner() || GF.rollout_manage === true || GF.head_management === true || GF.location_manage === true || GF.settings_approve === true || GF.list_manage === true;
+let GF = {};   // grants that open the day book / salary report for non-owners (server still decides on every call)
+const GROUPS = B.ia.GID;   // the 13 categories live in ia.js
+const locOk = () => isOwner() || (S.ctx.roles || []).includes('management') || (S.ctx.locations || []).length > 0;   // stock / purchase pages: the server decides the rest
+const AREA_G = B.ia.AREA_G;
+const formLive = (code) => (code === '0-1' ? isOwner() : !!(B.forms && B.forms[code]));
+const cx = () => ({ own: isOwner(), roles: (S.ctx && S.ctx.roles) || [], P, GF, locOk, canPos, anyApprove, ctlOk, formLive });
+// reversible switch: rule ia_home_v2 (absent = ON) or this phone's bos_ia_home_v2 = 'off'; OFF = the old Home / bottom bar / search
+const v2 = () => { let r = true; try { r = B.rule('ia_home_v2', true) !== false; } catch (e) { r = true; } try { if (store.get('bos_ia_home_v2') === 'off') r = false; } catch (e) { /* keep */ } return r; };   // what the ia.js predicates may look at
+let FORMS = null;   // rows of the forms table, fetched once
+function entries() {
+  const c = cx();
+  const out = B.IA.filter((r) => r.status === 'live').map((r) => ({ key: 'r:' + r.route, route: r.route, g: r.group, label: B.ia.label(r), icon: r.icon, ok: B.ia.visible(r, c), live: true, cnt: r.cnt, tone: r.tone, kind: 'r', drawer: r.drawer !== false, rec: r }));
+  (FORMS || []).filter((f) => f.area !== 'master' && f.code !== 'POS' && AREA_G[f.area]).forEach((f) => {
+    const live = f.code === '0-1' ? isOwner() : !!(B.forms && B.forms[f.code]);
+    out.push({ key: 'f:' + f.code, route: 'form/' + f.code, g: AREA_G[f.area], label: f.code + ' · ' + nm(f), icon: 'doc', ok: P(f.code, 'view'), live, kind: 'f', code: f.code, drawer: true });
+  });
+  return out;
+}
+const byKey = (k) => entries().find((e) => e.key === k);
+function keyOfHash() {
+  const p = location.hash.replace(/^#\/?/, '').split('/');
+  const page = p[0] || 'home';
+  if (page === 'form' && p[1]) return 'f:' + p[1];
+  if (page === 'entry' && p[1] === 'new' && p[2]) return 'f:' + p[2];
+  const rr = B.ia.resolve(p.join('/'));
+  if (rr) return 'r:' + (rr.alias || rr.route);
+  return 'r:' + page;
+}
+
+// ---------- per-user favourites + usage counter (localStorage only) ----------
+const jget = (k, d) => { try { const v = JSON.parse(store.get(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } };
+const pins = () => jget('bos_pins_' + uid(), []);
+const usage = () => jget('bos_use_' + uid(), {});
+const setPins = (a) => store.set('bos_pins_' + uid(), JSON.stringify(a));
+// Module E: what each person sees of the favourites is only changed from the ⋮ menus. Own label and "hide from Home" are per person (synced in user_favourites.label / hidden, phase45)
+const hiddenKeys = () => jget('bos_hide_' + uid(), []);
+const setHidden = (a) => store.set('bos_hide_' + uid(), JSON.stringify(a));
+const isHidden = (k) => hiddenKeys().includes(k);
+const labelsMap = () => jget('bos_lbl_' + uid(), {});
+const setLabels = (m) => store.set('bos_lbl_' + uid(), JSON.stringify(m));
+const lblOf = (e) => (labelsMap()[e.key] || e.label);
+function bump(k) { if (!k || k === 'r:home' || !S.ctx) return; const u = usage(); u[k] = (u[k] || 0) + 1; store.set('bos_use_' + uid(), JSON.stringify(u)); pushUse(k); }
+let lastCounted = null;
+function countRoute() {
+  const h = location.hash;
+  if (h === lastCounted) return; lastCounted = h;
+  const k = keyOfHash(); if (k && byKey(k)) { bump(k); if (S.ctx && k.startsWith('r:')) B.ia.pushRecent(uid(), k.slice(2)); }
+}
+
+// ---------- server sync: user_favourites / role_favourites. localStorage stays the offline fallback; changes made offline wait in a small queue ----------
+const fkOf = (key) => (key.startsWith('f:') ? { kind: 'form', key: key.slice(2) } : { kind: 'route', key: key.replace(/^r:/, '') });
+const keyOfFav = (r) => (r.kind === 'form' ? 'f:' : 'r:') + r.key;
+const favQ = () => jget('bos_favq_' + uid(), []);
+const setFavQ = (a) => store.set('bos_favq_' + uid(), JSON.stringify(a));
+const okRes = (p) => Promise.resolve(p).then((r) => (r && r.error ? Promise.reject(r.error) : r));
+const NOFN = /does not exist|could not find|schema cache|42883|PGRST20[1-5]/i;   // phase45 not installed: nothing to retry
+let RF = [], favSynced = null;
+function pushPin(key, pinned) {
+  if (!S.ctx) return; const k = fkOf(key);
+  okRes(sb.rpc('set_pin', { p_kind: k.kind, p_key: k.key, p_pinned: pinned })).catch(() => { setFavQ([...favQ().filter((x) => x.key !== key), { key, pinned }]); });
+}
+function pushUse(key) { if (!S.ctx || navigator.onLine === false) return; const k = fkOf(key); okRes(sb.rpc('touch_favourite', { p_kind: k.kind, p_key: k.key })).catch(() => {}); }
+// order of the pinned list and own label / hidden flag (phase45: fav_order_set / fav_meta_set); a failed push is retried at the next sync
+function pushOrder() {
+  if (!S.ctx) return;
+  okRes(sb.rpc('fav_order_set', { p_items: pins().map(fkOf) })).then(() => store.set('bos_favdirty_' + uid(), '0')).catch((e) => { if (!NOFN.test(String(e && e.message))) store.set('bos_favdirty_' + uid(), '1'); });
+}
+const metaQ = () => jget('bos_favmq_' + uid(), []);
+function pushMeta(key) {
+  if (!S.ctx) return; const k = fkOf(key);
+  okRes(sb.rpc('fav_meta_set', { p_kind: k.kind, p_key: k.key, p_label: labelsMap()[key] || null, p_hidden: isHidden(key) })).then(() => store.set('bos_favmq_' + uid(), JSON.stringify(metaQ().filter((x) => x !== key))))
+    .catch((e) => { if (!NOFN.test(String(e && e.message))) store.set('bos_favmq_' + uid(), JSON.stringify([...new Set([...metaQ(), key])])); });
+}
+async function syncFavs() {
+  if (!S.ctx || favSynced === uid()) return; const me = uid(); favSynced = me;
+  try {
+    for (const q of favQ()) { const k = fkOf(q.key); await okRes(sb.rpc('set_pin', { p_kind: k.kind, p_key: k.key, p_pinned: q.pinned })); }
+    setFavQ([]);
+    if (store.get('bos_favmig_' + me) !== '1') { for (const key of pins()) { const k = fkOf(key); await okRes(sb.rpc('set_pin', { p_kind: k.kind, p_key: k.key, p_pinned: true })); } store.set('bos_favmig_' + me, '1'); }   // pins made before the sync existed go up once
+    const dirty = store.get('bos_favdirty_' + me) === '1';
+    if (dirty) { try { await okRes(sb.rpc('fav_order_set', { p_items: pins().map(fkOf) })); store.set('bos_favdirty_' + me, '0'); } catch (e) { /* retried next time */ } }
+    for (const key of metaQ()) { const k = fkOf(key); try { await okRes(sb.rpc('fav_meta_set', { p_kind: k.kind, p_key: k.key, p_label: labelsMap()[key] || null, p_hidden: isHidden(key) })); store.set('bos_favmq_' + me, JSON.stringify(metaQ().filter((x) => x !== key))); } catch (e) { /* retried next time */ } }
+    let [r, rf] = await Promise.all([sb.from('user_favourites').select('kind,key,pinned,uses,sort,label,hidden'), sb.from('role_favourites').select('role_code,kind,key,sort')]);
+    let meta = true;
+    if (r && r.error) { meta = false; r = await sb.from('user_favourites').select('kind,key,pinned,uses'); }   // phase45 columns not there yet
+    if (rf && !rf.error) RF = rf.data || [];
+    if (r && !r.error) {
+      const rows = r.data || [], pr = rows.filter((x) => x.pinned), loc = pins(), u = usage();
+      const sp = (meta && pr.some((x) => x.sort !== null && x.sort !== undefined) && !dirty ? [...pr].sort((a, b) => (a.sort === null || a.sort === undefined ? 1e9 : a.sort) - (b.sort === null || b.sort === undefined ? 1e9 : b.sort)) : pr).map(keyOfFav);
+      setPins(meta && !dirty && pr.some((x) => x.sort !== null && x.sort !== undefined) ? [...sp, ...loc.filter((k) => !sp.includes(k))] : [...loc.filter((k) => sp.includes(k)), ...sp.filter((k) => !loc.includes(k))]);
+      if (meta) {
+        const mq = metaQ(), hid = rows.filter((x) => x.hidden).map(keyOfFav), lm = labelsMap();
+        setHidden([...new Set([...hid, ...hiddenKeys().filter((k) => mq.includes(k))])]);
+        rows.forEach((x) => { const k = keyOfFav(x); if (mq.includes(k)) return; if (x.label) lm[k] = x.label; else delete lm[k]; });
+        setLabels(lm);
+      }
+      rows.forEach((x) => { const k = keyOfFav(x); u[k] = Math.max(u[k] || 0, Number(x.uses) || 0); });
+      store.set('bos_use_' + me, JSON.stringify(u));
+    }
+    afterPin();
+  } catch (e) { favSynced = null; /* offline or tables missing: local copy keeps working, try again later */ }
+}
+const roleDefaults = () => { const mine = new Set((S.ctx && S.ctx.roles) || []); return [...new Set(RF.filter((x) => mine.has(x.role_code)).sort((a, b) => a.sort - b.sort).map(keyOfFav))]; };
+const effPins = () => { const p = pins(); return p.length ? p : roleDefaults(); };
+const isFav = (k) => effPins().includes(k);
+
+// ---------- attention counts ----------
+let CNT = null, cntAt = 0;
+async function counts(force) {
+  if (!S.ctx) return {};
+  if (CNT && !force && Date.now() - cntAt < 45000) return CNT;
+  const q = (x) => x.then((r) => (r && !r.error ? r.count || 0 : 0), () => 0);
+  const own = isOwner(), ap = anyApprove(), canDecide = own || P('ITEMS', 'approve');
+  const head = (tb, st) => q(sb.from(tb).select('id', { count: 'exact', head: true }).eq('status', st));
+  const [ex, rel, em, stf, itm] = await Promise.all([ap ? head('exceptions', 'open') : 0, own ? head('release_requests', 'pending') : 0, own ? head('emergency_requests', 'pending') : 0,
+    own ? head('profiles', 'pending') : 0, canDecide ? head('item_changes', 'pending') : 0]);
+  let lq = 0;      // list requests + Other entries waiting (owner and list managers; the server returns 0 for everybody else)
+  if (own) { try { const r = await sb.rpc('list_queue_counts'); if (r && !r.error && r.data) lq = (Number(r.data.requests) || 0) + (Number(r.data.other) || 0); } catch (e) { /* phase15 not installed */ } }
+  let loc = 0, sd = 0, wst = 0;   // phase16 control_counts: places being set up, settings drafts, wastage approvals (the server returns only what the caller may decide)
+  if (own || ctlOk()) { try { const r = await sb.rpc('control_counts'); if (r && !r.error && r.data) { loc = Number(r.data.location_setup) || 0; sd = Number(r.data.settings_drafts) || 0; wst = Number(r.data.wastage) || 0; if (!own) lq = Number(r.data.lists) || 0; } } catch (e) { /* phase16 not installed */ } }
+  let chg = 0;      // phase17: change requests the caller may decide (0 for everybody else / when not installed)
+  if (own || GF.change_approve) { try { const r = await sb.rpc('entry_change_counts'); if (r && !r.error && r.data) chg = Number(r.data.pending) || 0; } catch (e) { /* phase17 not installed */ } }
+  let pend = 0, pendOld = null, low = 0;   // Increment A: entries waiting for MY approval (same rule as #/pending) and items below minimum (stock_levels)
+  if (ap) { try { const r = await sb.from('entries').select('form_code,entry_date').eq('status', 'submitted').order('entry_date', { ascending: true }).limit(200); const l = (r && !r.error ? r.data || [] : []).filter((e) => own || P(e.form_code, 'approve')); pend = l.length; pendOld = l.length ? l[0].entry_date : null; } catch (e) { /* table unreadable */ } }
+  if (locOk()) { try { const cl = curLoc(); const r = await sb.rpc('stock_levels', { p_loc: cl === undefined ? null : cl, p_filters: { below_min: true } }); low = r && !r.error && Array.isArray(r.data) ? r.data.filter((x) => x.below_min !== false).length : 0; } catch (e) { low = 0; } }
+  let prq = 0;      // R1: pay requests waiting for me (inbox + due); the server returns 0 for everybody who is not an approver
+  try { const r = await sb.rpc('pay_request_counts'); if (r && !r.error && r.data) prq = (Number(r.data.inbox) || 0) + (Number(r.data.due) || 0); } catch (e) { /* phase120 not installed */ }
+  const obx = (B.outbox && B.outbox.count) ? B.outbox.count() : 0;      // forms waiting on this phone (offline queue)
+  CNT = { ex, rel, em, stf, itm, lq, loc, sd, wst, chg, obx, pend, pendOld, low, prq, ctl: (own ? ex + rel + em + stf + itm + lq + wst : 0) + loc + sd + (own ? 0 : lq) }; cntAt = Date.now(); return CNT;
+}
+async function loadGrantFlags() {
+  if (!S.ctx || isOwner()) return;
+  const locs = (S.ctx.locations || []).length ? [null, ...S.ctx.locations] : [null];
+  const codes = locOk() ? ['view_daybook', 'cash_move', 'production_void', 'release_decide', 'print_books', 'employee_view', 'employee_manage', 'deed_manage', 'attendance_manage', 'payroll_manage', 'accounts_view', 'accounts_manage', 'customer_manage', 'assistant_use',  'salary_view', 'item_create', 'item_bulk', 'head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve', 'view_reports', 'report_marketing', 'report_control', 'report_sales', 'report_stock', 'report_cash', 'report_profit', 'crm_view', 'crm_settings_edit', 'crm_lead_manage', 'crm_lead_all', 'crm_loyalty_manage', 'crm_voucher_issue', 'crm_coupon_override', 'crm_merge', 'crm_complaint_log', 'crm_complaint_manage', 'crm_feedback_view'] : ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve', 'employee_view', 'attendance_manage', 'accounts_view', 'customer_manage', 'assistant_use', 'view_reports', 'report_marketing', 'report_control', 'report_sales', 'report_stock', 'report_cash', 'report_profit', 'crm_view', 'crm_settings_edit', 'crm_lead_manage', 'crm_lead_all', 'crm_loyalty_manage', 'crm_voucher_issue', 'crm_coupon_override', 'crm_merge', 'crm_complaint_log', 'crm_complaint_manage', 'crm_feedback_view'];
+  await Promise.all(codes.map(async (code) => {
+    let ok = false;
+    for (const l of locs) { try { const r = await sb.rpc('has_grant', { p_code: code, p_loc: l }); if (r && !r.error && r.data === true) { ok = true; break; } } catch (e) { /* not granted */ } }
+    GF[code] = ok;
+  }));
+  try { if ($('#hv_tiles')) drawTiles(); if ($('#hv_ctl')) drawCtl(); if (drawerOpen) dr_body(); } catch (e) { /* screens not drawn yet */ }
+}
+let staticP = null;
+function ensureStatic() {
+  if (!staticP) staticP = (async () => {
+    try { await B.loadStatic(); } catch (e) { /* rules fall back to defaults */ }
+    if (!FORMS) { const r = await sb.from('forms').select('code,area,name_bn,name_mix,name_en,sort,enabled').order('sort'); FORMS = r && r.data ? r.data : []; }
+    try { if (B.rule('ui_calm', true) === false) document.body.removeAttribute('data-ui'); } catch (e) { /* keep calm */ }
+    syncFavs();
+    await loadGrantFlags();
+  })();
+  return staticP;
+}
+
+// ---------- current location (drawer footer): one choice per person, followed by every screen that asks B.curLoc() ----------
+// null = all the places this person may use (the owner / management see every place; others only their own). A person with exactly one place is fixed to it.
+const wideLoc = () => isOwner() || (S.ctx.roles || []).includes('management');
+function locChoices() { const all = ((B.ENV && B.ENV.locs) || []).filter((l) => l.is_active !== false && l.status !== 'closed'); return wideLoc() ? all : all.filter((l) => (S.ctx.locations || []).includes(l.id)); }
+function curLoc() {
+  if (!S.ctx) return null;
+  const ch = locChoices(); if (ch.length === 1) return ch[0].id;
+  let v = null; try { v = store.get('bos_curloc_' + uid()); } catch (e) { v = null; }
+  const id = v === null || v === '' || v === 'all' ? null : Number(v);
+  return id !== null && ch.some((l) => l.id === id) ? id : null;
+}
+function setCurLoc(id) {
+  try { store.set('bos_curloc_' + uid(), id === null || id === undefined ? 'all' : String(id)); } catch (e) { /* private window: the choice lasts until reload */ }
+  if (id !== null && id !== undefined) { try { store.set('bos_pos_loc', String(id)); } catch (e) { /* ignore */ } }   // the POS reads its own remembered place
+  try { window.dispatchEvent(new CustomEvent('bos:loc', { detail: { id: id === undefined ? null : id } })); } catch (e) { /* old browser */ }
+}
+function drawLocBox() {
+  const box = $('#nav_locbox'); if (!box) return;
+  const ch = locChoices(); if (ch.length < 2) { box.innerHTML = ''; return; }
+  const cur = curLoc();
+  box.innerHTML = `<label for="nav_loc" style="font-size:.85rem;color:var(--muted)">${esc(T('locsw'))}</label>
+    <select id="nav_loc" aria-label="${esc(T('locsw'))}" style="width:100%;min-height:44px"><option value="all" ${cur === null ? 'selected' : ''}>${esc(T('all_loc'))}</option>${ch.map((l) => `<option value="${l.id}" ${cur === l.id ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>`;
+}
+document.addEventListener('change', (e) => {
+  if (!e.target || e.target.id !== 'nav_loc') return;
+  setCurLoc(e.target.value === 'all' ? null : Number(e.target.value));
+  setDrawer(false);
+  HS.data = null;
+  if ((location.hash.replace(/^#\/?/, '') || 'home').split('/')[0] === 'home') loadStats(); else window.dispatchEvent(new HashChangeEvent('hashchange'));   // the open screen draws again with the new place
+  if ($('#hv_sheets')) loadSheets();
+});
+
+// ---------- drawer search over items / customers (the menu itself is searched on the phone, instantly) ----------
+const SR = { q: '', items: [], cust: [], busy: false, tm: null };
+let ITEMS_ALL = null, ITEMS_AT = 0;
+async function itemsAll() {
+  if (ITEMS_ALL && Date.now() - ITEMS_AT < 300000) return ITEMS_ALL;
+  const r = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,barcode,is_active').order('code'));
+  ITEMS_ALL = r && !r.error ? r.data || [] : (ITEMS_ALL || []); ITEMS_AT = Date.now(); return ITEMS_ALL;
+}
+const normQ = (x) => String(x || '').toLowerCase().trim();
+async function searchMore(qq) {
+  const ql = normQ(qq);
+  if (ql.length < 2) { SR.items = []; SR.cust = []; SR.busy = false; SR.q = ql; return; }
+  SR.busy = true;
+  const jobs = [];
+  if (P('ITEMS', 'view') && window.BOS_ALL) jobs.push(itemsAll().then((a) => a.filter((it) => [it.code, it.name_bn, it.name_en, it.name_mix, it.barcode].some((v) => normQ(v).includes(ql))).slice(0, 8), () => []));
+  else jobs.push(Promise.resolve([]));
+  if (canPos()) {
+    const safe = ql.replace(/[^\p{L}\p{M}\p{N} ]/gu, ' ').trim();
+    jobs.push(safe.length < 2 ? Promise.resolve([]) : (async () => { try { const r = await sb.from('customers').select('id,name,mobile').or(`name.ilike.%${safe}%,mobile.ilike.%${safe}%`).order('name').limit(6); return r && !r.error ? r.data || [] : []; } catch (e) { return []; } })());
+  } else jobs.push(Promise.resolve([]));
+  const [it, cu] = await Promise.all(jobs);
+  if (normQ(q) !== ql) return;      // typed on meanwhile: this answer is stale
+  SR.q = ql; SR.items = it; SR.cust = cu; SR.busy = false;
+}
+function queueSearch() {
+  clearTimeout(SR.tm);
+  const ql = normQ(q);
+  if (ql.length < 2) { SR.items = []; SR.cust = []; SR.busy = false; SR.q = ''; return; }
+  SR.busy = SR.q !== ql;
+  SR.tm = setTimeout(() => { searchMore(q).then(() => { if (drawerOpen && normQ(q) === ql) dr_body(); }, () => { SR.busy = false; }); }, 250);
+}
+
+// ---------- drawer ----------
+let drawerOpen = false, pendingRoute = null, openGroups = null, sig = '', q = '';
+const el = {};
+function mount() {
+  if (el.drawer) return;
+  const sc = document.createElement('div'); sc.className = 'scrim'; sc.id = 'navScrim'; sc.dataset.act = 'nav_close';
+  const dr = document.createElement('aside'); dr.className = 'drawer'; dr.id = 'navDrawer'; dr.setAttribute('role', 'dialog'); dr.setAttribute('aria-modal', 'true');
+  const bn = document.createElement('nav'); bn.className = 'bnav'; bn.id = 'bnav';
+  document.body.append(sc, dr, bn); el.scrim = sc; el.drawer = dr; el.bnav = bn;
+  if (!document.body.dataset.ui && store.get('bos_ui') !== 'off') document.body.dataset.ui = 'calm';
+}
+const groupOpen = () => { if (!openGroups) { openGroups = jget('bos_navg_' + uid(), null); if (!openGroups) openGroups = { dash: true }; } return openGroups; };
+// ---------- theme control (Premium Dark / Premium Light / Classic): compact dropdown in the drawer footer and the Me sheet ----------
+const themeSel = (id) => { const TH = window.BOS_THEME; if (!TH) return ''; const cur = TH.get();
+  return `<div class="th-row"><label for="${id}">${esc(T('theme'))}</label><select id="${id}" data-theme-pick aria-label="${esc(T('theme'))}">${[['dark', 'th_dark'], ['light', 'th_light'], ['classic', 'th_classic']].map(([v, k]) => `<option value="${v}" ${cur === v ? 'selected' : ''}>${esc(T(k))}</option>`).join('')}</select></div>`; };
+document.addEventListener('change', (ev) => {
+  const t0 = ev.target; if (!t0 || !t0.matches || !t0.matches('[data-theme-pick]') || !window.BOS_THEME) return;
+  window.BOS_THEME.set(t0.value); sig = '';
+  try { renderDrawer(); syncBnav(); } catch (e) { /* shell not ready */ }
+  window.dispatchEvent(new HashChangeEvent('hashchange'));   // redraw the current screen with the new icon set
+  document.querySelectorAll('[data-theme-pick]').forEach((x) => { x.value = window.BOS_THEME.get(); });
+});
+function renderDrawer() {
+  if (!el.drawer || !S.ctx) return;
+  dr_shell();
+  dr_body();
+}
+function dr_shell() {
+  const s = S.lang + '|' + uid() + '|' + (window.BOS_THEME ? window.BOS_THEME.get() : ''); if (s === sig && el.drawer.firstChild) return; sig = s;
+  el.drawer.setAttribute('aria-label', T('menu'));
+  el.drawer.innerHTML = `<div class="dr-head"><img src="mark.svg" alt=""><div class="nm"><b>${esc(BRAND.bn)}</b><i>${esc(BRAND.en)}</i></div>
+      <button class="hbtn" style="min-height:48px;min-width:48px;border:0;background:transparent;color:var(--ink)" data-act="nav_close" aria-label="${esc(T('close'))}">${IC.x.replace('<svg', '<svg width="22" height="22"')}</button></div>
+    <div class="dr-search"><input id="nav_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" aria-label="${esc(T('search'))}" value="${esc(q)}"></div>
+    <div class="dr-body" id="nav_body"></div>
+    <div class="dr-foot"><div id="nav_locbox"></div><div class="me-lang">${A.langBar()}</div>${themeSel('nav_theme')}<div class="row"><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net"></span><span id="nav_nett">${esc(navigator.onLine === false ? T('offline') : T('online'))}</span></span>
+      <button class="lo" data-act="logout">${esc(T('logout'))}</button></div></div>`;
+}
+const crumbOf = (e) => B.ia.groupLabel(e.g) + ' › ' + e.label;
+function dr_body() {
+  const body = $('#nav_body'); if (!body) return;
+  drawLocBox();
+  const all = entries(), mode = npMode(), cur = keyOfHash(), cn = CNT || {}, og = groupOpen(), ql = q.trim().toLowerCase();
+  const row = (e, sub, cls = 'dr-it') => {
+    const on = e.key === cur, c = e.cnt && cn[e.cnt];
+    return `<div class="dr-i ${on ? 'on' : ''}"><button class="rb ${cls}" data-act="nav_go" data-v="${esc(e.route)}" ${on ? 'aria-current="page"' : ''}>${ico(e.icon, e.rec && e.rec.i3)}<span class="lb">${esc(lblOf(e))}${sub ? `<small class="muted" style="display:block;font-weight:400">${esc(B.ia.groupLabel(e.g))}</small>` : ''}</span>${c ? `<span class="ct">${c}</span><span class="dot ${e.tone || 'warn'}"></span>` : ''}</button>
+      ${dotsBtn(e.key, 'drawer')}</div>`;
+  };
+  const lockRow = (label) => `<div class="dr-i lock">${IC.lock}<span>${esc(label)}</span></div>`;
+  if (ql) {
+    const byK = new Map(all.map((e) => [e.key, e]));
+    const sc = B.ia.searchSections(q, cx());
+    const toE = (r) => byK.get('r:' + r.route);
+    const ia = (v2() ? sc.go : B.ia.search(q, cx()).filter(Boolean)).map(toE).filter((e) => e && e.ok && e.live);
+    const setH = v2() ? sc.settings.map(toE).filter((e) => e && e.ok && e.live) : [];
+    const fm0 = all.filter((e) => e.kind === 'f' && e.ok && e.live && (e.label.toLowerCase().includes(ql) || e.route.toLowerCase().includes(ql)));
+    const doH = v2() ? sc.do.filter((d) => !ia.some((e) => e.route === d.route) && !fm0.some((e) => e.route === d.route)).map((d) => ({ key: 'do:' + d.route, route: d.route, label: d.label, icon: d.icon, g: '', ok: true, live: true, kind: 'd' })) : [];
+    const fm = all.filter((e) => e.kind === 'f' && e.ok && e.live && (e.label.toLowerCase().includes(ql) || e.route.toLowerCase().includes(ql)));
+    const hit = [...ia, ...fm];
+    const stale = SR.q !== ql;
+    const itH = stale ? [] : SR.items.map((it) => `<div class="dr-i"><button class="rb dr-it" data-act="nav_go" data-v="${esc(P('ITEMS', 'enter') ? 'items/edit/' + it.id : 'items')}">${ico('items')}<span class="lb">${esc(it.code)} · ${esc(nm(it))}${it.is_active === false ? ' ·' : ''}<small class="muted" style="display:block;font-weight:400">${esc(B.ia.groupLabel('item'))}</small></span></button></div>`);
+    const cuH = stale ? [] : SR.cust.map((c) => `<div class="dr-i"><button class="rb dr-it" data-act="nav_go" data-v="dues">${ico('dues')}<span class="lb">${esc(c.name || '')}${c.mobile ? ' · ' + esc(c.mobile) : ''}<small class="muted" style="display:block;font-weight:400">${esc(B.ia.groupLabel('cust'))}</small></span></button></div>`);
+    const sec = (title, arr) => (arr.length ? `<div class="hsec">${esc(title)}<small>${arr.length}</small></div>${arr.join('')}` : '');
+    const loc = hit.map((e) => row(e, true));
+    const doR = doH.map((e) => `<div class="dr-i"><button class="rb dr-it" data-act="nav_go" data-v="${esc(e.route)}" data-do="1">${ico(e.icon, e.rec && e.rec.i3)}<span class="lb">${esc(e.label)}</span></button></div>`);
+    const setR = setH.map((e) => row(e, true));
+    const offl = navigator.onLine === false ? `<p class="muted center pad" data-state="offline">${esc(T('find_off'))}</p>` : '';
+    body.innerHTML = (v2() ? sec(T('s_do'), doR) : '') + (loc.length || itH.length || cuH.length || setR.length ? sec(T('s_screens'), loc) + sec(T('s_set'), setR) + sec(T('s_items'), itH) + sec(T('s_cust'), cuH) : '') + (v2() ? offl : '')
+      + (SR.busy && ql.length >= 2 ? B.ui.state('loading', T('s_more')) : '')
+      + (!loc.length && !itH.length && !cuH.length && !doR.length && !setR.length && !SR.busy ? B.ui.state('empty', T('nores')) : '');
+    return;
+  }
+  let lockLines = 0;
+  body.innerHTML = GROUPS.map((g) => {
+    const list = all.filter((e) => e.g === g && e.live && e.drawer);
+    const okL = list.filter((e) => e.ok), bad = list.filter((e) => !e.ok);
+    const core = (e) => e.kind === 'r' && e.rec && (e.rec.mod || (e.rec.mob >= 1 && e.rec.mob <= 2));
+    if (!okL.length) return '';
+    const open = !!og[g] || okL.some((e) => e.key === cur), attn = okL.some((e) => e.cnt && cn[e.cnt]);
+    // lock mode: ONE summary line per category (at most 8 lines in the whole drawer)
+    const locks = mode === 'lock' && bad.length && lockLines++ < 8 ? [lockRow(T('noperm') + ' (' + bad.length + ')')] : [];
+    return `<div class="dr-grp"><button class="rb dr-g" data-act="nav_grp" data-v="${g}" aria-expanded="${open}"><span class="gl">${skin() ? ico('doc', 'g:' + g, 20) : ''}${esc(B.ia.groupLabel(g))}${attn ? '<span class="dot warn"></span>' : ''}${!okL.length ? IC.lock.replace('<svg', '<svg width="16" height="16"') : ''}</span>${IC.cv.replace('<svg', '<svg class="cv"')}</button>
+      <div class="dr-list" ${open ? '' : 'hidden'}>${okL.map((e) => row(e)).join('')}${okL.length ? `<div class="dr-i"><button class="rb dr-rc" data-act="go_group" data-v="${g}" data-grp="${g}" style="opacity:.8"><span class="lb"><small>${esc(T('all_in'))} ›</small></span></button></div>` : ''}${locks.join('')}</div></div>`;
+  }).join('');
+}
+function setDrawer(on) {
+  mount(); drawerOpen = on;
+  el.scrim.classList.toggle('on', on); el.drawer.classList.toggle('on', on);
+  syncBnav();
+}
+async function openDrawer() {
+  if (drawerOpen || !S.ctx) return;
+  mount(); await ensureStatic(); q = ''; sig = ''; renderDrawer();
+  try { history.pushState({ bosNav: 1 }, '', location.href); } catch (e) { /* ignore */ }
+  setDrawer(true);
+  requestAnimationFrame(() => { const cb = $('.dr-head button', el.drawer); if (cb) cb.focus(); });
+  counts().then((c) => { if (drawerOpen) dr_body(); return c; }, () => {});
+}
+function closeDrawer() {
+  if (!drawerOpen) return;
+  setDrawer(false);
+  try { if (history.state && history.state.bosNav) history.back(); } catch (e) { /* ignore */ }
+}
+window.addEventListener('popstate', () => {
+  if (drawerOpen) setDrawer(false);                 // hardware Back: close the drawer first
+  if (pendingRoute) { const r = pendingRoute; pendingRoute = null; location.hash = '#/' + r; }
+});
+window.addEventListener('hashchange', () => { countRoute(); if (drawerOpen) setDrawer(false); syncBnav(); });
+document.addEventListener('keydown', (e) => {
+  if (!drawerOpen) return;
+  if (e.key === 'Escape') { closeDrawer(); return; }
+  if (e.key === 'Tab') {   // keep focus inside the drawer
+    const f = [...el.drawer.querySelectorAll('button:not([disabled]),input')].filter((x) => x.offsetParent !== null || x === document.activeElement);
+    if (!f.length) return; const a = f[0], z = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === a) { e.preventDefault(); z.focus(); } else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); }
+  }
+});
+document.addEventListener('input', (e) => { if (e.target.id === 'nav_q') { q = e.target.value; queueSearch(); dr_body(); } if (e.target.id === 'pk_q') drawPicker(e.target.value); });
+window.addEventListener('online', netDot); window.addEventListener('offline', netDot);
+function netDot() { const d = $('#nav_net'), tx = $('#nav_nett'); if (!d) return; const on = navigator.onLine !== false; d.className = 'dot ' + (on ? 'ok' : 'bad'); tx.textContent = on ? T('online') : T('offline'); }
+
+// ---------- bottom nav ----------
+function hideBnav() {
+  const page = (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0];
+  return page === 'pos' || page === 'entry';
+}
+function syncBnav() {
+  if (!el.bnav) return;
+  const live = !!(S.ctx && S.ctx.profile && S.ctx.profile.status === 'active');
+  const show = live && !hideBnav();
+  document.body.classList.toggle('has-bnav', show);
+  if (!show) return;
+  const page = (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0], pos = canPos(), mode = npMode();
+  const cur = drawerOpen ? 'menu' : page === 'home' ? 'home' : page === 'pos' ? 'pos' : keyOfHash();
+  const b = (act, ic, lb, k, extra = '') => `<button data-act="${act}" ${cur === k ? 'aria-current="page"' : ''} ${extra}>${ic}<span>${esc(lb)}</span></button>`;
+  const posBtn = pos ? b('go', ico('pos'), t('pos'), 'pos', 'data-v="pos"') : mode === 'lock' ? `<button disabled aria-label="${esc(t('pos') + ' · ' + T('noperm'))}">${IC.lock}<span>${esc(t('pos'))}</span></button>` : '';
+  el.bnav.setAttribute('aria-label', T('menu'));
+  if (v2()) {
+    const cur2 = drawerOpen ? 'menu' : page === 'home' ? 'home' : keyOfHash();
+    const slB = (x) => x.kind === 'home' ? `<button data-act="go" data-v="home" ${cur2 === 'home' ? 'aria-current="page"' : ''}>${ic3('home')}<span>${esc(t('home'))}</span></button>`
+      : x.kind === 'menu' ? `<button data-act="nav_open" ${cur2 === 'menu' ? 'aria-current="page"' : ''}>${ic3('menu')}<span>${esc(T('menu'))}</span></button>`
+      : x.kind === 'me' ? `<button data-act="nav_me">${ic3('me')}<span>${esc(T('me'))}</span></button>`
+      : `<button data-act="go" data-v="${esc(x.route)}" data-slot="${esc(x.route)}" ${cur2 === 'r:' + x.route || location.hash === '#/' + x.route ? 'aria-current="page"' : ''}>${ico(x.icon, x.i3)}<span>${esc(x.label)}</span></button>`;
+    const bs = B.ia.barSlots(cx());   // [2 slots] [Sell orb in the centre when the person may sell] [2 slots]
+    const sellB = bs.centre ? `<button class="sell" data-act="go" data-v="pos" data-slot="pos" aria-label="${esc(T('sell'))}" ${location.hash === '#/pos' ? 'aria-current="page"' : ''}><span class="orb">${ic3('sell', 28) || ico('pos')}</span><span class="sl">${esc(T('sell'))}</span></button>` : '';
+    el.bnav.setAttribute('aria-label', T('menu')); el.bnav.innerHTML = bs.left.map(slB).join('') + sellB + bs.right.map(slB).join(''); return;
+  }
+  const sc = B.ia.bottom(cx()).map((r) => b('go', ico(r.icon, r.i3), B.ia.label(r), 'r:' + r.route, `data-v="${esc(r.route)}"`)).join('');   // best other shortcut for this role (priority in ia.js)
+  el.bnav.innerHTML = b('go', ic3('home'), t('home'), 'home', 'data-v="home"') + posBtn + sc + b('nav_open', ic3('menu'), T('menu'), 'menu') + b('nav_me', ic3('me'), T('me'), 'me');
+}
+
+// ---------- header bits (called from shell) ----------
+function menuBtn() { return `<button class="hbtn" data-act="nav_open" aria-label="${esc(T('menu'))}" aria-haspopup="dialog">${ic3('menu', 24)}</button>`; }
+function headExtra() {
+  const k = keyOfHash(), e = k !== 'r:home' ? byKey(k) : null;
+  if (k !== 'r:home' && !(e && e.ok) && !ownerBoardOk()) return '';
+  return `${B.notifications && B.notifications.badge ? B.notifications.badge() : ''}<button class="hbtn pin dots" id="hd_dots" data-act="nav_hmenu" aria-haspopup="menu" aria-label="${esc(T('more'))}">⋮</button>`;
+}
+function crumb() {
+  if (!S.ctx || !S.ctx.profile || S.ctx.profile.status !== 'active') return '';
+  const page = (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0];
+  if (page === 'home' || page === 'group') return '';
+  const e = byKey(keyOfHash()); if (!e || !e.ok) return '';
+  return `<nav class="crumb muted" aria-label="breadcrumb" style="font-size:.82rem;margin:2px 0 8px;display:flex;flex-wrap:wrap;gap:4px;align-items:center"><button data-act="go_group" data-v="${esc(e.g)}" style="background:none;border:0;padding:0 2px;min-height:44px;color:inherit;text-decoration:underline">${esc(B.ia.groupLabel(e.g))}</button><span aria-hidden="true">›</span><span>${esc(e.label)}</span></nav>`;
+}
+let syncUid = null;
+function sync(live) {
+  mount();
+  const who0 = live ? uid() : null;
+  if (who0 !== syncUid) { syncUid = who0; ITEMS_ALL = null; ITEMS_AT = 0; SR.items = []; SR.cust = []; SR.q = ''; CNT = null; }   // other person / logged out: no cached item list
+  if (!live) { setDrawer(false); document.body.classList.remove('has-bnav'); return; }
+  countRoute();
+  if (!FORMS) ensureStatic().then(() => { renderDrawer(); }, () => {});
+  if (drawerOpen) { sig = ''; renderDrawer(); }
+  else sig = '';
+  syncBnav();
+  if (B.announce && B.announce.tick) B.announce.tick();   // R2-A: the headline bar under the header (nothing at all while announce_on is OFF or nothing is addressed to this person)
+}
+
+// ---------- favourites: pin / unpin / order / label / hide - all from the ⋮ menus (no star buttons anywhere) ----------
+const dotsBtn = (key, where) => `<button class="st dots" data-act="nav_menu" data-v="${esc(key)}" data-w="${where}" aria-haspopup="menu" aria-label="${esc(T('more'))}">⋮</button>`;
+function togglePin(k) {
+  let p = pins();
+  if (!p.length) { const rd = roleDefaults(); if (rd.length) { p = rd.slice(); setPins(p); pushOrder(); } }   // first change: the role defaults become this person's own list
+  const i = p.indexOf(k);
+  if (i >= 0) p.splice(i, 1); else p.push(k);
+  setPins(p); afterPin(); pushPin(k, i < 0);
+}
+const visFavKeys = () => effPins().filter((k) => { const e = byKey(k); return e && e.ok && e.live && !isHidden(k); });
+function reorderFav(key, how) {
+  const all = effPins().slice(), vis = visFavKeys(), i = vis.indexOf(key); if (i < 0) return;
+  const j = Math.max(0, Math.min(vis.length - 1, how === 'top' ? 0 : how === 'bottom' ? vis.length - 1 : i + Number(how))); if (j === i) return;
+  const v2 = vis.slice(); v2.splice(i, 1); v2.splice(j, 0, key);
+  setPins([...v2, ...all.filter((k) => !vis.includes(k))]); afterPin(); pushOrder();
+}
+function resetOrder() {   // back to the order of the menu (registry), not the order of tapping
+  const idx = new Map(entries().map((e, n) => [e.key, n])); const p = effPins().slice().sort((a, b) => (idx.has(a) ? idx.get(a) : 1e9) - (idx.has(b) ? idx.get(b) : 1e9));
+  setPins(p); afterPin(); pushOrder();
+}
+function hideKey(k, on) {
+  const h = hiddenKeys().filter((x) => x !== k); if (on) h.push(k);
+  setHidden(h); afterPin(); pushMeta(k);
+}
+function renameSheet(k) {
+  const e = byKey(k); if (!e) return;
+  openSheet(`<h2>${esc(T('m_rename'))}</h2><div class="stack"><label for="rn_in">${esc(T('rn_t'))}</label><input id="rn_in" maxlength="40" autocomplete="off" value="${esc(labelsMap()[k] || '')}" placeholder="${esc(e.label)}"><p class="muted" style="margin:0;font-size:.85rem">${esc(T('rn_h'))}</p>
+    <button class="primary full" data-act="nav_rn_save" data-v="${esc(k)}">${esc(T('rn_save'))}</button></div>`);
+  setTimeout(() => { const i = $('#rn_in'); if (i) i.focus(); }, 30);
+}
+function copyLink(route) {
+  const url = location.origin + location.pathname + '#/' + route;
+  const done = () => A.toast(T('copied'));
+  try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(url).then(done, () => A.toast(url)); return; } } catch (e) { /* fall through */ }
+  A.toast(url);
+}
+// the ⋮ menu of one tile / drawer row / header: pin, order, label, hide, open, copy link, reset order
+function menuItems(key, where) {
+  const e = byKey(key); if (!e) return [];
+  const fav = isFav(key), vis = visFavKeys(), i = vis.indexOf(key), items = [];
+  items.push({ label: fav ? T('unpin') : T('pin'), onClick: () => togglePin(key) });
+  if (fav && i >= 0) items.push({ label: T('m_up'), disabled: i === 0, onClick: () => reorderFav(key, -1) }, { label: T('m_down'), disabled: i === vis.length - 1, onClick: () => reorderFav(key, 1) },
+    { label: T('m_top'), disabled: i === 0, onClick: () => reorderFav(key, 'top') }, { label: T('m_bottom'), disabled: i === vis.length - 1, onClick: () => reorderFav(key, 'bottom') });
+  items.push({ label: T('m_rename'), onClick: () => renameSheet(key) });
+  if (where !== 'header') {
+    items.push({ label: isHidden(key) ? T('m_unhide') : T('m_hide'), onClick: () => hideKey(key, !isHidden(key)) });
+    items.push({ label: T('m_open'), onClick: () => H.nav_go({ dataset: { v: e.route } }) });
+  }
+  items.push({ label: T('m_copy'), onClick: () => copyLink(e.route) }, { label: T('m_reset'), onClick: resetOrder });
+  return items;
+}
+function showMenu(title, items) {
+  const old = document.getElementById('nav_pop'); if (old) old.remove();
+  if (B.ctl && B.ctl.menu) { const t = B.ctl.menu({ label: title, items }); t.id = 'nav_pop'; t.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0'; document.body.appendChild(t); t.click(); return; }
+  navMenuItems = items;
+  openSheet(`<h2>${esc(title)}</h2><div class="stack">${items.map((it, n) => `<button class="full" data-act="nav_pick" data-i="${n}" ${it.disabled ? 'disabled' : ''}>${esc(it.label)}</button>`).join('')}</div>`);
+}
+let navMenuItems = [];
+// header ⋮: the page's own favourite actions, plus (Home) edit favourites / unhide / refresh, plus the owner-mode switch
+function headerItems() {
+  const k = keyOfHash(), home = k === 'r:home', e = home ? null : byKey(k), items = e && e.ok ? menuItems(k, 'header') : [];
+  if (home) {
+    items.push({ label: HS.favEdit ? T('fav_done') : T('fav_edit') + ' · ' + T('fav'), onClick: () => { HS.favEdit = !HS.favEdit; if ($('#hv_fav')) drawFav(); else H.nav_open(); } });
+    if (hiddenKeys().length) items.push({ label: T('m_unhide') + ' (' + hiddenKeys().length + ')', onClick: () => { const h = hiddenKeys(); setHidden([]); h.forEach(pushMeta); afterPin(); drawTiles(); } });
+    items.push({ label: T('m_reset'), onClick: resetOrder }, { label: T('m_refresh'), onClick: () => H.hv_refresh() });
+  }
+  if (ownerBoardOk()) items.push({ label: ownerModeOn() ? T('omode_off') : T('omode_on'), onClick: () => setOwnerMode(!ownerModeOn()) });
+  return items;
+}
+const ownerBoardOk = () => isOwner() && !!B.ia.byRoute('owner') && B.rule('owner_board_on', true) !== false;   // the screen itself (ownerboard.js) may load a moment after the first Home
+const ownerModeOn = () => { try { return ownerBoardOk() && !!B.ownerboard && store.get('bos_ownermode_' + uid()) === '1'; } catch (e) { return false; } };
+function setOwnerMode(on) {
+  try { store.set('bos_ownermode_' + uid(), on ? '1' : '0'); } catch (e) { /* ignore */ }
+  if ((location.hash.replace(/^#\/?/, '') || 'home').split('/')[0] === 'home') window.dispatchEvent(new HashChangeEvent('hashchange')); else location.hash = '#/home';
+}
+function afterPin() {
+  if ($('#nav_body')) dr_body();
+  if ($('#hv_fav')) drawFav(); if ($('#hv_tiles')) drawTiles(); if ($('#pk_list')) drawPicker(($('#pk_q') || {}).value || '');
+}
+function pickerSheet() {
+  openSheet(`<h2>${esc(T('pick'))}</h2><input id="pk_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" aria-label="${esc(T('search'))}"><div id="pk_list" style="margin:8px 0"></div>
+    <button class="full" data-act="closesheet">${esc(T('done'))}</button>`);
+  drawPicker('');
+}
+function drawPicker(v) {
+  const ql = (v || '').trim().toLowerCase(), box = $('#pk_list'); if (!box) return;
+  const list = entries().filter((e) => e.ok && e.live && e.key !== 'r:home' && (!ql || e.label.toLowerCase().includes(ql)));
+  box.innerHTML = list.map((e) => { const pin = isFav(e.key); return `<div class="pk-row" data-ctl="off"><span class="lb">${esc(lblOf(e))}</span>
+    <button class="mini pkb" data-act="nav_pin" data-v="${esc(e.key)}" aria-pressed="${pin}" style="min-height:44px;min-width:76px">${esc(pin ? '✓ ' + T('added') : '+ ' + T('add'))}</button></div>`; }).join('') || `<p class="muted center">${esc(T('nores'))}</p>`;
+}
+
+// ---------- Me sheet ----------
+function meSheet() {
+  const p = S.ctx.profile;
+  openSheet(`<h2>${esc(p.full_name || p.staff_id)} <span class="muted">· ${esc(p.staff_id)}</span></h2>
+    <div class="me-lang" style="margin:10px 0">${A.langBar()}</div>${themeSel('me_theme')}
+    <div class="stack"><button class="full" data-act="nav_reset">${esc(T('reset'))}</button>
+    <button class="full" data-act="logout">${esc(T('logout'))}</button><button class="full" data-act="closesheet">${esc(T('done'))}</button></div>`);
+}
+
+// ---------- Home v2 ----------
+const HS = { mode: null, period: null, data: null, dataFrom: null, favEdit: false };
+const dhaka = (d = new Date()) => d.toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
+const addDays = (iso, n) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+// first day of the fiscal year that contains iso: the same rule as the server (fiscal_year_start_month / _day; empty = 1 January)
+function fyStart(iso) {
+  const nn = (k, lo, hi) => { const v = Number(B.rule(k, null)); return B.rule(k, null) !== null && Number.isInteger(v) && v >= lo && v <= hi ? v : 1; };
+  const mm = nn('fiscal_year_start_month', 1, 12), dd = nn('fiscal_year_start_day', 1, 31), y = Number(iso.slice(0, 4));
+  const mk = (yy) => { const last = new Date(Date.UTC(yy, mm, 0)).getUTCDate(); return yy + '-' + String(mm).padStart(2, '0') + '-' + String(Math.min(dd, last)).padStart(2, '0'); };
+  const s0 = mk(y); return iso < s0 ? mk(y - 1) : s0;
+}
+function periodFrom(p) { const td = dhaka(); return p === 'day' ? td : p === 'week' ? addDays(td, -6) : p === 'month' ? td.slice(0, 8) + '01' : fyStart(td); }
+const money = (n) => '৳ ' + fmt(n);
+const sumOf = (a, k = 'total') => a.reduce((s, x) => s + Number(x[k] || 0), 0);
+const hdef = () => { if (!HS.mode) HS.mode = store.get('bos_hmode_' + uid()) === 'acc' ? 'acc' : 'biz'; if (!HS.period) HS.period = ['day', 'week', 'month', 'year'].includes(store.get('bos_hper_' + uid())) ? store.get('bos_hper_' + uid()) : 'day'; };
+
+async function home() {
+  const p = S.ctx.profile, own = isOwner(), ap = anyApprove();
+  hdef(); mount();
+  if (ownerModeOn()) return B.ownerboard.view({ home: true });   // Module E: the owner chose "Owner mode" as his Home
+  A.shell(t('app'), `<div class="hgreet"><b>${esc(T('hi'))}, ${esc(p.full_name || p.staff_id)}</b><span>${esc(p.staff_id)}</span></div>
+    <div id="hv_main"><p class="muted">${esc(t('loading'))}</p></div>`);
+  await ensureStatic();
+  if (!$('#hv_main')) return;
+  const cn = await counts().catch(() => ({}));   // 45 s cache; the refresh button forces
+  if (!$('#hv_main')) return;
+  const rows = [];
+  if (own) rows.push(['em', cn.em, 'warn', t('emergency'), 'emergency']);
+  if (ap) rows.push(['ex', cn.ex, 'bad', t('exceptions'), 'exceptions']);
+  if (own) rows.push(['rel', cn.rel, 'warn', t('releases'), 'releases'], ['stf', cn.stf, 'info', t('staff'), 'staff']);
+  if (P('ITEMS', 'approve')) rows.push(['itm', cn.itm, 'info', t('item_req'), 'itemreq']);
+  if (own || GF.list_manage) rows.push(['lq', cn.lq, 'info', t('lists'), 'lists']);
+  if (own || ctlOk()) rows.push(['loc', cn.loc, 'info', T('n_loc'), 'locations'], ['sd', cn.sd, 'info', T('n_sd'), 'locset']);
+  if (own) rows.push(['wst', cn.wst, 'warn', T('n_wst'), 'stock']);
+  if (own || GF.change_approve) rows.push(['chg', cn.chg, 'info', lab(L('বদলের অনুরোধ', 'Change requests', 'Change request')), 'changes']);
+  rows.push(['obx', cn.obx, 'warn', lab(L('ফোনে জমা (পাঠানো হয়নি)', 'Not sent yet', 'Phone-এ জমা')), 'outbox']);
+  const V2 = v2();
+  if (V2 && ap) rows.push(['pend', cn.pend, 'info', T('n_pend') + (cn.pendOld ? ' · ' + cn.pendOld : ''), 'pending']);
+  if (V2 && locOk()) rows.push(['low', cn.low, 'warn', T('n_low'), 'stock']);
+  const hot = rows.filter((r) => r[1]).slice(0, V2 ? 5 : 8);
+  const attn = ap || own || ctlOk() ? `<div class="hsec">${esc(T('attn'))}${hot.length ? `<small>${hot.reduce((s, r) => s + r[1], 0)}</small>` : ''}${V2 ? `<button class="mini" data-act="hv_refresh" aria-label="${esc(T('refresh'))}">↻</button>` : ''}</div>
+    <div class="card" style="padding:4px 12px">${hot.length ? hot.map((r) => `<button class="hrow mk ${r[2]}" data-act="go" data-v="${r[4]}"><span>${esc(r[3])}</span><span class="n">${r[1]}</span><span class="cv">›</span></button>`).join('')
+      : `<div class="dash-ok">${esc(V2 ? T('all_clear') : T('attn_ok'))}</div>`}${V2 && rows.filter((r) => r[1]).length > 5 ? `<button class="hrow" data-act="go" data-v="${own || ctlOk() ? 'control' : 'pending'}"><span>${esc(T('see_all'))}</span><span class="cv">›</span></button>` : ''}</div>` : (V2 && hot.length ? `<div class="hsec">${esc(T('attn'))}<small>${hot.reduce((s, r) => s + r[1], 0)}</small></div><div class="card" style="padding:4px 12px">${hot.map((r) => `<button class="hrow mk ${r[2]}" data-act="go" data-v="${r[4]}"><span>${esc(r[3])}</span><span class="n">${r[1]}</span><span class="cv">›</span></button>`).join('')}</div>` : '');
+  const sellBtn = P('POS', 'enter') ? `<button class="primary hbig sellbig" data-act="go" data-v="pos" data-sell="1">${ic3('sell', 34)}<span class="sb-t"><b>${esc(T('sell'))}</b><small>${esc(t('pos'))}</small></span></button>` : '';
+  const ownBtn = ownerBoardOk() ? `<button class="hbig ownbig" data-act="go" data-v="owner" data-owner="1">${ico('control', 'sliders', 34)}<span class="sb-t"><b>${esc(T('omode'))}</b><small>${esc(T('omode_d'))}</small></span></button>` : '';
+  const posBtn = sellBtn || ownBtn ? `<div class="hbigrow">${sellBtn}${ownBtn}</div>` : '';
+  if (V2) setTimeout(() => loadOldest(), 0);
+  if (own || GF.accounts_view || GF.accounts_manage) setTimeout(() => { const el = $('#hv_fresh'); if (el && B.freshness) B.freshness.mount(el); }, 0);   // W1-G: the "last posted at" strip (silent when the server has no phase 98)
+  setTimeout(() => { const el = $('#hv_tasks'); if (el && B.crmTasks) B.crmTasks.stripHTML().then((h) => { if (h) el.innerHTML = h; }).catch(() => {}); }, 0);   // bos326 (CRM-G): the My tasks strip (silent while tasks are off or nothing is due)
+  const r2t = !!(B.rule && B.rule('todo_on', false) === true);   // R2-B: the small to-do card (only while todo_on is ON, and only drawn when the person has something open)
+  if (r2t) setTimeout(() => { const el = $('#hv_todo'); if (el && B.todo) B.todo.mount(el); }, 0);
+  $('#hv_main').innerHTML = `${posBtn}<div id="hv_tasks"></div>${attn}${V2 ? '<div id="hv_oldest"></div>' : ''}${r2t ? '<div id="hv_todo"></div>' : ''}${own || GF.accounts_view || GF.accounts_manage ? '<div id="hv_fresh"></div>' : ''}${V2 ? '<div id="hv_sheets"></div><div id="hv_qa"></div><div class="hsec">' + esc(T('fav')) + favEditBtn() + '</div><div id="hv_fav"></div>' : ''}
+    <div class="seg" role="group" aria-label="${esc(T('biz') + ' / ' + T('acc'))}"><button data-act="hv_mode" data-v="biz" aria-pressed="${HS.mode === 'biz'}">${esc(T('biz'))}</button><button data-act="hv_mode" data-v="acc" aria-pressed="${HS.mode === 'acc'}">${esc(T('acc'))}</button></div>
+    <div class="ptabs" role="tablist" id="hv_pt"></div><div id="hv_stats"></div>
+    ${V2 ? '' : '<div id="hv_sheets"></div><div class="hsec">' + esc(T('fav')) + favEditBtn() + '</div><div id="hv_fav"></div>'}
+    <div class="hsec" id="hv_th"></div><div class="qgrid" id="hv_tiles"></div>
+    <div class="hsec">${esc(T('modules'))}</div><div class="grid" id="hv_mods"></div><div id="hv_ctl"></div>
+    <div class="hsec">${esc(T('cats'))}</div><div class="grid" id="hv_cats"></div>
+    <details class="acc" id="hv_forms"><summary>${esc(T('forms'))}</summary><div class="accb" id="hv_formsb"></div></details>
+    ${ap || canPos() ? `<details class="acc" id="hv_dt"><summary>${esc(T('detail'))}</summary><div class="accb"><div id="dash"></div></div></details>` : ''}`;
+  drawPeriod(); drawTiles(); drawFav(); drawMods(); drawCtl(); drawForms(); drawQuick(); drawCats();
+  const dt = $('#hv_dt'); if (dt) dt.addEventListener('toggle', () => { if (dt.open && B.dash) B.dash.render().catch(() => {}); });
+  loadStats(); loadSheets();
+}
+// ---------- staff home: today's sheets to fill (forms I may enter, at my place, in a mode that allows the app) ----------
+// the oldest waiting things this person may decide, oldest first (supabase/phase28.sql needs_you_oldest); nothing is shown when the function is missing or the list is empty
+async function loadOldest() {
+  const box = $('#hv_oldest'); if (!box) return;
+  let r; try { r = await sb.rpc('needs_you_oldest', { p_limit: 5 }); } catch (e) { return; }
+  const ny = r && !r.error && Array.isArray(r.data) ? r.data : []; if (!ny.length || !$('#hv_oldest')) return;
+  const KL = { entry: L('ফর্ম', 'Form', 'Form'), release: L('ছাড়ের অনুরোধ', 'Release request', 'Release request'), emergency: L('জরুরি অনুরোধ', 'Emergency request', 'Emergency request'), item_change: L('আইটেম বদল', 'Item change', 'Item change'),
+    staff: L('নতুন স্টাফ', 'New staff', 'নতুন staff'), wastage: L('নষ্ট মাল', 'Wastage', 'Wastage'), parallel: L('পাশাপাশি মাসের সিদ্ধান্ত', 'Parallel month decision', 'Parallel মাসের সিদ্ধান্ত') };
+  const age = (s) => { const h = Math.max(0, Math.round((Date.now() - new Date(s).getTime()) / 3600000)); return h >= 48 ? Math.floor(h / 24) + (S.lang === 'en' ? ' d' : ' দিন') : h + (S.lang === 'en' ? ' h' : ' ঘণ্টা'); };
+  box.innerHTML = `<div class="hsec">${esc(lab(L('পুরনো আগে', 'Oldest first', 'পুরনো আগে')))}</div><div class="card" style="padding:4px 12px">${ny.map((x) =>
+    `<button class="hrow mk warn" ${x.kind === 'entry' ? `data-act="openentry" data-v="${esc(x.id)}"` : `data-act="go" data-v="${esc(x.route)}"`}><span>${esc(lab(KL[x.kind] || KL.entry))} · ${esc(x.label || '')}</span><span class="n">${esc(age(x.since))}</span><span class="cv">›</span></button>`).join('')}</div>`;
+}
+async function loadSheets() {
+  const box = $('#hv_sheets'); if (!box) return;
+  if (isOwner() || !FORMS) { box.innerHTML = ''; return; }
+  const only = String(B.rule('home_daily_forms', '') || '').split(/[\s,;]+/).filter(Boolean);
+  let list = FORMS.filter((f) => f.enabled !== false && f.area !== 'master' && f.code !== 'POS' && f.code !== '0-1' && P(f.code, 'enter') && B.forms && B.forms[f.code]);
+  if (only.length) list = list.filter((f) => only.includes(f.code));
+  if (!list.length) { box.innerHTML = ''; return; }
+  const cl = curLoc(), locs = locChoices().map((l) => l.id), ids = cl !== null ? [cl] : locs;
+  if (!ids.length) { box.innerHTML = ''; return; }
+  const td = dhaka(), key = td + '|' + ids.join(',');
+  let ents = [], roll = [];
+  try { const r = await sb.from('entries').select('form_code,location_id,status').eq('entry_date', td).in('location_id', ids).limit(1000); ents = r && !r.error ? r.data || [] : []; } catch (e) { ents = []; }
+  try { const r = await sb.from('form_rollout').select('form_code,location_id,mode').in('location_id', ids); roll = r && !r.error ? r.data || [] : []; } catch (e) { roll = []; }   // table missing / not readable: every place counts as app
+  if (!$('#hv_sheets') || key !== td + '|' + (cl !== null ? [cl] : locChoices().map((l) => l.id)).join(',')) return;
+  const rank = { done: 0, draft: 1, rej: 2, pending: 3, paper: 4 };
+  const rows = [];
+  list.forEach((f) => ids.forEach((id) => {
+    const mode = (roll.find((x) => x.form_code === f.code && x.location_id === id) || {}).mode || 'app';
+    const mine = ents.filter((x) => x.form_code === f.code && x.location_id === id);
+    let st = mode === 'paper' ? 'paper' : 'pending';
+    if (mode !== 'paper') { if (mine.some((x) => x.status === 'submitted' || x.status === 'approved')) st = 'done'; else if (mine.some((x) => x.status === 'draft')) st = 'draft'; else if (mine.some((x) => x.status === 'rejected')) st = 'rej'; }
+    rows.push({ f, id, st });
+  }));
+  rows.sort((a, b) => (a.st === 'done') - (b.st === 'done') || (a.st === 'paper') - (b.st === 'paper') || String(a.f.code).localeCompare(String(b.f.code), 'en', { numeric: true }));
+  const done = rows.filter((r) => r.st === 'done').length, app = rows.filter((r) => r.st !== 'paper').length;
+  const chipCls = { done: 'ok', pending: 'warn', draft: 'info', rej: 'bad', paper: '' };
+  const lname = (id) => { const l = (B.ENV && B.ENV.locs || []).find((x) => x.id === id); return l ? nm(l) : ''; };
+  box.innerHTML = `<div class="hsec">${esc(T('sheets'))}<small>${done}/${app} ${esc(T('sheets_of'))}</small></div>
+    <div class="card" style="padding:4px 12px">${rows.map((r) => `<button class="hrow" data-act="openform" data-v="${esc(r.f.code)}" ${r.st === 'paper' ? 'style="opacity:.7"' : ''}><span><b>${esc(r.f.code)}</b> · ${esc(nm(r.f))}${ids.length > 1 ? ` <small class="muted">${esc(lname(r.id))}</small>` : ''}</span><span class="chip ${chipCls[r.st]}">${esc(T('st_' + r.st))}</span><span class="cv">›</span></button>`).join('')}
+    ${only.length ? '' : `<p class="muted" style="font-size:.85rem;margin:6px 0">${esc(T('sheets_hint'))}</p>`}</div>`;
+}
+function drawPeriod() {
+  const b = $('#hv_pt'); if (!b) return;
+  b.innerHTML = [['day', 'p_day'], ['week', 'p_week'], ['month', 'p_month'], ['year', 'p_year']].map(([k, l]) => `<button role="tab" data-act="hv_period" data-v="${k}" aria-selected="${HS.period === k}">${esc(T(l))}</button>`).join('');
+}
+async function loadStats() {
+  const box = $('#hv_stats'); if (!box) return;
+  if (!canPos()) { box.innerHTML = ''; return; }
+  const from = periodFrom(HS.period), key = from + '|' + uid();
+  box.innerHTML = `<p class="muted">${esc(t('loading'))}</p>`;
+  if (!HS.data || HS.dataFrom !== key) {
+    const qq = (x) => x.then((r) => (r && !r.error ? r.data || [] : []), () => []);
+    const [s, pay, dues] = await Promise.all([qq(sb.rpc('sales_summary', { p_from: from })), qq(sb.rpc('payments_summary', { p_from: from })), qq(sb.rpc('customer_dues'))]);
+    HS.data = { s, pay, dues }; HS.dataFrom = key;
+  }
+  drawStats();
+}
+function drawStats() {
+  const box = $('#hv_stats'); if (!box || !HS.data) return;
+  const from = periodFrom(HS.period), td = dhaka();
+  const rows = (HS.data.s || []).map((r) => ({ ...r, total: Number(r.total || 0), discount: Number(r.discount || 0), n: Number(r.n || 0), due: Number(r.due || 0) })).filter((r) => r.status === 'done' && r.sale_date >= from && r.sale_date <= td && (curLoc() === null || r.location_id === curLoc()));
+  const stat = (k, v, s, cls = '', wide = '') => `<div class="stat ${cls ? "mk " + cls : ""} ${wide}"><div class="k">${esc(k)}</div><div class="v">${v}</div>${s ? `<div class="s">${esc(s)}</div>` : ''}</div>`;
+  if (HS.mode === 'biz') {
+    const locs = ((B.ENV && B.ENV.locs) || []).filter((l) => isOwner() || (S.ctx.roles || []).includes('management') || (S.ctx.locations || []).includes(l.id));
+    let h = stat(T('sales'), money(sumOf(rows)), rows.reduce((s, r) => s + r.n, 0) + ' ' + T('cnt'), '', 'wide')
+      + stat(T('disc'), money(sumOf(rows, 'discount')), '') + stat(T('due_p'), money(sumOf(rows, 'due')), '', sumOf(rows, 'due') > 0 ? 'warn' : '');
+    if (locs.length > 1) h += `<div class="stat wide"><div class="k">${esc(T('perloc'))}</div>${locs.map((l) => `<div class="row" style="justify-content:space-between;min-height:36px"><span>${esc(nm(l))}</span><b>${money(sumOf(rows.filter((r) => r.location_id === l.id)))}</b></div>`).join('')}
+      <div class="row" style="justify-content:space-between;border-top:1px solid var(--hair);min-height:36px"><b>${esc(T('total'))}</b><b>${money(sumOf(rows))}</b></div></div>`;
+    box.innerHTML = `<div class="stats">${h}</div>`;
+  } else {
+    const pay = (m) => (HS.data.pay || []).filter((x) => x.mode === m && (!x.pay_date || x.pay_date >= from)).reduce((s, x) => s + Number(x.total || 0), 0);
+    const dueAll = (HS.data.dues || []).reduce((s, c) => s + Number(c.balance || 0), 0);
+    box.innerHTML = `<div class="stats">${stat(T('cash'), money(pay('cash')), '')}${stat(T('digital'), money(pay('mobile') + pay('card')), '')}
+      ${stat(T('due_all'), `<span class="${dueAll > 0 ? 'amt-bad' : ''}">${money(dueAll)}</span>`, '', dueAll > 0 ? 'bad' : '', 'wide')}</div>`;
+  }
+}
+function tileDefs() {
+  const lbl = B.ia.HOME_LABEL, mode = HS.mode;
+  return B.ia.homeKeys(mode).map((key) => (lbl[key] && lbl[key][mode] ? { key, label: () => T(lbl[key][mode]) } : { key }));
+}
+function tile(e, o = {}) {
+  const c = e.cnt && CNT && CNT[e.cnt], ed = o.fav && HS.favEdit && isFav(e.key);
+  return `<div class="qt ${ed ? 'edit' : ''}"><button class="qm" data-act="go" data-v="${esc(e.route)}">${ico(e.icon, e.rec && e.rec.i3)}<span class="lb">${esc(labelsMap()[e.key] || o.label || e.label)}</span>${c ? `<span class="dot ${e.tone || 'warn'}"></span>` : ''}</button>
+    ${dotsBtn(e.key, 'tile')}${ed ? `<div class="fedit" data-ctl="off"><button data-act="fav_mv" data-v="${esc(e.key)}" data-d="-1" aria-label="${esc(T('m_up'))}">↑</button><button data-act="fav_mv" data-v="${esc(e.key)}" data-d="1" aria-label="${esc(T('m_down'))}">↓</button><button data-act="fav_rm" data-v="${esc(e.key)}" aria-label="${esc(T('unpin'))}">✕</button></div>` : ''}</div>`;
+}
+const favEditBtn = () => `<button class="mini" id="hv_favedit" data-act="fav_edit" aria-pressed="${HS.favEdit}">${esc(HS.favEdit ? T('fav_done') : T('fav_edit'))}</button>`;
+function drawTiles() {
+  const box = $('#hv_tiles'), hd = $('#hv_th'); if (!box) return;
+  hd.textContent = T(HS.mode === 'biz' ? 'tiles_biz' : 'tiles_acc');
+  const mode = npMode();
+  box.innerHTML = tileDefs().map((d) => {
+    if (d.soon) return `<div class="qt soon"><div class="qm" aria-disabled="true"><span class="lb">${esc(T(d.soon))}</span><span class="chip">${esc(T('soon'))}</span></div></div>`;
+    if (isHidden(d.key)) return '';   // "Hide from Home" (⋮ menu)
+    const e = byKey(d.key);
+    if (!e) return mode === 'lock' && d.key.startsWith('f:') ? '' : '';   // form not in the forms table at all: nothing to show
+    if (!e.live) return `<div class="qt soon"><div class="qm" aria-disabled="true"><span class="lb">${esc(e.label)}</span><span class="chip">${esc(T('soon'))}</span></div></div>`;
+    if (!e.ok) return mode === 'lock' ? `<div class="qt lock"><div class="qm" aria-disabled="true">${IC.lock}<span class="lb">${esc(d.label ? d.label() : e.label)}</span><span class="chip">${esc(T('noperm'))}</span></div></div>` : '';
+    return tile(e, d.label ? { label: d.label() } : {});
+  }).join('') + topUpTiles();
+}
+// role-relevant extras (priority in ia.js) when fewer than 8 tiles are usable for this person
+function topUpTiles() {
+  const have = tileDefs().filter((d) => { const e = byKey(d.key); return e && e.ok && e.live; }).length;
+  return B.ia.topUp(HS.mode, cx(), have, 8).map((k) => { const e = byKey(k); return e && e.ok && e.live && !isHidden(k) ? tile(e) : ''; }).join('');
+}
+function drawFav() {
+  const box = $('#hv_fav'); if (!box) return;
+  const pinned = visFavKeys().map(byKey);
+  const u = usage(), pk = new Set(effPins());
+  const used = Object.keys(u).filter((k) => !pk.has(k) && !isHidden(k)).sort((a, b) => u[b] - u[a]).map(byKey).filter((e) => e && e.ok && e.live && e.key !== 'r:home').slice(0, Math.max(4, 8 - pinned.length));
+  const add = `<div class="qt"><button class="qm" data-act="nav_picker">${IC.plus}<span class="lb">${esc(T('add'))}</span></button></div>`;
+  const fb = $('#hv_favedit'); if (fb) { fb.textContent = HS.favEdit ? T('fav_done') : T('fav_edit'); fb.setAttribute('aria-pressed', HS.favEdit); }
+  box.innerHTML = (pinned.length || used.length ? '' : `<p class="muted" style="margin:0 0 10px">${esc(T('fav_empty'))}</p>`) + `<div class="qgrid">${pinned.map((e) => tile(e, { fav: true })).join('')}${used.map((e) => tile(e, { fav: true })).join('')}${add}</div>`;
+}
+function drawMods() {
+  const box = $('#hv_mods'); if (!box) return;
+  const cn = CNT || {}, mode = npMode();
+  const order = B.ia.modules().map((r) => r.route);
+  const lockable = new Set(['pos', 'dues', 'biz', 'items']);
+  box.innerHTML = order.map((k) => {
+    const e = byKey('r:' + k); if (!e) return '';
+    if (!e.ok) return mode === 'lock' && lockable.has(k) ? `<div class="lockcard">${IC.lock}<span>${esc(e.label)} · ${esc(T('noperm'))}</span></div>` : '';
+    const c = e.cnt && cn[e.cnt];
+    return `<button class="tile" data-act="go" data-v="${esc(e.route)}">${ico(e.icon, e.rec && e.rec.i3)}<span>${esc(e.label)}</span>${c ? `<span class="badge">${c}</span>` : ''}</button>`;
+  }).join('');
+}
+function drawCtl() {
+  const box = $('#hv_ctl'); if (!box) return;
+  const e = byKey('r:control'); if (!e || !e.ok) { box.innerHTML = ''; return; }
+  const c = (CNT && CNT.ctl) || 0;
+  box.innerHTML = `<button class="tile t-ink" data-act="go" data-v="control" style="width:100%;margin-top:12px;min-height:76px;flex-direction:row;align-items:center;justify-content:flex-start">${ico('control', 'sliders', 30)}<span style="flex:1;text-align:start"><b>${esc(T('ctl'))}</b><br><small>${esc(T('ctl_d'))}</small></span>${c ? `<span class="badge">${c}</span>` : ''}</button>`;
+}
+function drawQuick() {   // quick actions only: the "Recent" block is gone from Home (Module E)
+  const qa = $('#hv_qa'); if (!qa || !v2()) return;   // switch OFF = the old Home
+  const acts = B.ia.quickActions(cx());
+  qa.innerHTML = acts.length ? `<div class="hsec">${esc(T('qa'))}</div><div class="qgrid" id="hv_qgrid">${acts.map((a) => `<div class="qt"><button class="qm" data-act="go" data-v="${esc(a.route)}" data-quick="${esc(a.route)}">${ico(a.icon, a.i3)}<span class="lb">${esc(a.label)}</span></button></div>`).join('')}</div>` : '';
+}
+function drawCats() {
+  const box = $('#hv_cats'); if (!box) return;
+  const all = entries().filter((e) => e.live && e.ok && e.drawer), cn = CNT || {};
+  box.innerHTML = GROUPS.filter((g) => g !== 'dash').map((g) => {
+    const l = all.filter((e) => e.g === g); if (!l.length) return '';
+    const n = l.reduce((s2, e) => s2 + (e.cnt && cn[e.cnt] && e.cnt !== 'ctl' ? cn[e.cnt] : 0), 0);
+    return `<button class="tile" data-act="go_group" data-v="${g}" data-cat="${g}">${ico(l[0].icon, 'g:' + g)}<span>${esc(B.ia.groupLabel(g))}</span>${n ? `<span class="badge">${n}</span>` : ''}</button>`;
+  }).join('');
+}
+function drawForms() {
+  const box = $('#hv_formsb'); if (!box) return;
+  const mine = (FORMS || []).filter((f) => f.area !== 'master' && f.code !== 'POS' && P(f.code, 'view') && !isOwnerFormHidden(f));
+  const AREAS = ['showroom', 'cash', 'stock', 'purchase', 'factory', 'sales', 'staff', 'assets', 'owner', 'settings'];
+  const by = AREAS.map((a) => [a, mine.filter((f) => f.area === a)]).filter(([, l]) => l.length);
+  box.innerHTML = by.length ? by.map(([a, l]) => `<h3 style="margin:12px 0 4px">${esc(t('area_' + a))}</h3>${l.map((f) => {
+    const pr = perms()[f.code] || {}, live = f.code === '0-1' ? isOwner() : (B.forms && B.forms[f.code]);
+    return `<div class="perm"><div class="row between" ${live ? `data-act="openform" data-v="${f.code}" style="cursor:pointer;min-height:44px"` : 'style="opacity:.6"'}><span><b>${esc(f.code)}</b> · ${esc(nm(f))}</span><span class="row">${
+      live ? '' : `<span class="chip">${esc(t('soon'))}</span>`}${pr.enter ? `<span class="chip ok">${esc(t('can_enter'))}</span>` : `<span class="chip">${esc(t('can_view'))}</span>`}${pr.approve ? `<span class="chip warn">${esc(t('can_approve'))}</span>` : ''}</span></div></div>`; }).join('')}`).join('')
+    : `<p class="muted">${esc(t('no_forms'))}</p>`;
+}
+const isOwnerFormHidden = () => false;
+
+// ---------- category page (#/group/<id>): every screen of one category the person may open, with counts and quick actions ----------
+async function viewGroup() {
+  mount();
+  const g = (location.hash.replace(/^#\/?/, '').split('/')[1] || ''), grp = B.ia.groupOf(g), title = grp ? B.ia.groupLabel(g) : T('menu');
+  A.shell(title, B.ui.state('loading'), true);
+  await ensureStatic(); const cn = await counts().catch(() => ({}));
+  if (!$('#app') || !grp) return grp ? null : A.shell(title, B.ui.state('empty', T('emptyg')), true);
+  const mode = npMode(), all = entries().filter((e) => e.live && e.kind === 'r' && (e.g === g || (e.rec.also || []).includes(g)));
+  const okL = all.filter((e) => e.ok), bad = all.filter((e) => !e.ok);
+  const main = okL.filter((e) => e.rec.parent === undefined), subs = okL.filter((e) => e.rec.parent !== undefined);
+  const c = cx();
+  const rowF = (e) => { const n = e.cnt && cn[e.cnt]; return `<div class="row between"><button class="hrow ${n ? 'mk ' + (e.tone || 'warn') : ''}" style="flex:1" data-act="go" data-v="${esc(e.route)}" data-ia="${esc(e.route)}"><span>${esc(e.label)}</span>${n ? `<span class="n">${n}</span>` : ''}<span class="cv">›</span></button></div>` + (e.rec.qa || []).filter((a) => !a.ok || a.ok(c)).map((a) => `<button class="tog" style="margin:0 0 6px 12px" data-act="go" data-v="${esc(a.route)}">＋ ${esc(lab(L(a.label[0], a.label[1], a.label[2])))}</button>`).join(''); };
+  const forms = (FORMS || []).filter((f) => f.area !== 'master' && f.code !== 'POS' && AREA_G[f.area] === g && P(f.code, 'view') && (f.code === '0-1' ? isOwner() : !!(B.forms && B.forms[f.code])));
+  const body = main.map(rowF).join('') + (subs.length ? `<div class="hsec">${esc(T('set2'))}</div>${subs.map(rowF).join('')}` : '')
+    + (forms.length ? `<div class="hsec">${esc(T('forms'))}</div>${forms.map((f) => `<button class="hrow" data-act="openform" data-v="${esc(f.code)}"><span><b>${esc(f.code)}</b> · ${esc(nm(f))}</span><span class="cv">›</span></button>`).join('')}` : '')
+    + (mode === 'lock' && bad.length ? bad.map((e) => `<div class="dr-i lock">${IC.lock}<span>${esc(e.label)} · ${esc(T('noperm'))}</span></div>`).join('') : '');
+  A.shell(title, body ? `<div class="card" style="padding:4px 12px">${body}</div>` : B.ui.state('empty', T('emptyg')), true);
+}
+window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { group: viewGroup });
+
+// ---------- handlers ----------
+Object.assign(H, {
+  nav_open: () => openDrawer(),
+  nav_close: () => closeDrawer(),
+  nav_go: (a) => {
+    const r = a.dataset.v;
+    if (history.state && history.state.bosNav) { pendingRoute = r; closeDrawer(); } else { setDrawer(false); location.hash = '#/' + r; }
+  },
+  nav_grp: (a) => { const og = groupOpen(), g = a.dataset.v; og[g] = !og[g]; store.set('bos_navg_' + uid(), JSON.stringify(og)); dr_body(); },
+  nav_pin: (a) => togglePin(a.dataset.v),
+  nav_menu: (a) => { const e = byKey(a.dataset.v); showMenu(e ? lblOf(e) : T('more'), menuItems(a.dataset.v, a.dataset.w)); },
+  nav_hmenu: () => { const it = headerItems(); if (it.length) showMenu(T('more'), it); },
+  nav_pick: (a) => { closeSheet(); const it = navMenuItems[Number(a.dataset.i)]; if (it && it.onClick) it.onClick(); },
+  nav_rn_save: (a) => { const k = a.dataset.v, v = (($('#rn_in') || {}).value || '').trim().slice(0, 40), m = labelsMap(); if (v) m[k] = v; else delete m[k]; setLabels(m); closeSheet(); pushMeta(k); afterPin(); },
+  fav_edit: () => { HS.favEdit = !HS.favEdit; drawFav(); },
+  fav_mv: (a) => reorderFav(a.dataset.v, a.dataset.d),
+  fav_rm: (a) => togglePin(a.dataset.v),
+  go_group: (a) => { const r = 'group/' + a.dataset.v; if (drawerOpen) H.nav_go({ dataset: { v: r } }); else location.hash = '#/' + r; },
+  hv_refresh: () => { CNT = null; HS.data = null; home(); },
+  ia_retry: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
+  nav_picker: pickerSheet,
+  nav_me: meSheet,
+  nav_reset: () => { store.set('bos_pins_' + uid(), '[]'); store.set('bos_use_' + uid(), '{}'); setHidden([]); setLabels({}); setFavQ([]); okRes(sb.from('user_favourites').delete().eq('user_id', uid())).catch(() => {}); closeSheet(); afterPin(); },
+  hv_mode: (a) => { HS.mode = a.dataset.v; store.set('bos_hmode_' + uid(), HS.mode); document.querySelectorAll('.seg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === HS.mode)); drawTiles(); drawStats(); },
+  hv_period: (a) => { HS.period = a.dataset.v; store.set('bos_hper_' + uid(), HS.period); drawPeriod(); loadStats(); },
+});
+// a language switch re-renders the page (route) but the drawer footer lives outside #app: sync() rebuilds it
+const prevLang = H.lang;
+H.lang = (a) => { sig = ''; return prevLang(a); };
+
+// ---------- Module E styles (⋮ buttons, favourites edit row, Owner mode button next to Sell) ----------
+(() => {
+  if (document.getElementById('nav_e_css')) return; const st = document.createElement('style'); st.id = 'nav_e_css';
+  st.textContent = `.st.dots{font-size:1.35rem;font-weight:700;line-height:1;color:var(--muted)}.hbtn.dots{font-size:1.5rem;font-weight:700;min-width:44px;min-height:44px}
+  .hbigrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:0 0 4px}body .hbigrow>.hbig.hbig{margin:0}.hbigrow:empty{display:none}
+  .hbig.ownbig{display:flex;align-items:center;justify-content:center;gap:12px;min-height:68px;width:100%;background:var(--card);color:var(--ink);border:1px solid var(--hair)}.hbig.ownbig svg{width:34px;height:34px;flex:none;color:var(--ink-2)}.hbig.ownbig .sb-t{display:flex;flex-direction:column;align-items:flex-start;line-height:1.3;text-align:start}.hbig.ownbig .sb-t b{font-size:1.05rem}.hbig.ownbig .sb-t small{opacity:.85}
+  .qt.edit{flex-direction:column}.qt.edit>.qm{padding-inline-end:38px}.qt .fedit{display:flex;border:1px solid var(--hair);border-top:0;border-radius:0 0 14px 14px;background:var(--card)}
+  .qt .fedit button{flex:1;min-height:44px;border:0;background:transparent;color:var(--ink);font-size:1.1rem}.pk-row{display:flex;align-items:center;gap:8px;min-height:48px}.pk-row .lb{flex:1;min-width:0;overflow-wrap:anywhere}`;
+  document.head.appendChild(st);
+})();
+
+B.curLoc = curLoc; B.setCurLoc = setCurLoc; B.fyStart = fyStart;
+window.BOS_NAV = { loadSheets, curLoc, fyStart, grantFlags: () => GF, ctlOk, menuBtn, headExtra, crumb, sync, home, open: openDrawer, close: closeDrawer, pins, usage, togglePin, reorderFav, resetOrder, hideKey, hidden: hiddenKeys, labels: labelsMap, menuItems, setOwnerMode, ownerModeOn, entries: () => entries().filter((e) => e.live), syncFavs };
+})();

@@ -1,1 +1,313 @@
-(()=>{"use strict";const e=window.BOS_APP,t=window.BOS,{sb:a,S:n,esc:l,toast:i,fail:o,shell:s,H:d,nm:r,openSheet:c,closeSheet:_}=e,u=t.L,p=t.lab,m=(e,t=document)=>t.querySelector(e),b=()=>(new Date).toLocaleDateString("en-CA",{timeZone:"Asia/Dhaka"}),v=(e,t)=>{const a=new Date(e+"T00:00:00Z");return a.setUTCDate(a.getUTCDate()+t),a.toISOString().slice(0,10)},$=e=>{const t=String(e??"").replace(/[০-৯]/g,e=>"০১২৩৪৫৬৭৮৯".indexOf(e)).replace(/,/g,"").trim();if(""===t)return NaN;const a=Number(t);return Number.isFinite(a)?a:NaN},f=e=>"৳ "+(Math.round(100*Number(e||0))/100).toLocaleString("en-US"),y=()=>crypto.randomUUID?crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,e=>{const t=16*Math.random()|0;return("x"===e?t:3&t|8).toString(16)}),x=()=>{const e=t.liveLocs?t.liveLocs(t.ENV&&t.ENV.locs||[]):t.ENV&&t.ENV.locs||[];return n.ctx.is_owner||(n.ctx.roles||[]).includes("management")?e:e.filter(e=>(n.ctx.locations||[]).includes(e.id))},h=(e,t)=>`<select id="${e}">${x().map(e=>`<option value="${e.id}" ${String(e.id)===String(t)?"selected":""}>${l(r(e))}</option>`).join("")}</select>`,w={oTitle:u("অনলাইন অর্ডার","Online orders","Online অর্ডার"),fTitle:u("ফর্ম 20-১/২/৪ ↔ সেল","Forms 20-1 / 2 / 4 ↔ sales","Form 20-1/2/4 ↔ sale"),bTitle:u("কর্মচারীর সুবিধা (রিপোর্ট)","Employee benefits (report)","Employee সুবিধা (report)"),eTitle:u("BI এক্সপোর্ট","BI export","BI export"),place:u("জায়গা","Place","Place"),status:u("অবস্থা","Status","Status"),all:u("সব","All","All"),new_:u("নতুন অর্ডার","New order","নতুন Order"),confirm:u("নিশ্চিত","Confirm","Confirm"),pack:u("প্যাক হয়েছে","Packed","Packed"),deliver:u("ডেলিভারি দিন","Deliver","Deliver"),cancel:u("ক্যান্সেল","Cancel","Cancel"),link:u("আগের সেলের সাথে জুড়ুন","Link an existing sale","আগের sale-এর সাথে জুড়ুন"),edit:u("বদলান","Edit","Edit"),s_new:u("নতুন","New","New"),s_confirmed:u("নিশ্চিত","Confirmed","Confirmed"),s_packed:u("প্যাক","Packed","Packed"),s_delivered:u("ডেলিভারি হয়েছে","Delivered","Delivered"),s_cancelled:u("ক্যান্সেল","Cancelled","Cancelled"),name:u("কাস্টমারের নাম","Customer name","Customer নাম"),mobile:u("মোবাইল","Mobile","Mobile"),addr:u("ঠিকানা","Address","Address"),channel:u("মাধ্যম","Channel","Channel"),dmode:u("ডেলিভারি","Delivery","Delivery"),pickup:u("দোকান থেকে নেবে","Pick up","Pickup"),home:u("হোম ডেলিভারি","Home delivery","Home delivery"),courier:u("কুরিয়ার","Courier","Courier"),ddate:u("ডেলিভারির ডেট","Delivery date","Delivery date"),charge:u("ডেলিভারি চার্জ","Delivery charge","Delivery charge"),disc:u("ডিসকাউন্ট","Discount","Discount"),adv:u("অ্যাডভান্স","Advance","Advance"),advm:u("অ্যাডভান্স কীভাবে","Advance paid by","Advance কীভাবে"),note:u("নোট","Note","Note"),cash:u("ক্যাশ","Cash","Cash"),mobileP:u("মোবাইল ব্যাংকিং","Mobile money","Mobile money"),card:u("কার্ড","Card","Card"),items:u("আইটেম","Items","Items"),addLine:u("+ আইটেম যোগ","+ Add item","+ Item যোগ"),qty:u("Qty","Qty","Qty"),save:u("সেভ","Save","Save"),saved:u("সেভ হয়েছে","Saved","Saved"),total:u("টোটাল","Total","Total"),balance:u("বাকি","Balance","Balance"),collect:u("এখন কত টাকা নিলেন","Collected now","এখন কত নিলেন"),payBy:u("কীভাবে","By","By"),none:u("কিছু নেই ✓","Nothing ✓","কিছু নেই ✓"),reason:u("কারণ লিখুন","Write the reason","কারণ লিখুন"),fate:u("অ্যাডভান্সের কী হবে","What happens to the advance","Advance-এর কী হবে"),refund:u("ফেরত","Refund","Refund"),adjust:u("সমন্বয়","Adjust","Adjust"),income:u("ব্যবসার আয়ে","To income","Income-এ"),receipt:u("রসিদ","Receipt","Receipt"),pickSale:u("কোন সেল","Which sale","কোন sale"),done:u("হয়ে গেছে","Done","Done"),from:u("থেকে","From","From"),to:u("পর্যন্ত","To","To"),show:u("দেখুন","Show","Show"),unl:u("সেলের সাথে জোড়া হয়নি","Not linked to a sale","Sale-এর সাথে জোড়া হয়নি"),lnk:u("জোড়া আছে","Linked","Linked"),cand:u("সম্ভাব্য সেল","Candidate sales","Candidate sales"),doLink:u("জুড়ুন","Link","Link"),unlink:u("জোড়া খুলুন","Unlink","Unlink"),diff:u("অঙ্কের তফাত","Amount difference","Amount তফাত"),customer:u("কাস্টমার","Customer","Customer"),asof:u("যে তারিখের হিসাবে","As of","As of"),ben:u("সুবিধার তালিকা","Grants","Grants"),miss:u("পাওনা কিন্তু দেওয়া হয়নি","Eligible but not granted","Eligible, grant নেই"),endIt:u("সুবিধা শেষ করুন","End this grant","Grant শেষ করুন"),notyet:u("এখনো প্রাপ্য নয়","Not yet eligible","Not yet"),eligible:u("প্রাপ্য","Eligible","Eligible"),ended:u("শেষ","Ended","Ended"),paid:u("বেতনের সাথে","Paid in payroll","Payroll-এ"),val:u("মাসিক মূল্য","Value / month","Value / month"),reportOnly:u("শুধু রিপোর্ট — বেতনের হিসাব বদলায় না।","Report only - payroll maths is not changed.","শুধু report - payroll হিসাব বদলায় না।"),addGrant:u("সুবিধা দিন","Grant a benefit","Benefit দিন"),emp:u("কর্মচারী","Employee","Employee"),type:u("ধরন","Type","Type"),fromD:u("শুরুর ডেট","From date","From date"),dataset:u("কী এক্সপোর্ট","What to export","কী export"),format:u("ফরম্যাট","Format","Format"),limit:u("সর্বোচ্চ সারি","Max rows","Max rows"),run:u("এক্সপোর্ট","Export","Export"),dl:u("ফাইল নামান","Download file","File নামান"),rows:u("সারি","rows","rows"),cut:u("সীমায় কাটা হয়েছে — ডেট ছোট করুন বা সীমা বাড়ান","Cut at the row cap - narrow the dates","Row cap-এ কাটা - dates ছোট করুন"),costNote:u("কস্টের প্রাইস শুধু কস্ট-অনুমতি থাকলে আসে।","Cost prices appear only with the cost right.","Cost price শুধু cost-right থাকলে আসে।"),log:u("এক্সপোর্ট লগ","Export log","Export log"),d_sales:u("সেল","Sales","Sales"),d_sale_lines:u("সেলের লাইন","Sale lines","Sale lines"),d_purchases:u("ক্রয়","Purchases","Purchases"),d_stock_ledger:u("স্টক খাতা","Stock ledger","Stock ledger"),d_journal:u("জার্নাল","Journal","Journal"),noperm:u("এই কাজের অনুমতি নেই","You are not allowed to do this","এই কাজের permission নেই")},g=e=>p(w[e]),k={module_off:u("এই সুবিধা এখনো চালু করা হয়নি (সুইচবোর্ডে চালু করুন)","This feature is switched off (owner: turn it on in the switch board)"),not_allowed:w.noperm,bad_status:u("এই অবস্থা থেকে এটা করা যায় না","Not possible from the current status"),order_closed:u("অর্ডার বন্ধ হয়ে গেছে","The order is already closed"),advance_fate_required:u("অ্যাডভান্সের কী হবে বাছুন","Choose what happens to the advance"),reason_required:w.reason,address_required:u("ঠিকানা দিন","Enter the address"),advance_over_total:u("অ্যাডভান্স মোটের চেয়ে বেশি","Advance is more than the total"),bad_mobile:u("মোবাইল নম্বর ঠিক নয়","Mobile number is not valid"),customer_name_required:u("নাম দিন","Enter the name"),no_lines:u("অন্তত একটি পণ্য দিন","Add at least one item"),bad_qty:u("পরিমাণ ঠিক নয়","Quantity is not valid"),overpaid:u("টাকা মোটের চেয়ে বেশি","Payment is more than the total"),sale_already_linked:u("এই বিক্রি আরেক অর্ডারে জোড়া","This sale is already linked"),sale_other_location:u("বিক্রিটি অন্য জায়গার","The sale belongs to another place"),entry_already_linked:u("ফর্মটি আগেই জোড়া","This form is already linked"),sale_already_has_form:u("এই বিক্রিতে এই ফর্ম আগেই আছে","This sale already has that form"),other_location:u("ফর্ম ও বিক্রি আলাদা জায়গার","Form and sale are at different places"),form_not_final:u("ফর্ম আগে জমা দিন","Submit the form first"),path_locked:u("মালিক এই পথ লক করেছেন","The owner has locked this path"),shadow_locked:u("জোড়া ফর্ম বদলানো যায় না","A linked form cannot be changed"),bad_date:u("তারিখ ঠিক নয় (সর্বোচ্চ ৩৬৬ দিন)","Dates are not valid (max 366 days)"),cost_not_allowed:u("ক্রয়ের ডেটায় খরচের দাম আছে — খরচ-অনুমতি লাগবে","Purchase data carries cost prices - the cost right is needed"),overlap:u("এই কর্মীর এই সুবিধা এই সময়ে আগেই আছে","The employee already holds this benefit in those dates"),grant_ended:u("এই সুবিধা শেষ হয়ে গেছে","This grant has ended"),note_needed:w.reason},S=e=>{console.error(e),i((e=>{const t=String(e&&e.message||""),a=Object.keys(k).filter(e=>t.includes(e)).sort((e,t)=>t.length-e.length)[0];return a?p(k[a]):t})(e)||"error")},N=async(e,t)=>{const n=await a.rpc(e,t);return n.error?(S(n.error),null):null===n.data?{}:n.data},j={loc:null,status:"",rows:[],items:[],lines:[],client:y(),edit:null},T=[["facebook","Facebook"],["instagram","Instagram"],["whatsapp","WhatsApp"],["phone",u("ফোন","Phone")],["website","Website"],["foodapp",u("ফুড অ্যাপ","Food app")],["other",u("অন্য","Other")]];async function C(){t.loadStatic&&await t.loadStatic(),j.loc||(j.loc=(x()[0]||{}).id);const e=await a.rpc("online_orders_list",{p_loc:j.loc,p_status:j.status||null,p_from:null,p_to:null,p_limit:100});if(e.error)throw e.error;j.rows=e.data||[]}function q(){const e=m("#sx_body");if(!e)return;e.innerHTML=`<div class="card stack"><div class="row wrap"><label>${l(g("place"))} ${h("sx_loc",j.loc)}</label>\n      <label>${l(g("status"))} <select id="sx_st">${["","new","confirmed","packed","delivered","cancelled"].map(e=>`<option value="${e}" ${j.status===e?"selected":""}>${l(g(e?"s_"+e:"all"))}</option>`).join("")}</select></label>\n      <button type="button" class="btn primary" data-act="sx_new">${l(g("new_"))}</button></div></div>\n    ${j.rows.length?j.rows.map(E).join(""):`<p class="muted">${l(g("none"))}</p>`}`}function E(e){const t=(t,a,n="")=>`<button type="button" class="mini ${n}" data-act="${t}" data-id="${l(e.id)}">${l(g(a))}</button>`,a="new"===e.status?t("sx_edit","edit")+t("sx_st_confirmed","confirm")+t("sx_cancel","cancel")+t("sx_linksale","link"):"confirmed"===e.status?t("sx_edit","edit")+t("sx_st_packed","pack")+t("sx_cancel","cancel")+t("sx_linksale","link"):"packed"===e.status?t("sx_deliver","deliver","primary")+t("sx_cancel","cancel")+t("sx_linksale","link"):"";return`<div class="card stack" data-order="${l(e.id)}"><div class="row between"><b>#${l(e.order_no)} · ${l(e.customer_name)}</b>${n=e.status,`<span class="chip ${"delivered"===n?"ok":"cancelled"===n?"warn":""}">${l(g("s_"+n))}</span>`}</div>\n    <div class="muted" style="font-size:.85rem">${l(e.channel)} · ${l(e.customer_mobile)} · ${l(e.delivery_mode)}${e.delivery_date?" · "+l(e.delivery_date):""}</div>\n    <div class="row between"><span>${l(g("total"))} ${l(f(Number(e.subtotal)-Number(e.discount)+Number(e.delivery_charge)))}${Number(e.advance)?" · "+l(g("adv"))+" "+l(f(e.advance)):""}</span><b>${l(g("balance"))} ${l(f(e.balance))}</b></div>\n    ${a?`<div class="row wrap">${a}</div>`:""}</div>`;var n}function D(e,t){return`<div class="row wrap" data-line="${t}"><select data-sxl="item" data-i="${t}" style="flex:1;min-width:10rem">${j.items.map(t=>`<option value="${l(t.id)}" ${t.id===e.item_id?"selected":""}>${l((e=>`${e.code} · ${p({bn:e.name_bn,mix:e.name_bn,en:e.name_en||e.name_bn})} · ${f(e.sell_price)}`)(t))}</option>`).join("")}</select>\n    <input data-sxl="qty" data-i="${t}" inputmode="decimal" value="${l(e.qty)}" style="max-width:5rem" aria-label="${l(g("qty"))}"><button type="button" class="mini" data-act="sx_delline" data-i="${t}" aria-label="x">✕</button></div>`}function A(e){const t=e||{};return`<div class="stack" id="sx_form"><h3>${l(e?"#"+e.order_no:g("new_"))}</h3>\n    <label>${l(g("name"))}<input id="sx_n" maxlength="80" value="${l(t.customer_name||"")}"></label>\n    <label>${l(g("mobile"))}<input id="sx_m" inputmode="tel" maxlength="20" value="${l(t.customer_mobile||"")}"></label>\n    <label>${l(g("channel"))}<select id="sx_ch">${T.map(e=>{return`<option value="${e[0]}" ${t.channel===e[0]?"selected":""}>${l((a=e[1],"string"==typeof a?a:p(a)))}</option>`;var a}).join("")}</select></label>\n    <label>${l(g("dmode"))}<select id="sx_dm">${[["pickup","pickup"],["home","home"],["courier","courier"]].map(e=>`<option value="${e[0]}" ${t.delivery_mode===e[0]?"selected":""}>${l(g(e[1]))}</option>`).join("")}</select></label>\n    <label>${l(g("addr"))}<input id="sx_a" maxlength="300" value="${l(t.address||"")}"></label>\n    <label>${l(g("ddate"))}<input id="sx_dd" type="date" value="${l(t.delivery_date||"")}"></label>\n    <b>${l(g("items"))}</b><div id="sx_lines">${j.lines.map(D).join("")}</div><button type="button" class="mini" data-act="sx_addline">${l(g("addLine"))}</button>\n    <div class="row wrap"><label>${l(g("charge"))}<input id="sx_c" inputmode="decimal" value="${l(t.delivery_charge||0)}" style="max-width:6rem"></label>\n      <label>${l(g("disc"))}<input id="sx_d" inputmode="decimal" value="${l(t.discount||0)}" style="max-width:6rem"></label>\n      <label>${l(g("adv"))}<input id="sx_ad" inputmode="decimal" value="${l(t.advance||0)}" style="max-width:6rem"></label>\n      <label>${l(g("advm"))}<select id="sx_am">${[["cash","cash"],["mobile","mobileP"],["card","card"]].map(e=>`<option value="${e[0]}" ${t.advance_mode===e[0]?"selected":""}>${l(g(e[1]))}</option>`).join("")}</select></label></div>\n    <label>${l(g("note"))}<input id="sx_nt" maxlength="300" value="${l(t.note||"")}"></label>\n    <button type="button" class="btn primary" data-act="sx_save">${l(g("save"))}</button></div>`}async function L(e){if(await async function(){if(j.items.length)return;const e=await a.from("items").select("id,code,name_bn,name_en,sell_price").eq("is_active",!0).order("code").limit(800);j.items=(e.data||[]).filter(e=>Number(e.sell_price)>0)}(),j.edit=null,j.lines=[],e){const t=await a.from("online_orders").select("id,client_id,order_no,location_id,channel,customer_name,customer_mobile,address,lines,subtotal,discount,delivery_mode,delivery_by,delivery_date,delivery_charge,advance,advance_mode,advance_wallet,note,status,sale_id,cancel_reason,advance_fate,created_by,created_staff,created_at,updated_at").eq("id",e).maybeSingle();j.edit=t.data,j.lines=(j.edit&&j.edit.lines||[]).map(e=>({item_id:e.item_id,qty:e.qty}))}!j.lines.length&&j.items[0]&&(j.lines=[{item_id:j.items[0].id,qty:1}]),j.client=y(),c(A(j.edit))}const O=()=>{const e=m("#sx_lines");e&&(e.innerHTML=j.lines.map(D).join(""))},P=async()=>{await C(),q()};Object.assign(d,{sx_new:()=>L(null).catch(o),sx_edit:e=>L(e.dataset.id).catch(o),sx_addline:()=>{j.lines.push({item_id:(j.items[0]||{}).id,qty:1}),O()},sx_delline:e=>{j.lines.length>1&&(j.lines.splice(Number(e.dataset.i),1),O())},sx_save:async()=>{const e=j.lines.map(e=>({item_id:e.item_id,qty:$(e.qty)}));if(e.some(e=>!(e.qty>0)))return i(p(k.bad_qty));const t=$(m("#sx_ad").value)||0;await N("online_order_save",{p_id:j.edit?j.edit.id:null,p_client:j.edit?null:j.client,p_loc:j.edit?j.edit.location_id:j.loc,p_channel:m("#sx_ch").value,p_name:m("#sx_n").value,p_mobile:m("#sx_m").value,p_address:m("#sx_a").value||null,p_lines:e,p_delivery_mode:m("#sx_dm").value,p_delivery_by:null,p_delivery_date:m("#sx_dd").value||null,p_charge:$(m("#sx_c").value)||0,p_discount:$(m("#sx_d").value)||0,p_advance:t,p_adv_mode:t>0?m("#sx_am").value:null,p_adv_wallet:null,p_note:m("#sx_nt").value||null})&&(_(),i(g("saved")),await P())},sx_st_confirmed:async e=>{await N("online_order_status",{p_id:e.dataset.id,p_to:"confirmed",p_note:null})&&await P()},sx_st_packed:async e=>{await N("online_order_status",{p_id:e.dataset.id,p_to:"packed",p_note:null})&&await P()},sx_cancel:e=>{const t=j.rows.find(t=>t.id===e.dataset.id);c(`<div class="stack"><h3>${l(g("cancel"))} #${l(t.order_no)}</h3><label>${l(g("reason"))}<input id="sx_cr" maxlength="300"></label>\n      ${Number(t.advance)>0?`<label>${l(g("fate"))} (${l(f(t.advance))})<select id="sx_cf"><option value="refund">${l(g("refund"))}</option><option value="adjust">${l(g("adjust"))}</option><option value="income">${l(g("income"))}</option></select></label>`:""}\n      <button type="button" class="btn primary" data-act="sx_cancel_go" data-id="${l(t.id)}">${l(g("cancel"))}</button></div>`)},sx_cancel_go:async e=>{await N("online_order_cancel",{p_id:e.dataset.id,p_reason:m("#sx_cr").value,p_advance_fate:m("#sx_cf")?m("#sx_cf").value:"none"})&&(_(),await P())},sx_deliver:e=>{const t=j.rows.find(t=>t.id===e.dataset.id);c(`<div class="stack"><h3>${l(g("deliver"))} #${l(t.order_no)}</h3><b>${l(g("balance"))} ${l(f(t.balance))}</b>\n      <label>${l(g("collect"))}<input id="sx_pa" inputmode="decimal" value="${l(t.balance)}"></label>\n      <label>${l(g("payBy"))}<select id="sx_pm"><option value="cash">${l(g("cash"))}</option><option value="mobile">${l(g("mobileP"))}</option><option value="card">${l(g("card"))}</option></select></label>\n      <button type="button" class="btn primary" data-act="sx_deliver_go" data-id="${l(t.id)}">${l(g("deliver"))}</button></div>`)},sx_deliver_go:async e=>{const t=$(m("#sx_pa").value)||0,a=await N("online_order_deliver",{p_id:e.dataset.id,p_payments:t>0?[{mode:m("#sx_pm").value,amount:t}]:[]});a&&(_(),i(g("done")+(a.receipt?" · "+g("receipt")+" "+a.receipt:"")),await P())},sx_linksale:async e=>{const t=j.rows.find(t=>t.id===e.dataset.id),n=await a.from("sales").select("id,receipt,total,sale_date").eq("location_id",t.location_id).eq("status","done").order("sold_at",{ascending:!1}).limit(40);c(`<div class="stack"><h3>${l(g("link"))} #${l(t.order_no)}</h3><label>${l(g("pickSale"))}<select id="sx_ls">${(n.data||[]).map(e=>`<option value="${l(e.id)}">#${l(e.receipt)} · ${l(e.sale_date)} · ${l(f(e.total))}</option>`).join("")}</select></label>\n      <button type="button" class="btn primary" data-act="sx_link_go" data-id="${l(t.id)}">${l(g("link"))}</button></div>`)},sx_link_go:async e=>{await N("online_order_link_sale",{p_id:e.dataset.id,p_sale:m("#sx_ls").value,p_note:null})&&(_(),await P())}}),document.addEventListener("change",e=>{const t=e.target;if("sx_loc"===t.id&&(j.loc=Number(t.value),P().catch(o)),"sx_st"===t.id&&(j.status=t.value,P().catch(o)),t.dataset&&t.dataset.sxl){const e=j.lines[Number(t.dataset.i)];e&&("item"===t.dataset.sxl?e.item_id=t.value:e.qty=t.value)}}),document.addEventListener("input",e=>{const t=e.target;if(t.dataset&&"qty"===t.dataset.sxl){const e=j.lines[Number(t.dataset.i)];e&&(e.qty=t.value)}});const M={from:null,to:null,loc:null,rep:[],linked:[],sales:{}};async function B(){t.loadStatic&&await t.loadStatic(),M.to=M.to||b(),M.from=M.from||v(M.to,-7),M.loc||(M.loc=(x()[0]||{}).id);const e=await a.rpc("unlinked_sale_forms",{p_from:M.from,p_to:M.to,p_loc:M.loc,p_limit:200});if(e.error)throw e.error;M.rep=e.data||[];const n=await a.from("sale_form_links").select("id,sale_id,entry_id,form_code,amount_diff,linked_at").eq("location_id",M.loc).eq("state","active").order("id",{ascending:!1}).limit(40);M.linked=n.data||[];const l=[...new Set(M.rep.flatMap(e=>e.candidate_sales||[]).concat(M.linked.map(e=>e.sale_id)))];if(M.sales={},l.length){((await a.from("sales").select("id,receipt,total,sale_date").in("id",l)).data||[]).forEach(e=>{M.sales[e.id]=e})}}const F=e=>{const t=M.sales[e];return t?`#${t.receipt} · ${t.sale_date} · ${f(t.total)}`:String(e).slice(0,8)};function I(){const e=m("#sf_body");e&&(e.innerHTML=`<div class="card stack"><div class="row wrap"><label>${l(g("place"))} ${h("sf_loc",M.loc)}</label><label>${l(g("from"))} <input type="date" id="sf_from" value="${l(M.from)}"></label>\n      <label>${l(g("to"))} <input type="date" id="sf_to" value="${l(M.to)}"></label><button type="button" class="btn" data-act="sf_run">${l(g("show"))}</button></div></div>\n    <h3>${l(g("unl"))} (${M.rep.length})</h3>\n    ${M.rep.length?M.rep.map(e=>`<div class="card stack" data-entry="${l(e.entry_id)}"><div class="row between"><b>${l(e.form_code)} #${l(e.serial)}</b><span class="muted">${l(e.entry_date)}</span></div>\n      <div class="muted">${l(g("customer"))}: ${l(e.customer||"-")}${null!=e.form_total?" · "+l(g("total"))+" "+l(f(e.form_total)):""}</div>\n      ${(e.candidate_sales||[]).length?`<div class="muted">${l(g("cand"))}</div>`+e.candidate_sales.map(t=>`<div class="row between"><span>${l(F(t))}</span><button type="button" class="mini" data-act="sf_link" data-e="${l(e.entry_id)}" data-s="${l(t)}">${l(g("doLink"))}</button></div>`).join(""):""}</div>`).join(""):`<p class="muted">${l(g("none"))}</p>`}\n    <h3>${l(g("lnk"))} (${M.linked.length})</h3>\n    ${M.linked.map(e=>`<div class="card row between"><span>${l(e.form_code)} ↔ ${l(F(e.sale_id))}${null!=e.amount_diff&&0!==Number(e.amount_diff)?` · <b>${l(g("diff"))} ${l(f(e.amount_diff))}</b>`:""}</span>\n      <button type="button" class="mini" data-act="sf_unlink" data-id="${l(e.id)}">${l(g("unlink"))}</button></div>`).join("")}`)}const U=async()=>{await B(),I()};Object.assign(d,{sf_run:async()=>{M.from=m("#sf_from").value,M.to=m("#sf_to").value,M.loc=Number(m("#sf_loc").value);try{await U()}catch(e){S(e)}},sf_link:async e=>{const t=await N("sale_form_link",{p_entry:e.dataset.e,p_sale:e.dataset.s,p_note:null});t&&(i(g("saved")+(t.amount_diff?" · "+g("diff")+" "+f(t.amount_diff):"")),await U().catch(S))},sf_unlink:async e=>{const t=window.prompt(g("reason"));if(!t)return;await N("sale_form_unlink",{p_link:Number(e.dataset.id),p_note:t})&&await U().catch(S)}});const R={asof:null,loc:null,rep:null,emps:[],types:[]};async function G(){t.loadStatic&&await t.loadStatic(),R.asof=R.asof||b();const e=await a.rpc("benefits_report",{p_as_of:R.asof,p_loc:R.loc||null});if(e.error)throw e.error;R.rep=e.data;const n=await a.from("benefit_types").select("code,name_bn,name_en,paid_in_payroll,eligible_after_days,default_for_all,active").eq("active",!0).order("sort");R.types=n.data||[]}function H(){const e=m("#bx_body");if(!e)return;const t=R.rep||{grants:[],missing:[]},a=e=>{const t=R.types.find(t=>t.code===e);return t?p({bn:t.name_bn,mix:t.name_bn,en:t.name_en||t.name_bn}):e};e.innerHTML=`<p class="muted">${l(g("reportOnly"))}</p>\n    <div class="card stack"><div class="row wrap"><label>${l(g("place"))} <select id="bx_loc"><option value="">${l(g("all"))}</option>${x().map(e=>`<option value="${e.id}" ${String(R.loc)===String(e.id)?"selected":""}>${l(r(e))}</option>`).join("")}</select></label>\n      <label>${l(g("asof"))} <input type="date" id="bx_asof" value="${l(R.asof)}"></label><button type="button" class="btn" data-act="bx_run">${l(g("show"))}</button>\n      <button type="button" class="btn primary" data-act="bx_add">${l(g("addGrant"))}</button></div></div>\n    <h3>${l(g("ben"))} (${t.grants.length})</h3>\n    ${t.grants.length?t.grants.map(e=>`<div class="card stack"><div class="row between"><b>${l(e.employee_name)} · ${l(a(e.type_code))}</b><span class="chip ${"eligible"===e.state?"ok":"ended"===e.state?"":"warn"}">${l(g("not_yet"===e.state?"notyet":e.state))}</span></div>\n      <div class="muted" style="font-size:.85rem">${l(e.from_date)} → ${l(e.to_date||"…")} · ${l(g("eligible"))} ${l(e.eligible_from)}${e.paid_in_payroll?" · "+l(g("paid")):""}${null!=e.value_per_month?" · "+l(g("val"))+" "+l(f(e.value_per_month)):""}</div>\n      ${"ended"!==e.state?`<button type="button" class="mini" data-act="bx_end" data-id="${l(e.id)}">${l(g("endIt"))}</button>`:""}</div>`).join(""):`<p class="muted">${l(g("none"))}</p>`}\n    <h3>${l(g("miss"))} (${t.missing.length})</h3>\n    ${t.missing.length?t.missing.map(e=>`<div class="card row between"><span>${l(e.employee_name)} · ${l(a(e.type_code))}</span><span class="muted">${l(e.eligible_from)}</span></div>`).join(""):`<p class="muted">${l(g("none"))}</p>`}`}Object.assign(d,{bx_run:async()=>{R.asof=m("#bx_asof").value||b(),R.loc=m("#bx_loc").value?Number(m("#bx_loc").value):null;try{await G(),H()}catch(e){S(e)}},bx_add:async()=>{const e=await a.from("employees").select("id,full_name_bn,employee_no").eq("status","active").order("full_name_bn").limit(500);R.emps=e.data||[],c(`<div class="stack"><h3>${l(g("addGrant"))}</h3><label>${l(g("emp"))}<select id="bx_e">${R.emps.map(e=>`<option value="${l(e.id)}">${l(e.full_name_bn)}${e.employee_no?" · "+l(e.employee_no):""}</option>`).join("")}</select></label>\n      <label>${l(g("type"))}<select id="bx_t">${R.types.map(e=>`<option value="${l(e.code)}">${l(p({bn:e.name_bn,mix:e.name_bn,en:e.name_en||e.name_bn}))}</option>`).join("")}</select></label>\n      <label>${l(g("fromD"))}<input type="date" id="bx_f" value="${l(b())}"></label><label>${l(g("val"))}<input id="bx_v" inputmode="decimal" placeholder="-"></label>\n      <label>${l(g("note"))}<input id="bx_n" maxlength="300"></label><button type="button" class="btn primary" data-act="bx_go">${l(g("save"))}</button></div>`)},bx_go:async()=>{const e=$(m("#bx_v").value);await N("employee_benefit_grant",{p_id:null,p_client:y(),p_emp:m("#bx_e").value,p_type:m("#bx_t").value,p_from:m("#bx_f").value,p_to:null,p_value:Number.isNaN(e)?null:e,p_paid:null,p_note:m("#bx_n").value||null})&&(_(),i(g("saved")),await G(),H())},bx_end:async e=>{await N("employee_benefit_grant_end",{p_id:Number(e.dataset.id),p_to:b(),p_note:null})&&(await G(),H())}});const V={ds:"sales",from:null,to:null,loc:null,fmt:"csv",limit:"",res:null,log:[]},W=["sales","sale_lines","purchases","stock_ledger","journal"];function z(){const e=m("#ex_body");if(!e)return;const t=V.res;e.innerHTML=`<div class="card stack"><label>${l(g("dataset"))}<select id="ex_ds">${W.map(e=>`<option value="${e}" ${V.ds===e?"selected":""}>${l(g("d_"+e))}</option>`).join("")}</select></label>\n    <div class="row wrap"><label>${l(g("from"))} <input type="date" id="ex_from" value="${l(V.from)}"></label><label>${l(g("to"))} <input type="date" id="ex_to" value="${l(V.to)}"></label></div>\n    <div class="row wrap"><label>${l(g("place"))} <select id="ex_loc"><option value="">${l(g("all"))}</option>${x().map(e=>`<option value="${e.id}" ${String(V.loc)===String(e.id)?"selected":""}>${l(r(e))}</option>`).join("")}</select></label>\n      <label>${l(g("format"))} <select id="ex_fmt"><option value="csv" ${"csv"===V.fmt?"selected":""}>CSV</option><option value="json" ${"json"===V.fmt?"selected":""}>JSON</option></select></label>\n      <label>${l(g("limit"))} <input id="ex_lim" inputmode="numeric" value="${l(V.limit)}" style="max-width:6rem"></label></div>\n    <div class="muted" style="font-size:.85rem">${l(g("costNote"))}</div><button type="button" class="btn primary" data-act="ex_run">${l(g("run"))}</button></div>\n    ${t?`<div class="card stack"><b>${l(g("d_"+t.dataset))}: ${l(t.row_count)} ${l(g("rows"))}</b>${t.truncated?`<div class="chip warn">${l(g("cut"))}</div>`:""}\n      <button type="button" class="btn" data-act="ex_dl">${l(g("dl"))}</button></div>`:""}\n    ${V.log.length?`<h3>${l(g("log"))}</h3>${V.log.slice(0,15).map(e=>`<div class="muted" style="font-size:.8rem">${l(String(e.at).slice(0,16).replace("T"," "))} · ${l(e.dataset)} · ${l(e.row_count)}${e.truncated?" ✂":""} · ${l(e.format)}</div>`).join("")}`:""}`}Object.assign(d,{ex_run:async()=>{V.ds=m("#ex_ds").value,V.from=m("#ex_from").value,V.to=m("#ex_to").value,V.loc=m("#ex_loc").value?Number(m("#ex_loc").value):null,V.fmt=m("#ex_fmt").value,V.limit=m("#ex_lim").value;const e=$(V.limit),t=await N("bi_export",{p_dataset:V.ds,p_from:V.from,p_to:V.to,p_loc:V.loc,p_format:V.fmt,p_limit:e>0?Math.floor(e):null});if(t){if(V.res=t,n.ctx.is_owner){const e=await a.rpc("bi_export_log_list",{p_limit:15});e.error||(V.log=e.data||[])}z()}},ex_dl:()=>{const e=V.res;if(!e)return;const t="csv"===e.format?"\ufeff"+e.csv:JSON.stringify(e.rows,null,1),a=URL.createObjectURL(new Blob([t],{type:"csv"===e.format?"text/csv;charset=utf-8":"application/json"})),n=document.createElement("a");n.href=a,n.download=`${e.dataset}_${V.from}_${V.to}.${e.format}`,document.body.appendChild(n),n.click(),n.remove(),setTimeout(()=>URL.revokeObjectURL(a),2e3)}}),window.BOS_PAGES=Object.assign(window.BOS_PAGES||{},{onlineorders:async function(){s(g("oTitle"),'<div id="sx_body"><p class="muted">…</p></div>',!0);try{await C(),q()}catch(e){S(e)}},saleforms:async function(){s(g("fTitle"),'<div id="sf_body"><p class="muted">…</p></div>',!0);try{await B(),I()}catch(e){S(e)}},benefitsx:async function(){s(g("bTitle"),'<div id="bx_body"><p class="muted">…</p></div>',!0);try{await G(),H()}catch(e){S(e)}},biexport:async function(){t.loadStatic&&await t.loadStatic(),V.to=V.to||b(),V.from=V.from||v(V.to,-30),V.res=null,s(g("eTitle"),'<div id="ex_body"></div>',!0),z()}})})();
+/* Islamia BOS · Sales extras (P3 slice b): online orders (#/onlineorders), forms 20-x <-> sales (#/saleforms, owner), benefit grants report (#/benefitsx), BI export (#/biexport).
+   Server: supabase/phase61.sql. Reads: online_orders_list / online_order_get, unlinked_sale_forms, sale_form_links, benefits_report, bi_export_log_list.
+   Writes (only through server functions): online_order_save / _status / _cancel / _deliver / _link_sale, sale_form_link / _unlink, benefit_type_save, employee_benefit_grant / _end, bi_export.
+   Delivering an order makes ONE sale through the existing record_sale2; linking a form makes it a locked shadow copy of the sale; benefits are report only. Nothing is deleted. */
+(() => {
+'use strict';
+const A = window.BOS_APP, B = window.BOS;
+const { sb, S, esc, toast, fail, shell, H, nm, openSheet, closeSheet } = A;
+const L = B.L, lab = B.lab;
+const $ = (s, el = document) => el.querySelector(s);
+const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
+const addDays = (d, n) => { const x = new Date(d + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
+const num = (v) => { const s = String(v == null ? '' : v).replace(/[০-৯]/g, (c) => '০১২৩৪৫৬৭৮৯'.indexOf(c)).replace(/,/g, '').trim(); if (s === '') return NaN; const n = Number(s); return Number.isFinite(n) ? n : NaN; };
+const money = (n) => '৳ ' + (Math.round(Number(n || 0) * 100) / 100).toLocaleString('en-US');
+const rid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3) | 8).toString(16); }));
+const locs = () => { const all = B.liveLocs ? B.liveLocs((B.ENV && B.ENV.locs) || []) : ((B.ENV && B.ENV.locs) || []); return S.ctx.is_owner || (S.ctx.roles || []).includes('management') ? all : all.filter((l) => (S.ctx.locations || []).includes(l.id)); };
+const locSel = (id, val) => `<select id="${id}">${locs().map((l) => `<option value="${l.id}" ${String(l.id) === String(val) ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>`;
+
+const X = {
+  oTitle: L('অনলাইন অর্ডার', 'Online orders', 'Online অর্ডার'), fTitle: L('ফর্ম 20-১/২/৪ ↔ বিক্রি', 'Forms 20-1 / 2 / 4 ↔ sales', 'Form 20-1/2/4 ↔ sale'),
+  bTitle: L('কর্মীর সুবিধা (রিপোর্ট)', 'Employee benefits (report)', 'Employee সুবিধা (report)'), eTitle: L('BI এক্সপোর্ট', 'BI export', 'BI export'),
+  place: L('জায়গা', 'Place', 'Place'), status: L('অবস্থা', 'Status', 'Status'), all: L('সব', 'All', 'All'), new_: L('নতুন অর্ডার', 'New order', 'নতুন Order'),
+  confirm: L('নিশ্চিত', 'Confirm', 'Confirm'), pack: L('প্যাক হয়েছে', 'Packed', 'Packed'), deliver: L('ডেলিভারি দিন', 'Deliver', 'Deliver'), cancel: L('বাতিল', 'Cancel', 'Cancel'),
+  link: L('আগের বিক্রির সাথে জুড়ুন', 'Link an existing sale', 'আগের sale-এর সাথে জুড়ুন'), edit: L('বদলান', 'Edit', 'Edit'),
+  s_new: L('নতুন', 'New', 'New'), s_confirmed: L('নিশ্চিত', 'Confirmed', 'Confirmed'), s_packed: L('প্যাক', 'Packed', 'Packed'), s_delivered: L('ডেলিভারি হয়েছে', 'Delivered', 'Delivered'), s_cancelled: L('বাতিল', 'Cancelled', 'Cancelled'),
+  name: L('গ্রাহকের নাম', 'Customer name', 'Customer নাম'), mobile: L('মোবাইল', 'Mobile', 'Mobile'), addr: L('ঠিকানা', 'Address', 'Address'), channel: L('মাধ্যম', 'Channel', 'Channel'),
+  dmode: L('ডেলিভারি', 'Delivery', 'Delivery'), pickup: L('দোকান থেকে নেবে', 'Pick up', 'Pickup'), home: L('হোম ডেলিভারি', 'Home delivery', 'Home delivery'), courier: L('কুরিয়ার', 'Courier', 'Courier'),
+  ddate: L('ডেলিভারির তারিখ', 'Delivery date', 'Delivery date'), charge: L('ডেলিভারি চার্জ', 'Delivery charge', 'Delivery charge'), disc: L('ডিসকাউন্ট', 'Discount', 'Discount'),
+  adv: L('অ্যাডভান্স', 'Advance', 'Advance'), advm: L('অ্যাডভান্স কীভাবে', 'Advance paid by', 'Advance কীভাবে'), note: L('নোট', 'Note', 'Note'), cash: L('নগদ', 'Cash', 'Cash'), mobileP: L('মোবাইল ব্যাংকিং', 'Mobile money', 'Mobile money'), card: L('কার্ড', 'Card', 'Card'),
+  items: L('পণ্য', 'Items', 'Items'), addLine: L('+ পণ্য যোগ', '+ Add item', '+ Item যোগ'), qty: L('পরিমাণ', 'Qty', 'Qty'), save: L('সংরক্ষণ', 'Save', 'Save'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
+  total: L('মোট', 'Total', 'Total'), balance: L('বাকি', 'Balance', 'Balance'), collect: L('এখন কত টাকা নিলেন', 'Collected now', 'এখন কত নিলেন'), payBy: L('কীভাবে', 'By', 'By'),
+  none: L('কিছু নেই ✓', 'Nothing ✓', 'কিছু নেই ✓'), reason: L('কারণ লিখুন', 'Write the reason', 'কারণ লিখুন'), fate: L('অ্যাডভান্সের কী হবে', 'What happens to the advance', 'Advance-এর কী হবে'),
+  refund: L('ফেরত', 'Refund', 'Refund'), adjust: L('সমন্বয়', 'Adjust', 'Adjust'), income: L('ব্যবসার আয়ে', 'To income', 'Income-এ'), receipt: L('রসিদ', 'Receipt', 'Receipt'),
+  pickSale: L('কোন বিক্রি', 'Which sale', 'কোন sale'), done: L('হয়ে গেছে', 'Done', 'Done'), from: L('থেকে', 'From', 'From'), to: L('পর্যন্ত', 'To', 'To'), show: L('দেখুন', 'Show', 'Show'),
+  unl: L('বিক্রির সাথে জোড়া হয়নি', 'Not linked to a sale', 'Sale-এর সাথে জোড়া হয়নি'), lnk: L('জোড়া আছে', 'Linked', 'Linked'), cand: L('সম্ভাব্য বিক্রি', 'Candidate sales', 'Candidate sales'),
+  doLink: L('জুড়ুন', 'Link', 'Link'), unlink: L('জোড়া খুলুন', 'Unlink', 'Unlink'), diff: L('অঙ্কের তফাত', 'Amount difference', 'Amount তফাত'), customer: L('গ্রাহক', 'Customer', 'Customer'),
+  asof: L('যে তারিখের হিসাবে', 'As of', 'As of'), ben: L('সুবিধার তালিকা', 'Grants', 'Grants'), miss: L('পাওনা কিন্তু দেওয়া হয়নি', 'Eligible but not granted', 'Eligible, grant নেই'),
+  endIt: L('সুবিধা শেষ করুন', 'End this grant', 'Grant শেষ করুন'), notyet: L('এখনো প্রাপ্য নয়', 'Not yet eligible', 'Not yet'), eligible: L('প্রাপ্য', 'Eligible', 'Eligible'), ended: L('শেষ', 'Ended', 'Ended'),
+  paid: L('বেতনের সাথে', 'Paid in payroll', 'Payroll-এ'), val: L('মাসিক মূল্য', 'Value / month', 'Value / month'), reportOnly: L('শুধু রিপোর্ট — বেতনের হিসাব বদলায় না।', 'Report only - payroll maths is not changed.', 'শুধু report - payroll হিসাব বদলায় না।'),
+  addGrant: L('সুবিধা দিন', 'Grant a benefit', 'Benefit দিন'), emp: L('কর্মী', 'Employee', 'Employee'), type: L('ধরন', 'Type', 'Type'), fromD: L('শুরুর তারিখ', 'From date', 'From date'),
+  dataset: L('কী এক্সপোর্ট', 'What to export', 'কী export'), format: L('ফরম্যাট', 'Format', 'Format'), limit: L('সর্বোচ্চ সারি', 'Max rows', 'Max rows'), run: L('এক্সপোর্ট', 'Export', 'Export'),
+  dl: L('ফাইল নামান', 'Download file', 'File নামান'), rows: L('সারি', 'rows', 'rows'), cut: L('সীমায় কাটা হয়েছে — তারিখ ছোট করুন বা সীমা বাড়ান', 'Cut at the row cap - narrow the dates', 'Row cap-এ কাটা - dates ছোট করুন'),
+  costNote: L('খরচের দাম শুধু খরচ-অনুমতি থাকলে আসে।', 'Cost prices appear only with the cost right.', 'Cost দাম শুধু cost-right থাকলে আসে।'), log: L('এক্সপোর্ট লগ', 'Export log', 'Export log'),
+  d_sales: L('বিক্রি', 'Sales', 'Sales'), d_sale_lines: L('বিক্রির লাইন', 'Sale lines', 'Sale lines'), d_purchases: L('ক্রয়', 'Purchases', 'Purchases'), d_stock_ledger: L('স্টক খাতা', 'Stock ledger', 'Stock ledger'), d_journal: L('জার্নাল', 'Journal', 'Journal'),
+  noperm: L('এই কাজের অনুমতি নেই', 'You are not allowed to do this', 'এই কাজের permission নেই'),
+};
+const T = (k) => lab(X[k]);
+const ERR = {
+  module_off: L('এই সুবিধা এখনো চালু করা হয়নি (সুইচবোর্ডে চালু করুন)', 'This feature is switched off (owner: turn it on in the switch board)'),
+  not_allowed: X.noperm, bad_status: L('এই অবস্থা থেকে এটা করা যায় না', 'Not possible from the current status'), order_closed: L('অর্ডার বন্ধ হয়ে গেছে', 'The order is already closed'),
+  advance_fate_required: L('অ্যাডভান্সের কী হবে বাছুন', 'Choose what happens to the advance'), reason_required: X.reason, address_required: L('ঠিকানা দিন', 'Enter the address'),
+  advance_over_total: L('অ্যাডভান্স মোটের চেয়ে বেশি', 'Advance is more than the total'), bad_mobile: L('মোবাইল নম্বর ঠিক নয়', 'Mobile number is not valid'), customer_name_required: L('নাম দিন', 'Enter the name'),
+  no_lines: L('অন্তত একটি পণ্য দিন', 'Add at least one item'), bad_qty: L('পরিমাণ ঠিক নয়', 'Quantity is not valid'), overpaid: L('টাকা মোটের চেয়ে বেশি', 'Payment is more than the total'),
+  sale_already_linked: L('এই বিক্রি আরেক অর্ডারে জোড়া', 'This sale is already linked'), sale_other_location: L('বিক্রিটি অন্য জায়গার', 'The sale belongs to another place'),
+  entry_already_linked: L('ফর্মটি আগেই জোড়া', 'This form is already linked'), sale_already_has_form: L('এই বিক্রিতে এই ফর্ম আগেই আছে', 'This sale already has that form'), other_location: L('ফর্ম ও বিক্রি আলাদা জায়গার', 'Form and sale are at different places'),
+  form_not_final: L('ফর্ম আগে জমা দিন', 'Submit the form first'), path_locked: L('মালিক এই পথ লক করেছেন', 'The owner has locked this path'), shadow_locked: L('জোড়া ফর্ম বদলানো যায় না', 'A linked form cannot be changed'),
+  bad_date: L('তারিখ ঠিক নয় (সর্বোচ্চ ৩৬৬ দিন)', 'Dates are not valid (max 366 days)'), cost_not_allowed: L('ক্রয়ের ডেটায় খরচের দাম আছে — খরচ-অনুমতি লাগবে', 'Purchase data carries cost prices - the cost right is needed'),
+  overlap: L('এই কর্মীর এই সুবিধা এই সময়ে আগেই আছে', 'The employee already holds this benefit in those dates'), grant_ended: L('এই সুবিধা শেষ হয়ে গেছে', 'This grant has ended'), note_needed: X.reason,
+};
+const eText = (e) => { const m = String((e && e.message) || ''); const k = Object.keys(ERR).filter((x) => m.includes(x)).sort((a, b) => b.length - a.length)[0]; return k ? lab(ERR[k]) : m; };
+const bad = (e) => { console.error(e); toast(eText(e) || 'error'); };
+const rpc = async (fn, a) => { const r = await sb.rpc(fn, a); if (r.error) { bad(r.error); return null; } return r.data === null ? {} : r.data; };
+const chips = (s) => `<span class="chip ${s === 'delivered' ? 'ok' : s === 'cancelled' ? 'warn' : ''}">${esc(T('s_' + s))}</span>`;
+
+/* ============ #/onlineorders ============ */
+const O = { loc: null, status: '', rows: [], items: [], lines: [], client: rid(), edit: null };
+const CH = [['facebook', 'Facebook'], ['instagram', 'Instagram'], ['whatsapp', 'WhatsApp'], ['phone', L('ফোন', 'Phone')], ['website', 'Website'], ['foodapp', L('ফুড অ্যাপ', 'Food app')], ['other', L('অন্য', 'Other')]];
+const nameOf = (x) => (typeof x === 'string' ? x : lab(x));
+async function loadOrders() {
+  if (B.loadStatic) await B.loadStatic();
+  if (!O.loc) O.loc = (locs()[0] || {}).id;
+  const r = await sb.rpc('online_orders_list', { p_loc: O.loc, p_status: O.status || null, p_from: null, p_to: null, p_limit: 100 });
+  if (r.error) throw r.error; O.rows = r.data || [];
+  if (B.c2orders) { await B.c2orders.init(); await B.c2orders.attach(O.rows); }      /* RPT-C2: true balance of closed orders, capture fields; silent when the server has no phase 445+ */
+}
+function drawOrders() {
+  const el = $('#sx_body'); if (!el) return;
+  const st = ['', 'new', 'confirmed', 'packed', 'delivered', 'cancelled'];
+  el.innerHTML = `<div class="card stack"><div class="row wrap"><label>${esc(T('place'))} ${locSel('sx_loc', O.loc)}</label>
+      <label>${esc(T('status'))} <select id="sx_st">${st.map((s) => `<option value="${s}" ${O.status === s ? 'selected' : ''}>${esc(s ? T('s_' + s) : T('all'))}</option>`).join('')}</select></label>
+      <button type="button" class="btn primary" data-act="sx_new">${esc(T('new_'))}</button></div></div>
+    ${O.rows.length ? O.rows.map(orderCard).join('') : `<p class="muted">${esc(T('none'))}</p>`}`;
+}
+function orderCard(o) {
+  const a = (act, k, cls = '') => `<button type="button" class="mini ${cls}" data-act="${act}" data-id="${esc(o.id)}">${esc(T(k))}</button>`;
+  const acts = o.status === 'new' ? a('sx_edit', 'edit') + a('sx_st_confirmed', 'confirm') + a('sx_cancel', 'cancel') + a('sx_linksale', 'link')
+    : o.status === 'confirmed' ? a('sx_edit', 'edit') + a('sx_st_packed', 'pack') + a('sx_cancel', 'cancel') + a('sx_linksale', 'link')
+    : o.status === 'packed' ? a('sx_deliver', 'deliver', 'primary') + a('sx_cancel', 'cancel') + a('sx_linksale', 'link') : '';
+  return `<div class="card stack" data-order="${esc(o.id)}"><div class="row between"><b>#${esc(o.order_no)} · ${esc(o.customer_name)}</b>${chips(o.status)}</div>
+    <div class="muted" style="font-size:.85rem">${esc(o.channel)} · ${esc(o.customer_mobile)} · ${esc(o.delivery_mode)}${o.delivery_date ? ' · ' + esc(o.delivery_date) : ''}</div>
+    <div class="row between"><span>${esc(T('total'))} ${esc(money(Number(o.subtotal) - Number(o.discount) + Number(o.delivery_charge)))}${Number(o.advance) ? ' · ' + esc(T('adv')) + ' ' + esc(money(o.advance)) : ''}</span><b>${esc(T('balance'))} ${esc(money(o.balance))}</b></div>
+    ${o.c2 && (o.status === 'delivered' || o.status === 'cancelled') ? `<div class="muted" style="font-size:.85rem">${esc(o.status === 'delivered' ? 'Still due on the sale' : 'Owes nothing (cancelled)')}: <b>${esc(money(o.c2.balance))}</b>${o.c2.advance_state && o.c2.advance_state !== 'none' ? ' · ' + esc(o.c2.advance_state.replace(/_/g, ' ')) : ''} · the balance above is total minus advance</div>` : ''}
+    ${acts ? `<div class="row wrap">${acts}</div>` : ''}${B.c2orders && B.c2orders.on('detail') ? `<div class="row"><button type="button" class="mini" data-act="sx_c2_detail" data-id="${esc(o.id)}">Details</button></div>` : ''}</div>`;
+}
+async function ensureItems() {
+  if (O.items.length) return;
+  const r = await sb.from('items').select('id,code,name_bn,name_en,sell_price').eq('is_active', true).order('code').limit(800);
+  O.items = (r.data || []).filter((i) => Number(i.sell_price) > 0);
+}
+const itemLabel = (i) => `${i.code} · ${lab({ bn: i.name_bn, mix: i.name_bn, en: i.name_en || i.name_bn })} · ${money(i.sell_price)}`;
+function lineRow(l, i) {
+  return `<div class="row wrap" data-line="${i}"><select data-sxl="item" data-i="${i}" style="flex:1;min-width:10rem">${O.items.map((it) => `<option value="${esc(it.id)}" ${it.id === l.item_id ? 'selected' : ''}>${esc(itemLabel(it))}</option>`).join('')}</select>
+    <input data-sxl="qty" data-i="${i}" inputmode="decimal" value="${esc(l.qty)}" style="max-width:5rem" aria-label="${esc(T('qty'))}"><button type="button" class="mini" data-act="sx_delline" data-i="${i}" aria-label="x">✕</button></div>`;
+}
+function orderForm(o) {
+  const v = o || {};
+  return `<div class="stack" id="sx_form"><h3>${esc(o ? '#' + o.order_no : T('new_'))}</h3>
+    <label>${esc(T('name'))}<input id="sx_n" maxlength="80" value="${esc(v.customer_name || '')}"></label>
+    <label>${esc(T('mobile'))}<input id="sx_m" inputmode="tel" maxlength="20" value="${esc(v.customer_mobile || '')}"></label>
+    <label>${esc(T('channel'))}<select id="sx_ch">${CH.map((c) => `<option value="${c[0]}" ${v.channel === c[0] ? 'selected' : ''}>${esc(nameOf(c[1]))}</option>`).join('')}</select></label>
+    <label>${esc(T('dmode'))}<select id="sx_dm">${[['pickup', 'pickup'], ['home', 'home'], ['courier', 'courier']].map((c) => `<option value="${c[0]}" ${v.delivery_mode === c[0] ? 'selected' : ''}>${esc(T(c[1]))}</option>`).join('')}</select></label>
+    <label>${esc(T('addr'))}<input id="sx_a" maxlength="300" value="${esc(v.address || '')}"></label>
+    <label>${esc(T('ddate'))}<input id="sx_dd" type="date" value="${esc(v.delivery_date || '')}"></label>
+    <b>${esc(T('items'))}</b><div id="sx_lines">${O.lines.map(lineRow).join('')}</div><button type="button" class="mini" data-act="sx_addline">${esc(T('addLine'))}</button>
+    <div class="row wrap"><label>${esc(T('charge'))}<input id="sx_c" inputmode="decimal" value="${esc(v.delivery_charge || 0)}" style="max-width:6rem"></label>
+      <label>${esc(T('disc'))}<input id="sx_d" inputmode="decimal" value="${esc(v.discount || 0)}" style="max-width:6rem"></label>
+      <label>${esc(T('adv'))}<input id="sx_ad" inputmode="decimal" value="${esc(v.advance || 0)}" style="max-width:6rem"></label>
+      <label>${esc(T('advm'))}<select id="sx_am">${[['cash', 'cash'], ['mobile', 'mobileP'], ['card', 'card']].map((c) => `<option value="${c[0]}" ${v.advance_mode === c[0] ? 'selected' : ''}>${esc(T(c[1]))}</option>`).join('')}</select></label></div>
+    <label>${esc(T('note'))}<input id="sx_nt" maxlength="300" value="${esc(v.note || '')}"></label>
+    ${B.c2orders ? B.c2orders.formHTML() : ''}
+    <button type="button" class="btn primary" data-act="sx_save">${esc(T('save'))}</button></div>`;
+}
+async function openForm(id) {
+  await ensureItems();
+  O.edit = null; O.lines = [];
+  if (id) { const r = await sb.from('online_orders').select('*').eq('id', id).maybeSingle(); O.edit = r.data; O.lines = ((O.edit && O.edit.lines) || []).map((l) => ({ item_id: l.item_id, qty: l.qty })); }
+  if (!O.lines.length && O.items[0]) O.lines = [{ item_id: O.items[0].id, qty: 1 }];
+  if (B.c2orders) { await B.c2orders.init(); await B.c2orders.preload(O.edit); }
+  O.client = rid(); openSheet(orderForm(O.edit));
+}
+const refreshLines = () => { const el = $('#sx_lines'); if (el) el.innerHTML = O.lines.map(lineRow).join(''); };
+const refreshOrders = async () => { await loadOrders(); drawOrders(); };
+Object.assign(H, {
+  sx_c2_detail: (a) => { if (B.c2orders) B.c2orders.detail(a.dataset.id); },
+  sx_new: () => openForm(null).catch(fail),
+  sx_edit: (a) => openForm(a.dataset.id).catch(fail),
+  sx_addline: () => { O.lines.push({ item_id: (O.items[0] || {}).id, qty: 1 }); refreshLines(); },
+  sx_delline: (a) => { if (O.lines.length > 1) { O.lines.splice(Number(a.dataset.i), 1); refreshLines(); } },
+  sx_save: async () => {
+    const lines = O.lines.map((l) => ({ item_id: l.item_id, qty: num(l.qty) })); if (lines.some((l) => !(l.qty > 0))) return toast(lab(ERR.bad_qty));
+    const adv = num($('#sx_ad').value) || 0;
+    const c2x = B.c2orders ? B.c2orders.read() : null; if (c2x && c2x.badWeight) return toast('The cake weight must be above 0');
+    const r = await rpc('online_order_save', { p_id: O.edit ? O.edit.id : null, p_client: O.edit ? null : O.client, p_loc: O.edit ? O.edit.location_id : O.loc, p_channel: $('#sx_ch').value, p_name: $('#sx_n').value, p_mobile: $('#sx_m').value,
+      p_address: $('#sx_a').value || null, p_lines: lines, p_delivery_mode: $('#sx_dm').value, p_delivery_by: null, p_delivery_date: $('#sx_dd').value || null, p_charge: num($('#sx_c').value) || 0, p_discount: num($('#sx_d').value) || 0,
+      p_advance: adv, p_adv_mode: adv > 0 ? $('#sx_am').value : null, p_adv_wallet: null, p_note: $('#sx_nt').value || null });
+    if (!r) return; if (B.c2orders) await B.c2orders.afterSave(r.id, c2x); closeSheet(); toast(T('saved')); await refreshOrders();
+  },
+  sx_st_confirmed: async (a) => { if (await rpc('online_order_status', { p_id: a.dataset.id, p_to: 'confirmed', p_note: null })) await refreshOrders(); },
+  sx_st_packed: async (a) => { if (await rpc('online_order_status', { p_id: a.dataset.id, p_to: 'packed', p_note: null })) await refreshOrders(); },
+  sx_cancel: (a) => {
+    const o = O.rows.find((x) => x.id === a.dataset.id);
+    openSheet(`<div class="stack"><h3>${esc(T('cancel'))} #${esc(o.order_no)}</h3><label>${esc(T('reason'))}<input id="sx_cr" maxlength="300"></label>
+      ${Number(o.advance) > 0 ? `<label>${esc(T('fate'))} (${esc(money(o.advance))})<select id="sx_cf"><option value="refund">${esc(T('refund'))}</option><option value="adjust">${esc(T('adjust'))}</option><option value="income">${esc(T('income'))}</option></select></label>` : ''}
+      ${B.c2orders ? B.c2orders.refundModeHTML(o) : ''}
+      <button type="button" class="btn primary" data-act="sx_cancel_go" data-id="${esc(o.id)}">${esc(T('cancel'))}</button></div>`);
+  },
+  sx_cancel_go: async (a) => {
+    const base = { p_id: a.dataset.id, p_reason: $('#sx_cr').value, p_advance_fate: $('#sx_cf') ? $('#sx_cf').value : 'none' };
+    const r = B.c2orders ? await rpc(B.c2orders.cancelFn(), B.c2orders.cancelArgs(base)) : await rpc('online_order_cancel', base);
+    if (r) { closeSheet(); if (r.refund === 'due') toast('Refund is due: a person who may move money pays it'); else if (r.refund === 'paid') toast('Refund recorded'); await refreshOrders(); }
+  },
+  sx_deliver: (a) => {
+    const o = O.rows.find((x) => x.id === a.dataset.id);
+    openSheet(`<div class="stack"><h3>${esc(T('deliver'))} #${esc(o.order_no)}</h3><b>${esc(T('balance'))} ${esc(money(o.balance))}</b>
+      <label>${esc(T('collect'))}<input id="sx_pa" inputmode="decimal" value="${esc(o.balance)}"></label>
+      <label>${esc(T('payBy'))}<select id="sx_pm"><option value="cash">${esc(T('cash'))}</option><option value="mobile">${esc(T('mobileP'))}</option><option value="card">${esc(T('card'))}</option></select></label>
+      ${B.c2orders ? B.c2orders.costFieldsHTML() : ''}
+      <button type="button" class="btn primary" data-act="sx_deliver_go" data-id="${esc(o.id)}">${esc(T('deliver'))}</button></div>`);
+  },
+  sx_deliver_go: async (a) => {
+    const amt = num($('#sx_pa').value) || 0;
+    const r = await rpc(B.c2orders ? B.c2orders.deliverFn() : 'online_order_deliver', { p_id: a.dataset.id, p_payments: amt > 0 ? [{ mode: $('#sx_pm').value, amount: amt }] : [] });
+    if (r && B.c2orders) await B.c2orders.afterDeliver(a.dataset.id);
+    if (r) { closeSheet(); toast(T('done') + (r.receipt ? ' · ' + T('receipt') + ' ' + r.receipt : '')); await refreshOrders(); }
+  },
+  sx_linksale: async (a) => {
+    const o = O.rows.find((x) => x.id === a.dataset.id);
+    const r = await sb.from('sales').select('id,receipt,total,sale_date').eq('location_id', o.location_id).eq('status', 'done').order('sold_at', { ascending: false }).limit(40);
+    openSheet(`<div class="stack"><h3>${esc(T('link'))} #${esc(o.order_no)}</h3><label>${esc(T('pickSale'))}<select id="sx_ls">${(r.data || []).map((s) => `<option value="${esc(s.id)}">#${esc(s.receipt)} · ${esc(s.sale_date)} · ${esc(money(s.total))}</option>`).join('')}</select></label>
+      <button type="button" class="btn primary" data-act="sx_link_go" data-id="${esc(o.id)}">${esc(T('link'))}</button></div>`);
+  },
+  sx_link_go: async (a) => { const r = await rpc('online_order_link_sale', { p_id: a.dataset.id, p_sale: $('#sx_ls').value, p_note: null }); if (r) { closeSheet(); await refreshOrders(); } },
+});
+document.addEventListener('change', (e) => {
+  const t = e.target;
+  if (t.id === 'sx_loc') { O.loc = Number(t.value); refreshOrders().catch(fail); }
+  if (t.id === 'sx_st') { O.status = t.value; refreshOrders().catch(fail); }
+  if (t.dataset && t.dataset.sxl) { const l = O.lines[Number(t.dataset.i)]; if (l) { if (t.dataset.sxl === 'item') l.item_id = t.value; else l.qty = t.value; } }
+});
+document.addEventListener('input', (e) => { const t = e.target; if (t.dataset && t.dataset.sxl === 'qty') { const l = O.lines[Number(t.dataset.i)]; if (l) l.qty = t.value; } });
+async function viewOrders() {
+  shell(T('oTitle'), '<div id="sx_body"><p class="muted">…</p></div>', true);
+  try { await loadOrders(); drawOrders(); } catch (e) { bad(e); }
+}
+
+/* ============ #/saleforms (owner) ============ */
+const F = { from: null, to: null, loc: null, rep: [], linked: [], sales: {} };
+async function loadForms() {
+  if (B.loadStatic) await B.loadStatic();
+  F.to = F.to || today(); F.from = F.from || addDays(F.to, -7); if (!F.loc) F.loc = (locs()[0] || {}).id;
+  const r = await sb.rpc('unlinked_sale_forms', { p_from: F.from, p_to: F.to, p_loc: F.loc, p_limit: 200 }); if (r.error) throw r.error; F.rep = r.data || [];
+  const l = await sb.from('sale_form_links').select('id,sale_id,entry_id,form_code,amount_diff,linked_at').eq('location_id', F.loc).eq('state', 'active').order('id', { ascending: false }).limit(40); F.linked = l.data || [];
+  const ids = [...new Set(F.rep.flatMap((x) => x.candidate_sales || []).concat(F.linked.map((x) => x.sale_id)))];
+  F.sales = {};
+  if (ids.length) { const s = await sb.from('sales').select('id,receipt,total,sale_date').in('id', ids); (s.data || []).forEach((x) => { F.sales[x.id] = x; }); }
+}
+const saleTxt = (id) => { const s = F.sales[id]; return s ? `#${s.receipt} · ${s.sale_date} · ${money(s.total)}` : String(id).slice(0, 8); };
+function drawForms() {
+  const el = $('#sf_body'); if (!el) return;
+  el.innerHTML = `<div class="card stack"><div class="row wrap"><label>${esc(T('place'))} ${locSel('sf_loc', F.loc)}</label><label>${esc(T('from'))} <input type="date" id="sf_from" value="${esc(F.from)}"></label>
+      <label>${esc(T('to'))} <input type="date" id="sf_to" value="${esc(F.to)}"></label><button type="button" class="btn" data-act="sf_run">${esc(T('show'))}</button></div></div>
+    <h3>${esc(T('unl'))} (${F.rep.length})</h3>
+    ${F.rep.length ? F.rep.map((x) => `<div class="card stack" data-entry="${esc(x.entry_id)}"><div class="row between"><b>${esc(x.form_code)} #${esc(x.serial)}</b><span class="muted">${esc(x.entry_date)}</span></div>
+      <div class="muted">${esc(T('customer'))}: ${esc(x.customer || '-')}${x.form_total != null ? ' · ' + esc(T('total')) + ' ' + esc(money(x.form_total)) : ''}</div>
+      ${(x.candidate_sales || []).length ? `<div class="muted">${esc(T('cand'))}</div>` + x.candidate_sales.map((sid) => `<div class="row between"><span>${esc(saleTxt(sid))}</span><button type="button" class="mini" data-act="sf_link" data-e="${esc(x.entry_id)}" data-s="${esc(sid)}">${esc(T('doLink'))}</button></div>`).join('') : ''}</div>`).join('') : `<p class="muted">${esc(T('none'))}</p>`}
+    <h3>${esc(T('lnk'))} (${F.linked.length})</h3>
+    ${F.linked.map((l) => `<div class="card row between"><span>${esc(l.form_code)} ↔ ${esc(saleTxt(l.sale_id))}${l.amount_diff != null && Number(l.amount_diff) !== 0 ? ` · <b>${esc(T('diff'))} ${esc(money(l.amount_diff))}</b>` : ''}</span>
+      <button type="button" class="mini" data-act="sf_unlink" data-id="${esc(l.id)}">${esc(T('unlink'))}</button></div>`).join('')}`;
+}
+const refreshForms = async () => { await loadForms(); drawForms(); };
+Object.assign(H, {
+  sf_run: async () => { F.from = $('#sf_from').value; F.to = $('#sf_to').value; F.loc = Number($('#sf_loc').value); try { await refreshForms(); } catch (e) { bad(e); } },
+  sf_link: async (a) => { const r = await rpc('sale_form_link', { p_entry: a.dataset.e, p_sale: a.dataset.s, p_note: null }); if (r) { toast(T('saved') + (r.amount_diff ? ' · ' + T('diff') + ' ' + money(r.amount_diff) : '')); await refreshForms().catch(bad); } },
+  sf_unlink: async (a) => { const why = window.prompt(T('reason')); if (!why) return; const r = await rpc('sale_form_unlink', { p_link: Number(a.dataset.id), p_note: why }); if (r) await refreshForms().catch(bad); },
+});
+async function viewForms() {
+  shell(T('fTitle'), '<div id="sf_body"><p class="muted">…</p></div>', true);
+  try { await loadForms(); drawForms(); } catch (e) { bad(e); }
+}
+
+/* ============ #/benefitsx ============ */
+const BN = { asof: null, loc: null, rep: null, emps: [], types: [] };
+async function loadBen() {
+  if (B.loadStatic) await B.loadStatic();
+  BN.asof = BN.asof || today();
+  const r = await sb.rpc('benefits_report', { p_as_of: BN.asof, p_loc: BN.loc || null }); if (r.error) throw r.error; BN.rep = r.data;
+  const t = await sb.from('benefit_types').select('code,name_bn,name_en,paid_in_payroll,eligible_after_days,default_for_all,active').eq('active', true).order('sort'); BN.types = t.data || [];
+}
+function drawBen() {
+  const el = $('#bx_body'); if (!el) return; const r = BN.rep || { grants: [], missing: [] };
+  const tn = (c) => { const t = BN.types.find((x) => x.code === c); return t ? lab({ bn: t.name_bn, mix: t.name_bn, en: t.name_en || t.name_bn }) : c; };
+  el.innerHTML = `<p class="muted">${esc(T('reportOnly'))}</p>
+    <div class="card stack"><div class="row wrap"><label>${esc(T('place'))} <select id="bx_loc"><option value="">${esc(T('all'))}</option>${locs().map((l) => `<option value="${l.id}" ${String(BN.loc) === String(l.id) ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select></label>
+      <label>${esc(T('asof'))} <input type="date" id="bx_asof" value="${esc(BN.asof)}"></label><button type="button" class="btn" data-act="bx_run">${esc(T('show'))}</button>
+      <button type="button" class="btn primary" data-act="bx_add">${esc(T('addGrant'))}</button></div></div>
+    <h3>${esc(T('ben'))} (${r.grants.length})</h3>
+    ${r.grants.length ? r.grants.map((g) => `<div class="card stack"><div class="row between"><b>${esc(g.employee_name)} · ${esc(tn(g.type_code))}</b><span class="chip ${g.state === 'eligible' ? 'ok' : g.state === 'ended' ? '' : 'warn'}">${esc(T(g.state === 'not_yet' ? 'notyet' : g.state))}</span></div>
+      <div class="muted" style="font-size:.85rem">${esc(g.from_date)} → ${esc(g.to_date || '…')} · ${esc(T('eligible'))} ${esc(g.eligible_from)}${g.paid_in_payroll ? ' · ' + esc(T('paid')) : ''}${g.value_per_month != null ? ' · ' + esc(T('val')) + ' ' + esc(money(g.value_per_month)) : ''}</div>
+      ${g.state !== 'ended' ? `<button type="button" class="mini" data-act="bx_end" data-id="${esc(g.id)}">${esc(T('endIt'))}</button>` : ''}</div>`).join('') : `<p class="muted">${esc(T('none'))}</p>`}
+    <h3>${esc(T('miss'))} (${r.missing.length})</h3>
+    ${r.missing.length ? r.missing.map((m) => `<div class="card row between"><span>${esc(m.employee_name)} · ${esc(tn(m.type_code))}</span><span class="muted">${esc(m.eligible_from)}</span></div>`).join('') : `<p class="muted">${esc(T('none'))}</p>`}`;
+}
+Object.assign(H, {
+  bx_run: async () => { BN.asof = $('#bx_asof').value || today(); BN.loc = $('#bx_loc').value ? Number($('#bx_loc').value) : null; try { await loadBen(); drawBen(); } catch (e) { bad(e); } },
+  bx_add: async () => {
+    const e = await sb.from('employees').select('id,full_name_bn,employee_no').eq('status', 'active').order('full_name_bn').limit(500); BN.emps = e.data || [];
+    openSheet(`<div class="stack"><h3>${esc(T('addGrant'))}</h3><label>${esc(T('emp'))}<select id="bx_e">${BN.emps.map((x) => `<option value="${esc(x.id)}">${esc(x.full_name_bn)}${x.employee_no ? ' · ' + esc(x.employee_no) : ''}</option>`).join('')}</select></label>
+      <label>${esc(T('type'))}<select id="bx_t">${BN.types.map((t) => `<option value="${esc(t.code)}">${esc(lab({ bn: t.name_bn, mix: t.name_bn, en: t.name_en || t.name_bn }))}</option>`).join('')}</select></label>
+      <label>${esc(T('fromD'))}<input type="date" id="bx_f" value="${esc(today())}"></label><label>${esc(T('val'))}<input id="bx_v" inputmode="decimal" placeholder="-"></label>
+      <label>${esc(T('note'))}<input id="bx_n" maxlength="300"></label><button type="button" class="btn primary" data-act="bx_go">${esc(T('save'))}</button></div>`);
+  },
+  bx_go: async () => {
+    const v = num($('#bx_v').value);
+    const r = await rpc('employee_benefit_grant', { p_id: null, p_client: rid(), p_emp: $('#bx_e').value, p_type: $('#bx_t').value, p_from: $('#bx_f').value, p_to: null, p_value: Number.isNaN(v) ? null : v, p_paid: null, p_note: $('#bx_n').value || null });
+    if (r) { closeSheet(); toast(T('saved')); await loadBen(); drawBen(); }
+  },
+  bx_end: async (a) => { const r = await rpc('employee_benefit_grant_end', { p_id: Number(a.dataset.id), p_to: today(), p_note: null }); if (r) { await loadBen(); drawBen(); } },
+});
+async function viewBen() {
+  shell(T('bTitle'), '<div id="bx_body"><p class="muted">…</p></div>', true);
+  try { await loadBen(); drawBen(); } catch (e) { bad(e); }
+}
+
+/* ============ #/biexport ============ */
+const guardCsv = (t) => String(t).replace(/(^|,|\n)("?)([=+\-@\t\r])(?!\d*(\.\d+)?(,|\n|"|$))/g, "$1$2'$3");   // spreadsheet formula guard: a cell starting with = + - @ tab CR gets a leading apostrophe (plain numbers are left alone)
+const EX = { ds: 'sales', from: null, to: null, loc: null, fmt: 'csv', limit: '', res: null, log: [] };
+const DS = ['sales', 'sale_lines', 'purchases', 'stock_ledger', 'journal'];
+function drawExport() {
+  const el = $('#ex_body'); if (!el) return; const r = EX.res;
+  el.innerHTML = `<div class="card stack"><label>${esc(T('dataset'))}<select id="ex_ds">${DS.map((d) => `<option value="${d}" ${EX.ds === d ? 'selected' : ''}>${esc(T('d_' + d))}</option>`).join('')}</select></label>
+    <div class="row wrap"><label>${esc(T('from'))} <input type="date" id="ex_from" value="${esc(EX.from)}"></label><label>${esc(T('to'))} <input type="date" id="ex_to" value="${esc(EX.to)}"></label></div>
+    <div class="row wrap"><label>${esc(T('place'))} <select id="ex_loc"><option value="">${esc(T('all'))}</option>${locs().map((l) => `<option value="${l.id}" ${String(EX.loc) === String(l.id) ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select></label>
+      <label>${esc(T('format'))} <select id="ex_fmt"><option value="csv" ${EX.fmt === 'csv' ? 'selected' : ''}>CSV</option><option value="json" ${EX.fmt === 'json' ? 'selected' : ''}>JSON</option></select></label>
+      <label>${esc(T('limit'))} <input id="ex_lim" inputmode="numeric" value="${esc(EX.limit)}" style="max-width:6rem"></label></div>
+    <div class="muted" style="font-size:.85rem">${esc(T('costNote'))}</div><button type="button" class="btn primary" data-act="ex_run">${esc(T('run'))}</button></div>
+    ${r ? `<div class="card stack"><b>${esc(T('d_' + r.dataset))}: ${esc(r.row_count)} ${esc(T('rows'))}</b>${r.truncated ? `<div class="chip warn">${esc(T('cut'))}</div>` : ''}
+      <button type="button" class="btn" data-act="ex_dl">${esc(T('dl'))}</button></div>` : ''}
+    ${EX.log.length ? `<h3>${esc(T('log'))}</h3>${EX.log.slice(0, 15).map((l) => `<div class="muted" style="font-size:.8rem">${esc(String(l.at).slice(0, 16).replace('T', ' '))} · ${esc(l.dataset)} · ${esc(l.row_count)}${l.truncated ? ' ✂' : ''} · ${esc(l.format)}</div>`).join('')}` : ''}`;
+}
+Object.assign(H, {
+  ex_run: async () => {
+    EX.ds = $('#ex_ds').value; EX.from = $('#ex_from').value; EX.to = $('#ex_to').value; EX.loc = $('#ex_loc').value ? Number($('#ex_loc').value) : null; EX.fmt = $('#ex_fmt').value; EX.limit = $('#ex_lim').value;
+    const lim = num(EX.limit);
+    const r = await rpc('bi_export', { p_dataset: EX.ds, p_from: EX.from, p_to: EX.to, p_loc: EX.loc, p_format: EX.fmt, p_limit: lim > 0 ? Math.floor(lim) : null });
+    if (!r) return; EX.res = r;
+    if (S.ctx.is_owner) { const l = await sb.rpc('bi_export_log_list', { p_limit: 15 }); if (!l.error) EX.log = l.data || []; }
+    drawExport();
+  },
+  ex_dl: () => {
+    const r = EX.res; if (!r) return;
+    const body = r.format === 'csv' ? '﻿' + guardCsv(r.csv) : JSON.stringify(r.rows, null, 1);
+    const url = URL.createObjectURL(new Blob([body], { type: r.format === 'csv' ? 'text/csv;charset=utf-8' : 'application/json' }));
+    const a = document.createElement('a'); a.href = url; a.download = `${r.dataset}_${EX.from}_${EX.to}.${r.format}`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+  },
+});
+async function viewExport() {
+  if (B.loadStatic) await B.loadStatic();
+  EX.to = EX.to || today(); EX.from = EX.from || addDays(EX.to, -30); EX.res = null;
+  shell(T('eTitle'), '<div id="ex_body"></div>', true); drawExport();
+}
+
+window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { onlineorders: viewOrders, saleforms: viewForms, benefitsx: viewBen, biexport: viewExport });
+})();

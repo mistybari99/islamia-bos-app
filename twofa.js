@@ -1,1 +1,194 @@
-(()=>{"use strict";const t=window.BOS_APP,e=window.BOS,{sb:a,esc:n,toast:o,fail:r,shell:i,H:s}=t,c=e.L,d=e.lab,l=(t,e=document)=>e.querySelector(t),u={title:c("দুই-ধাপ যাচাই (2FA)","Two-factor sign-in (2FA)","২-ধাপ যাচাই (2FA)"),intro:c("পিনের পরে মোবাইলের অথেনটিকেটর অ্যাপের ৬ অঙ্কের কোড লাগবে। এতে পিন কেউ জেনে গেলেও একা ঢুকতে পারবে না।","After your PIN you also type a 6-digit code from an authenticator app on your phone. A leaked PIN alone then cannot open your account.","PIN-এর পরে phone-এর authenticator app-এর ৬ অঙ্কের code লাগবে। PIN জেনে গেলেও একা ঢোকা যাবে না।"),status:c("আপনার অবস্থা","Your status","আপনার অবস্থা"),on:c("চালু আছে ✓","ON ✓","চালু আছে ✓"),off:c("চালু নেই","OFF","চালু নেই"),lvl:c("এই সেশনের স্তর","This session level","এই session-এর level"),l1:c("শুধু পিন (aal1)","PIN only (aal1)","শুধু PIN (aal1)"),l2:c("পিন + কোড (aal2)","PIN + code (aal2)","PIN + code (aal2)"),facts:c("আপনার ফ্যাক্টর","Your factors","আপনার factor"),nofact:c("কোনো ফ্যাক্টর নেই","No factor yet","কোনো factor নেই"),verified:c("যাচাই-করা","verified","verified"),unver:c("অসম্পূর্ণ","not finished","অসম্পূর্ণ"),enroll:c("2FA চালু করুন","Turn 2FA on","2FA চালু করুন"),scan:c("অথেনটিকেটর অ্যাপে (Google Authenticator, Microsoft Authenticator ইত্যাদি) এই QR স্ক্যান করুন। স্ক্যান না হলে নিচের গোপন কোড হাতে লিখুন।","Scan this QR with an authenticator app (Google Authenticator, Microsoft Authenticator, etc.). If scanning fails, type the secret below by hand.","Authenticator app-এ এই QR scan করুন। না হলে নিচের secret হাতে লিখুন।"),secret:c("গোপন কোড (কাউকে দেবেন না)","Secret (share with nobody)","Secret (কাউকে দেবেন না)"),code:c("অ্যাপের ৬ অঙ্কের কোড","6-digit code from the app","App-এর ৬ অঙ্কের code"),verify:c("যাচাই করে চালু করুন","Verify and turn on","Verify করে চালু করুন"),cancel:c("ক্যান্সেল","Cancel","cancel"),off2:c("2FA বন্ধ করুন (কোড লাগবে)","Turn 2FA off (code needed)","2FA বন্ধ করুন (code লাগবে)"),warn:c("ফোন হারালে বা অ্যাপ মুছলে আপনি লগইন করতে পারবেন না — তখন মালিককে বলুন, তিনি Supabase থেকে ফ্যাক্টর সরাবেন। এই অ্যাপে কোনো রিকভারি কোড নেই।","If you lose the phone or delete the app you cannot sign in - ask the owner, who removes the factor in Supabase. This app has NO recovery codes.","Phone হারালে বা app মুছলে login করা যাবে না — owner-কে বলুন, তিনি Supabase থেকে factor সরাবেন। এখানে recovery code নেই।"),nomfa:c("2FA এখনো সার্ভারে চালু করা হয়নি (মালিক Supabase ড্যাশবোর্ডে MFA চালু করবেন)।","2FA is not enabled on the server yet (the owner turns MFA on in the Supabase dashboard).","2FA server-এ এখনো চালু নেই (owner Supabase dashboard-এ MFA চালু করবেন)।"),pol:c("নীতি","Policy","নীতি"),must:c("আপনার রোলে 2FA লাগার কথা — এখনই চালু করুন।","Your role is expected to use 2FA - please turn it on now.","আপনার role-এ 2FA লাগার কথা — এখনই চালু করুন।"),blocked:c("সার্ভার-সুইচ চালু: মালিকের সংবেদনশীল কাজ করতে কোড দিয়ে আবার লগইন করতে হবে।","Server switch is ON: sensitive owner actions need a sign-in with a code.","Server switch চালু: owner-এর sensitive কাজে code দিয়ে আবার login লাগবে।"),rep:c("কার 2FA আছে (মালিক)","Who has 2FA (owner)","কার 2FA আছে (owner)"),run:c("দেখুন","Show","দেখুন"),missing:c("নেই — লাগার কথা","missing - expected","নেই — লাগার কথা"),done:c("2FA চালু হয়েছে","2FA is on","2FA চালু হয়েছে"),gone:c("2FA বন্ধ হয়েছে","2FA is off","2FA বন্ধ হয়েছে"),bad:c("কোড ভুল বা মেয়াদ শেষ","Wrong or expired code","Code ভুল বা মেয়াদ শেষ"),need6:c("৬ অঙ্কের কোড দিন","Enter the 6-digit code","৬ অঙ্কের code দিন"),gtitle:c("কোড দিন","Enter your code","Code দিন"),gtext:c("আপনার অথেনটিকেটর অ্যাপ খুলে ৬ অঙ্কের কোড লিখুন।","Open your authenticator app and type the 6-digit code.","Authenticator app খুলে ৬ অঙ্কের code লিখুন।"),gok:c("ঢুকুন","Continue","ঢুকুন"),gout:c("লগ আউট","Sign out","লগ আউট"),tries:c("অনেকবার ভুল — লগ আউট করা হলো","Too many wrong codes - signed out","অনেকবার ভুল — logout করা হলো"),loading:c("লোড হচ্ছে…","Loading…","লোড হচ্ছে…")},f=t=>d(u[t]),p={enr:null,busy:!1,gating:!1},g=()=>a.auth&&a.auth.mfa,w=t=>String(t||"").replace(/\D/g,"");async function h(){if(!g()||!g().getAuthenticatorAssuranceLevel)return null;const t=await g().getAuthenticatorAssuranceLevel();return t&&!t.error?t.data:null}async function y(){try{const t=await h();return!(!t||"aal2"!==t.nextLevel||"aal2"===t.currentLevel)}catch(t){return!1}}async function v(){const t=await g().listFactors();if(t.error)throw t.error;return(t.data&&(t.data.all||t.data.totp)||[]).filter(t=>!t.factor_type||"totp"===t.factor_type)}async function b(t,e){const a=await g().challenge({factorId:t});if(a.error)return a.error;return(await g().verify({factorId:t,challengeId:a.data.id,code:e})).error||null}function _(){return p.gating?Promise.resolve(!1):(p.gating=!0,new Promise(async t=>{let e=[];try{e=(await v()).filter(t=>"verified"===t.status)}catch(t){e=[]}const a=e[0];if(!a)return p.gating=!1,t(!0);const o=document.createElement("div");o.id="tf_gate",o.style.cssText="position:fixed;inset:0;z-index:99999;background:rgba(20,23,58,.96);display:flex;align-items:center;justify-content:center;padding:16px",o.innerHTML=`<div class="card panel stack" style="max-width:340px;width:100%"><h2 style="margin:0">${n(f("gtitle"))}</h2><p>${n(f("gtext"))}</p>\n      <div id="tf_gerr" class="notice bad" style="display:none"></div>\n      <input id="tf_gcode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" aria-label="${n(f("code"))}">\n      <button class="primary full" id="tf_gok" type="button">${n(f("gok"))}</button><button class="full" id="tf_gout" type="button">${n(f("gout"))}</button></div>`,document.body.appendChild(o);let r=0;const i=e=>{o.remove(),p.gating=!1,t(e)},s=t=>{const e=l("#tf_gerr",o);e.textContent=t,e.style.display=""};l("#tf_gcode",o).focus(),l("#tf_gout",o).onclick=()=>i(!1),l("#tf_gok",o).onclick=async()=>{const t=w(l("#tf_gcode",o).value);if(6!==t.length)return s(f("need6"));if(!await b(a.id,t))return i(!0);r++,l("#tf_gcode",o).value="",r>=5?(s(f("tries")),setTimeout(()=>i(!1),900)):s(f("bad"))}}))}function m(){const t=a.auth;if(!t||t.__tfWrapped||!t.signInWithPassword)return;const e=t.signInWithPassword.bind(t);t.signInWithPassword=async(...a)=>{const n=await e(...a);if(!n||n.error||!n.data||!n.data.session)return n;if(!await y())return n;if(await _())return n;try{await t.signOut()}catch(t){}return{data:{user:null,session:null},error:{message:"twofa_cancelled"}}},t.__tfWrapped=!0}async function $(){try{const{data:t}=await a.auth.getSession();if(!t||!t.session||p.gating||!await y())return;if(!await _()){try{await a.auth.signOut()}catch(t){}location.reload()}}catch(t){}}function A(t){return`<div class="row wrap" data-fid="${n(t.id)}"><b>${n(t.friendly_name||"TOTP")}</b> <span class="chip ${"verified"===t.status?"ok":"warn"}">${n(f("verified"===t.status?"verified":"unver"))}</span></div>`}async function F(){const e=l("#tf_body");if(!e)return;let o=[],r=null,i=null,s="";try{o=await v(),r=await h()}catch(t){s=t.message||String(t)}try{const t=await a.rpc("twofa_policy");t.error||(i=t.data)}catch(t){}if(s)return void(e.innerHTML=`<div class="card stack"><p>${n(f("nomfa"))}</p><p class="muted" style="font-size:.8rem">${n(s)}</p></div>`);const c=o.filter(t=>"verified"===t.status),d=c.length>0,u=r&&"aal2"===r.currentLevel?"l2":"l1";e.innerHTML=`<p class="muted">${n(f("intro"))}</p>\n    <div class="card stack"><b>${n(f("status"))}</b>\n      <div class="row wrap"><span class="chip ${d?"ok":"warn"}" id="tf_state">${n(f(d?"on":"off"))}</span><span class="muted">${n(f("lvl"))}: <span id="tf_lvl">${n(f(u))}</span></span></div>\n      ${i&&i.must_enroll?`<div class="notice bad" id="tf_must">${n(f("must"))}</div>`:""}\n      ${i&&i.sensitive_actions_blocked_now?`<div class="notice bad" id="tf_blk">${n(f("blocked"))}</div>`:""}\n      <b>${n(f("facts"))}</b>${o.length?o.map(A).join(""):`<span class="muted">${n(f("nofact"))}</span>`}\n      ${d?`<div><label>${n(f("code"))}</label><input id="tf_off_code" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div>\n        <button class="btn full" type="button" data-act="tf_unenroll" data-fid="${n(c[0].id)}">${n(f("off2"))}</button>`:`<button class="primary full" type="button" data-act="tf_enroll">${n(f("enroll"))}</button>`}\n      <div class="notice" id="tf_warn">${n(f("warn"))}</div></div>\n    <div id="tf_enroll"></div>\n    ${t.S&&t.S.ctx&&t.S.ctx.is_owner?`<div class="card stack"><b>${n(f("rep"))}</b><button class="btn" type="button" data-act="tf_report">${n(f("run"))}</button><div id="tf_rep"></div></div>`:""}`,p.enr&&S()}function S(){const t=l("#tf_enroll");if(!t||!p.enr)return;const e=p.enr;t.innerHTML=`<div class="card stack"><p>${n(f("scan"))}</p>\n    <img id="tf_qr" alt="QR" src="${n(e.qr)}" style="width:200px;height:200px;max-width:100%;background:#fff;align-self:center">\n    <div><label>${n(f("secret"))}</label><code id="tf_secret" style="word-break:break-all;user-select:all">${n(e.secret)}</code></div>\n    <div><label>${n(f("code"))}</label><input id="tf_code" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div>\n    <div class="row wrap"><button class="primary" type="button" data-act="tf_verify">${n(f("verify"))}</button><button class="btn" type="button" data-act="tf_cancel">${n(f("cancel"))}</button></div></div>`}Object.assign(s,{tf_enroll:async()=>{await async function(){for(const t of(await v()).filter(t=>"verified"!==t.status))await g().unenroll({factorId:t.id})}();const t=await g().enroll({factorType:"totp",friendlyName:"BOS-"+Date.now().toString(36)});if(t.error)return r(t.error);p.enr={id:t.data.id,qr:t.data.totp.qr_code,secret:t.data.totp.secret},S()},tf_cancel:async()=>{if(p.enr)try{await g().unenroll({factorId:p.enr.id})}catch(t){}p.enr=null,await F()},tf_verify:async()=>{const t=w(l("#tf_code").value);if(6!==t.length)return o(f("need6"));if(await b(p.enr.id,t))return o(f("bad"));p.enr=null,o(f("done")),await F()},tf_unenroll:async t=>{const e=w(l("#tf_off_code").value);if(6!==e.length)return o(f("need6"));if(await b(t.dataset.fid,e))return o(f("bad"));const a=await g().unenroll({factorId:t.dataset.fid});if(a.error)return r(a.error);o(f("gone")),await F()},tf_report:async()=>{const t=await a.rpc("twofa_status_report");if(t.error)return r(t.error);l("#tf_rep").innerHTML=(t.data&&t.data.users||[]).map(t=>`<div class="row wrap"><b>${n(t.name||t.staff_id)}</b> <span class="muted">${n((t.roles||[]).join(", "))}</span> <span class="chip ${t.has_2fa?"ok":t.missing?"bad":"warn"}">${n(t.has_2fa?f("on"):t.missing?f("missing"):f("off"))}</span></div>`).join("")||'<span class="muted">-</span>'}}),window.BOS_PAGES=Object.assign(window.BOS_PAGES||{},{twofa:async function(){i(f("title"),`<div id="tf_body"><p class="muted">${n(f("loading"))}</p></div>`,!0);try{await F()}catch(t){r(t)}}}),window.BOS_TWOFA={gate:_,needsCode:y,wrapSignIn:m,bootCheck:$},m(),$()})();
+/* Islamia BOS · Two-factor sign-in (2FA, TOTP) · screen #/twofa for every signed-in user. Gap #18 (safe core).
+   Uses Supabase Auth MFA (sb.auth.mfa.enroll / challenge / verify / unenroll / listFactors / getAuthenticatorAssuranceLevel). The owner must switch MFA on in the
+   Supabase dashboard first (docs/TWOFA.md). Server side: supabase/phase71.sql (twofa_policy, twofa_status_report, optional guard on the most sensitive owner actions).
+   Login hook: sb.auth.signInWithPassword is wrapped; PIN login is untouched unless the person HAS a verified factor, then a code is asked before the app opens.
+   The PIN scheme (`${pin}-bos`) is NOT changed (#16 stays postponed). The overlay is a browser-side gate; the real server refusal is only the optional owner-actions guard. */
+(() => {
+'use strict';
+const A = window.BOS_APP, B = window.BOS;
+const { sb, esc, toast, fail, shell, H } = A;
+const L = B.L, lab = B.lab;
+const $ = (s, el = document) => el.querySelector(s);
+const X = {
+  title: L('দুই-ধাপ যাচাই (2FA)', 'Two-factor sign-in (2FA)', '২-ধাপ যাচাই (2FA)'),
+  intro: L('পিনের পরে মোবাইলের অথেনটিকেটর অ্যাপের ৬ অঙ্কের কোড লাগবে। এতে পিন কেউ জেনে গেলেও একা ঢুকতে পারবে না।', 'After your PIN you also type a 6-digit code from an authenticator app on your phone. A leaked PIN alone then cannot open your account.', 'PIN-এর পরে phone-এর authenticator app-এর ৬ অঙ্কের code লাগবে। PIN জেনে গেলেও একা ঢোকা যাবে না।'),
+  status: L('আপনার অবস্থা', 'Your status', 'আপনার অবস্থা'),
+  on: L('চালু আছে ✓', 'ON ✓', 'চালু আছে ✓'), off: L('চালু নেই', 'OFF', 'চালু নেই'),
+  lvl: L('এই সেশনের স্তর', 'This session level', 'এই session-এর level'),
+  l1: L('শুধু পিন (aal1)', 'PIN only (aal1)', 'শুধু PIN (aal1)'), l2: L('পিন + কোড (aal2)', 'PIN + code (aal2)', 'PIN + code (aal2)'),
+  facts: L('আপনার ফ্যাক্টর', 'Your factors', 'আপনার factor'), nofact: L('কোনো ফ্যাক্টর নেই', 'No factor yet', 'কোনো factor নেই'),
+  verified: L('যাচাই-করা', 'verified', 'verified'), unver: L('অসম্পূর্ণ', 'not finished', 'অসম্পূর্ণ'),
+  enroll: L('2FA চালু করুন', 'Turn 2FA on', '2FA চালু করুন'),
+  scan: L('অথেনটিকেটর অ্যাপে (Google Authenticator, Microsoft Authenticator ইত্যাদি) এই QR স্ক্যান করুন। স্ক্যান না হলে নিচের গোপন কোড হাতে লিখুন।', 'Scan this QR with an authenticator app (Google Authenticator, Microsoft Authenticator, etc.). If scanning fails, type the secret below by hand.', 'Authenticator app-এ এই QR scan করুন। না হলে নিচের secret হাতে লিখুন।'),
+  secret: L('গোপন কোড (কাউকে দেবেন না)', 'Secret (share with nobody)', 'Secret (কাউকে দেবেন না)'),
+  code: L('অ্যাপের ৬ অঙ্কের কোড', '6-digit code from the app', 'App-এর ৬ অঙ্কের code'),
+  verify: L('যাচাই করে চালু করুন', 'Verify and turn on', 'Verify করে চালু করুন'),
+  cancel: L('বাতিল', 'Cancel', 'বাতিল'),
+  off2: L('2FA বন্ধ করুন (কোড লাগবে)', 'Turn 2FA off (code needed)', '2FA বন্ধ করুন (code লাগবে)'),
+  warn: L('ফোন হারালে বা অ্যাপ মুছলে আপনি লগইন করতে পারবেন না — তখন মালিককে বলুন, তিনি Supabase থেকে ফ্যাক্টর সরাবেন। এই অ্যাপে কোনো রিকভারি কোড নেই।', 'If you lose the phone or delete the app you cannot sign in - ask the owner, who removes the factor in Supabase. This app has NO recovery codes.', 'Phone হারালে বা app মুছলে login করা যাবে না — owner-কে বলুন, তিনি Supabase থেকে factor সরাবেন। এখানে recovery code নেই।'),
+  nomfa: L('2FA এখনো সার্ভারে চালু করা হয়নি (মালিক Supabase ড্যাশবোর্ডে MFA চালু করবেন)।', '2FA is not enabled on the server yet (the owner turns MFA on in the Supabase dashboard).', '2FA server-এ এখনো চালু নেই (owner Supabase dashboard-এ MFA চালু করবেন)।'),
+  pol: L('নীতি', 'Policy', 'নীতি'), must: L('আপনার ভূমিকায় 2FA লাগার কথা — এখনই চালু করুন।', 'Your role is expected to use 2FA - please turn it on now.', 'আপনার role-এ 2FA লাগার কথা — এখনই চালু করুন।'),
+  blocked: L('সার্ভার-সুইচ চালু: মালিকের সংবেদনশীল কাজ করতে কোড দিয়ে আবার লগইন করতে হবে।', 'Server switch is ON: sensitive owner actions need a sign-in with a code.', 'Server switch চালু: owner-এর sensitive কাজে code দিয়ে আবার login লাগবে।'),
+  rep: L('কার 2FA আছে (মালিক)', 'Who has 2FA (owner)', 'কার 2FA আছে (owner)'), run: L('দেখুন', 'Show', 'দেখুন'),
+  missing: L('নেই — লাগার কথা', 'missing - expected', 'নেই — লাগার কথা'),
+  done: L('2FA চালু হয়েছে', '2FA is on', '2FA চালু হয়েছে'), gone: L('2FA বন্ধ হয়েছে', '2FA is off', '2FA বন্ধ হয়েছে'),
+  bad: L('কোড ভুল বা মেয়াদ শেষ', 'Wrong or expired code', 'Code ভুল বা মেয়াদ শেষ'), need6: L('৬ অঙ্কের কোড দিন', 'Enter the 6-digit code', '৬ অঙ্কের code দিন'),
+  gtitle: L('কোড দিন', 'Enter your code', 'Code দিন'), gtext: L('আপনার অথেনটিকেটর অ্যাপ খুলে ৬ অঙ্কের কোড লিখুন।', 'Open your authenticator app and type the 6-digit code.', 'Authenticator app খুলে ৬ অঙ্কের code লিখুন।'),
+  gok: L('ঢুকুন', 'Continue', 'ঢুকুন'), gout: L('লগ আউট', 'Sign out', 'লগ আউট'), tries: L('অনেকবার ভুল — লগ আউট করা হলো', 'Too many wrong codes - signed out', 'অনেকবার ভুল — logout করা হলো'),
+  loading: L('লোড হচ্ছে…', 'Loading…', 'লোড হচ্ছে…'),
+};
+const T = (k) => lab(X[k]);
+const D = { enr: null, busy: false, gating: false };
+const mfa = () => sb.auth && sb.auth.mfa;
+const digits = (v) => String(v || '').replace(/\D/g, '');
+
+/* ---------- AAL helpers ---------- */
+async function aal() {
+  if (!mfa() || !mfa().getAuthenticatorAssuranceLevel) return null;
+  const r = await mfa().getAuthenticatorAssuranceLevel();
+  return r && !r.error ? r.data : null;
+}
+// true when the signed-in session has a verified factor but has not yet been raised to aal2
+async function needsCode() {
+  try { const a = await aal(); return !!(a && a.nextLevel === 'aal2' && a.currentLevel !== 'aal2'); } catch (e) { return false; }
+}
+async function factors() {
+  const r = await mfa().listFactors();
+  if (r.error) throw r.error;
+  const all = (r.data && (r.data.all || r.data.totp)) || [];
+  return all.filter((f) => !f.factor_type || f.factor_type === 'totp');
+}
+async function codeCheck(factorId, code) {
+  const c = await mfa().challenge({ factorId });
+  if (c.error) return c.error;
+  const v = await mfa().verify({ factorId, challengeId: c.data.id, code });
+  return v.error || null;
+}
+
+/* ---------- sign-in gate (overlay) ---------- */
+function gate() {
+  if (D.gating) return Promise.resolve(false);
+  D.gating = true;
+  return new Promise(async (resolve) => {
+    let fs = [];
+    try { fs = (await factors()).filter((f) => f.status === 'verified'); } catch (e) { fs = []; }
+    const f = fs[0];
+    if (!f) { D.gating = false; return resolve(true); }          // nothing to ask: PIN login as before
+    const el = document.createElement('div'); el.id = 'tf_gate';
+    el.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(20,23,58,.96);display:flex;align-items:center;justify-content:center;padding:16px';
+    el.innerHTML = `<div class="card panel stack" style="max-width:340px;width:100%"><h2 style="margin:0">${esc(T('gtitle'))}</h2><p>${esc(T('gtext'))}</p>
+      <div id="tf_gerr" class="notice bad" style="display:none"></div>
+      <input id="tf_gcode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" aria-label="${esc(T('code'))}">
+      <button class="primary full" id="tf_gok" type="button">${esc(T('gok'))}</button><button class="full" id="tf_gout" type="button">${esc(T('gout'))}</button></div>`;
+    document.body.appendChild(el);
+    let tries = 0;
+    const end = (ok) => { el.remove(); D.gating = false; resolve(ok); };
+    const err = (m) => { const e = $('#tf_gerr', el); e.textContent = m; e.style.display = ''; };
+    $('#tf_gcode', el).focus();
+    $('#tf_gout', el).onclick = () => end(false);
+    $('#tf_gok', el).onclick = async () => {
+      const code = digits($('#tf_gcode', el).value);
+      if (code.length !== 6) return err(T('need6'));
+      const bad = await codeCheck(f.id, code);
+      if (!bad) return end(true);
+      tries++; $('#tf_gcode', el).value = '';
+      if (tries >= 5) { err(T('tries')); setTimeout(() => end(false), 900); } else err(T('bad'));
+    };
+  });
+}
+
+// wrap the PIN sign-in: PIN login stays exactly as it was unless a verified factor exists
+function wrapSignIn() {
+  const au = sb.auth; if (!au || au.__tfWrapped || !au.signInWithPassword) return;
+  const orig = au.signInWithPassword.bind(au);
+  au.signInWithPassword = async (...args) => {
+    const r = await orig(...args);
+    if (!r || r.error || !(r.data && r.data.session)) return r;
+    if (!(await needsCode())) return r;
+    if (await gate()) return r;
+    try { await au.signOut(); } catch (e) { /* already out */ }
+    return { data: { user: null, session: null }, error: { message: 'twofa_cancelled' } };
+  };
+  au.__tfWrapped = true;
+}
+// a PIN-only session left over (page reloaded while the code box was open) must not slip into the app
+async function bootCheck() {
+  try {
+    const { data } = await sb.auth.getSession();
+    if (!(data && data.session) || D.gating || !(await needsCode())) return;
+    if (!(await gate())) { try { await sb.auth.signOut(); } catch (e) { /* ignore */ } location.reload(); }
+  } catch (e) { /* MFA not enabled: PIN login only */ }
+}
+
+/* ---------- screen ---------- */
+function fRow(f) {
+  return `<div class="row wrap" data-fid="${esc(f.id)}"><b>${esc(f.friendly_name || 'TOTP')}</b> <span class="chip ${f.status === 'verified' ? 'ok' : 'warn'}">${esc(T(f.status === 'verified' ? 'verified' : 'unver'))}</span></div>`;
+}
+async function draw() {
+  const el = $('#tf_body'); if (!el) return;
+  let fs = [], a = null, pol = null, mfaErr = '';
+  try { fs = await factors(); a = await aal(); } catch (e) { mfaErr = e.message || String(e); }
+  try { const r = await sb.rpc('twofa_policy'); if (!r.error) pol = r.data; } catch (e) { /* phase71 not pasted yet */ }
+  if (mfaErr) { el.innerHTML = `<div class="card stack"><p>${esc(T('nomfa'))}</p><p class="muted" style="font-size:.8rem">${esc(mfaErr)}</p></div>`; return; }
+  const ver = fs.filter((f) => f.status === 'verified'), on = ver.length > 0;
+  const lvl = a && a.currentLevel === 'aal2' ? 'l2' : 'l1';
+  el.innerHTML = `<p class="muted">${esc(T('intro'))}</p>
+    <div class="card stack"><b>${esc(T('status'))}</b>
+      <div class="row wrap"><span class="chip ${on ? 'ok' : 'warn'}" id="tf_state">${esc(T(on ? 'on' : 'off'))}</span><span class="muted">${esc(T('lvl'))}: <span id="tf_lvl">${esc(T(lvl))}</span></span></div>
+      ${pol && pol.must_enroll ? `<div class="notice bad" id="tf_must">${esc(T('must'))}</div>` : ''}
+      ${pol && pol.sensitive_actions_blocked_now ? `<div class="notice bad" id="tf_blk">${esc(T('blocked'))}</div>` : ''}
+      <b>${esc(T('facts'))}</b>${fs.length ? fs.map(fRow).join('') : `<span class="muted">${esc(T('nofact'))}</span>`}
+      ${on ? `<div><label>${esc(T('code'))}</label><input id="tf_off_code" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div>
+        <button class="btn full" type="button" data-act="tf_unenroll" data-fid="${esc(ver[0].id)}">${esc(T('off2'))}</button>`
+        : `<button class="primary full" type="button" data-act="tf_enroll">${esc(T('enroll'))}</button>`}
+      <div class="notice" id="tf_warn">${esc(T('warn'))}</div></div>
+    <div id="tf_enroll"></div>
+    ${A.S && A.S.ctx && A.S.ctx.is_owner ? `<div class="card stack"><b>${esc(T('rep'))}</b><button class="btn" type="button" data-act="tf_report">${esc(T('run'))}</button><div id="tf_rep"></div></div>` : ''}`;
+  if (D.enr) drawEnroll();
+}
+function drawEnroll() {
+  const el = $('#tf_enroll'); if (!el || !D.enr) return;
+  const e = D.enr;
+  el.innerHTML = `<div class="card stack"><p>${esc(T('scan'))}</p>
+    <img id="tf_qr" alt="QR" src="${esc(e.qr)}" style="width:200px;height:200px;max-width:100%;background:#fff;align-self:center">
+    <div><label>${esc(T('secret'))}</label><code id="tf_secret" style="word-break:break-all;user-select:all">${esc(e.secret)}</code></div>
+    <div><label>${esc(T('code'))}</label><input id="tf_code" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div>
+    <div class="row wrap"><button class="primary" type="button" data-act="tf_verify">${esc(T('verify'))}</button><button class="btn" type="button" data-act="tf_cancel">${esc(T('cancel'))}</button></div></div>`;
+}
+async function dropHalf() {   // an unfinished enrolment blocks a new one with the same name: clear them first
+  for (const f of (await factors()).filter((x) => x.status !== 'verified')) await mfa().unenroll({ factorId: f.id });
+}
+Object.assign(H, {
+  tf_enroll: async () => {
+    await dropHalf();
+    const r = await mfa().enroll({ factorType: 'totp', friendlyName: 'BOS-' + Date.now().toString(36) });
+    if (r.error) return fail(r.error);
+    D.enr = { id: r.data.id, qr: r.data.totp.qr_code, secret: r.data.totp.secret }; drawEnroll();
+  },
+  tf_cancel: async () => { if (D.enr) { try { await mfa().unenroll({ factorId: D.enr.id }); } catch (e) { /* ignore */ } } D.enr = null; await draw(); },
+  tf_verify: async () => {
+    const code = digits($('#tf_code').value); if (code.length !== 6) return toast(T('need6'));
+    const bad = await codeCheck(D.enr.id, code); if (bad) return toast(T('bad'));
+    D.enr = null; toast(T('done')); await draw();
+  },
+  tf_unenroll: async (a) => {
+    const code = digits($('#tf_off_code').value); if (code.length !== 6) return toast(T('need6'));
+    const bad = await codeCheck(a.dataset.fid, code); if (bad) return toast(T('bad'));      // Supabase wants aal2 before it removes a verified factor
+    const r = await mfa().unenroll({ factorId: a.dataset.fid }); if (r.error) return fail(r.error);
+    toast(T('gone')); await draw();
+  },
+  tf_report: async () => {
+    const r = await sb.rpc('twofa_status_report'); if (r.error) return fail(r.error);
+    $('#tf_rep').innerHTML = ((r.data && r.data.users) || []).map((u) => `<div class="row wrap"><b>${esc(u.name || u.staff_id)}</b> <span class="muted">${esc((u.roles || []).join(', '))}</span> <span class="chip ${u.has_2fa ? 'ok' : (u.missing ? 'bad' : 'warn')}">${esc(u.has_2fa ? T('on') : (u.missing ? T('missing') : T('off')))}</span></div>`).join('') || `<span class="muted">-</span>`;
+  },
+});
+async function viewTwofa() {
+  shell(T('title'), `<div id="tf_body"><p class="muted">${esc(T('loading'))}</p></div>`, true);
+  try { await draw(); } catch (e) { fail(e); }
+}
+
+window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { twofa: viewTwofa });
+window.BOS_TWOFA = { gate, needsCode, wrapSignIn, bootCheck };
+wrapSignIn();
+bootCheck();
+})();
