@@ -1502,6 +1502,157 @@ end $$;
 
 revoke all on function public._i2_patch(regprocedure, text, text[]), public._i2_apply_all(), public._i2_expect(), public._i2_state(), public._i2_exc_kinds(), public._i2_exc_kinds_apply() from public, anon, authenticated;
 
+-- ===================== fix_biz_items (added by the integrator, not a phase) =====================
+-- WHY: phase 477 puts the RPT-B1 hook (bos402) back into public.biz_items(date,date,integer). That hook replaces one exact piece of text (the item-cost join, written by phase 14 as a "bos14" sub-select).
+--      On this database biz_items has a different body (a newer variant), so the piece is not there and phase 477 stopped with "phase400 patch site not found in biz_items".
+-- WHAT: three steps, the gentlest first. Nothing happens when biz_items already has the hook or the expected text (so it is safe to paste twice and a no-op on a normal database).
+--   1. the item-cost join is there under another spelling (the plain phase-4 join, or "as c"): only that join is rewritten to the phase-14 form. The rest of the owner's body is untouched.
+--   2. otherwise biz_items is restored from the repository (phase 4 + phase 14 body). The previous body is first copied to public._fix_fn_backup (owner only) so it can be put back by hand.
+--   3. the hook (bos402) is then applied by phase 477 as usual. With the setting reports_cost_basis at its default (price_list) the figures are the same as before.
+do $fx$
+declare
+  d text; o regprocedure; want text := $w$(select ic.item_id, ic.cost_price from public.item_costs ic join public.items cbi on cbi.id = ic.item_id where cbi.count_in_business /* bos14 */) c on c.item_id = i.id$w$;
+  re text := 'left\s+join\s+(public\.)?item_costs\s+(as\s+)?c\s+on\s+c\.item_id\s*=\s*i\.id(?![\w.])';
+  args text; ref text := $ref$CREATE OR REPLACE FUNCTION public.biz_items(p_from date, p_to date, p_loc integer DEFAULT NULL::integer)
+ RETURNS TABLE(item_id uuid, code text, name_bn text, name_en text, unit text, qty numeric, revenue numeric, cogs numeric, share_pct numeric, cum_pct numeric, abc text)
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare cost_ok boolean := public.biz_cost_ok();
+begin
+  if not public.biz_ok() then raise exception 'not allowed'; end if;
+  if p_to < p_from or p_to - p_from > 400 then raise exception 'bad_range'; end if;
+  return query
+  with ok as (
+    select * from public.sales x
+    where x.status = 'done' and x.sale_date between p_from and p_to and (p_loc is null or x.location_id = p_loc) and x.location_id in (select l.id from public.locations l where public.can_loc(l.id))),
+  ln as (
+    select case when e->>'item_id' ~ '^[0-9a-f-]{36}$' then (e->>'item_id')::uuid end iid,
+           case when e->>'qty' ~ '^[0-9]+(\.[0-9]+)?$' then (e->>'qty')::numeric end qty,
+           case when e->>'amount' ~ '^[0-9]+(\.[0-9]+)?$' then round((e->>'amount')::numeric * (case when o.subtotal > 0 then o.total / o.subtotal else 1 end), 2) end amt
+    from ok o, jsonb_array_elements(case when jsonb_typeof(o.lines) = 'array' then o.lines else '[]'::jsonb end) e),
+  by_item as (select l.iid, sum(l.qty) q, sum(l.amt) r from ln l where l.iid is not null group by 1),
+  tot as (select coalesce(sum(r), 0) t from by_item),
+  j as (
+    select i.id, i.code, i.name_bn, i.name_en, i.unit, coalesce(b.q, 0) q, coalesce(b.r, 0) r,
+           case when cost_ok and c.cost_price is not null then coalesce(b.q, 0) * c.cost_price end cg
+    from public.items i
+    left join by_item b on b.iid = i.id left join (select ic.item_id, ic.cost_price from public.item_costs ic join public.items cbi on cbi.id = ic.item_id where cbi.count_in_business /* bos14 */) c on c.item_id = i.id
+    where (i.is_active and i.sellable) or b.iid is not null),
+  r as (
+    select j.*, case when (select t from tot) > 0 then round(100 * j.r / (select t from tot), 2) else 0 end sp,
+           case when (select t from tot) > 0 then round(100 * sum(j.r) over (order by j.r desc, j.code) / (select t from tot), 2) else 0 end cp
+    from j)
+  select r.id, r.code, r.name_bn, r.name_en, r.unit, r.q, r.r, r.cg, r.sp, r.cp,
+         case when r.r = 0 then '-' when r.cp - r.sp < 80 then 'A' when r.cp - r.sp < 95 then 'B' else 'C' end
+  from r order by r.r desc, r.code;
+end $function$$ref$;
+begin
+  o := to_regprocedure('public.biz_items(date,date,integer)');
+  if o is null or to_regprocedure('public._rptb1_p402_present()') is null or to_regprocedure('public._rptb1_biz_item_cost(date,date,integer)') is null then return; end if;
+  d := pg_get_functiondef(o);
+  if position('bos402' in d) > 0 or position(want in d) > 0 then return; end if;
+  args := pg_get_function_arguments(o);
+  if d ~* re and args like 'p\_from date, p\_to date, p\_loc integer%' then
+    execute regexp_replace(d, re, 'left join ' || want, 'i');
+    raise notice 'fix_biz_items: the item-cost join of biz_items was rewritten (rest of the body kept)';
+  else
+    create table if not exists public._fix_fn_backup (fn text not null, saved_at timestamptz not null default now(), def text not null);
+    alter table public._fix_fn_backup enable row level security;
+    revoke all on public._fix_fn_backup from public, anon, authenticated;
+    insert into public._fix_fn_backup (fn, def) values (o::text, d);
+    if not exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'items' and column_name = 'sellable') then
+      ref := replace(ref, '(i.is_active and i.sellable)', 'i.is_active');
+    end if;
+    begin
+      execute ref;
+    exception when others then      -- the live function has another result shape or parameter names: replace it whole
+      drop function public.biz_items(date, date, integer);
+      execute ref;
+      revoke all on function public.biz_items(date, date, integer) from public, anon;
+      grant execute on function public.biz_items(date, date, integer) to authenticated;
+    end;
+    raise notice 'fix_biz_items: biz_items restored from the repository; the old body is in public._fix_fn_backup';
+  end if;
+  if position(want in pg_get_functiondef('public.biz_items(date,date,integer)'::regprocedure)) = 0 then
+    raise exception 'fix_biz_items: biz_items still has no item-cost join the hook can patch';
+  end if;
+end $fx$;
+
+-- ===================== pre-flight (added by the integrator, not a phase) =====================
+-- Dry run of every exact-text hook that phase 477 is about to put back (Wave 1, W1-FIX, RPT-B1, RPT-B3, CRM-B, CRM-C, RPT-C1, glue).
+-- It changes nothing that stays: the patch helpers are swapped for recording copies for the length of this one block, then put back.
+-- If any hook site is missing in the live function bodies, it STOPS with ONE message listing ALL of them (so there is no second and third failure).
+-- Since this whole paste is one transaction, a stop here leaves the database exactly as it was.
+do $pf$
+declare h record; bad text; err text; u boolean; n int;
+begin
+  create temp table _pf_rec (helper text, fn text, marker text, status text, site text) on commit drop;
+  create temp table _pf_def (f text primary key, d text) on commit drop;
+  create temp table _pf_saved (def text) on commit drop;
+  execute $q$create or replace function public._pf_sim(h text, p_fn regprocedure, p_marker text, p_pairs text[], p_uniq boolean) returns boolean language plpgsql set search_path = public as $s$
+    declare def text; i int; n int; ok boolean := true;
+    begin
+      select d into def from pg_temp._pf_def where f = p_fn::text;
+      if def is null then def := pg_get_functiondef(p_fn); end if;
+      if position(p_marker in def) > 0 then insert into pg_temp._pf_rec values (h, p_fn::text, p_marker, 'already', null); return false; end if;
+      for i in 1 .. array_length(p_pairs, 1) by 2 loop
+        n := (length(def) - length(replace(def, p_pairs[i], ''))) / greatest(length(p_pairs[i]), 1);
+        if n = 0 then insert into pg_temp._pf_rec values (h, p_fn::text, p_marker, 'missing', left(p_pairs[i], 120)); ok := false;
+        elsif n > 1 and p_uniq then insert into pg_temp._pf_rec values (h, p_fn::text, p_marker, 'not unique', left(p_pairs[i], 120)); ok := false;
+        end if;
+        def := replace(def, p_pairs[i], p_pairs[i + 1]);
+      end loop;
+      insert into pg_temp._pf_def values (p_fn::text, def) on conflict (f) do update set d = excluded.d;
+      if ok then insert into pg_temp._pf_rec values (h, p_fn::text, p_marker, 'would apply', null); end if;
+      return false;
+    end $s$$q$;
+  execute $q$create or replace function public._pf_span(p_fn regprocedure, p_marker text, p_start text, p_end text, p_new text) returns boolean language plpgsql set search_path = public as $s$
+    declare def text; a int; b int;
+    begin
+      select d into def from pg_temp._pf_def where f = p_fn::text;
+      if def is null then def := pg_get_functiondef(p_fn); end if;
+      if position(p_marker in def) > 0 then insert into pg_temp._pf_rec values ('_c1_patch_span', p_fn::text, p_marker, 'already', null); return false; end if;
+      a := position(p_start in def);
+      if a = 0 then insert into pg_temp._pf_rec values ('_c1_patch_span', p_fn::text, p_marker, 'missing', left(p_start, 120)); return false; end if;
+      b := position(p_end in substr(def, a + length(p_start)));
+      if b = 0 then insert into pg_temp._pf_rec values ('_c1_patch_span', p_fn::text, p_marker, 'missing', 'end: ' || left(p_end, 110)); return false; end if;
+      b := a + length(p_start) + b - 1;
+      insert into pg_temp._pf_def values (p_fn::text, substr(def, 1, a - 1) || p_new || substr(def, b)) on conflict (f) do update set d = excluded.d;
+      insert into pg_temp._pf_rec values ('_c1_patch_span', p_fn::text, p_marker, 'would apply', null);
+      return false;
+    end $s$$q$;
+  for h in select pg_get_function_arguments(p.oid) args, p.proname, pg_get_functiondef(p.oid) def from pg_proc p
+           where p.pronamespace = 'public'::regnamespace and p.proname in ('_w1b_patch','_w1d_patch','_rptb1_patch','_c1_patch','_i2_patch','_w1a_patch','_w1c_patch','_w1f_patch','_w1x_patch','_crmb_patch','_crmc_patch','_rb3_patch','_m_patch','_c1_patch_span')
+  loop
+    insert into _pf_saved values (h.def);
+    u := position('not unique' in h.def) > 0;
+    if h.proname in ('_w1b_patch','_w1d_patch','_rptb1_patch','_c1_patch','_i2_patch') then
+      execute format($f$create or replace function public.%I(%s) returns boolean language sql set search_path = public as $b$ select public._pf_sim(%L, $1, $2, $3, %L::boolean) $b$$f$, h.proname, h.args, h.proname, u);
+    elsif h.proname in ('_w1a_patch','_w1c_patch','_w1f_patch','_w1x_patch','_crmb_patch','_crmc_patch','_rb3_patch') then
+      execute format($f$create or replace function public.%I(%s) returns boolean language sql set search_path = public as $b$ select public._pf_sim(%L, $1, $3, $2, %L::boolean) $b$$f$, h.proname, h.args, h.proname, u);
+    elsif h.proname = '_m_patch' then
+      execute format($f$create or replace function public.%I(%s) returns boolean language sql set search_path = public as $b$ select public._pf_sim(%L, $1, 'bos87', $2, false) $b$$f$, h.proname, h.args, h.proname);
+    else
+      execute format($f$create or replace function public._c1_patch_span(%s) returns boolean language sql set search_path = public as $b$ select public._pf_span($1, $2, $3, $4, $5) $b$$f$, h.args);
+    end if;
+  end loop;
+  begin
+    perform public._i2_apply_all();
+  exception when others then err := sqlerrm;
+  end;
+  for h in select def from _pf_saved loop execute h.def; end loop;       -- the real helpers are back
+  drop function public._pf_sim(text, regprocedure, text, text[], boolean);
+  drop function public._pf_span(regprocedure, text, text, text, text);
+  select string_agg(format('%s: %s (%s) site: %s', status, fn, marker, replace(site, E'\n', ' ')), E'\n' order by fn) into bad from _pf_rec where status in ('missing', 'not unique');
+  select count(*) into n from _pf_rec;
+  if bad is not null or err is not null then
+    raise exception E'bos pre-flight: the hooks of phase 477 cannot be put back on this database.\n%\n%', coalesce(bad, '(no missing site found by the dry run)'), coalesce('other error in the dry run: ' || err, '');
+  end if;
+  raise notice 'bos pre-flight ok: % hook sites checked, none missing', n;
+end $pf$;
+
 select public._i2_apply_all();
 select pkg, fn, marker, how from public._i2_state() where not present;      -- must print no rows
 
