@@ -1,4 +1,4 @@
-X5 vendored recognition libraries (web/vendor). Loaded lazily by web/scan.js only when a setting needs them.
+X5 vendored recognition libraries (web/vendor). Loaded lazily by web/scan_items.js only when a setting needs them.
 Checked in as-is from the npm tarballs (npm pack). Do not edit these files; replace the whole file and update this table.
 
 file | library | licence | source | bytes | sha256

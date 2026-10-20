@@ -2370,7 +2370,11 @@
    "change": "Cakes cancelled before delivery free their place again.",
    "who": "Only the owner, in Settings.",
    "verified": true,
-   "src": "XB (docs/integration/XB_info.json)"
+   "src": "XB (docs/integration/XB_info.json)",
+   "related": [
+    "rule:cake_flow_on",
+    "screen:cakejobs"
+   ]
   },
   "rule:cake_flow_on": {
    "title": "Custom cake workflow",
@@ -2380,7 +2384,12 @@
    "change": "On: a cake needs a price quote, a day that passes the lead time and the daily cap, and the advance in the order before it is confirmed.",
    "who": "Only the owner, in Settings.",
    "verified": true,
-   "src": "XB (docs/integration/XB_info.json)"
+   "src": "XB (docs/integration/XB_info.json)",
+   "related": [
+    "screen:cakejobs",
+    "rule:cake_capacity_day",
+    "rule:cake_lead_days"
+   ]
   },
   "rule:cake_lead_days": {
    "title": "How many days ahead a cake must be ordered",
@@ -2390,7 +2399,11 @@
    "change": "A value of 1 means a cake for tomorrow at the earliest.",
    "who": "Only the owner, in Settings.",
    "verified": true,
-   "src": "XB (docs/integration/XB_info.json)"
+   "src": "XB (docs/integration/XB_info.json)",
+   "related": [
+    "rule:cake_flow_on",
+    "screen:cakejobs"
+   ]
   },
   "rule:cake_photo_required": {
    "title": "Photo of the finished cake before delivery",
@@ -2400,7 +2413,10 @@
    "change": "On: the delivered step is refused until a photo path is stored for the job.",
    "who": "Only the owner, in Settings.",
    "verified": true,
-   "src": "XB (docs/integration/XB_info.json)"
+   "src": "XB (docs/integration/XB_info.json)",
+   "related": [
+    "screen:cakejobs"
+   ]
   },
   "rule:cash_short_post_on": {
    "title": "Post an approved cash short/over to the books",
@@ -4006,7 +4022,11 @@
    "change": "On: a Trx-ID already written is refused. Each capture gets a flag (ok, overpay, underpay, no target) and waits for a second person to verify it.",
    "who": "Only the owner, in Settings.",
    "verified": true,
-   "src": "XB (docs/integration/XB_info.json)"
+   "src": "XB (docs/integration/XB_info.json)",
+   "related": [
+    "screen:paycapture",
+    "rule:pay_capture_tol"
+   ]
   },
   "rule:pay_capture_tol": {
    "title": "Taka difference allowed when matching a payment",
@@ -4016,7 +4036,11 @@
    "change": "A number such as 5 lets a payment within 5 taka of the due amount be flagged ok. Only the flag changes; nothing is posted.",
    "who": "Only the owner, in Settings.",
    "verified": true,
-   "src": "XB (docs/integration/XB_info.json)"
+   "src": "XB (docs/integration/XB_info.json)",
+   "related": [
+    "rule:pay_capture_on",
+    "screen:paycapture"
+   ]
   },
   "rule:pay_request_advance_ceiling": {
    "title": "Highest open advance for one staff member",
@@ -4432,7 +4456,7 @@
    ],
    "warn": "No model is installed in this version: the list stays empty.",
    "verified": true,
-   "src": "phase486.sql; X5 scan.js"
+   "src": "phase486.sql; X5 web/scan_items.js"
   },
   "rule:recog_image_threshold": {
    "title": "Photo match distance limit",
@@ -4488,7 +4512,7 @@
     "screen:camrec"
    ],
    "verified": true,
-   "src": "phase486.sql; X5 scan.js"
+   "src": "phase486.sql; X5 web/scan_items.js"
   },
   "rule:recog_ocr_wifi_only": {
    "title": "Download language files on Wi-Fi only",
@@ -5484,7 +5508,10 @@
    "change": "On: a delivery can be assigned to an active rider with a zone fee. The cash collected per rider per day is compared with the deposits; a difference opens one case for the owner to explain.",
    "who": "Only the owner, in Settings.",
    "verified": true,
-   "src": "XB (docs/integration/XB_info.json)"
+   "src": "XB (docs/integration/XB_info.json)",
+   "related": [
+    "screen:riders"
+   ]
   },
   "rule:xc_coaching_on": {
    "title": "Staff coaching board (owner only)",
@@ -5701,7 +5728,7 @@
     "rule:recog_vision_on"
    ],
    "verified": true,
-   "src": "web/scan.js"
+   "src": "web/scan_items.js"
   },
   "screen:connect": {
    "title": "Connect Center",
@@ -6177,6 +6204,1586 @@
    ],
    "verified": true,
    "src": "phase48.sql (path_domains); paths.js; W1-G.md"
+  },
+  "rule:transfer_overdraw_block": {
+   "title": "Refuse a send bigger than the stock on hand (transfers)",
+   "does": "When ON, a transfer from a place is refused if the place has less stock of that item than the quantity sent.",
+   "why": "Stops a factory from sending goods it does not have, which makes its stock negative in the books.",
+   "default": "Off. A send bigger than the stock is accepted and the sender balance can go negative (as before).",
+   "change": "On: the send is refused with \"insufficient_stock\". Sends within stock still work.",
+   "who": "Owner, in Settings (stock rules).",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
+  },
+  "rule:transfer_paused_block": {
+   "title": "Refuse a transfer to a paused or closed place",
+   "does": "When ON, a transfer to a place whose status is not live (paused or closed) is refused.",
+   "why": "Goods sent to a place nobody is open to receive end up in transit for ever.",
+   "default": "Off. A send to a paused place is accepted (as before).",
+   "change": "On: the send is refused with \"destination_paused\".",
+   "who": "Owner, in Settings (stock rules).",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
+  },
+  "rule:transfer_partial_on": {
+   "title": "Receive a transfer in parts",
+   "does": "When ON, the receiver can take in part of a transfer now and the rest later. The transfer stays open until all of it arrives, or the owner closes the rest as short.",
+   "why": "A factory ships by van in several lots, so one receipt for the whole transfer is not how it arrives.",
+   "default": "Off. One receipt closes the transfer, as before.",
+   "change": "On: a part receipt leaves the transfer open. The owner can close the rest as short with the close-short action (one short-in-transit line is written).",
+   "who": "Owner, in Settings (stock rules).",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
+  },
+  "rule:stock_unit_unknown_block": {
+   "title": "Refuse a sale when the unit conversion is unknown",
+   "does": "When ON, a sale of a tracked item whose unit has no conversion to the base unit is refused.",
+   "why": "Without a conversion the sale is kept but the stock is not reduced, so the stock figure is wrong.",
+   "default": "Off. The sale is kept with a yellow warning and the stock is not reduced (as before).",
+   "change": "On: the sale is refused with \"stock_unit_unknown\". Fix the conversion first.",
+   "who": "Owner, in Settings (stock rules).",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
+  },
+  "rule:return_sale_factor_on": {
+   "title": "Return at the conversion factor of the sale",
+   "does": "When ON, a sale return puts back stock using the conversion factor that the sale used, not today factor.",
+   "why": "If the conversion was edited after the sale, today factor puts back the wrong quantity.",
+   "default": "Off. A return uses today factor (as before). Sales made before the new table have no saved factor and always use today factor.",
+   "change": "On: the returned quantity matches what the sale took out.",
+   "who": "Owner, in Settings (stock rules).",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
+  },
+  "rule:biz_items_net_returns": {
+   "title": "Item analysis takes sale returns off",
+   "does": "When ON, the item analysis (per item revenue and quantity) takes off the returns made in the period.",
+   "why": "The returns line of the other reports already takes them off, and the item analysis did not.",
+   "default": "Off. The item analysis shows sales before returns (as before).",
+   "change": "On: quantity and revenue per item are after returns, for the day the return was made.",
+   "who": "Owner, in Settings (reports).",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
+  },
+  "rule:dues_net_advance_on": {
+   "title": "Customer due takes off applied advances",
+   "does": "When ON, an advance that was applied to a customer sale reduces the customer due in the due list.",
+   "why": "An advance that was used still showed the sale as owed, so the same money could be collected twice.",
+   "default": "Off. The due list shows the sale as owed (as before).",
+   "change": "On: the due list shows the due after the applied advance.",
+   "who": "Owner, in Settings (customers / POS).",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
+  },
+  "rule:recipe_intermediate_on": {
+   "title": "A made product as an ingredient of another recipe",
+   "does": "When ON, a finished item made by its own recipe (for example chhana or dough) can be an ingredient of another recipe. A loop (A needs B needs A) is refused.",
+   "why": "Two-stage sweets need the made intermediate, and without this the recipe cannot be saved.",
+   "default": "Off. Only raw material, packaging and resale items can be ingredients (as before).",
+   "change": "On: the recipe can use a made product. Production uses its stock at the average cost.",
+   "who": "Owner, in Settings (recipes).",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
+  },
+  "rule:tracking_map_apply_on": {
+   "title": "Apply the reviewed stock tracking map",
+   "does": "When ON, the owner can apply the reviewed tracking proposal to the items of one item type. The proposal is shown first and changes nothing until applied.",
+   "why": "Not every item should be stock-tracked, so the proposal is decided once per item type.",
+   "default": "Off. The map can be read and reviewed; nothing changes.",
+   "change": "On: the owner can apply a reviewed type. Opening stock must be counted first.",
+   "who": "Owner only.",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
+  },
+  "rule:accounting_autopost": {
+   "title": "Post new business events when the accounts page opens",
+   "does": "On = opening the accounts page posts new sales, purchases and expenses by itself. Off = press \"Post now\".",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "On.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase40.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:assistant_closed_age_days": {
+   "title": "Remind when the books-closed date is older than (days)",
+   "does": "Remind when the books-closed date is older than (days)",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "45 (the value that applies until the owner sets another).",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase47.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:assistant_provider": {
+   "title": "AI proxy",
+   "does": "llm_proxy works only after the owner deploys the Edge Function and sets a monthly token budget; otherwise it stays local.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "local (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase47.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:att_late_mode": {
+   "title": "Late cut: count = N lates = 1 day, per_minute = by the minute, none",
+   "does": "Late cut: count = N lates = 1 day, per_minute = by the minute, none",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "count (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase42.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:block_expired_sale": {
+   "title": "Block selling expired stock",
+   "does": "Off = the sale goes through and the owner gets a red line (as before). On = the sale is refused. A sale that syncs late from an offline phone is never refused",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase12.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:block_on_missing_limit": {
+   "title": "Block a form submit while a limit it needs is blank (Data needed)",
+   "does": "Default off: only shows Data needed",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase16.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:cost_rule_self_approve": {
+   "title": "The person who entered an allocation rule may also approve it",
+   "does": "Off (default) = a second person with the cost_rule_approve grant is needed (the owner can always approve what he did not enter).",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase75.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:costing_method": {
+   "title": "Costing method",
+   "does": "Only average for now; more can be added later",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "avg (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase8.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:em_period": {
+   "title": "Emergency allowed for: an entry in a closed period",
+   "does": "Emergency allowed for: an entry in a closed period",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "On.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase7.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:entry_paper_no_required": {
+   "title": "The printed paper number is required to submit a form",
+   "does": "Turn on when paper forms run alongside the app",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase7.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:gift_window_days": {
+   "title": "after a birthday or anniversary a gift shows",
+   "does": "after a birthday or anniversary a gift shows",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "7 (the value that applies until the owner sets another).",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase43.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:grn_receipt_source": {
+   "title": "Bought goods enter stock from: purchase page or GRN",
+   "does": "Only one of the two adds stock, so nothing is counted twice. Default = purchase page; GRN in-lines are then skipped (reason covered_by_purchase_page). Choose grn if you stop using the purchase page for stock.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "purchase (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase23.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:item_create_needs_approval": {
+   "title": "A new item needs approval (unless added by the owner or a person with the item_create grant)",
+   "does": "Off = anyone who may enter items adds a new item at once",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "On.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase14.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:location_block_when_paused": {
+   "title": "Block new entries and sales at a paused or closed place",
+   "does": "When on the server refuses new entries and sales; reading and reports stay open",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "On.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase16.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:notify_approvals_hours": {
+   "title": "Approval waiting for more than (hours)",
+   "does": "Approval waiting for more than (hours)",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "24 (the value that applies until the owner sets another).",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase46.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:notify_approvals_on": {
+   "title": "Tell me when approvals wait too long",
+   "does": "Tell me when approvals wait too long",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "On.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase46.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:notify_digest_times": {
+   "title": "Daily digest email hours (Dhaka)",
+   "does": "08 = 8am, 21 = 9pm, both, or off.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "08,21 (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase46.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:notify_exceptions_hours": {
+   "title": "Red exception open for more than (hours)",
+   "does": "Red exception open for more than (hours)",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "24 (the value that applies until the owner sets another).",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase46.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:notify_exceptions_on": {
+   "title": "Tell me when red exceptions stay open",
+   "does": "Tell me when red exceptions stay open",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "On.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase46.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:packaging_consume_on": {
+   "title": "When packaging leaves the stock: off, with a sale, or with production",
+   "does": "Off = packaging is not taken out automatically. Uses the per-product packaging list. A sale is never blocked by packaging.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase19.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:pay_round_net": {
+   "title": "Round the net pay to the nearest taka",
+   "does": "Round the net pay to the nearest taka",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "nearest (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase42.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:pin_signature_owner_override": {
+   "title": "Owner may submit without the PIN signatures (yellow exception)",
+   "does": "When on only the owner may submit without signatures; a yellow exception is raised",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase18.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:pos_credit_mode": {
+   "title": "When a customer’s credit limit is exceeded: block, warn only, or off",
+   "does": "When a customer’s credit limit is exceeded: block, warn only, or off",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "block (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase7.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:pos_override_manager": {
+   "title": "A granted role is needed to change a list price",
+   "does": "A granted role is needed to change a list price",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "On.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase7.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:pos_unlisted": {
+   "title": "Selling an item that is not in the list: allow, flag (tell the owner), or block",
+   "does": "Selling an item that is not in the list: allow, flag (tell the owner), or block",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "flag (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase7.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:production_requires_cost": {
+   "title": "When an ingredient cost is unknown (empty or 0): warn, or refuse the production",
+   "does": "warn = production is posted as before, the finished good has no cost and is flagged. refuse = production_post is refused (cost_missing) until every ingredient has a cost above 0.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "warn (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase72.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:production_short_mode": {
+   "title": "When raw material is short: refuse, or follow the general stock rule",
+   "does": "refuse = the production is refused (unless stock_negative_mode is allow, or the person may sell below zero). follow_stock_rule = same as selling (warn / block / allow).",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "refuse (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase19.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:quality_block_on": {
+   "title": "rejected batches",
+   "does": "OFF = QC is only a record. ON = a held/rejected GRN cannot get new batches and its batches are marked blocked; a red line is raised",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase60.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:recipe_approval_required": {
+   "title": "Cost and production before a recipe is approved: off, yellow warning, or refuse",
+   "does": "off = today's behaviour (no approval needed). warn = yellow line for the owner. on = recipe_cost and production_post refuse an unapproved recipe (form 05-3: no costing before approval).",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase73.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:recipe_self_approve": {
+   "title": "The person who changed a recipe may also approve it",
+   "does": "Off (default) = the last changer can never approve; a second person with the recipe_approve grant is needed.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase73.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:recipe_waste_required": {
+   "title": "Refuse production when a recipe line has no waste %",
+   "does": "Off = an empty waste % counts as 0 and the owner gets a yellow line. The owner sets the real waste %; nothing is guessed.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase19.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:stock_negative_mode": {
+   "title": "Selling more than the stock: allow, warn or block",
+   "does": "Used when the stock ledger arrives (B2)",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "warn (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase8.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:twofa_required_roles": {
+   "title": "Roles that should use 2FA (comma list)",
+   "does": "Empty = nobody is told they must. Example: owner,accountant. Informational only; it does not block login.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Blank: the feature says \"not set\" and invents no number.",
+   "change": "Type another text in Settings.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase71.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:ui_noperm_mode": {
+   "title": "Module without permission: lock card or hide",
+   "does": "Module without permission: lock card or hide",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "lock (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase8.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:wastage_approval_limit": {
+   "title": "A wastage above this quantity waits for a second person to approve (in the item base unit)",
+   "does": "Empty = Data needed = off (every write-off posts at once). The owner is never held back",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Blank: the feature says \"not set\" and invents no number.",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase12.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:web_form_rate_window_min": {
+   "title": "Web form: rate window",
+   "does": "Web form: rate window",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "60 (the value that applies until the owner sets another).",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase76.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:week_start": {
+   "title": "Week starts on",
+   "does": "Empty = Saturday in reports",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Blank: the feature says \"not set\" and invents no number.",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase8.sql; entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:acct_cost_wait_alert_days": {
+   "title": "Alert when a document has waited for its cost longer than this many days (blank = no alert)",
+   "does": "You type the number; there is no built-in value. Blank = the waiting list is shown but no alert is raised.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Blank: the feature says \"not set\" and invents no number.",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase522.sql (imported from the advanced line phase96); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:acct_count_adjust": {
+   "title": "loss)",
+   "does": "Off = as before: a count difference changes the stock only, not the books. On = one entry per count adjustment against the stock gain / loss account.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase511.sql (imported from the advanced line phase85); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:acct_issue_out": {
+   "title": "Post own-use stock issues to the books",
+   "does": "Off = as before: an issue lowers the stock only. On = Dr stock issued for own use / Cr inventory at the ledger cost.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase511.sql (imported from the advanced line phase85); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:acct_manual_prod_in103": {
+   "title": "Post direct production-in (no recipe) to the books",
+   "does": "Off = as before: a production-in typed without a recipe raises the stock only and is not in the books (inventory_vs_gl lists it as manual_in). On = one entry per row at the typed cost: Dr inventory / Cr overhead absorbed. A row without a cost waits in the cost-waiting list either way.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase103.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:acct_pending_alert_days": {
+   "title": "Alert for documents waiting longer than this many days",
+   "does": "A document dated before (today minus this many days) that is still not in the books is counted as waiting too long.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "1 (the value that applies until the owner sets another).",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase511.sql (imported from the advanced line phase85); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:acct_purchase_variance": {
+   "title": "Post the price variance of purchase returns to the books",
+   "does": "A return takes the stock out at average cost while the supplier credit is at bill price. On = the difference goes to the purchase variance account.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase511.sql (imported from the advanced line phase85); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:acct_scheduler_on": {
+   "title": "Scheduled auto posting (scheduler)",
+   "does": "On = a scheduler calling acct_autopost_tick() posts the waiting documents. Starting the scheduler itself is a server setup.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase511.sql (imported from the advanced line phase85); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:acct_stock_moves_from": {
+   "title": "Stock movement posting from this date (blank = from the accounting start)",
+   "does": "Format YYYY-MM-DD. Older stock movements are left out.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Blank: the feature says \"not set\" and invents no number.",
+   "change": "Type another text in Settings.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase511.sql (imported from the advanced line phase85); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:acct_stock_opening": {
+   "title": "Post opening stock to the books (against owner capital)",
+   "does": "Only openings dated on or after the accounting start are posted. If the stock is already inside the opening balance (acct_opening) leave this off, it would count twice.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase511.sql (imported from the advanced line phase85); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:acct_transfer_mode": {
+   "title": "Stock transfer accounting: off, location-tagged pair, or company-wide",
+   "does": "location_tagged = a send entry and a receive entry, each tagged with its own place, through the inter-location clearing account. company_wide = the books are company-wide only, the pair is not posted. off = as before.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase511.sql (imported from the advanced line phase85); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:acct_transit_loss": {
+   "title": "Post stock short in transit to the books",
+   "does": "When a transfer is received short, the missing cost goes to the transit loss account.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase511.sql (imported from the advanced line phase85); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:acct_transit_loss_at": {
+   "title": "Which place carries a transit loss: receiver or sender",
+   "does": "Used only when transit loss posting is on.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "receiver (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase511.sql (imported from the advanced line phase85); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:bank_stmt_post_on": {
+   "title": "interest from a statement line: off or on",
+   "does": "off = as before (an unmatched statement line needs a manual journal). on = bank_stmt_post113 posts the line (fee: Dr bank charges 5810 / Cr bank; interest: Dr bank / Cr other income 4900) and matches it in one step. Needs the rule bank_recon_on.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase113.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:batch_for_adjustments": {
+   "title": "Count gains and opening stock get an adjustment batch",
+   "does": "Off = as before (default): this stock has no batch, so it is missing from expiry / FEFO lists and is sold last. On = a no-expiry adjustment batch is opened so the batches add up to the book stock.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase114.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:batch_refill_cap": {
+   "title": "A batch that refills a negative balance only keeps what is really on hand",
+   "does": "Off = as before (default): producing 10 while the balance is -2 leaves 8 in the book but 10 in the batch (2 phantom). On = the batch keeps 8. Voiding such a run may report \"batch partly used\".",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase114.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:bill_pay_auto_credit_ok": {
+   "title": "Allow auto payment for parties with credit terms",
+   "does": "When off, an auto mode never pays a bill of a supplier / source that has credit terms.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase525.sql (imported from the advanced line phase99); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:bill_pay_large_amount": {
+   "title": "Large bill amount (for the recommendation)",
+   "does": "You type it; blank = none. At or above it the recommendation is always \"ask\".",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Blank: the feature says \"not set\" and invents no number.",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase525.sql (imported from the advanced line phase99); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:bill_pay_small_cash_max": {
+   "title": "Small cash bill amount (for the recommendation)",
+   "does": "You type it; blank = none. At or below it, with no credit and a cash party, the recommendation is \"auto_cash\".",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Blank: the feature says \"not set\" and invents no number.",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase525.sql (imported from the advanced line phase99); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:bill_void_payment_mode": {
+   "title": "When the bill is voided, what happens to a payment made through this option?",
+   "does": "void = the payment is voided too (a reversing entry follows). keep_credit = the payment stays; for a purchase it becomes supplier credit.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "void (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase525.sql (imported from the advanced line phase99); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:branch_stmt_ageing_hours": {
+   "title": "In-transit ageing boundaries (hours, comma-separated)",
+   "does": "Two numbers, for example 24,72 = under 24 hours / 1-3 days / over 3 days. Blank or invalid falls back to 24,72.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "24,72 (the value that applies until the owner sets another).",
+   "change": "Type another text in Settings.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase118.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:card_settle_over_mode": {
+   "title": "Card settlement larger than the unsettled card receivable: off, warn or refuse",
+   "does": "off = as before (the settlement is saved and only the over flag in the answer shows it, counted on the booked balance). warn = saved, and a yellow exception is logged when it is more than the unsettled receivable, counting settlements saved but not yet booked. refuse = such a settlement is rejected with over_settlement.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase109.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:cash_drawer_method": {
+   "title": "Cash drawer: connection type",
+   "does": "none = nothing. browser_print_pulse = a tiny print job; works when the printer driver is set to open the drawer on print. web_serial / web_usb / bluetooth = send the ESC/POS pulse straight to the device (Chrome on Android or a computer; iPhone browsers cannot).",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "none (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase521.sql (imported from the advanced line phase95); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:cash_drawer_mode": {
+   "title": "Cash drawer: when it opens",
+   "does": "off = as today (the drawer does nothing). on_cash_sale = ask the drawer to open when cash is taken. on_any_sale = on every sale.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase521.sql (imported from the advanced line phase95); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:cash_drawer_no_sale_requires_reason": {
+   "title": "Cash drawer: a \"No sale\" open needs a reason",
+   "does": "On = a no-sale open cannot be logged without a reason (default and recommended: every open without a sale is an anti-theft signal).",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "On.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase521.sql (imported from the advanced line phase95); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:cash_drawer_when": {
+   "title": "Cash drawer: before or after the sale is saved",
+   "does": "after_payment = opens only once the sale is saved (default; recommended). before_payment = opens as soon as Save is tapped, even if the sale then fails.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "after_payment (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase521.sql (imported from the advanced line phase95); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:category_required_on_item": {
+   "title": "Sub-category on every item: off, warn or required",
+   "does": "off = as before. warn = lists the items with no category and never blocks (recommended). required = a NEW item cannot be saved without a Category (and a Sub-category when the Category has any); old items stay editable.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase100.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:client_error_rate_max": {
+   "title": "Most error reports one user may send per hour",
+   "does": "Blank = the built-in safety ceiling of 200 (not a business number, only a guard against a runaway loop hammering the server). A number can only lower it, never raise it above 200.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Blank: the feature says \"not set\" and invents no number.",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase107.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:client_errors_keep_days": {
+   "title": "Days to keep error reports",
+   "does": "Blank = keep for ever (default). A number: reports older than that are deleted automatically. The owner can also purge by hand from the Problems page.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Blank: the feature says \"not set\" and invents no number.",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase107.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:client_errors_on": {
+   "title": "Collect error reports from the app automatically",
+   "does": "Off = as before (default). On: when a screen breaks, a short note (which screen, what error, which build) is saved and the owner reads it on the Problems page. Passwords, tokens and customer data are never stored.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase107.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:conv_provisional116": {
+   "title": "Provisional conversion cost from the last month with a pool",
+   "does": "Off (default) = as today, conversion 0 + a yellow flag. On = when the month has no pool at all, the rate of the latest month (up to 6 back) that has one is used and the run is marked PROVISIONAL; re-price it with production_reprice116 once the bills are in.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase116.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:cost_bill_creates_payment": {
+   "title": "Does saving a cost bill create a payment?",
+   "does": "off = today (a cost bill is information only). ask = after saving it offers \"Record payment now?\". auto_* = records it by itself (parties with credit terms are skipped).",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase525.sql (imported from the advanced line phase99); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:cost_share_prorate_mode": {
+   "title": "Shared monthly bills pro rata by days: off or on",
+   "does": "off = as before (a one-day report shows the whole month's bills). on = a monthly bill share is taken for the days of the report range only (1 day of a 30-day month = 1/30). Full-month reports are unchanged.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase112.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:cost_supply_to_avg116": {
+   "title": "A supplied cost also reaches the item average and re-costs the run",
+   "does": "Off (default) = as today: the supplied cost lives only in the ledger overlay and the item average stays blank. On = the supplied cost also sets (or blends into) stock_balance.avg_cost and the production run it belongs to is re-costed.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase116.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:customers_pii_guard_on": {
+   "title": "address",
+   "does": "Off = as today. On = the browser can no longer read mobile, whatsapp, address, note with a plain table read; only customer_directory / customer_profile / customer_dues show them (following inbox_pii_mode). Screens that search customers by mobile must be moved first.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase105.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:daybook_align_mode": {
+   "title": "Day book follows the journal: off or on",
+   "does": "off = as before. on = a 10-2 voucher paid by bank or mobile shows with that mode in the day book (today every voucher is cash) and the card fee of a settlement leaves the bank side. daybook_vs_journal then shows no difference for these kinds.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase113.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:dealer_cheque_on": {
+   "title": "PDC register",
+   "does": "When on, cheques can be registered, deposited, cleared and bounced. Only CLEAR moves money in the party ledger.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase127.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:dealer_scheme_on": {
+   "title": "Principal schemes",
+   "does": "When on, schemes, accruals and claims can be written. Amounts come only from the rules you enter; nothing is invented.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase128.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:dealer_tint_on": {
+   "title": "Tinting machine",
+   "does": "When on, shade formulas and tint jobs can be written; a job consumes the base and colorants from stock.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase129.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:drawer_short_post": {
+   "title": "Post the drawer count difference to the books: off or on",
+   "does": "off = as before (the difference is only the yellow / red flag and the books keep more cash than the till holds). on = a submitted or approved drawer count (form 14-1) with a difference posts Cash short / over (5800) and the day book shows the same row. A form that stops being final is reversed.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase113.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:dues_net_advance": {
+   "title": "Dues list and collection net of the advance already used: off or on",
+   "does": "off = as before (a due already paid off with an advance still shows and can be collected a second time). on = the dues list (customer_dues_net113) and collect_payment subtract the advance already applied to bills.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase113.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:expiry_sale_guard": {
+   "title": "Selling expired stock: off, warn or refuse",
+   "does": "off = as before (the \"block expired sale\" switch decides). warn = the sale goes through, the red warning names the batch and its expiry date. refuse = a sale that would take expired stock is refused (late offline syncs are still accepted, with the red warning).",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase513.sql (imported from the advanced line phase87); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:factory_labour_absorbed117": {
+   "title": "Factory salary leaves out the labour already absorbed into product cost",
+   "does": "Off (default) = as today: labour appears in product cost (COGS where sold) and again as the factory branch salary. On = the branch P&L takes from the factory salary the labour absorbed into product cost that month (never more than the salary).",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase117.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:form_051_mode": {
+   "title": "Factory daily sheet (05-1): how it reaches stock",
+   "does": "reference = exactly as before (default). post = when the sheet posts to stock, the recipe ingredients also go out at the average cost and the finished goods get a cost. refuse = 05-1 never posts to stock.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "reference (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase509.sql (imported from the advanced line phase83); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:impexp_on": {
+   "title": "Import-Export module on",
+   "does": "When off, shipments, currencies and rates cannot be written (reading works). Nothing is posted to the GL.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase124.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:inbox_pii_mode": {
+   "title": "Mask customer details in the inbox",
+   "does": "off = today. mask_phone = phone hidden. mask_phone_address = phone and address hidden.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase525.sql (imported from the advanced line phase99); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:inbox_rate_max_per_min": {
+   "title": "Inbox: most messages stored per channel per minute",
+   "does": "Empty = no limit (as before). Above the limit a message goes to the retry list. The security review suggested 120.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Blank: the feature says \"not set\" and invents no number.",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase520.sql (imported from the advanced line phase94); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:inbox_unmask_daily_max": {
+   "title": "Max reveals per person per day",
+   "does": "You type it; blank = no limit. The owner is not limited.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Blank: the feature says \"not set\" and invents no number.",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase525.sql (imported from the advanced line phase99); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:intake_reject_max_per_min": {
+   "title": "Most rejected-call lines kept per minute",
+   "does": "Empty = no limit (as before). Stops a flood of forged calls from filling the failed list.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Blank: the feature says \"not set\" and invents no number.",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase520.sql (imported from the advanced line phase94); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:invoice_own_sales_only": {
+   "title": "POS approve",
+   "does": "Off = as before (anyone with POS at the place can open any sale's invoice). On: a cashier opens and logs only his own sales' invoices.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase520.sql (imported from the advanced line phase94); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:item_images_cache_hours": {
+   "title": "Hours to keep photo links and pictures",
+   "does": "You type it; blank = this session only. A longer time helps on slow data or offline, but a changed photo shows later. Signed links themselves last at most 1 hour; the picture copy is kept for this time.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Blank: the feature says \"not set\" and invents no number.",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase102.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:item_images_mode": {
+   "title": "Show item photos",
+   "does": "off = today (photos only in the item form). pos_only = POS item cards only. everywhere = POS and every item picker / list.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase102.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:item_images_thumb_only": {
+   "title": "Load the small thumbnail first",
+   "does": "on = when a photo has a small copy (uploaded with it) only that is loaded (less data). Without a small copy the original is used. off = always the original.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "on (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase102.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:item_lifecycle_needs_zero": {
+   "title": "An item with stock cannot be untracked or deactivated",
+   "does": "Off = as before (default): selling after tracking is switched off leaves the book wrong; a deactivated item's stock vanishes from the stock list but is still valued. On = both are refused until the stock is zero.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase114.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:item_unit_change_needs_zero": {
+   "title": "The base unit cannot change while stock is on hand",
+   "does": "Off = as before (default): changing kg to pc silently changes what the stock number means. On = the base unit cannot be changed unless the stock is zero everywhere (count it down first).",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase114.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:items_net_of_returns": {
+   "title": "Item reports net of returns: off or on",
+   "does": "off = as before (top items and category reports ignore returns). on = returned revenue, quantity and cost are subtracted, like the margin report. Works only while the rule \"reports net of returns\" is on.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase112.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:landed_alloc_default": {
+   "title": "equal",
+   "does": "value = costly goods take more. qty = the same per unit. weight or volume = best for freight, but the weight must be known (it is never guessed).",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "value (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase523.sql (imported from the advanced line phase97); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:landed_base_currency": {
+   "title": "Base currency of landed costs (code)",
+   "does": "A charge in another currency is converted to this one; you type the rate yourself.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "BDT (the value that applies until the owner sets another).",
+   "change": "Type another text in Settings.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase523.sql (imported from the advanced line phase97); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:landed_cost_mode": {
+   "title": "per shipment",
+   "does": "off = as today, item cost = the invoice price. manual = you add it when you need it. per bill = one landed cost per bill.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase523.sql (imported from the advanced line phase97); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:landed_cost_requires_approval": {
+   "title": "required",
+   "does": "warn = it can be posted without approval, but a yellow warning is kept. required = it cannot be posted until approved, and the person who made it cannot approve it (the owner can). Recommended: required for big amounts.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "warn (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase523.sql (imported from the advanced line phase97); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:landed_late_mode": {
+   "title": "variance account",
+   "does": "split = the part still on the shelf goes into stock cost, the part already sold goes to the landed-cost variance (profit and loss). remaining stock = the whole charge is added to what is left (its cost looks higher). variance account = stock is not touched, the whole charge is an expense.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "split_remaining_and_cogs (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase523.sql (imported from the advanced line phase97); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:landed_reminder_days": {
+   "title": "How many days back the reminder list looks",
+   "does": "Older bills do not appear in the list.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "30 (the value that applies until the owner sets another).",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase523.sql (imported from the advanced line phase97); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:landed_reminder_on": {
+   "title": "\"Landed cost not added?\" reminder list",
+   "does": "When on, bills of imported or flagged suppliers that have no landed cost are listed. Off = no list. Recommended: on if you import.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase523.sql (imported from the advanced line phase97); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:late_sale_follows_block": {
+   "title": "The block rule also applies to online sales that carry an old time",
+   "does": "Off = as before (default): any sale that arrives with a time more than 2 minutes old counts as a late sync and is not stopped by block mode. On = only a real offline-queue replay is exempt; a phone with a slow clock or a direct API call is stopped by block like any other sale.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase114.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:manual_journal_guard": {
+   "title": "Manual journal guard: off or on",
+   "does": "On = a manual journal on an inventory, COGS, sales, payable, receivable or stock-adjust account needs a reason code, and payable / receivable lines need a party.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase511.sql (imported from the advanced line phase85); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:neg_grant_log": {
+   "title": "Yellow warning when the sell-below-zero permission is used",
+   "does": "On = in block mode, going below zero by that permission logs who, which item and how much. Off = as before.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase508.sql (imported from the advanced line phase82); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:offline_sale_max_age": {
+   "title": "Hours an old-dated sale may skip the stock guard",
+   "does": "Empty = as before (a sale dated more than 2 minutes back never stops on stock). With a number, a sale dated older than that gets the full stock guard; a manager replay override works as before. Set it to the longest time a phone is normally offline.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Blank: the feature says \"not set\" and invents no number.",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase520.sql (imported from the advanced line phase94); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:offline_soft_stock": {
+   "title": "Accept offline sales even when stock is short",
+   "does": "Off = as before (default). On = a sale re-sent from the offline queue that is refused only because stock is short is accepted and flagged yellow (the goods were already handed over). Online sales do not change.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase509.sql (imported from the advanced line phase83); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:org_scope_on": {
+   "title": "Separate data scope per business (when on, staff of one business cannot see another business's data)",
+   "does": "Off = everything works as before. On = management is limited to its own business, role/personal grants without a place stop at the business border, the listed reports and settings tables are filtered. Read org_scope_preflight() first.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase122.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:packaging_on_actual_yield116": {
+   "title": "Packaging is used for the quantity really made",
+   "does": "Off (default) = as today, planned yield. On = when an actual yield is given, packaging quantity and cost follow the quantity really made (only with packaging_consume_on = production).",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase116.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:packaging_return_mode": {
+   "title": "Packaging on a sale return: none, restore to stock, or record as wastage",
+   "does": "none = nothing, as today. restore = the packaging the sale took out goes back to stock in proportion. wastage = a record only (stock does not grow).",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "none (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase506.sql (imported from the advanced line phase80); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:partner_base_estimate": {
+   "title": "When the partner profit base contains an estimated cost: warn, or refuse the settlement",
+   "does": "warn = a warning only. refuse = a settlement on a profit base with an estimated cost is not saved (a typed manual base is accepted).",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "warn (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase506.sql (imported from the advanced line phase80); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:period_lock_late_warn": {
+   "title": "Warn about documents the scheduler could not book (closed period): off or on",
+   "does": "off = as before (they are only counted). on = a yellow exception late_docs_locked is written and the result lists them (locked_docs). The documents stay unbooked until the period is reopened.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase113.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:period_lock_owner_mode": {
+   "title": "Owner changes inside a closed period: off or warn",
+   "does": "off = as before (the owner can write into a closed period and nothing is left behind). warn = the owner still can, and a yellow exception closed_period_owner is written (once per date and day). Nobody else is affected: they are still refused.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase113.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:pool_drivers116": {
+   "title": "Overhead pool drivers: kg, units, batches, labour hours",
+   "does": "Off (default) = as today: output kg only (piece / litre products get no conversion cost in pool mode). On = pick the driver per place and per cost type (loc_cost_driver_set116); the matching normal monthly quantity must be typed. Nothing is guessed.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase116.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:pool_gl_post117": {
+   "title": "Factory cost pools are also posted as an expense in the books",
+   "does": "Off (default) = a pool is a memo; production credits \"overhead absorbed\" (5950) with no matching expense necessarily in the books. On = each pool row is posted Dr expense / Cr 2400 accrued. Careful: if the same cost is also entered as an expense, payroll or bill it is counted twice.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase117.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:pos_show_invoice_after_sale": {
+   "title": "Show the invoice on screen after a sale: never, ask or always",
+   "does": "never = as before (only the small \"Print receipt\" bar). ask = a \"Show invoice\" bar appears after a sale. always = the invoice opens on screen after every sale, with Print, Email, SMS and WhatsApp buttons.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "never (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase518.sql (imported from the advanced line phase92); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:production_double_issue_guard": {
+   "title": "Same stock taken by production and by an issue: off or warn",
+   "does": "warn = a yellow warning when the same item leaves the same place on the same day both through a recipe production run and through a stock issue / form out-line (nothing is blocked). off = as before.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase513.sql (imported from the advanced line phase87); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:production_negative_reason": {
+   "title": "Production taking an ingredient below zero: off, warn or reason required",
+   "does": "off = as before. warn = yellow warning. required = refused unless the production note gives a reason.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase508.sql (imported from the advanced line phase82); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:profit_truth_mode": {
+   "title": "One true net profit (shop P&L and dashboard tile): off or on",
+   "does": "off = as before (the shop P&L ignores wastage, card fees, app payroll and shared bills; the dashboard tile shows the books figure).",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase112.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:profit_variable_heads": {
+   "title": "Expense heads that count as variable cost in the net profit report",
+   "does": "Comma-separated expense head codes (for example transport). Spending on these heads is counted inside the contribution margin; every other expense is overhead. Blank = no head is variable.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "transport (the value that applies until the owner sets another).",
+   "change": "Type another text in Settings.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase118.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:purchase_backdate_flag": {
+   "title": "Posting a purchase bill with a date other than today: off or warn",
+   "does": "warn = a yellow warning when the bill date is not today: the stock is stamped now, the journal uses the bill date. off = as before.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase513.sql (imported from the advanced line phase87); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:purchase_bill_creates_payment": {
+   "title": "Does posting a purchase bill create a payment?",
+   "does": "off = today (payment is written separately or at posting). ask = offers it after posting. auto_* = pays the whole open amount by itself (suppliers with credit terms are skipped).",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase525.sql (imported from the advanced line phase99); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:purchase_grn_guard": {
+   "title": "When GRN is the stock source, does the purchase bill add stock: off, skip or link required",
+   "does": "off = as before (both add stock, goods can be counted twice). skip = the bill only records money / dues, stock comes from the GRN. link = the bill must be linked to its GRN before posting.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase508.sql (imported from the advanced line phase82); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:purchase_void_guard": {
+   "title": "Voiding a posted purchase bill: off, warn or refuse",
+   "does": "Refuse (or flag red) when a posted return refers to the bill, voiding would make stock negative, or a live GRN batch exists. off = as before.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "off (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase508.sql (imported from the advanced line phase82); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:purchase_void_payments": {
+   "title": "Supplier payments when a bill is voided: void them or keep them as credit",
+   "does": "Default = as before (payments are voided too, the day book shows the cash back). keep = the money really left, so the payment stays and becomes supplier credit; record a supplier refund when the money comes back.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "void (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase508.sql (imported from the advanced line phase82); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:report_cost_source": {
+   "title": "Where every report takes the product cost from: stock-ledger average, typed item cost, or ledger first then typed...",
+   "does": "ledger_then_item_costs (default) = the cost the journal uses, typed item cost only where the ledger has none (marked as estimate). ledger_avg = ledger only, no ledger cost = unknown. item_costs = typed cost only.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "ledger_then_item_costs (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase514.sql (imported from the advanced line phase88); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:return_uses_sale_rows": {
+   "title": "A sale return puts back what the sale took out",
+   "does": "Off = as before (default): the returned quantity is converted with today's unit factor, so a factor edited after the sale shifts the book. On = the return is taken from the sale's own stock ledger rows, in proportion to the returned part of the line.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase114.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:rpt131_on": {
+   "title": "Verified reports (Stage 1)",
+   "does": "When on, the sales / status, item profit, stock reconciliation, wastage, cash close and ageing reports open; every figure is tied to the books.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase527.sql (imported from the advanced line phase131); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:scan_ai_max_per_job": {
+   "title": "Scan: most AI readings per photo",
+   "does": "Empty = no limit (as before). Every AI reading costs money; with a limit, readings above it are refused. The security review suggested 5.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Blank: the feature says \"not set\" and invents no number.",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase520.sql (imported from the advanced line phase94); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:scan_ai_max_per_user_day": {
+   "title": "Scan: most AI readings per person in 24 hours",
+   "does": "Empty = no limit (as before). The number is the owner's choice; there is no built-in value.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Blank: the feature says \"not set\" and invents no number.",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase520.sql (imported from the advanced line phase94); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:scan_enabled": {
+   "title": "Scan a photo of a bill or list",
+   "does": "Off = default. On: a photo becomes a DRAFT; nothing is entered until a person reviews and confirms.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase516.sql (imported from the advanced line phase90); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:scan_engine": {
+   "title": "Scan reading method",
+   "does": "manual = you type the lines beside the photo (always works). browser_ocr = free reading on the phone (weak on Bangla and handwriting). ai_vision = an AI service (needs the separate setup and key, see docs/SCAN_SETUP.md).",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "manual (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase516.sql (imported from the advanced line phase90); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:scan_min_confidence": {
+   "title": "Scan: warn below this confidence (never blocks)",
+   "does": "Warning only. A field the reader was unsure about and you did not change is shown yellow. It never blocks Confirm.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "0.6 (the value that applies until the owner sets another).",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase516.sql (imported from the advanced line phase90); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:semi_finished_ingredient116": {
+   "title": "A finished good (semi-finished) may be an ingredient of another recipe",
+   "does": "Off (default) = as today: only raw material, packaging and resale items. On = a semi-finished good such as chhana can be an ingredient; production takes it out of stock at its average cost. A circle (A uses B, B uses A) is refused.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase116.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:std_cost_true116": {
+   "title": "std_cost holds the true standard cost per unit",
+   "does": "Off (default) = as today: std_cost = (actual material + actual conversion) / theoretical output (a mislabelled number, not a standard). On = std_cost = the stored standard cost per unit. The old number is always kept in cost_full_yield116.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase116.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:std_snapshot_auto116": {
+   "title": "Store the recipe standard cost at the first run",
+   "does": "Off (default) = nothing is stored. On = at the first run of a recipe at a place, the recipe quantities x that day's average prices are kept as the standard (for the price / usage variance report). To set one by hand use recipe_std_set116.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase116.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:telegram_intake_on": {
+   "title": "Telegram message intake is on",
+   "does": "Nothing arrives until the Edge function and the bot are set up. No reply is ever sent automatically.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase512.sql (imported from the advanced line phase86); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:transfer_late_receive": {
+   "title": "The rest of a short transfer can be received later",
+   "does": "Off = as before (default): the first receipt closes the transfer and the second lorry stays \"short\" for ever. On = more can be received later up to the shortage, as long as the shortage was not written off as a transit loss or booked in the accounts.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase115.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:transfer_needs_stock": {
+   "title": "A transfer cannot send more than the sender holds",
+   "does": "Off = as before (default): in warn mode a transfer above the sender's stock is accepted, the sender goes negative and the receiver gets stock from nothing. On = a transfer above what the sender holds is refused (the sell-below-zero permission or an emergency approval still lets it through). Count your stock first.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase114.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:transfer_notify_receiver": {
+   "title": "Tell the receiving branch when goods are sent",
+   "does": "Off = as before (default): the receiving branch is not told that goods are on the way (the owner only gets an alert after a long delay). On = the managers of that place get a notification as soon as goods are sent.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase115.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:transfer_return_marker": {
+   "title": "Returns to the factory are marked with a reason and a link",
+   "does": "Off = as before (default): a return to the factory is an ordinary reverse transfer with no reason or link. On = a return transfer records its reason (damaged / expired / excess / wrong item / other) and the original transfer.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase115.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:transit_loss_gl_fix": {
+   "title": "Transit loss no longer creates phantom inventory in the accounts",
+   "does": "Off = as before (default). On = with location-tagged transfer accounting, transit_short_mode = loss or resolving a short leaves the inventory GL equal to the stock valuation and the transit-loss entry is no longer stuck. Entries already posted wrongly are not rewritten.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase115.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:transit_open_hours": {
+   "title": "Open transfers older than this many hours raise an urgent alert",
+   "does": "Blank = no alert (default). A number: a transfer that stays sent but not received for longer than that raises an urgent notification.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Blank: the feature says \"not set\" and invents no number.",
+   "change": "Type another number in Settings (blank = not set). The change applies the next time the function reads it.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase509.sql (imported from the advanced line phase83); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:transit_short_mode": {
+   "title": "How a short transfer receipt is booked",
+   "does": "keep_in_transit = as before (default; only the yellow flag, the shortfall stays on a list). loss = the shortfall is booked in the stock ledger as a transit loss.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "keep_in_transit (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase509.sql (imported from the advanced line phase83); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:unit_conv_required": {
+   "title": "Sale of a tracked item with no unit conversion: off, warn or refuse",
+   "does": "warn = as before (the sale goes through, stock is not reduced, yellow warning). refuse = an online sale is refused with unit_unknown; a late offline sale is accepted but flagged red; the item editor also refuses tracked.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "warn (the value that applies until the owner sets another).",
+   "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase508.sql (imported from the advanced line phase82); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "rule:variants_on": {
+   "title": "colour) and price lists",
+   "does": "Off: sweets works exactly as before. On: variant generation and price lists work and one business can no longer read another business's items.",
+   "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
+   "default": "Off.",
+   "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
+   "who": "Owner (or a person the owner gave the settings right).",
+   "verified": false,
+   "src": "phase125.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
+  },
+  "grant:pos_replay_override": {
+   "title": "Re-send a refused offline sale on manager override",
+   "does": "A person holding this right can: re-send a refused offline sale on manager override.",
+   "why": "Each such action is a right the owner gives, never a default.",
+   "default": "Nobody holds it except the owner.",
+   "change": "The owner gives or takes it on the rights screen.",
+   "who": "The owner gives and takes the right.",
+   "verified": false,
+   "src": "phase509.sql (advanced line phase83); entry written from the right text in the database seed, not yet checked in the app"
+  },
+  "grant:landed_entry": {
+   "title": "Write and post landed costs (freight, duty ...)",
+   "does": "A person holding this right can: write and post landed costs (freight, duty ...).",
+   "why": "Each such action is a right the owner gives, never a default.",
+   "default": "Nobody holds it except the owner.",
+   "change": "The owner gives or takes it on the rights screen.",
+   "who": "The owner gives and takes the right.",
+   "verified": false,
+   "src": "phase523.sql (advanced line phase97); entry written from the right text in the database seed, not yet checked in the app"
+  },
+  "grant:scan_upload": {
+   "title": "Photograph a bill or list and prepare a draft",
+   "does": "A person holding this right can: photograph a bill or list and prepare a draft.",
+   "why": "Each such action is a right the owner gives, never a default.",
+   "default": "Nobody holds it except the owner.",
+   "change": "The owner gives or takes it on the rights screen.",
+   "who": "The owner gives and takes the right.",
+   "verified": false,
+   "src": "phase516.sql (advanced line phase90); entry written from the right text in the database seed, not yet checked in the app"
+  },
+  "grant:scan_confirm": {
+   "title": "Confirm or reject a draft made from a photo",
+   "does": "A person holding this right can: confirm or reject a draft made from a photo.",
+   "why": "Each such action is a right the owner gives, never a default.",
+   "default": "Nobody holds it except the owner.",
+   "change": "The owner gives or takes it on the rights screen.",
+   "who": "The owner gives and takes the right.",
+   "verified": false,
+   "src": "phase516.sql (advanced line phase90); entry written from the right text in the database seed, not yet checked in the app"
+  },
+  "grant:drawer_nosale": {
+   "title": "Open the cash drawer with no sale",
+   "does": "A person holding this right can: open the cash drawer with no sale.",
+   "why": "Each such action is a right the owner gives, never a default.",
+   "default": "Nobody holds it except the owner.",
+   "change": "The owner gives or takes it on the rights screen.",
+   "who": "The owner gives and takes the right.",
+   "verified": false,
+   "src": "phase521.sql (advanced line phase95); entry written from the right text in the database seed, not yet checked in the app"
+  },
+  "grant:landed_approve": {
+   "title": "Approve and void landed costs",
+   "does": "A person holding this right can: approve and void landed costs.",
+   "why": "Each such action is a right the owner gives, never a default.",
+   "default": "Nobody holds it except the owner.",
+   "change": "The owner gives or takes it on the rights screen.",
+   "who": "The owner gives and takes the right.",
+   "verified": false,
+   "src": "phase523.sql (advanced line phase97); entry written from the right text in the database seed, not yet checked in the app"
   }
  }
 }
