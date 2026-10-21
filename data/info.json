@@ -7784,6 +7784,16 @@
    "who": "The owner gives and takes the right.",
    "verified": false,
    "src": "phase523.sql (advanced line phase97); entry written from the right text in the database seed, not yet checked in the app"
+  },
+  "feature:layout_choice": {
+   "title": "Screen layout (phone or PC look)",
+   "does": "Lets you choose how the app looks on this device: Automatic (by screen width), Phone look (always the phone layout) or PC look (the desktop layout with a side menu, where the screen is wide enough).",
+   "why": "A PC with a narrow window or a phone in landscape may look better with one of the two fixed looks.",
+   "default": "Automatic. The choice is saved on this device only, never in the database.",
+   "change": "Tap one of the three buttons in Settings. The screen changes at once; no reload is needed.",
+   "who": "Anyone who can open Settings sees the choice for this device only. It does not change what other devices or staff see.",
+   "verified": false,
+   "src": "DESKTOP_LAYOUT 4.2 (docs/DESKTOP_LAYOUT.md)"
   }
  }
 }
