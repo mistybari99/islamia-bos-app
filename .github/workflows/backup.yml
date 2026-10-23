@@ -3,7 +3,7 @@
 # so this file must be on the default branch of mistybari99/My-tools.
 #
 # What it does: tools/backup_dump.py (dump through the least-privilege "ops bot", no service_role key) -> tools/backup_photos.py (private photo bucket)
-# -> commits to the orphan branch "backups": latest/ (always the newest) + YYYY/MM/DD/ (that day's dump). The code branches are never touched.
+# -> tools/backup_seal.py (photo manifests + sha256 into manifest.json) -> commits to the orphan branch "backups": latest/ (always the newest) + YYYY/MM/DD/ (that day's dump). The code branches are never touched.
 name: backup
 
 on:
@@ -78,19 +78,30 @@ jobs:
         continue-on-error: true
         run: |
           mkdir -p data/latest drive_extra
+          rm -f data/latest/storage_manifest_*.json data/latest/storage_buckets.json   # only this run's manifests may be sealed (a bucket switched off later must not leave a stale one)
           if [ "$HAS_DRIVE" = "true" ]; then DRIVE=--drive; else DRIVE=; fi
-          python3 code/tools/backup_photos.py --git-dir data/latest/photos --drive-dir drive_extra/photos $DRIVE
+          # --all-buckets: also web-refs / payproof / web-public when the owner switched the rule backup_buckets_on ON (phase547); without phase547 only photos
+          python3 code/tools/backup_photos.py --git-dir data/latest/photos --drive-dir drive_extra/photos --all-buckets $DRIVE
+
+      - name: Seal the run (checksums of the photo manifests into manifest.json, files checked on disk)
+        id: seal
+        continue-on-error: true
+        if: always() && steps.dump.outcome == 'success'
+        run: |
+          if [ "${{ steps.photos.outcome }}" = "failure" ]; then FAILED=--photos-failed; else FAILED=; fi
+          python3 code/tools/backup_seal.py --out out --storage-dir data/latest $FAILED
 
       - name: Put the dump into latest/ and the dated folder
         run: |
           DAY=$(TZ=Asia/Dhaka date +%Y/%m/%d)
           mkdir -p data/latest "data/$DAY"
-          # latest/ = exactly this run's dump (photos/ inside latest/ is kept: files are only added)
-          find data/latest -maxdepth 1 -type f \( -name '*.ndjson.gz' -o -name '*.ndjson.gz.enc' -o -name 'manifest.json' \) -delete
+          # latest/ = exactly this run's dump (photos/ and buckets/ inside latest/ are kept: files are only added)
+          find data/latest -maxdepth 1 -type f \( -name '*.ndjson.gz' -o -name '*.ndjson.gz.enc' -o -name 'manifest.json' -o -name 'accounts.json' -o -name 'accounts.json.enc' -o -name 'photos_manifest.json' -o -name 'storage_manifest_*.json' -o -name 'storage_buckets.json' \) -delete
           cp out/*.ndjson.gz* out/manifest.json data/latest/
+          cp out/accounts.json* out/photos_manifest.json out/storage_manifest_*.json out/storage_buckets.json data/latest/ 2>/dev/null || true
           rm -rf "data/$DAY" && mkdir -p "data/$DAY"
           cp out/*.ndjson.gz* out/manifest.json "data/$DAY/"
-          cp data/latest/photos_manifest.json "data/$DAY/" 2>/dev/null || true
+          cp out/accounts.json* out/photos_manifest.json out/storage_manifest_*.json out/storage_buckets.json "data/$DAY/" 2>/dev/null || true
           echo "DAY=$DAY" >> "$GITHUB_ENV"
 
       - name: Commit and push to the backups branch
@@ -118,13 +129,15 @@ jobs:
           RCLONE_CONFIG_GD_TOKEN: ${{ secrets.GDRIVE_OAUTH_TOKEN }}
           RCLONE_CONFIG_GD_TEAM_DRIVE: ${{ secrets.GDRIVE_SHARED_DRIVE_ID }}
         run: |
-          rclone copy data/latest "gd:latest" --include '*.ndjson.gz' --include '*.ndjson.gz.enc' --include 'manifest.json' --include 'photos_manifest.json'
+          rclone copy data/latest "gd:latest" --include '*.ndjson.gz' --include '*.ndjson.gz.enc' --include 'manifest.json' --include 'photos_manifest.json' --include 'accounts.json' --include 'accounts.json.enc' --include 'storage_manifest_*.json' --include 'storage_buckets.json'
           rclone copy "data/${DAY}" "gd:${DAY}"
           if [ -d data/latest/photos ] && [ "$(du -sm data/latest/photos | cut -f1)" -lt 1024 ]; then rclone copy data/latest/photos gd:photos; fi
+          if [ -d data/latest/buckets ] && [ "$(du -sm data/latest/buckets | cut -f1)" -lt 1024 ]; then rclone copy data/latest/buckets gd:buckets; fi
           if [ -d drive_extra/photos ]; then rclone copy drive_extra/photos gd:photos; fi
+          if [ -d drive_extra/buckets ]; then rclone copy drive_extra/buckets gd:buckets; fi
 
-      - name: Fail the run if the photo copy failed (the database part is already saved)
-        if: steps.photos.outcome == 'failure'
+      - name: Fail the run if the photo copy or the seal failed (the database part is already saved)
+        if: steps.photos.outcome == 'failure' || steps.seal.outcome == 'failure'
         run: |
-          echo "::error::The photo copy failed. The database backup itself was saved. Look at the 'Copy the photos' step."
+          echo "::error::The photo copy or the seal check failed (a photo is missing, changed or not copied). The database backup itself was saved. Look at the 'Copy the photos' and 'Seal the run' steps."
           exit 1
