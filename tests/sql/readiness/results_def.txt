@@ -134,9 +134,14 @@ PASS R19 profit_source_check agrees (report COGS = journal COGS) exp=1 act=1
 PASS R20 acct_party_ledger customer: balance 400 exp=400 act=400.00
 PASS R21 catalogue reports that raise an error exp=0 act=0
 PASS R22 report hub metrics call works 
+PASS K1 flour counted 78 against book 79: book becomes 78 exp=78 act=78.0000
+FAIL K2 count loss in the books 5110 = 1 kg x 42 (posted by default? switch acct_count_adjust) exp=42 act=0
+PASS K3 voided sale: showroom 3 stock back to 7.5 exp=7.5 act=7.5000
+PASS K3 voided sale: cash showroom 3 back to 0 exp=0 act=0.00
+PASS K3 trial balance still balanced exp=0 act=0
 PASS Z1 unbalanced journal entries exp=0 act=0
 PASS Z2 journal total debit = credit exp=0 act=0.00
-SUMMARY mode=def pass=118 fail=18
+SUMMARY mode=def pass=122 fail=19
 FAILLIST 13 | P2 transporter payable 490 (supplier_dues of the second supplier) | exp=490 | act=0
 FAILLIST 20 | P3 pay_supplier for the transporter owed 490 by the party ledger (DEFECT D1 if this errors: supplier_dues does not see landed charges) | exp=error zzz_expect_success | act=overpaid
 FAILLIST 41 | T3 per-place stock valuation total (stock_valuation all places) = GL inventory 1310+1320+1330 [short kg 0.5 x 70.65 is lost: stock gone, GL must show 5130 or stay in inventory] | exp=10894.6750000000 | act=10930.00
@@ -155,3 +160,4 @@ FAILLIST 107 | F2 total assets = cash 18340+1600, bank 89387, wallet 600, card 5
 FAILLIST 109 | F2 equity + earnings = 120000 + correct net profit | exp=115439.365 | act=115484.69
 FAILLIST 122 | R12 transfers short value in the books = 0.5 kg x 70.65 (5130) | exp=35.325 | act=0
 FAILLIST 130 | R18c t3_payroll (staff cost report) shows the paid payroll runs | exp=9613 | act=0
+FAILLIST 136 | K2 count loss in the books 5110 = 1 kg x 42 (posted by default? switch acct_count_adjust) | exp=42 | act=0

@@ -392,6 +392,19 @@ end $$;
 select tt.eq('R21 catalogue reports that raise an error', 0, (select count(*) from sm where not ok));
 select tt.t('R22 report hub metrics call works', (select rpt_hub_metrics() is not null));
 
+\echo == K stock count adjustment, void of a sale (extra, after the statements above)
+select tt.as(:'o');
+select tt.bal('5110') as k_before_count \gset
+select stock_count_adjust(tt.iid('test_flour'),6,78,'test count') is not null as kc \gset
+select tt.eq('K1 flour counted 78 against book 79: book becomes 78', 78, tt.qty('test_flour',6));
+select acct_post_pending(false) is not null as ppk1 \gset
+select tt.eq('K2 count loss in the books 5110 = 1 kg x 42 (posted by default? switch acct_count_adjust)', 42, tt.bal('5110') - :k_before_count::numeric, 0.01);
+select void_sale((:'s6j'::jsonb->>'id')::uuid, 'test void') is not null as vs \gset
+select acct_post_pending(false) is not null as ppk2 \gset
+select tt.eq('K3 voided sale: showroom 3 stock back to 7.5', 7.5, tt.qty('test_sweet_a',3));
+select tt.eq('K3 voided sale: cash showroom 3 back to 0', 0, tt.bal_loc('1110',3));
+select tt.eq('K3 trial balance still balanced', 0, tt.unbalanced());
+
 \echo == Z totals
 select tt.eq('Z1 unbalanced journal entries', 0, tt.unbalanced());
 select tt.eq('Z2 journal total debit = credit', 0, (select sum(debit-credit) from journal_lines));
