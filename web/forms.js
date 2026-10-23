@@ -25,7 +25,7 @@ const diffText = (d) => (d === 0 ? L('মিল আছে ✓', 'Matches ✓') :
 const HEADS = [['staff_meal', L('স্টাফের খাবার / নাস্তা', 'Staff meals / snacks')], ['transport', L('যাতায়াত / পরিবহন', 'Transport')], ['hospitality', L('কাস্টমার আপ্যায়ন', 'Customer hospitality')],
   ['repair', L('মেরামত / ইউটিলিটি', 'Repairs / utilities')], ['labour', L('অস্থায়ী শ্রমিকের মজুরি', 'Temporary labour wages')], ['sourcing', L('বাইরের সোর্সিংয়ের মালামাল', 'Outside-sourced goods')], ['other', L('অন্যান্য (লিখুন)', 'Other (write it)')]];
 B.forms['11-1'] = {
-  title: L('ব্যয় ভাউচার', 'Expense Voucher'),
+  title: L('ব্যয় ভাউচার', 'Expense Voucher', 'Expense Voucher'),
   head: [TM('time', L('সময়', 'Time')), T('sheet_no', L('দৈনিক শোরুম শিট নং', 'Daily showroom sheet no.'))],
   sections: [
     { title: L('খরচের তালিকা (ইমপ্রেস্ট থেকে)', 'Expenses (from the imprest)'), fields: [
@@ -67,7 +67,7 @@ B.forms['11-1'] = {
 
 /* ============ 03-1 · Cash handover slip ============ */
 B.forms['03-1'] = {
-  title: L('ক্যাশ হ্যান্ডওভার', 'Cash Handover'),
+  title: L('ক্যাশ হ্যান্ডওভার', 'Cash Handover', 'Cash Handover'),
   head: [T('sheet_no', L('দৈনিক শোরুম শিট নং', 'Daily showroom sheet no.')), T('carrier', L('বহনকারী', 'Carrier'), { req: true }), T('seal_no', L('সিল / ব্যাগ নং', 'Seal / bag no.')), TM('send_time', L('পাঠানোর সময়', 'Time sent'))],
   sections: [
     { title: L('হ্যান্ডওভার (শোরুম পূরণ করবে)', 'Handover (showroom fills)'), fields: [
@@ -103,7 +103,7 @@ const TTYPES = [['f2s', L('কারখানা → শোরুম', 'Factory 
   ['g2l', L('গোডাউন → লোকেশন', 'Godown → location')], ['p2l', L('পার্টির ফেরত → লোকেশন', 'Party return → location')], ['other', L('অন্য', 'Other')]];
 const GRADES = [['g1', L('১ম', '1st')], ['g2', L('২য়', '2nd')]];
 B.forms['39-1'] = {
-  title: L('ট্রান্সফার চালান', 'Transfer Challan'),
+  title: L('ট্রান্সফার চালান', 'Transfer Challan', 'Transfer Challan'),
   head: [SEL('ttype', L('ধরন', 'Type'), TTYPES, { req: true }), LOC('from_loc', L('প্রেরক লোকেশন (From)', 'Sender location (From)'), { req: true }), LOC('to_loc', L('প্রাপক লোকেশন (To)', 'Receiver location (To)'), { req: true }),
     CH('shift', L('শিফট', 'Shift'), [['m', L('সকাল', 'Morning')], ['a', L('বিকাল', 'Afternoon')], ['n', L('রাত', 'Night')]]), T('vehicle', L('গাড়ি / ভ্যান', 'Vehicle')), T('driver', L('ডেলিভারি ম্যান', 'Delivery man')),
     TM('out_time', L('আউট টাইম (প্রেরক)', 'Out time (sender)')), T('handover_point', L('হ্যান্ডওভার পয়েন্ট', 'Handover point'))],
@@ -158,7 +158,7 @@ B.forms['39-1'] = {
 
 /* ============ 36-1 · Stock count sheet ============ */
 B.forms['36-1'] = {
-  title: L('স্টক কাউন্ট', 'Stock Count'),
+  title: L('স্টক কাউন্ট', 'Stock Count', 'Stock Count'),
   head: [TM('start_time', L('শুরুর সময়', 'Start time')), TM('end_time', L('শেষ সময়', 'End time')),
     ST('counted_by', L('গণনাকারী (Counted by)', 'Counted by'), { req: true }), ST('storekeeper', L('স্টোরকিপার', 'Storekeeper'), { req: true }),
     CH('kind', L('ধরন', 'Kind'), [['regular', L('নিয়মিত কাউন্ট', 'Regular count')], ['surprise', L('হঠাৎ কাউন্ট (Surprise)', 'Surprise count')]])],
@@ -210,7 +210,7 @@ const CLOSE_STEPS = [
 ];
 const moneyFlds = (list) => list.map(([id, l, o]) => M(id, l, o || {}));
 B.forms['06-1'] = {
-  title: L('দৈনিক শোরুম শিট', 'Daily Showroom Sheet'),
+  title: L('দৈনিক শোরুম শিট', 'Daily Showroom Sheet', 'দৈনিক Showroom Sheet'),
   head: [CH('day_type', L('দিনের ধরন', 'Day type'), [['normal', L('সাধারণ দিন', 'Normal day')], ['busy', L('ব্যস্ত দিন (Peak)', 'Busy day (Peak)')]], { req: true }),
     CH('shift', L('শিফট', 'Shift'), [['full', L('পুরো দিন', 'Full day')], ['s1', L('শিফট ১', 'Shift 1')], ['s2', L('শিফট ২', 'Shift 2')]]), ST('duty_manager', L('ডিউটি ম্যানেজার', 'Duty manager'), { req: true })],
   sections: [

@@ -12,11 +12,11 @@
   'use strict';
   const B = (window.BOS = window.BOS || {});
   const GROUPS = [
-    { key: 'main', en: 'Main Showroom', bn: 'মেইন শোরুম' },
-    { key: 'branch', en: 'Branch', bn: 'শাখা' },
-    { key: 'production', en: 'Production House', bn: 'প্রোডাকশন হাউস' },
-    { key: 'warehouse', en: 'Warehouse', bn: 'ওয়্যারহাউস' },
-    { key: 'unclassified', en: 'Unclassified', bn: 'শ্রেণি ঠিক হয়নি' },
+    { key: 'main', en: 'Main Showroom', bn: 'মেইন শোরুম', mix: 'মেইন Showroom' },
+    { key: 'branch', en: 'Branch', bn: 'শাখা', mix: 'Branch' },
+    { key: 'production', en: 'Production House', bn: 'প্রোডাকশন হাউস', mix: 'Production House' },
+    { key: 'warehouse', en: 'Warehouse', bn: 'ওয়্যারহাউস', mix: 'Warehouse' },
+    { key: 'unclassified', en: 'Unclassified', bn: 'শ্রেণি ঠিক হয়নি', mix: 'Unclassified' },
   ];
   const classify = (l) => {
     if (!l || typeof l !== 'object') return 'unclassified';
@@ -30,9 +30,9 @@
     return 'unclassified';
   };
   // groups in order; a group with no place is left out (Unclassified only when it has a place)
-  const grouped = (locs) => GROUPS.map((g) => ({ key: g.key, en: g.en, bn: g.bn, items: (locs || []).filter((l) => classify(l) === g.key) }))
+  const grouped = (locs) => GROUPS.map((g) => ({ key: g.key, en: g.en, bn: g.bn, mix: g.mix, items: (locs || []).filter((l) => classify(l) === g.key) }))
     .filter((g) => g.items.length > 0);
-  const title = (g) => (B.L && B.lab ? B.lab(B.L(g.bn, g.en)) : g.en);
+  const title = (g) => (B.L && B.lab ? B.lab(B.L(g.bn, g.en, g.mix)) : g.en);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // <option>s with one <optgroup> per group. The option values are the place ids, as before.
   const optionsHTML = (locs, selected, nameOf, allLabel) => {
