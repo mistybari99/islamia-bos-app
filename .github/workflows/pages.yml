@@ -1,0 +1,63 @@
+# Single-repo publishing (docs/SINGLE_REPO.md). Builds web/ with tools/build_web.sh and deploys ONLY the built folder to GitHub Pages.
+# Runs ONLY on a push to the branch Main-Img, and never in a fork. There is no schedule and no manual trigger.
+# It reads no secret. It publishes only what tools/build_web.sh writes (web/ minified): never tests, sql, docs, tools, secrets or the repository-root data/ folder;
+# tools/check_pages_dist.py refuses the upload if any of those (or a secret-looking value, or a changed config.js) is found.
+# Owner must set once: Settings > Pages > Source = "GitHub Actions". Until then the deploy job fails harmlessly and nothing is published.
+# Rollback: Actions > pages > open the older green run > "Re-run all jobs" (it rebuilds that older commit and deploys it).
+# Action versions are pinned to exact releases that are older than two weeks. Their exact tag names could not be checked online when this file was written (UNVERIFIED): see docs/SINGLE_REPO.md.
+name: pages
+
+on:
+  push:
+    branches: [Main-Img]
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    if: ${{ github.event.repository.fork == false }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4.4.0
+        with:
+          node-version: '20'
+
+      - name: Build web/ into a folder outside the repository
+        run: bash tools/build_web.sh --out "$RUNNER_TEMP/site"
+
+      - name: Guard (config.js unchanged and public-only, nothing that must not be published)
+        run: python3 tools/check_pages_dist.py "$RUNNER_TEMP/site" --web web
+
+      - name: Keep the build id for the run log
+        run: echo "build id $(cat "$RUNNER_TEMP/site/.build-id") from $GITHUB_SHA"
+
+      - uses: actions/configure-pages@v5.0.0
+
+      - uses: actions/upload-pages-artifact@v3.0.1
+        with:
+          path: ${{ runner.temp }}/site
+
+  deploy:
+    needs: build
+    if: ${{ github.event.repository.fork == false }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4.0.5
