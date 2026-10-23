@@ -4,6 +4,9 @@ Owner task 5 of the audit of 19 Oct 2026. This file lists, for review, the brows
 
 ## 0. Where the numbers come from, and a warning
 
+> **Superseded (23 Oct 2026).** The comparison below was made before the union merge, on a local build of phases 8 to 505. The chain is now phases up to 546 on `Main-Img` and the live project is being replaced by a new clean project (`docs/NEW_PROJECT_SETUP.md`), so the counts in this section are stale; regenerate the lists from a fresh build before acting on them. Kept as history.
+
+
 - The lists below were produced from a **local throwaway build** of the repository's own paste chain (phases 8 to 505, `tests/sql/ORDER.txt`), not from the live project. The live project was read by the owner's audit only.
 - The counts do not match the live audit:
 

@@ -1,5 +1,8 @@
 # DEMAND_VERIFY: is everything the owner asked for present now? (21 Oct 2026)
 
+> **Superseded in part (23 Oct 2026).** Written 21 Oct 2026. Since then the union merge was finished, the sorted form-code sequence was chosen and applied (21 Oct, phase 543), the public site serves builds of `My-tools` commits (for example `ed3bac3`), and the single repository is `islamia-bos-app` on `Main-Img`. The PRESENT / PARTIAL verdicts below were not re-checked on 23 Oct; verify an item before relying on its verdict. The single repository is `islamia-bos-app`, branch `Main-Img` (owner decision 23 Oct 2026; see `docs/SINGLE_REPO.md`). The earlier text below is kept as history and was not rewritten.
+
+
 ## বাংলা সারাংশ (ছোট)
 
 মালিকের প্রশ্ন: "যা যা চেয়েছিলাম, সব কি ঠিক আছে?" উত্তর: **বেশিরভাগ আছে, কিন্তু কয়েকটা অসম্পূর্ণ।** সব দাবি মার্জ করা কোডের সঙ্গে মিলিয়ে দেখা হয়েছে (শুধু পড়া ও চালানো, কোনো live Supabase ছোঁয়া হয়নি)।

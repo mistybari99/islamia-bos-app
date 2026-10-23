@@ -97,6 +97,9 @@ Files: `web/ia.js`, `web/nav.js`, `web/optviews.js` (button only), `web/i18n.js`
 
 ## 3. Form-code sequencing and shortcut names (needs ONE owner approval)
 
+> **Superseded (23 Oct 2026).** The owner approved the sorted form-code sequence (Option B, A-Z by English short name, `NN-1`) on 21 Oct 2026 and it was applied (phase 543). The rule is `docs/FORM_SEQUENCE.md`; change a code only through `tools/renumber.py` and a numbered phase. The text below is the earlier proposal.
+
+
 ### 3.1 Facts
 
 - 42 paper forms in 12 groups (`docs/ARCHITECTURE_DESIGN.md` 5.8). Codes are the kit's numbers.

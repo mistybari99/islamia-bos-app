@@ -32,6 +32,9 @@ Not changed: any web file (except `info.json`), any live database, any grant, an
 
 ## 1. Facts about this branch that the audit did not have
 
+> **Superseded (23 Oct 2026).** Section 1 describes the branch as it was on 19 Oct: diverged from the advanced line, live built from another line, `bos112` not recoverable. Today the union merge is done (the advanced line is an ancestor), `bos112` logic is in the chain, and the single repository is `islamia-bos-app` on `Main-Img` (`docs/SINGLE_REPO.md`). Kept as history.
+
+
 1.1 **The branch is not the audited code.** `origin/ccr-9c1f9be7-3s9qnz` is 235 commits ahead of this branch and this branch has 192 commits the other does not have. They diverged. The same phase numbers hold different work: here phase 131 is the to-do list and phase 132 the shift schedule; on the advanced branch phase 131 is reports stage 1 and phase 132 the group ERP master-data separation, and phases 123 and 133 to 135 exist only there. **The multi-business code is not in this branch.** There are no `org_units`, `business_profiles`, `org_scope_on`, or other-business templates here (checked: no matches in `supabase/`, `web/`, `tools/`, `docs/`).
 
 1.2 **Live is built from another line.** 27 of the 69 no-policy tables in the live audit are not created by this branch (landed costs, import/export, phase 134 business profile, Telegram secrets, and others). The live project matches the advanced branch more than this one. See docs/SECURITY_BACKLOG.md section 0.

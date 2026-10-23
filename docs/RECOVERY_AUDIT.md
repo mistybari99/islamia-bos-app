@@ -1,5 +1,8 @@
 # RECOVERY AUDIT: what was lost when the public site was replaced (20 Oct 2026)
 
+> **Superseded (23 Oct 2026).** The union merge of the advanced line and our line is done: it is the phase chain in `docs/PASTE_ORDER.md` (phases 529 to 539 and later) and the branch that became `Main-Img`; the line `ccr-9c1f9be7-3s9qnz` is an ancestor of it. The public site now serves builds of `My-tools` commits (for example `ed3bac3`), not the build this audit calls `pub-new`. The statements below about what was lost, the branch tips and the live database describe 20 Oct 2026. The single repository is `islamia-bos-app`, branch `Main-Img` (owner decision 23 Oct 2026; see `docs/SINGLE_REPO.md`). The earlier text below is kept as history and was not rewritten.
+
+
 Status: READ-ONLY analysis. Nothing was written to the live Supabase project, the public repository `mistybari99/islamia-bos-app`, or any branch except this one. The owner reads Bengali; the one-page summary is `docs/RECOVERY_SUMMARY_BN.md`. The plan is `docs/RECOVERY_ROADMAP.md`. The rehearsal tool is `tools/recovery_merge.py` (result: `docs/RECOVERY_MERGE_DRYRUN.md`).
 
 How to read the evidence: `adv` = branch `origin/ccr-9c1f9be7-3s9qnz` (tip `0bc142b`); `ours` = `claude/supabase-readonly-audit-xo3qkp` (tip `551eb71`); `pub-old` = public commit `4ec5e56` (the build that was live); `pub-new` = public commit `b67ea29` (our upload). `file:line` means the line in that ref.

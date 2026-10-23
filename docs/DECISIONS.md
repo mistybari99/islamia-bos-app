@@ -35,3 +35,10 @@ Source: owner answers in chat, 11 Oct 2026. Scope: all 42 forms of BOS Build Kit
 - Hosting: web/ goes to a separate PUBLIC repo (free GitHub Pages). This private repo keeps schema, data, docs. Costs/prices never go in the public repo.
 - Cost price is a separate permission (ITEM_COST view / enter). Owner switches it per role in the matrix. Hidden roles cannot read it even through the API.
 - Item and price changes by anyone except the owner are requests: they wait for the owner or a role with ITEMS "approve". The requester cannot approve own request unless the owner allows it for that role. Owner's own changes apply at once. All changes are logged.
+
+## Update 23 Oct 2026
+- One repository only: `islamia-bos-app` (GitHub Pages site). Everything from `My-tools` is brought into it, with full history, on a branch named exactly `Main-Img`, which becomes the repository's default branch. Plan and checklist: `docs/SINGLE_REPO.md`.
+- The database will be a NEW, clean Supabase project. The old live project (`Islamiya-Bos`) is almost empty and stays untouched until the owner says otherwise. Plan: `docs/NEW_PROJECT_SETUP.md`.
+- Nothing is uploaded, pushed, deleted, renamed or switched on GitHub or Supabase without the owner's explicit yes. Until then everything is prepared locally only.
+- Repository visibility (public or private) is STILL OPEN. The 12 Oct decision (costs and prices never in a public repo) and the backup guard (backups refuse to run in a public repo) both bear on it. It is documented, not decided.
+- Unchanged: new SQL only in new phase files, every new behaviour OFF by default, no demo or fictional material in the repository.

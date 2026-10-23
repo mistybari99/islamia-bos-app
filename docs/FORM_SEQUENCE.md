@@ -1,5 +1,7 @@
 # FORM_SEQUENCE: how printed form codes are ordered (rule file for Claude and contributors)
 
+> **Superseded (23 Oct 2026).** The status line below is out of date. The owner approved Option B (sorted by English short name, `NN-1`) on 21 Oct 2026, final; `tools/numbering_map.json` has `form_groups_approved: true` and phase 543 applied the codes. The printed codes are the new ones. The rule in section 1 stands.
+
 Status: the owner chose **Option B** (sorted by short name). The mapping below is the proposal the owner must approve line by line before anything is applied. Until then the printed codes in the app and the database are the OLD codes, and `tools/numbering_map.json` keeps `form_groups_approved: false`.
 
 ## 1. The rule

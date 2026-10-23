@@ -1,4 +1,6 @@
 #!/bin/bash
+# SUPERSEDED NOTE (23 Oct 2026): the header below describes the 20 Oct plan (live state = phases up to 103). The union merge is done and the chain on Main-Img runs to phase 546;
+# the script still works as a lost-tag check from the phase103 baseline to the last phase. The live project is being replaced by a new clean project (docs/NEW_PROJECT_SETUP.md).
 # Tag-loss check for the pending phases: build the owner's live state (everything in paste_order.env up to phase103), then paste the later phases one by one in canonical order,
 # snapshot md5(pg_get_functiondef) + bosNN tags of every public function after each phase (tests/sql/fn_snapshot.sh) and report lost tags (tools/tag_loss.py).
 # usage: bash tests/sql/tag_loss_check.sh [outdir]      exit 0 = no tag lost between the phase103 baseline and the last phase

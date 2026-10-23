@@ -1,5 +1,8 @@
 # RECOVERY ROADMAP: one plan to get every lost feature back without losing the new ones
 
+> **Superseded (23 Oct 2026).** The union merge this roadmap plans is done (phases 529 to 539 and later are in `docs/PASTE_ORDER.md`); the canonical branch is `Main-Img`, not `recovery/union`. The public site serves builds of `My-tools` commits (for example `ed3bac3`). Treat the steps below as history; the open work is in `docs/SINGLE_REPO.md` and `docs/NEW_PROJECT_SETUP.md`. The single repository is `islamia-bos-app`, branch `Main-Img` (owner decision 23 Oct 2026; see `docs/SINGLE_REPO.md`). The earlier text below is kept as history and was not rewritten.
+
+
 Written 20 Oct 2026 on branch `claude/supabase-readonly-audit-xo3qkp`. Evidence is in `docs/RECOVERY_AUDIT.md`; the rehearsal is `tools/recovery_merge.py` (result: `docs/RECOVERY_MERGE_DRYRUN.md`). Bengali one-pager: `docs/RECOVERY_SUMMARY_BN.md`.
 
 Rules that hold for every step (from `CLAUDE.md`, `docs/BUILD-RULES.md`): no agent writes to the live Supabase project (the owner pastes SQL after review); no demo or fictional names anywhere (`python3 tools/check_no_demo_leak.py` must print OK before every commit); new SQL only in new numbered phase files, never edit an old phase, always paste-twice safe; every journal entry balances; new behaviour is OFF by default; screens are registered only through `web/ia.js`; the public repository is changed only by the owner or on his explicit go.

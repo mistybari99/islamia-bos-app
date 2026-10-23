@@ -2,6 +2,8 @@
 
 English index of every folder under `docs/`, and of the files at the top level. Links are relative to this file. The Bangla owner guides are in `guide/`.
 
+- [START_HERE.md](START_HERE.md) - which document is for what, newest first.
+
 ## Folders
 
 - [guide/](guide/OWNER_GUIDE.md) - owner guides in Bangla: new features from phase 72 to 103, phone-only steps, recommended settings, safe rollout order, 30-minute UAT checklist.
