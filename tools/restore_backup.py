@@ -14,7 +14,10 @@
   for that moment and put back as they were; the output says so in its first lines).
 * Order: tables are restored alphabetically; foreign keys are not checked because of session_replication_role = replica. The auth users (logins) are NOT in the
   backup: restore into the SAME Supabase project, or re-create the users with the same ids first (profiles.id points at auth.users.id).
-* The photos live in Storage and are not in this SQL (see docs/OPS_SETUP.md, tools/backup_photos.py).
+* The photos live in Storage and are not in this SQL (see docs/BACKUP_AND_RESTORE_GUIDE.md, tools/restore_storage.py). The staff / login list (accounts.json) is
+  restored with tools/restore_accounts.py BEFORE this SQL.
+* The last file ends with a count check: when a restored table has fewer rows than the backup (exactly as many in --truncate mode) the transaction of that file fails.
+  Afterwards run tools/verify_restore.py to compare the content (row checksums) with the backup.
 """
 import argparse
 import gzip
@@ -63,10 +66,113 @@ def verify(folder, manifest, names):
         if hashlib.sha256(data).hexdigest() != info['sha256']:
             bad.append(f'{t}: sha256 does not match (file damaged)')
             continue
-        n = sum(1 for _ in read_rows(p))
+        n, digests = 0, []
+        for line in iter_lines(p):
+            n += 1
+            digests.append(hashlib.sha256(line.encode('utf-8')).digest())
         if n != info['rows']:
             bad.append(f'{t}: {n} rows in the file but the manifest says {info["rows"]}')
+        elif info.get('rows_sha256') and hashlib.sha256(b''.join(sorted(digests))).hexdigest() != info['rows_sha256']:
+            bad.append(f'{t}: the rows do not match the row checksum (rows_sha256) of the manifest')
     return bad
+
+
+def iter_lines(path):
+    with gzip.open(path, 'rt', encoding='utf-8') as f:
+        for line in f:
+            line = line.rstrip('\n')
+            if line.strip():
+                yield line
+
+
+def verify_extras(folder, manifest):
+    """Extra files (staff / login manifest) against manifest.json: present, sha256, and the number of items. Returns the problems."""
+    bad = []
+    for name, info in (manifest.get('extras') or {}).items():
+        if info.get('encrypted'):
+            bad.append(f'{name}: encrypted - decrypt the folder first (tools/backup_crypto.py decrypt)')
+            continue
+        p = os.path.join(folder, info['file'])
+        if not os.path.isfile(p):
+            bad.append(f'{name}: file missing')
+            continue
+        with open(p, 'rb') as f:
+            data = f.read()
+        if hashlib.sha256(data).hexdigest() != info['sha256']:
+            bad.append(f'{name}: sha256 does not match (file damaged)')
+            continue
+        try:
+            n = int(json.loads(data).get('logins', -1)) if name == 'accounts' else info.get('items')
+        except ValueError:
+            n = -1
+        if name == 'accounts' and n != info.get('items'):
+            bad.append(f'{name}: {n} logins in the file but the manifest says {info.get("items")}')
+    return bad
+
+
+def verify_storage(folder, manifest, storage_root=None):
+    """Storage (photos) block of the manifest: the manifest files in the folder match their sha256, and every saved photo under <storage_root>/photos or
+    <storage_root>/buckets/<bucket> exists with the same sha256. storage_root defaults to the backup folder; a dated folder holds no photos (they sit in latest/): then
+    pass --photos-root, otherwise the photo files are reported as NOT CHECKED. Returns (problems, notes)."""
+    bad, notes = [], []
+    st = manifest.get('storage')
+    if not st:
+        return bad, ['no storage block in this manifest (a backup made before manifest version 2): photos are not verified']
+    root = storage_root or folder
+    for bucket, info in (st.get('buckets') or {}).items():
+        mp = os.path.join(folder, info['manifest'])
+        if not os.path.isfile(mp):
+            bad.append(f'storage {bucket}: manifest file {info["manifest"]} missing')
+            continue
+        with open(mp, 'rb') as f:
+            raw = f.read()
+        if hashlib.sha256(raw).hexdigest() != info['manifest_sha256']:
+            bad.append(f'storage {bucket}: manifest file does not match its sha256')
+            continue
+        man = json.loads(raw)
+        d = os.path.join(root, 'photos') if bucket == 'photos' else os.path.join(root, 'buckets', bucket)
+        if man.get('destination') != 'git':
+            notes.append(f"storage {bucket}: {man.get('files')} file(s) are not in git (destination {man.get('destination')}): fetch them from Google Drive")
+            continue
+        if not os.path.isdir(d):
+            notes.append(f"storage {bucket}: {man.get('files')} file(s) listed but NOT CHECKED here (no folder {d}; use --photos-root <the latest/ folder>)")
+            continue
+        checked = 0
+        for e in man.get('entries', []):
+            if not e.get('saved'):
+                bad.append(f"storage {bucket}/{e['path']}: was not saved by the backup")
+                continue
+            p = os.path.normpath(os.path.join(d, e['path']))
+            if not p.startswith(os.path.normpath(d) + os.sep) or not os.path.isfile(p):
+                bad.append(f"storage {bucket}/{e['path']}: file missing")
+                continue
+            h = hashlib.sha256()
+            with open(p, 'rb') as f:
+                for chunk in iter(lambda: f.read(1 << 20), b''):
+                    h.update(chunk)
+            if e.get('sha256') and h.hexdigest() != e['sha256']:
+                bad.append(f"storage {bucket}/{e['path']}: sha256 does not match")
+            checked += 1
+        notes.append(f'storage {bucket}: {checked} of {man.get("files")} file(s) checked (sha256)')
+    return bad, notes
+
+
+def verify_sql(names, counts, exact):
+    """A block for the END of the last restore file: counts the rows of every restored table and RAISES (the whole transaction rolls back) when a table has fewer rows
+    than the backup (or a different number in --truncate mode). The row checksums are compared afterwards by tools/verify_restore.py."""
+    for t in names:
+        if not SAFE_NAME.match(t):
+            raise SystemExit(f'refusing an unsafe table name: {t!r}')
+    vals = ', '.join(f"('{t}', {int(counts[t])})" for t in names)
+    op = '<>' if exact else '<'
+    return (
+        "do $v$ declare r record; n bigint; bad text := ''; begin\n"
+        f"  for r in select * from (values {vals}) x(t, want) loop\n"
+        "    execute format('select count(*) from public.%I', r.t) into n;\n"
+        f"    if n {op} r.want then bad := bad || ' ' || r.t || '(has ' || n || ', backup ' || r.want || ')'; end if;\n"
+        "  end loop;\n"
+        "  if bad <> '' then raise exception 'RESTORE CHECK FAILED - nothing was written. Row counts differ:%', bad; end if;\n"
+        "end $v$;")
 
 
 def pick_tag(text, stem='bk'):
@@ -130,6 +236,7 @@ def main(argv=None):
     ap.add_argument('--truncate', action='store_true')
     ap.add_argument('--split-mb', type=float, default=4.0)
     ap.add_argument('--chunk-rows', type=int, default=300)
+    ap.add_argument('--photos-root', default='', help='folder that holds photos/ and buckets/ (the latest/ folder) when you restore from a dated folder')
     a = ap.parse_args(argv)
     try:
         m = load_manifest(a.folder)
@@ -145,6 +252,12 @@ def main(argv=None):
             return 2
         names = sorted(want)
     problems = verify(a.folder, m, names)
+    if not a.tables:
+        problems += verify_extras(a.folder, m)
+        sp, notes = verify_storage(a.folder, m, a.photos_root or None)
+        problems += sp
+        for n_ in notes:
+            print('note:', n_)
     if problems:
         print('BACKUP IS NOT INTACT - nothing generated:\n  ' + '\n  '.join(problems), file=sys.stderr)
         return 1
@@ -171,6 +284,8 @@ def main(argv=None):
                 cur, size = [head], len(head)
             cur.append(s)
             size += len(s) + 1
+    cur.append('-- check: the row count of every restored table (this whole restore is undone when one is wrong)')
+    cur.append(verify_sql(names, {t: m['tables'][t]['rows'] for t in names}, a.truncate))
     files.append(cur)
     base, ext = os.path.splitext(a.out)
     paths = []

@@ -40,12 +40,14 @@ KEY_FUNCTIONS = ['is_owner', 'is_active', 'can_loc', 'rule_num', 'set_rule', 'ba
                  'save_entry', 'stock_opening', 'stock_issue', 'path_switch_set', 'no_hard_delete', 'log_change']
 OPTIONAL_FUNCTIONS = ['restore_drill_record', 'restore_drill_status', 'backup_coverage106']          # phase70: reported but never a failure
 SKIP_REASONS = [                                                                   # why the dump leaves a table out (mirrors public._backup_tables())
-    (r'_secret', 'name contains _secret (credentials)'), (r'^ops_', 'ops_* (bot accounts)'),
+    (r'_secret', 'name contains _secret (credentials)'), (r'^ops_', 'ops_* (bot accounts; listed in the staff manifest)'),
     (r'^(login_failures|login_attempts|login_throttle)$', 'login throttle data (re-created by use)'),
     (r'^(backup_runs|notifications|notification_reads)$', 'run-time table of the backup / notification module (re-created by the app)'),
 ]
-NOT_IN_BACKUP = ['auth users (logins) - Supabase Auth, not schema public: create the users again with the SAME ids before a real restore',
-                 'Storage photos - see tools/backup_photos.py', 'passwords / PIN hashes / device token hashes (deliberately excluded)']
+NOT_IN_BACKUP = ['auth users (logins): the nightly backup holds a staff / login LIST (accounts.json, when the rule backup_accounts_on is ON) - tools/restore_accounts.py re-creates them with the same ids; passwords and PINs are never saved: every person gets a new PIN',
+                 'Storage photos and files: tools/backup_photos.py (+ tools/restore_storage.py); not part of this drill',
+                 'passwords / PIN hashes / device token hashes / 2FA enrolments / edge function secret VALUES (deliberately excluded; the names are in manifest.json)',
+                 'run tools/verify_restore.py on the restored database to compare the CONTENT (row checksums), not only the counts']
 
 
 class Refused(Exception):
