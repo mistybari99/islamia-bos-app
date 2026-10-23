@@ -6,7 +6,11 @@ const SP = process.argv[2] || _P.TESTS_DIR, ROOT = _P.WEB_DIR;
 // sample data from the real seed files
 const csv = fs.readFileSync(process.env.BOS_REPO_DIR + '/data/items_seed.csv', 'utf8').trim().split('\n').slice(1).map((l, i) => { const c = l.split(','); return { id: 'i' + i, code: 'I-' + String(i + 1).padStart(3, '0'), name_bn: c[0], name_en: null, name_mix: null, category: ({ 'Misty / KG': 'sweet_kg', 'Misty / Piece': 'sweet_pc', 'Doi': 'doi', 'Cake / Pound': 'cake_lb', 'Cake / Piece': 'cake_pc' })[c[1]], category_bn: c[1], unit: (({ 'Misty / KG': 'kg', 'Cake / Pound': 'lb' })[c[1]] || 'pc'), sell_price: +c[2], cost_price: +c[3], is_active: true }; });
 const sql = fs.readFileSync(process.env.BOS_REPO_DIR + '/supabase/schema.sql', 'utf8');
-const forms = [...sql.matchAll(/^\s+\('([^']+)','(\w+)','([^']*)','([^']*)','([^']*)','([^']*)',(\d+)\)/gm)].map((m) => ({ code: m[1], area: m[2], name_bn: m[3], name_mix: m[4], name_en: m[5], version: m[6], sort: +m[7], count_first: true, red_block: true, enabled: true }));
+const forms0 = [...sql.matchAll(/^\s+\('([^']+)','(\w+)','([^']*)','([^']*)','([^']*)','([^']*)',(\d+)\)/gm)].map((m) => ({ code: m[1], area: m[2], name_bn: m[3], name_mix: m[4], name_en: m[5], version: m[6], sort: +m[7], count_first: true, red_block: true, enabled: true }));
+// supabase/schema.sql still carries the OLD printed codes; phase 543 renumbered them in the database (tools/numbering_map.json).
+// Apply the same map here (all at once, so no code is mapped twice) so the fixture matches the app. 0-1 is unchanged.
+const _fmap = new Map(JSON.parse(fs.readFileSync(process.env.BOS_REPO_DIR + '/tools/numbering_map.json', 'utf8')).form_codes.map((r) => [r.old, r]));
+const forms = forms0.map((f) => { const r = _fmap.get(f.code); return r ? { ...f, code: r.new, sort: r.sort, name_bn: r.bn, name_en: r.en, name_mix: r.bn } : f; });
 const roles = [...sql.matchAll(/^\s+\('(\w+)','([^']+)','([^']+)','([^']+)',(\d+)\)/gm)].filter((m) => ['owner','management','cash_controller','showroom_manager','salesperson','storekeeper','factory_incharge','purchasing','party_coordinator','carrier','hr'].includes(m[1])).map((m) => ({ code: m[1], name_bn: m[2], name_mix: m[3], name_en: m[4], sort: +m[5], allow_self_approve: false }));
 const data = { tables: { forms, roles, items: csv,
   profiles: [{ id: 'u1', staff_id: 'owner1', full_name: 'TestK Uddin', status: 'active', created_at: '2026-10-11' }, { id: 'u2', staff_id: 'testf02', full_name: 'TestF', status: 'pending', created_at: '2026-10-12' }],
