@@ -6,10 +6,8 @@
 - প্রস্তাব শুধু পরামর্শ। সিস্টেম নিজে কিছু চালু করে না, আটকায়ও না। Apply (মালিক) চাপলে তবেই বসে।
 - **"নেই"** = সিস্টেম কোনো মান প্রস্তাব করে না। সংখ্যা বা সিদ্ধান্ত আপনার। এই গাইডের অন্য ফাইল যা বলে, সেটা গাইডের লেখকের পরামর্শ, সিস্টেমের নয়, এবং সেখানে আলাদা করে লেখা।
 - সুইচ বদলান `#/switchboard`-এ। প্রস্তাবসহ দেখুন `#/setupadvisor` ও `#/guards`। চালু করার ক্রম `ROLLOUT_PLAN.md`-এ।
-- **উৎস কোড:** S81 = `setup_rec_defs81` (phase 81), S94 = ওই টেবিলে phase 94-এর সারি, G82 = `guard_recommendations()` (phase 82), F83 = `form_guard_recommendations()` (phase 83), P87 = `production_recommendations()` (phase 87), V91 = permission পরামর্শ (phase 91), L97 = `landed_recommendation` (phase 97), B85 = `#/books85` পর্দার হিসাব (SQL-এ নেই), H = সুইচের নিজের hint-লেখা (SQL-এ প্রস্তাব-সারি নেই), I = Inv রিপোর্টের সুপারিশ, **S99 / S100 / S101 / S102** = ওই phase-এর `setup_rec_defs81` সারি, S103 = phase 103-এর read-time override।
-- Phase 99, 100, 101, 102, 103 লাইভে বসেছে। Phase 101 phase 82..97-এর প্রতিটি নিয়মের সারি দিয়েছে (43টি নতুন), তাই আগে "নেই" লেখা কিছু সারি এখন বদলেছে (নিচে চিহ্নিত)।
-- **Phase 105 (নিরাপত্তা), `#/dashx`, Liquid Glass: coming।** এদের রিপোর্ট এখনো নেই, তাই কোনো সুইচ বা মান লেখা হয়নি।
-- "apply-ready" = পরিষ্কার সিস্টেমে এক ট্যাপে বসে। "শর্তসহ" = ready-check পরিষ্কার হলে। "info" = সিস্টেম মান দেয় না।
+- **উৎস কোড:** S81 = `setup_rec_defs81` (phase 81), S94 = ওই টেবিলে phase 94-এর সারি, G82 = `guard_recommendations()` (phase 82), F83 = `form_guard_recommendations()` (phase 83), P87 = `production_recommendations()` (phase 87), V91 = permission পরামর্শ (phase 91), L97 = `landed_recommendation` (phase 97), B85 = `#/books85` পর্দার হিসাব (SQL-এ নেই), H = সুইচের নিজের hint-লেখা (SQL-এ প্রস্তাব-সারি নেই), I = Inv রিপোর্টের সুপারিশ।
+- Phase 99 (Opt) ও 101 (Rec) এখনো আসেনি। 100 (Cat) এর প্রস্তাব নিচে।
 
 ## হিসাব ও রিপোর্ট
 
@@ -18,16 +16,16 @@
 | `accounting_on` | চালু | বিক্রি, ক্রয়, উৎপাদন নিজে খাতায় যায়; শুধু শুরুর তারিখ, mapping, opening ঠিক হলে | S81 |
 | `accounting_autopost` | চালু | হাতে post করতে হয় না, pending জমে না | S81 |
 | `reports_net_of_returns` | চালু | ফেরত বাদ দিলে বিক্রি ও লাভ বাস্তবের কাছাকাছি | S81 |
-| `report_cost_source` | `ledger_then_item_costs` | সব report journal-এর cost (stock ledger) নেয়; ledger-এ না থাকলে আইটেমের লেখা cost | S101 |
-| `acct_count_adjust` | চালু (শর্তসহ: `acc_start`, `acc_coa`, `acc_map` পরিষ্কার হলে) | না হলে স্টকের মান আর খাতা আলাদা হয়ে যায়। **"Apply all" Dscr-এর confirm sheet দেখায় না; একা, সতর্কতা পড়ে চালান** | S101, B85 |
+| `report_cost_source` | নেই | ডিফল্ট `ledger_then_item_costs` রাখাই গাইডের পরামর্শ, সিস্টেম-প্রস্তাব-সারি নেই | - |
+| `acct_count_adjust` | চালু | না হলে স্টকের মান আর খাতা আলাদা হয়ে যায় | B85 |
 | `acct_stock_opening` | **বন্ধ** (আগে `acct_opening` দেখুন) | opening স্টক জেরে থাকলে দুবার গোনা হবে; এখন `#/books96`-এ সিদ্ধান্ত নিন | B85 |
-| `acct_issue_out` | চালু (শর্তসহ: একই তিন check) | না হলে issue স্টক কমায় কিন্তু খরচ আসে না। একই সতর্কতা | S101, B85 |
+| `acct_issue_out` | চালু | না হলে issue স্টক কমায় কিন্তু খরচ আসে না | B85 |
 | `acct_transfer_mode` | একের বেশি জায়গা হলে `location_tagged`, নইলে `off` | জায়গা-ভিত্তিক জোড়া ভালো; এক জায়গায় দরকার নেই | B85 |
 | `acct_transit_loss` | transfer_mode `off` না হলে চালু | transfer হিসাব চালু থাকলে এটাও চালু ভালো | B85 |
 | `acct_transit_loss_at` | `receiver` | সাধারণ পছন্দ | B85 |
-| `acct_purchase_variance` | চালু (শর্তসহ: একই তিন check) | না হলে return-এর পর স্টক-মূল্য ও খাতা মেলে না। একই সতর্কতা | S101, B85 |
+| `acct_purchase_variance` | চালু | না হলে return-এর পর স্টক-মূল্য ও খাতা মেলে না | B85 |
 | `acct_stock_moves_from` | ফাঁকা | দেরিতে সুইচ চালালে backlog এড়াতে তারিখ দিন; তারিখ আপনার | B85 |
-| `manual_journal_guard` | `on` | inventory, COGS, sales, payable, receivable বা stock-adjust account-এ হাতে-journal-এ কারণ-কোড লাগে | S101 |
+| `manual_journal_guard` | নেই | accountant-এর সঙ্গে ঠিক করুন | - |
 | `acct_scheduler_on` | নেই | pg_cron লাগে, ফোনে হয় না | - |
 | `acct_pending_alert_days` | নেই | সংখ্যা আপনার (0 থেকে 365) | - |
 | `acct_cost_wait_alert_days` (96) | নেই | ফাঁকা = alert নেই; সংখ্যা আপনার | - |
@@ -38,10 +36,8 @@
 
 | সুইচ / পরিস্থিতি | প্রস্তাব | কেন | উৎস |
 |---|---|---|---|
-| `landed_cost_mode` | নেই (ডিফল্ট `off`) | আমদানি বা বড় ভাড়া না থাকলে `off`; থাকলে `per_shipment` (নিচের সারি); স্থানীয় ডেলিভারি চার্জে `manual` | L97, S101 |
-| `landed_alloc_default` | `value` | দামি মাল বড় ভাগ পায় | S101 |
-| `landed_late_mode` | `split_remaining_and_cogs` | charge দেরিতে এলে শেলফের অংশ stock cost-এ, বিক্রি হওয়া অংশ COGS-এ | S101 |
-| `landed_reminder_on`, `landed_reminder_days`, `landed_base_currency` | নেই | সংখ্যা/কোড আপনার; বড় bill কী তা আপনার | S101 |
+| `landed_cost_mode` | নেই (ডিফল্ট `off`) | আমদানি বা বড় ভাড়া না থাকলে `off`; থাকলে `per_shipment` (নিচের সারি) | L97 |
+| `landed_alloc_default`, `landed_late_mode`, `landed_reminder_*` | নেই | ডিফল্ট `value` / `split_remaining_and_cogs` / বন্ধ রাখা যায় | - |
 | `landed_cost_requires_approval` | বড় অঙ্কে `required` | যে বানায় সে নিজে approve পারে না; "বড়" কত তা আপনার | L97 |
 | আমদানি করা মাল | `per_shipment` | একাধিক বিল এক lot; প্রতি charge-এ নিজের পদ্ধতি | L97 |
 | ভাড়া / transport | ওজন (সব লাইনে জানা থাকলে), নইলে দাম | ওজনেই ভাড়ার ন্যায্য ভাগ | L97 |
@@ -71,20 +67,19 @@
 
 | সুইচ | প্রস্তাব | কেন | উৎস |
 |---|---|---|---|
-| `purchase_grn_guard` | `grn_receipt_source = grn` হলে `skip`, নইলে কোনো প্রস্তাব নেই | নইলে একই মাল দুবার গোনা হয়। Phase 103 থেকে `setup_recommendations` এটা পড়ার সময় ঠিক করে। আপনার নিজের বসানো মান Apply বদলায় না | G82, S103 |
+| `purchase_grn_guard` | GRN উৎস হলে `skip`, নইলে `off` | নইলে একই মাল দুবার গোনা হয় | G82 |
 | `purchase_void_guard` | `refuse` | ফেরত/ব্যবহার হওয়া মালের বিল void করলে স্টক ঋণাত্মক হয় | G82 |
 | `purchase_void_payments` | `keep` | টাকা সত্যিই বেরিয়েছে; payment void করলে day book ভুল | G82 |
 | `unit_conv_required` | `unit_unknown_items()` = 0 হলে `refuse`, নইলে `warn` | conversion না থাকলে block বিপজ্জনক | G82 |
 | `neg_grant_log` | চালু | অনুমতিতে মাইনাসে বিক্রি হলে মালিক জানেন | G82 |
 | `stock_negative_mode` | প্রথম count/opening হয়ে গেলে `block`, নইলে বর্তমান মান | তার আগে block করলে বিক্রি আটকে যেতে পারে | G82 |
-| `expiry_sale_guard` | `warn` | মেয়াদোত্তীর্ণ মাল বিক্রি হলে সতর্কতা (batch ও তারিখ সহ), বিক্রি আটকায় না। ভুল তারিখ টাইপ হলে `refuse` আসল বিক্রিও আটকাবে | S101 |
-| `purchase_backdate_flag` | `warn` | ভিন্ন তারিখে বিল পোস্ট হলে হলুদ সতর্কতা | S101 |
+| `expiry_sale_guard`, `purchase_backdate_flag` | নেই | কোনো প্রস্তাব-তালিকায় নেই | - |
 
 ## Form, transit, offline POS
 
 | সুইচ | প্রস্তাব | কেন | উৎস |
 |---|---|---|---|
-| `form_051_mode` | 12-1 শিটই production-record হলে `post`, নইলে `reference` | `post` না হলে তৈরি মাল বিনা cost-এ ঢোকে | F83 |
+| `form_051_mode` | 05-1 শিটই production-record হলে `post`, নইলে `reference` | `post` না হলে তৈরি মাল বিনা cost-এ ঢোকে | F83 |
 | `transit_short_mode` | `loss` | কম পৌঁছানো মাল তখন cost সহ ledger-এ থাকে | F83 |
 | `transit_open_hours` | নেই | আপনার delivery-র সাধারণ সময়ের একটু বেশি লিখুন | F83 |
 | `offline_soft_stock` | চালু | offline বিক্রিতে মাল দেওয়া হয়ে গেছে; আটকালে বিক্রি হারায় | F83 |
@@ -115,47 +110,23 @@
 |---|---|---|---|
 | `partner_base_estimate` | `refuse` (ledger cost বসার পর; তার আগে `warn`) | অনুমানের cost ভিত্তিতে লাভ ভাগ হয় না | S94 |
 | `packaging_return_mode` | `wastage` | ফেরত মোড়ক সাধারণত আর বিক্রিতে লাগে না | S94 |
-| `scan_enabled` | চালু | ছবি শুধু খসড়া হয়; মানুষ দেখে confirm না করলে কিছু ঢোকে না | S101 |
-| `scan_engine` | `manual` | নিজে লেখেন, সবসময় চলে, খরচ নেই। পরে `browser_ocr`, সবশেষে `ai_vision` | S101 |
-| `scan_min_confidence` | নেই | ডিফল্ট 0.6; সংখ্যা আপনার। কম আস্থার ঘর হলুদ, Confirm আটকায় না | S101 |
+| `scan_enabled` | নেই | গাইডের পরামর্শ: চালু, `manual` দিয়ে শুরু | - |
+| `scan_engine` | নেই | গাইডের পরামর্শ: `manual`, পরে `browser_ocr`, সবশেষে `ai_vision` | - |
+| `scan_min_confidence` | নেই | ডিফল্ট 0.6; সংখ্যা আপনার | - |
 | `scan_ai_max_per_job`, `scan_ai_max_per_user_day` | নেই | AI-তে প্রতিবার খরচ; সংখ্যা আপনার (ফাঁকা = সীমাহীন) | S94 |
 
 ## ইনভয়েস, template, drawer, category
 
 | সুইচ | প্রস্তাব | কেন | উৎস |
 |---|---|---|---|
-| `pos_show_invoice_after_sale` | **`always`** (ডিফল্ট `never`) | সেল শেষে ইনভয়েস পর্দায়, Print/Email/SMS/WhatsApp বোতামসহ। কিছু না করলে আগের মতো থাকে বলে ডিফল্ট `never` | S101 |
+| `pos_show_invoice_after_sale` | **`always`** (ডিফল্ট `never`) | সেল শেষে ইনভয়েস পর্দায়; কিছু না করলে আগের মতো থাকে বলে ডিফল্ট `never` | I (Inv রিপোর্ট ও phase 92 hint) |
 | `invoice_own_sales_only` | চালু | ক্যাশিয়ার শুধু নিজের বিক্রির ইনভয়েস দেখে | S94 |
 | Template ডিজাইন (`#/templates`) | "Suggested" চিহ্নিত ডিজাইন (রসিদ `thermal80_slip`, pay_slip `a5_classic` ইত্যাদি) | picker-এ প্রস্তাব; কারণ আলাদা লেখা নেই | phase 93 seed |
-| `cash_drawer_mode` | নেই (ড্রয়ার লাগানোর পর `on_cash_sale` সাধারণ পছন্দ) | সিস্টেম মান দেয় না, hardware-এর ওপর নির্ভর | S101 |
-| `cash_drawer_when` | `after_payment` | বিক্রি সেভ হলে তবেই খোলে | S101 |
-| `cash_drawer_method` | নেই (গাইডের পরামর্শ: USB/সিরিয়াল প্রিন্টারে `web_serial`; iPhone-এ চলে না) | সংযোগ ডিভাইস ও প্রিন্টারের ওপর নির্ভর | S101 |
-| `cash_drawer_no_sale_requires_reason` | চালু | কারণ ছাড়া "No sale" খোলা যায় না; চুরির ঝুঁকির সংকেত | S101 |
-| `category_required_on_item` | `warn` | Category ছাড়া আইটেমের তালিকা দেখায়, আটকায় না। ডিফল্ট `off`; `required` হলে নতুন আইটেমে Category লাগে | S100 |
-
-## Bill payment, inbox mask (phase 99), ছবি (phase 102), end-to-end (phase 103)
-
-| সুইচ | প্রস্তাব | কেন (এক লাইনে) | উৎস |
-|---|---|---|---|
-| `cost_bill_creates_payment` | `ask` (ডিফল্ট `off`) | সেভের পর জিজ্ঞেস করে; নিজে টাকা লেখে না। `auto_*` পরে, accountant-এর সঙ্গে | S99 |
-| `purchase_bill_creates_payment` | `ask` (ডিফল্ট `off`) | একই কারণ | S99 |
-| `bill_void_payment_mode` | `void` (ডিফল্টও `void`) | bill বাতিলে payment-ও বাতিল, উল্টো entry যায় | S99 |
-| `bill_pay_auto_credit_ok` | বন্ধ (ডিফল্টও বন্ধ) | credit-শর্তের supplier সাধারণত পরে টাকা পায় | S99 |
-| `bill_pay_large_amount`, `bill_pay_small_cash_max` | নেই | সংখ্যা আপনার (টাকা); ফাঁকা = প্রস্তাব সব সময় `ask` | S99 |
-| `inbox_pii_mode` | `mask_phone_address` (ডিফল্ট `off`) | বেশিরভাগ কাজে পুরো নম্বর লাগে না; ফাঁস হলে ক্ষতি বেশি; নাম ও লেখা দেখা যায়, কাজ আটকায় না | S99 |
-| `inbox_unmask_daily_max` | নেই | সংখ্যা আপনার (কমপক্ষে 1); ফাঁকা = সীমাহীন; owner সীমার বাইরে | S99 |
-| `item_images_mode` | `pos_only` (ডিফল্ট `off`) | ছবি mobile data খায়; POS-এ কার্ড সীমিত, ছবি কাজে লাগে; লম্বা তালিকায় অনেক ছবি লোড হয় | S102 |
-| `item_images_thumb_only` | `on` (ডিফল্টও `on`) | ছোট কপি থাকলে কম data | S102 |
-| `item_images_cache_hours` | নেই | সংখ্যা আপনার (1..720 ঘণ্টা); ফাঁকা = শুধু এই session | S102 |
-| `acct_manual_prod_in103` | নেই (ডিফল্ট বন্ধ) | চালু করলে recipe ছাড়া production-in খাতায় যায় (Dr inventory / Cr overhead absorbed), কারও লাভ বদলায়; accountant-এর সঙ্গে ঠিক করুন | - |
-
-## coming (এখনো আসেনি, রিপোর্ট নেই)
-
-| বিষয় | অবস্থা |
-|---|---|
-| Phase 105 নিরাপত্তা-ঠিক | coming |
-| Owner dashboard `#/dashx` | coming |
-| Liquid Glass theme | coming |
+| `cash_drawer_mode` | ড্রয়ার লাগানোর পর `on_cash_sale` | শুধু ক্যাশ নিলে খোলে | H |
+| `cash_drawer_when` | `after_payment` | বিক্রি সেভ হলে তবেই খোলে | H |
+| `cash_drawer_method` | USB/সিরিয়াল প্রিন্টারে `web_serial` | সরাসরি ESC/POS, কম্পিউটার বা Android Chrome; iPhone-এ চলে না | H |
+| `cash_drawer_no_sale_requires_reason` | চালু | বিক্রি ছাড়া খোলা মানেই চুরির ঝুঁকির সংকেত | H |
+| `category_required_on_item` (phase 100, আসছে) | `warn` | Category ছাড়া আইটেম ধরা যায়, আটকায় না | phase 100 recommendation row |
 
 ## Permission (V91, প্রতিটি ব্যক্তির জন্য `permission_recommendations(user)`)
 
@@ -168,4 +139,4 @@
 (ব্যবহার-ইতিহাস থেকে "কেউ ব্যবহার করেনি" ধরনের প্রস্তাব বানানো হয় না। কারণ-বাক্য সাধারণ; আপনি `reco_role_set` দিয়ে বদলাতে পারেন।)
 
 ---
-**যাচাই হয়নি:** S101 সারির মান আগের ধাপের রিপোর্ট ও বিদ্যমান পরামর্শ-ফাংশন থেকে নেওয়া (মালিক বা accountant নিশ্চিত করেননি); "Apply all" ব্রাউজারে চালানো হয়নি। এই প্রস্তাবগুলো আপনার লাইভ ডাটার ওপর ব্যবসায়িকভাবে যাচাই হয়নি; `B85`-এর মান লেখকের বিচার, accountant নিশ্চিত করেননি; `G82`-এর `stock_negative_mode` ও `unit_conv_required` আপনার ডাটা দেখে বদলায় (এখানে শর্তসহ লেখা)।
+**যাচাই হয়নি:** এই প্রস্তাবগুলো আপনার লাইভ ডাটার ওপর ব্যবসায়িকভাবে যাচাই হয়নি; `B85`-এর মান লেখকের বিচার, accountant নিশ্চিত করেননি; `G82`-এর `stock_negative_mode` ও `unit_conv_required` আপনার ডাটা দেখে বদলায় (এখানে শর্তসহ লেখা)।

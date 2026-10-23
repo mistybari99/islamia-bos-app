@@ -1,16 +1,16 @@
-# মালিকের গাইড - নতুন ফিচার (phase 72 থেকে 103, আর পরে আসা web-ফিচার)
+# মালিকের গাইড - নতুন ফিচার (phase 72 থেকে 98, আর পরে আসা 99, 100, 101)
 
 ফোনে পড়ার জন্য লেখা। বাক্য ছোট। সাধারণ শব্দ English-এ।
-সব তথ্য এসেছে কোড (`supabase/phase72..103.sql`, `web/*.js`) আর ধাপের রিপোর্ট (`docs/briefs_p2p3/*_REPORT.md`, `docs/SCAN_SETUP.md`, `docs/TELEGRAM_SETUP.md`) থেকে।
+সব তথ্য এসেছে কোড (`supabase/phase72..98.sql`, `web/*.js`) আর ধাপের রিপোর্ট (`docs/briefs_p2p3/*_REPORT.md`, `docs/SCAN_SETUP.md`, `docs/TELEGRAM_SETUP.md`) থেকে।
 সংখ্যা বানানো হয়নি। যেখানে সংখ্যা আছে, সেটা কোডের ডিফল্ট।
 
 সঙ্গে আরও চারটি ফাইল:
 - `docs/guide/PHONE_ONLY_STEPS.md` - ফোনে নিজে কী কী করবেন, আর কোনটা ফোনে হয় না।
 - `docs/guide/ROLLOUT_PLAN.md` - একটা একটা করে চালু করার নিরাপদ ক্রম।
-- `docs/guide/UAT_CHECKLIST.md` - প্রতি ধাপের পরে ৩০ মিনিটে ফোনে ছোট পরীক্ষা (এখন 64টি, অংশ অনুযায়ী)।
+- `docs/guide/UAT_CHECKLIST.md` - প্রতি ধাপের পরে ৩০ মিনিটে ফোনে ৪০টা ছোট পরীক্ষা।
 - `docs/guide/RECOMMENDED_SETTINGS.md` - প্রতিটি সুইচের সিস্টেম-প্রস্তাবিত মান, এক পাতায়।
 
-**অবস্থা (শেষ হালনাগাদ):** মালিক নিজে লাইভ ডাটাবেসে phase 72 থেকে 103 সব paste করে ফেলেছেন, canonical ক্রমে (72..88, 90, 91, 89, 92, 93, 95, 94, 96, 97, 98, 99, 100, 101, 102, 103; দেখুন `docs/PASTE_ORDER.md`)। তাই আর কোনো পুরনো phase আবার paste করবেন না। **নতুন phase যা আসবে, সেটা শেষ বসানো phase-এর পরে যাবে (অংশ 18)।** যা এখনো আসেনি, সেটা "coming" চিহ্নিত (অংশ 30)।
+**অবস্থা (শেষ হালনাগাদ):** মালিক নিজে লাইভ ডাটাবেসে phase 72 থেকে 98 সব paste করে ফেলেছেন (ক্রম: 72..88, 90, 91, 89, 92, 93, 95, 94, 96, 97, 98, দেখুন `docs/PASTE_ORDER.md`)। তাই আর কোনো পুরনো phase আবার paste করবেন না। নতুন phase (99, 100, 101) আলাদা ছোট paste হিসেবে আসবে (অংশ 18)।
 
 ---
 
@@ -24,7 +24,7 @@
 6. **নতুন phase সবসময় 98-এর পরে। আগের কোনো phase কখনো আবার paste করবেন না।** (কেন: অংশ 18)
 7. **এই গাইডের কিছুই লাইভ ডাটাবেসে বা আসল ফোনে চালিয়ে দেখা হয়নি।** সব পরীক্ষা scratch ডাটাবেসে আর নকল (stub) সার্ভারে হয়েছে। প্রতিটি অংশের শেষে "যাচাই হয়নি" লেখা আছে।
 
-**চিহ্ন:** `[যাচাই হয়নি]` = কোডে বা পরীক্ষায় নিশ্চিত হইনি। **coming** = এখনো আসেনি (origin-এ রিপোর্ট নেই), তাই বিস্তারিত লেখা হয়নি।
+**চিহ্ন:** `[যাচাই হয়নি]` = কোডে বা পরীক্ষায় নিশ্চিত হইনি।
 
 ---
 
@@ -49,19 +49,15 @@
 | 15 | বিক্রির পর Invoice | `#/invoiceview` |
 | 16 | Template (print ও message) | `#/templates` |
 | 17 | Phase 72 এর ভিত্তি (rounding, এক cost source) | `#/accounts` |
-| 18 | Paste-এর নিয়ম: 103 পর্যন্ত বসেছে, নতুন phase তার পরে | - |
+| 18 | Paste-এর নিয়ম: 98-এর পরে নতুন phase (99, 100, 101) | - |
 | 19 | নিরাপত্তা-পরিবর্তন (phase 94): মালিক কী পরীক্ষা করবেন | `#/switchboard` |
 | 20 | ক্যাশ ড্রয়ার অপশন (phase 95) | `#/cashdrawer` |
 | 21 | Opening stock সাহায্যকারী ও cost-অপেক্ষা তালিকা (phase 96) | `#/books96` |
 | 22 | Landed cost (phase 97) আর phase 98 | `#/landed` |
 | 23 | কীবোর্ড-নিরাপদ sheet ও গোটানো মেনু-footer | সব পর্দা, মেনু |
-| 24 | Category / Sub-category (phase 100) | `#/categories`, `#/catreport` |
-| 25 | Bill payment option ও inbox PII mask (phase 99) | `#/optionsx`, `#/billpay`, `#/inboxpii` |
-| 26 | Setup advisor-এর advisor সারি (phase 101) | `#/setupadvisor` |
-| 27 | আইটেমের ছবি (phase 102) | `#/itemimg` |
-| 28 | End-to-end ঠিকঠাক (phase 103) | `#/books96`, `#/setupadvisor` |
-| 29 | Home badge, Undo, Landed GRN বাছাই, ক্রয় বিল Print, polish | Home, `#/purchaseprint`, `#/landed` |
-| 30 | coming: নিরাপত্তা (phase 105), Owner dashboard, Liquid Glass | `#/dashx` (coming) |
+| 24 | Category / Sub-category (phase 100, আসছে) | `#/categories`, `#/catreport` |
+| 25 | Bill payment option ও inbox PII mask (phase 99, আসছে) | - |
+| 26 | Setup advisor-এর advisor সারি (phase 101, আসছে) | `#/setupadvisor` |
 
 ---
 
@@ -111,7 +107,7 @@
 - Approver বানাতে: Staff-এ role `recipe_approver` দিন (`#/delegation`)।
 - `production_requires_cost = refuse` দিলে বিনামূল্যের উপাদান (যেমন পানি) ব্যাচ আটকাবে। আগে `#/s1setup`-এ ওই আইটেম "cost শূন্য (free)" চিহ্নিত করুন (অংশ 11 দেখুন)।
 - Pool মোডে মিশ্র kg ও পিস product থাকলে পিসের product অসম্পূর্ণ দেখায় (`pool_unit_not_kg`)।
-- Paper form 31-1 আর app recipe আলাদা জিনিস। Section A/B/C, card-level সময়/লোক/যন্ত্র app-এ নেই। দুই জায়গায় একই তথ্য টাইপ করতে হতে পারে।
+- Paper form 05-3 আর app recipe আলাদা জিনিস। Section A/B/C, card-level সময়/লোক/যন্ত্র app-এ নেই। দুই জায়গায় একই তথ্য টাইপ করতে হতে পারে।
 - যা তৈরি হয়নি: production-এর পরে cost সংশোধন (`production_recost`), আর bill-level landed cost (freight ইত্যাদি ভাগ)। মালিকের সিদ্ধান্ত বাকি।
 
 **[যাচাই হয়নি]** লাইভ ডাটাবেসে, আসল ফোনে, Anek Bangla / Hind Siliguri ফন্টে (sandbox-এ system ফন্ট দিয়ে দেখা), আসল প্রিন্টারে। 5950 account ও `overhead_absorbed` mapping accountant-এর সঙ্গে মেলানো হয়নি।
@@ -150,11 +146,11 @@
 **সাবধান:**
 - **শতাংশ ১০০ না হলে সেভ হয় না** (`percent_not_100`)। ফাঁকা ঘর থাকলে শুধু খসড়া হয়, approve হয় না।
 - হাতে-লেখা অঙ্ক বিলের বেশি হলে নেয় না। কম হলে বাকিটা "অভাগিত" সারি।
-- **Cost bill মানে তথ্য, payment নয়।** কোনো cash/bank/payable এন্ট্রি হয় না। Payment আগের জায়গাতেই (supplier payment, 11-1) লিখতে হবে। তাই একই বিল দুবার (এখানে বিস্তারিত, ওখানে payment) লেখা হতে পারে।
-- 11-1 duplicate সতর্কতা শুধু একই জায়গা + মাস + head + অঙ্ক মিললে ধরে। Bill number দিয়ে না।
+- **Cost bill মানে তথ্য, payment নয়।** কোনো cash/bank/payable এন্ট্রি হয় না। Payment আগের জায়গাতেই (supplier payment, 10-2) লিখতে হবে। তাই একই বিল দুবার (এখানে বিস্তারিত, ওখানে payment) লেখা হতে পারে।
+- 10-2 duplicate সতর্কতা শুধু একই জায়গা + মাস + head + অঙ্ক মিললে ধরে। Bill number দিয়ে না।
 - Output-kg ভাগ শুধু kg-ভিত্তিক আইটেম গোনে। পিসের product হলে `no_output`।
 - **Branch P&L ও journal এখনো এই ভাগ পড়ে না** (অংশ 3 দেখুন)।
-- `cost_bill_creates_payment` এখন আছে (phase 99, অংশ 25)। ডিফল্ট `off`। Accountant-এর সঙ্গে ঠিক করে চালান।
+- `cost_bill_creates_payment` (বিল থেকে payment/payable বানানো) তৈরি হয়নি। Accountant-এর সঙ্গে ঠিক করে করতে হবে।
 
 **[যাচাই হয়নি]** লাইভ ডাটা, ফোন। শুধু "cost right আছে/নেই" এর বাইরে place-অনুযায়ী দৃশ্যমানতা (শুধু কোড পড়া)।
 
@@ -185,7 +181,7 @@
 
 **সাবধান:**
 - `l4` মালিক-শিট, break-even (`l5`), partner profit এই ভাগ **দেখে না**, সুইচ চালু থাকলেও। ইচ্ছাকৃত। এগুলো দেখুক কিনা মালিকের সিদ্ধান্ত।
-- **দুবার গোনার ঝুঁকি:** একই বিল যদি 11-1 voucher-এও থাকে, P&L-এ দুবার আসতে পারে।
+- **দুবার গোনার ঝুঁকি:** একই বিল যদি 10-2 voucher-এও থাকে, P&L-এ দুবার আসতে পারে।
 - Journal/GL-এ কিছু post হয় না। এটা শুধু management রিপোর্ট।
 - Approval separation পরামর্শ: একই মানুষকে `recipe_manage` + `recipe_approve`, বা `cost_bill_entry` + `cost_rule_approve` দিলে `#/delegation`-এ হলুদ পরামর্শ আসে। আটকায় না।
 - P&L ON থাকলে মাসের পুরো ভাগ ধরা হয়। মাঝ-মাসের রিপোর্টে দিন-হিসাবে কাটা হয় না।
@@ -302,18 +298,18 @@
 
 ## 6. Form বনাম screen mode (phase 83)
 
-**এক লাইনে:** কাগজের ফর্ম (12-1 production, 11-1 খরচ) আর স্ক্রিন-এন্ট্রি একই জিনিস দুবার গুনলে তা ধরা বা ঠেকানো।
+**এক লাইনে:** কাগজের ফর্ম (05-1 production, 10-2 খরচ) আর স্ক্রিন-এন্ট্রি একই জিনিস দুবার গুনলে তা ধরা বা ঠেকানো।
 
 **কোথায়:**
 - `#/formguard` - চারটা সুইচ ও প্রস্তাব (মালিক)।
 - `#/unmatched` - স্ক্রিন-রেকর্ডহীন ফর্ম-লাইন।
-- `#/expenselink` - দ্রুত খরচ আর 11-1 voucher একসঙ্গে জোড়া।
+- `#/expenselink` - দ্রুত খরচ আর 10-2 voucher একসঙ্গে জোড়া।
 
 **সুইচ:**
 
 | সুইচ | অপশন ও মানে | ডিফল্ট | সিস্টেমের প্রস্তাব ও কেন |
 |---|---|---|---|
-| `form_051_mode` | `reference` = আজকের মতো (ফর্ম শুধু রেফারেন্স, আইটেম +, cost ফাঁকা, কাঁচামাল কাটে না। হলুদ `form051_cost_null`)। `post` = কাঁচামাল গড় দামে কাটে, তৈরি মাল cost সহ ঢোকে। recipe না থাকলে বা মাল কম হলে পুরো লাইন ব্যর্থ, কিছু অর্ধেক হয় না। `refuse` = লাইন skip (`form051_not_a_source`) | `reference` | `post`, যদি 12-1 ই আসল production রেকর্ড হয়। নইলে `reference` |
+| `form_051_mode` | `reference` = আজকের মতো (ফর্ম শুধু রেফারেন্স, আইটেম +, cost ফাঁকা, কাঁচামাল কাটে না। হলুদ `form051_cost_null`)। `post` = কাঁচামাল গড় দামে কাটে, তৈরি মাল cost সহ ঢোকে। recipe না থাকলে বা মাল কম হলে পুরো লাইন ব্যর্থ, কিছু অর্ধেক হয় না। `refuse` = লাইন skip (`form051_not_a_source`) | `reference` | `post`, যদি 05-1 ই আসল production রেকর্ড হয়। নইলে `reference` |
 
 **টেবিলের পরের তিনটা সুইচ `form_guard_recommendations()` দেখায়:** `transit_short_mode`, `transit_open_hours`, `offline_soft_stock` (পরের দুই অংশে)।
 
@@ -321,14 +317,14 @@
 - `dup_suspects`: একই দিন একই আইটেমে production run আর `stock_production_in` থাকলে সন্দেহ flag।
 - `expense_link_apply`: voucher-এর **প্রতিটি লাইন** দ্রুত খরচে মিললে তবেই জোড়া লাগে (day book একবার গোনে)। একটাও না মিললে `not_fully_covered`।
 
-**চালু করলে কী বদলায়:** `post` মোডে 12-1 অনুমোদনে স্টক ও cost সত্যি বদলায়। এটা বড় বদল।
+**চালু করলে কী বদলায়:** `post` মোডে 05-1 অনুমোদনে স্টক ও cost সত্যি বদলায়। এটা বড় বদল।
 
 **ডিফল্টে যা বদলায় না:** `reference` = আজকের আচরণ।
 
 **সাবধান:**
-- ফর্মের 31-1 / 11-1 আর app-এর recipe/cost একই তথ্য দুই জায়গায় রাখে। সব মিল মেলানো হয়নি।
+- ফর্মের 05-3 / 10-2 আর app-এর recipe/cost একই তথ্য দুই জায়গায় রাখে। সব মিল মেলানো হয়নি।
 - যে voucher আগেই auto-post হয়ে গেছে তা পরে shadow হলে GL-এ কী হয়, কোড পড়ে বোঝা। চালিয়ে দেখা হয়নি।
-- 11-1 অনুমোদনের সময় "জোড়া লাগান" প্রস্তাব ফর্মের ভেতরে বসানো হয়নি। আলাদা পর্দা `#/expenselink`।
+- 10-2 অনুমোদনের সময় "জোড়া লাগান" প্রস্তাব ফর্মের ভেতরে বসানো হয়নি। আলাদা পর্দা `#/expenselink`।
 
 **[যাচাই হয়নি]** আসল ফোন, লাইভ ডাটা, GL-এ shadow voucher-এর প্রভাব।
 
@@ -442,7 +438,7 @@
 | `acct_pending_alert_days` | এত দিনের পুরনো pending কাগজ alert | 1 | সংখ্যা প্রস্তাব নেই। 0 থেকে 365 |
 
 **Card settlement:** `card_settle(জায়গা, তারিখ, gross, fee, note, client_id, bank_mode)` = Dr bank (net) + Dr bank_charges (fee) / Cr card receivable (gross)। `card_settle_void` বাতিল, `card_settlement_list` অসমাপ্ত দেখায়। শুধু আপনার টাইপ করা অঙ্ক post হয়। `gross` অমীমাংসিতের বেশি হলে "over" ইঙ্গিত দেয়, আটকায় না।
-11-1 voucher-এ ঐচ্ছিক "কীভাবে দিলেন" (cash/bank/mobile)। ফাঁকা = cash (আগের মতো)।
+10-2 voucher-এ ঐচ্ছিক "কীভাবে দিলেন" (cash/bank/mobile)। ফাঁকা = cash (আগের মতো)।
 
 **চালু করলে কী বদলায়:**
 - সুইচ চালালে **আগের সব ঘটনা** হিসাব-শুরুর তারিখ (বা `acct_stock_moves_from`) পর্যন্ত পিছিয়ে মূল তারিখে post হয়। বন্ধ period-এর তারিখ আটকে থাকে (locked), শুধু মালিক জোর করে post করতে পারে।
@@ -457,7 +453,7 @@
 - `acct_transit_loss_at = receiver` হলে clearing account নিষ্পত্তি না হওয়া পর্যন্ত sender +V ও receiver −V দেখায়।
 - Account 5110 থেকে 5140 ও owner capital (3100) ডিফল্ট। আপনি `acct_mapping_set` দিয়ে বদলাতে পারেন। accountant-এর সঙ্গে মেলানো হয়নি।
 - **পুরনো `phase40.sql` / `ALL_NEW10.sql` phase 85 এর পরে আবার paste করবেন না।** এতে `acct_journal_post`-এর পুরনো রূপ ফিরে ambiguity হয়।
-- Form-path (18-1/12-1) থেকে আসা count gain/transfer-in-এর cost ledger-এ NULL থাকলে `cost_missing` হয়ে অপেক্ষায় থাকে। D2 (opening stock সাহায্যকারী) ও D3 (cost-অপেক্ষা তালিকা) phase 96-এ বানানো হয়েছে (অংশ 21)।
+- Form-path (04-2/05-1) থেকে আসা count gain/transfer-in-এর cost ledger-এ NULL থাকলে `cost_missing` হয়ে অপেক্ষায় থাকে। D2 (opening stock সাহায্যকারী) ও D3 (cost-অপেক্ষা তালিকা) phase 96-এ বানানো হয়েছে (অংশ 21)।
 - `purchase_variance` শুধু purchase-এর item-type key ধরে। `purch_consumable`-এ বুক হওয়া stock-tracked item বাদ।
 
 **[যাচাই হয়নি]** আসল Supabase, আসল pg_cron (শুধু ছদ্ম schema), card/bank আসল অঙ্ক, concurrent poster, `#/books85`-এর ফোনের চেহারা (360px দেখা হয়নি, শুধু নকল DOM-এ 351 চেক), `<select>` ট্যাপ।
@@ -693,7 +689,7 @@
   - **পে-স্লিপ (`payroll.js`):** `pay_slip` ডিজাইন।
   - **লেবেল (`invoice.js` লেবেল ছাপা):** `barcode_label` ডিজাইন (নাম, barcode, বিক্রয়মূল্য, কপি)।
   - **বার্তা** (SMS/WhatsApp/Email) উপরের ইনভয়েসেই। একই `msg_due` ইত্যাদি অন্য বার্তা-পর্দায় বসেছে কিনা যাচাই হয়নি।
-  - **ক্রয় বিল ছাপা: এখন আছে** (`#/purchaseprint`, অংশ 29; আগে ছিল না)। বাকি ধরন (order_confirm, delivery_challan ইত্যাদি) এখনো কোনো পর্দা ডাকে না। GRN এখন ক্রয় বিলের Print sheet থেকে ছাপা যায়।
+  - **ক্রয় বিল ছাপা: বসানো হয়নি** (`purchase.js`-এ ছাপার পথই নেই)। বাকি ধরন (order_confirm, delivery_challan, GRN ইত্যাদি) এখনো কোনো পর্দা ডাকে না।
   - নিয়ম: কিছু না বাছলে, `B.tpl` না থাকলে, ডিজাইন ফেরত না এলে বা কিছু ভাঙলে, **আজকের ছাপাই চলে**। পছন্দ আনা ২ সেকেন্ডের বেশি লাগলে ছেড়ে পুরনো ছাপায় যায়। গ্রাহকমুখী ডাটায় cost থাকে না।
   - **[যাচাই হয়নি]** salereturn, pay slip, label-এর হুকে বাছা ডিজাইন দিয়ে পুরো ছাপা আসল ডিভাইসে; আসল প্রিন্টার।
 - Shop-এর নাম, logo, footer, tax id আসে settings key থেকে (`business_name` আছে, বাকি `shop_logo`, `invoice_footer`, `tax_id`, `shop_address`, `shop_phone` অনুমানে বসানো)। না পেলে `[Shop name]`, `[Tax ID]` ও "Thank you" বসে।
@@ -727,37 +723,30 @@
 
 ---
 
-## 18. Paste-এর নিয়ম: 103 পর্যন্ত বসেছে, নতুন phase তার পরে
+## 18. Paste-এর নিয়ম: 98-এর পরে নতুন phase (99, 100, 101)
 
-**এক লাইনে:** DB-র সব phase 72 থেকে 103 আপনার লাইভ ডাটাবেসে বসে গেছে, canonical ক্রমে। নতুন phase ছোট করে একটা একটা আসবে, সবসময় **শেষ বসানো phase-এর পরে** (এখন 103-এর পরে)।
+**এক লাইনে:** DB-র সব phase 72 থেকে 98 আপনার লাইভ ডাটাবেসে বসে গেছে। নতুন phase ছোট করে একটা একটা আসবে, সবসময় 98-এর **পরে**।
 
-**ক্রম যা paste হয়েছে:** 72 থেকে 88, তারপর 90, 91, **89**, 92, 93, 95, **94**, 96, 97, 98, 99, 100, 101, 102, **103 (শেষ)**। (89 আর 94 ইচ্ছা করে ক্রমের বাইরে: 89 হলো জোড়া-ফাইল, 94 নিরাপত্তা-ধাপ। উৎস: `docs/PASTE_ORDER.md`।)
+**ক্রম যা paste হয়েছে:** 72 থেকে 88, তারপর 90, 91, **89**, 92, 93, 95, **94**, 96, 97, 98। (89 আর 94 ইচ্ছা করে ক্রমের বাইরে: 89 হলো জোড়া-ফাইল, 94 নিরাপত্তা-ধাপ। উৎস: `docs/PASTE_ORDER.md`।)
 
 **নিয়ম (মুখস্থ রাখুন):**
-1. **নতুন phase সবসময় শেষ বসানো phase-এর পরে paste হবে।** এখন মানে 103-এর পরে।
-2. **আগের কোনো phase আবার paste করবেন না।** বিশেষ করে 89, 94, 96, 97, 98, 99, 76, 40, `ALL_NEW10`।
-3. কারণ: কিছু ফাংশন একাধিক phase আবার লেখে। পুরনো phase আবার paste করলে ফাংশনের পুরনো রূপ ফিরে আসে এবং পরের phase-এর কাজ মুছে যায়। যেমন phase 97 একা paste করলে phase 96-এর লাইন মুছে যায়; phase 89 একা paste করলে `_acct_docs` ও `inventory_vs_gl` পুরনো হয়ে যায়।
-4. **দুর্ঘটনায় পুরনো phase আবার paste হলে:** phase 103 **একবার** আবার paste করুন। Phase 103-এ ওই ফাংশনগুলোর শেষ পুরো রূপ আছে (রিপোর্টে phase 89-এর ক্ষেত্রে পরীক্ষিত)। Phase 98 এখন আর এর জন্য নয়, কারণ phase 103-এর পর phase 98 নিজেই থামে (তার guard নতুন tag চেনে না)।
-5. প্রতিটি নতুন ফাইলের শুরুতে guard আছে। আগের phase না থাকলে নিজেই থামে ও কোন নম্বর নেই তা লেখে।
-6. `*_test.sql` ফাইল paste করবেন না।
+1. **নতুন phase সবসময় 98-এর পরে paste হবে।**
+2. **আগের কোনো phase আবার paste করবেন না।** বিশেষ করে 89, 94, 96, 97, 76, 40, `ALL_NEW10`।
+3. কারণ: কিছু ফাংশন একাধিক phase আবার লেখে। পুরনো phase আবার paste করলে ফাংশনের পুরনো রূপ ফিরে আসে এবং পরের phase-এর কাজ মুছে যায়। যেমন phase 97 একা paste করলে phase 96-এর লাইন মুছে যায়; phase 89 একা paste করলে `_acct_docs` ও `inventory_vs_gl` পুরনো হয়ে যায়। দুর্ঘটনায় এমন হলে phase 98 আবার paste করলে সব ঠিক হয়ে যায় (phase 98 শুধু ওই ৫টা ফাংশন ঠিক করে, কোনো টেবিল বা ডাটা ছোঁয় না)।
+4. প্রতিটি নতুন ফাইলের শুরুতে guard আছে। আগের phase না থাকলে নিজেই থামে ও কোন নম্বর নেই তা লেখে।
+5. `*_test.sql` ফাইল paste করবেন না।
 
-**কোন phase কী (সংক্ষেপে):**
+**যা আসছে (আলাদা ছোট paste, 98-এর পরে):**
 
-| Phase | নাম | কী | অংশ |
+| Phase | নাম | কী | অবস্থা |
 |---|---|---|---|
-| 99 | Opt | Bill payment option + inbox PII mask | 25 |
-| 100 | Cat | Category / Sub-category | 24 |
-| 101 | Rec | Setup advisor-এ সব নিয়মের সারি | 26 |
-| 102 | Img | আইটেমের ছবি | 27 |
-| 103 | E2E | End-to-end চালানোয় পাওয়া ভুল ঠিক | 28 |
-| 104 | - | এটা phase নয়; `bos104` = ক্রয় বিল Print (শুধু web, কোনো SQL নেই) | 29 |
-| 105 | Sec2 | নিরাপত্তা-ঠিক | coming (অংশ 30) |
-
-**Phase 105 (coming):** origin-এ `fix/phase-Sec2` branch আর `step_Sec2_REPORT.md` এখনো নেই। তাই কী ঠিক হবে তা এখানে লেখা হয়নি। এলে সেটা 103-এর পরে paste হবে।
+| 99 | Opt | Bill payment option + inbox PII mask | **আসছে।** এখনো কোনো branch বা ফাইল নেই। এই গাইডে বিস্তারিত নেই |
+| 100 | Cat | Category / Sub-category | কোড আছে `fix/phase-Cat` branch-এ, রিপোর্ট অসম্পূর্ণ (সংখ্যার ঘর খালি)। **আসছে** (অংশ 24) |
+| 101 | Rec | Advisor সারি (setup advisor-এ নতুন সারি) | **আসছে।** এখনো কোনো branch বা ফাইল নেই |
 
 প্রতিটি paste-এর পর `UAT_CHECKLIST.md`-এর ছোট পরীক্ষা চালান।
 
-**[যাচাই হয়নি]** আপনার লাইভ ডাটাবেসে `phase103_test`-এর আসল ফল; ফোনে সত্যিই কতটা ঠিকঠাক paste হয়েছে তা আপনিই জানেন। Phase 99 শুধু ক্রমে 72..98 তারপর 99 এই ক্রমে পরীক্ষিত; অন্য ক্রম পরীক্ষিত নয়।
+**[যাচাই হয়নি]** আপনার লাইভ ডাটাবেসে `phase98_test` বা guard-এর আসল ফল; ফোনে সত্যিই কতটা ঠিকঠাক paste হয়েছে তা আপনিই জানেন।
 
 ---
 
@@ -924,7 +913,7 @@
 
 **নিরাপত্তা:** cost-দেখার অধিকার (`view_cost`) + grant `landed_entry` / `landed_approve` (ডিফল্ট ভূমিকা: purchasing, management)। posted বিলে landed cost থাকলে সেই বিল void আটকায়। accounting শুরুর আগের তারিখে post হয় না। পোস্ট হলে ledger-এ `cost_adjust` জোড়া যায় (ledger বদলায় না, replay করা যায়)। Re-post = 0।
 
-**সীমা:** একটা landed cost = এক জায়গার বিল। GRN শুধু linked বিল হয়ে আসে। GRN বাছার sheet এখন আছে (অংশ 29, `#/landed`-এ "Add from a GRN")। production-এ ব্যবহৃত অংশ finished goods-এ যায় না, variance খাতে যায়। lot-এর "কতটা বাকি" = min(on-hand, lot qty), FIFO অনুমান নয়।
+**সীমা:** একটা landed cost = এক জায়গার বিল। GRN শুধু linked বিল হয়ে আসে; GRN বাছার UI নেই (বিল বাছুন)। production-এ ব্যবহৃত অংশ finished goods-এ যায় না, variance খাতে যায়। lot-এর "কতটা বাকি" = min(on-hand, lot qty), FIFO অনুমান নয়।
 
 **Phase 98:** শেষ ফাইল। শুধু `_acct_docs` ও আরও ৪টা ফাংশন ঠিক রাখে যাতে phase 96 আর 97-এর লাইন একসঙ্গে থাকে। কোনো টেবিল, নিয়ম, ডাটা, privilege বা trigger বদলায় না। **Phase 89, 94, 96 বা 97 কখনো আবার paste হলে phase 98-ও আবার paste করুন।** (অংশ 18)
 
@@ -943,288 +932,29 @@
 
 ---
 
-## 24. Category / Sub-category (phase 100)
+## 24. Category / Sub-category (phase 100, আসছে)
 
-**এক লাইনে:** যেখানেই আইটেম আছে, সেখানে Category ও Sub-category **বেছে** নেওয়া যায় (হাতে লেখা নয়) এবং filter করা যায়। (উৎস: `docs/briefs_p2p3/step_Cat_REPORT.md`)
+**অবস্থা: আসছে।** কোড আছে `fix/phase-Cat` branch-এ (এখনো আপনার ডাটাবেসে paste হয়নি)। রিপোর্ট `docs/briefs_p2p3/step_Cat_REPORT.md` (ওই branch-এ) অসম্পূর্ণ: পরীক্ষার সংখ্যার ঘরগুলো এখনো ফাঁকা। তাই নিচে যা লেখা, তা রিপোর্টের পরিকল্পনা ও ডিজাইন-অংশ থেকে, **পরীক্ষার ফল অজানা**।
 
-**কী বদলায়নি:** পুরনো `items.category` / `sub_category` লেখা কলাম যেমন ছিল তেমন। Phase 100 কোনো পুরনো ফাংশন আবার লেখে না।
+**ডিজাইন:** যেখানেই আইটেম আছে (POS, ক্রয়, স্টক, recipe, scan, bulk, অনলাইন অর্ডার, কাগজের ফর্ম) সেখানে Category ও Sub-category **বেছে** নেওয়া যাবে (হাতে লেখা নয়) এবং ফিল্টার করা যাবে। পুরনো `items.category` / `sub_category` লেখা কলাম যেমন ছিল তেমন থাকে। Phase 100 কোনো পুরনো ফাংশন আবার লেখে না, তাই 98-এর পরে paste করলে কিছু মুছে যায় না।
+- মাস্টার টেবিল `item_categories` (কোড ধরে রাখা, bn/en/mix নাম, merge, ক্রম)। শুরুর তথ্য আপনার আইটেমে থাকা নাম থেকে, কিছু বানানো হয়নি (রিপোর্টে দোকানের ডাটায় 5 Category, 57 আইটেম লিঙ্কড)।
+- নিয়ম `category_required_on_item`: `off` (ডিফল্ট) / `warn` / `required`। সিস্টেম প্রস্তাব-সারি: `warn`। `required` হলে নতুন আইটেমে Category লাগে (Sub থাকলে Sub-ও); পুরনো আইটেম সম্পাদনা চলে।
+- পর্দা: `#/categories` (যোগ, নাম বদল, merge, ক্রম, বন্ধ, আইটেম সরানো), `#/catreport` (বিক্রি বা স্টক-মূল্য Category/Sub অনুযায়ী, CSV; cost কেবল cost-অধিকারীর)।
+- বানানো হয়নি (রিপোর্ট): scan-এ Sub-category, label/price tag-এ Category ছাপা, রিপোর্ট-builder-এ Sub, costboard/costing, GRN, landed.
 
-**মাস্টার:** টেবিল `item_categories` (কোড ধরে রাখা, bn/en/mix নাম, merge, ক্রম)। শুরুর তথ্য আপনার আইটেমে থাকা নাম থেকে, কিছু বানানো হয়নি। রিপোর্টের পরীক্ষার ডাটায় 5 Category, 57 আইটেম লিঙ্কড ছিল। আপনার দোকানের সংখ্যা আলাদা হবে।
-
-**সুইচ:**
-
-| সুইচ | কী করে | অপশন | ডিফল্ট | প্রস্তাব ও কারণ |
-|---|---|---|---|---|
-| `category_required_on_item` | আইটেমে Category লাগবে কিনা | `off` / `warn` / `required` | `off` | **`warn`**। Category ছাড়া আইটেমের তালিকা দেখায়, আটকায় না। `required` হলে নতুন আইটেমে Category লাগে (Sub থাকলে Sub-ও); পুরনো আইটেম সম্পাদনা চলে |
-
-**কোথায় Category/Sub বাছা যায়:** POS (Sub chip), স্টক filter, ক্রয় ও স্টকের item picker, recipe তালিকা ও picker, bulk item editor ("Set Category of selected"), অনলাইন অর্ডার, কাগজের ফর্ম, item editor।
-
-**পর্দা:**
-
-| Route | কী |
-|---|---|
-| `#/categories` | যোগ, নাম বদল (owner), merge (owner), ক্রম, বন্ধ, আইটেম সরানো, Sub-category সরানো, Category-ছাড়া আইটেমের তালিকা |
-| `#/catreport` | বিক্রি বা স্টক-মূল্য Category/Sub অনুযায়ী, CSV। Cost কেবল cost-অধিকারী দেখে |
-
-Manage করতে পারে: owner, অথবা grant `item_create` / `item_bulk`। Rename ও merge শুধু owner।
-
-**বানানো হয়নি (রিপোর্ট):** scan-এ Sub-category, label/price tag-এ Category ছাপা, report-builder-এ Sub, costboard/costing, GRN, landed, stock-hub-এর server-side Sub filter (শুধু ফোনে filter হয়)।
-
-**[যাচাই হয়নি]** লাইভ ডাটাবেস, আসল ফোন; দুজন owner একসঙ্গে merge; 1300+ আইটেমে গতি; `required` মোডে আসল import ফাইল।
+**নিরাপত্তা-নোট:** আপনি paste করার পর `UAT_CHECKLIST.md`-এর Category সারি চালান।
 
 ---
 
-## 25. Bill payment option ও inbox PII mask (phase 99)
+## 25. Bill payment option ও inbox PII mask (phase 99, আসছে)
 
-**এক লাইনে:** দুটি OPTION। দুটোর ডিফল্ট = আজকের আচরণ। সিস্টেম শুধু প্রস্তাব দেখায়, নিজে কিছু চালু করে না। (উৎস: `docs/briefs_p2p3/step_Opt_REPORT.md`)
-
-### ক. Bill সেভ হলে payment
-
-**কোন bill:** cost bill (`cost_source_bills`, অংশ 2) আর purchase bill। আলাদা "expense bill" নেই: খরচ নিজেই payment।
-
-| সুইচ | কী করে | অপশন | ডিফল্ট | প্রস্তাব ও কারণ |
-|---|---|---|---|---|
-| `cost_bill_creates_payment` | cost bill সেভ হলে payment হবে কিনা | `off` / `ask` / `auto_cash` / `auto_bank` / `auto_by_supplier_default` | `off` | **`ask`**। সেভের পর "Record payment now?" জিজ্ঞেস করে, নিজে টাকা লেখে না |
-| `purchase_bill_creates_payment` | purchase bill পোস্ট হলে payment হবে কিনা | একই পাঁচটি | `off` | **`ask`**। একই কারণ |
-| `bill_void_payment_mode` | bill void হলে ওই payment-এর কী হবে | `void` / `keep_credit` | `void` | **`void`**। Payment-ও বাতিল, উল্টো entry যায়। `keep_credit` = payment থাকে; ক্রয়ে supplier-এর credit হয় |
-| `bill_pay_auto_credit_ok` | credit-শর্তের পক্ষেও auto payment চলবে | চালু/বন্ধ | বন্ধ | **বন্ধ**। Credit-শর্তের supplier সাধারণত পরে টাকা পায় |
-| `bill_pay_large_amount` | এর সমান বা বেশি bill-এ সবসময় `ask` প্রস্তাব | সংখ্যা (টাকা) | ফাঁকা | সংখ্যা **আপনার**; সিস্টেম প্রস্তাব করে না |
-| `bill_pay_small_cash_max` | এর সমান বা কম cash bill-এ `auto_cash` প্রস্তাব | সংখ্যা (টাকা) | ফাঁকা | সংখ্যা **আপনার**; সিস্টেম প্রস্তাব করে না |
-
-**`ask` মোডে কী হয়:** সেভের পর পর্দায় sheet আসে (cash / bank / mobile / other; purchase-এ cash / bank / mobile / card)। অঙ্ক = যা বাকি, বদলানো যায়, আংশিক payment চলে। একই খরচ আগে লেখা থাকলে সতর্কতা ও confirm। Sheet বন্ধ করলে bill আটকায় না।
-
-**`auto_*` মোডে কী হয়:** system নিজে payment লেখে। **ব্যর্থ হলে bill আটকায় না**, হলুদ চিহ্ন থাকে। নিজে লেখে না যখন: পক্ষের credit-শর্ত আছে (সুইচ চালু না থাকলে), পোস্টের সময় নিজে কিছু দেওয়া হয়েছে, বা খরচটা আগের 11-1 voucher / quick expense-এর মতো। `auto_by_supplier_default`: পক্ষের নিজের পদ্ধতি; জানা না থাকলে `ask`-এর মতো।
-
-**টাকা কোথায় যায় (একবারই গোনা হয়):**
-- Purchase bill: `supplier_payments` (bill-এর সঙ্গে বাঁধা), supplier balance, cash book, journal।
-- Cost bill: `quick_expenses`। Mode "other" শুধু নোট (cash book/journal-এ যায় না, sheet-এ বলা আছে)।
-- Void-এ: যে payment দিনের-শেষ ফর্মে ঢুকে গেছে বা বন্ধ period-এ, সেটা void হয় না; থাকে ও হলুদ চিহ্ন পায়।
-
-**Link ledger:** `bill_payments99` শুধু বাড়ে, কিছু মোছে না, প্রতিটি audited।
-
-**পর্দা:**
-
-| Route | কী |
-|---|---|
-| `#/optionsx` (owner) | তিনটি নিয়ম-কার্ড (Current / Recommended চিপ ও কারণ), credit সুইচ, দুটি সংখ্যার ঘর, প্রতি পক্ষের ডিফল্ট, "Inbox privacy" tab, "Reveal log" tab |
-| `#/billpay` | "Bills without payment" তালিকা; যেকোনো সময় একই sheet খোলা যায় |
-
-**দেখুন:** purchase `mode other` আর cost-bill `mode card` প্রত্যাখ্যাত। Cost-bill payment আসল খরচ (P&L) হয়, আবার একই bill factory pool-এ product cost-এও যায়। সব মিলিয়ে P&L-এ utility ঠিক একবার দেখাবে কিনা, রিপোর্টে আবার হিসাব করা হয়নি। **Accountant-এর সঙ্গে মিলিয়ে নিন।** মালিকের নিজের পকেটের টাকা (`owner_topup`) এখানে আলাদা বাঁধা হয় না।
-
-### খ. Inbox PII mask
-
-| সুইচ | কী করে | অপশন | ডিফল্ট | প্রস্তাব ও কারণ |
-|---|---|---|---|---|
-| `inbox_pii_mode` | inbox-এ কী ঢাকা থাকবে | `off` / `mask_phone` / `mask_phone_address` / `mask_all_pii` | `off` | **`mask_phone_address`**। বেশিরভাগ কাজে (বার্তা পড়া, অর্ডার বানানো) পুরো নম্বর লাগে না, ফাঁস হলে ক্ষতি বেশি। নাম ও বার্তার লেখা দেখা যায়, তাই কাজ আটকায় না |
-| `inbox_unmask_daily_max` | একজন দিনে কতবার খুলতে পারবে | সংখ্যা (বার), কমপক্ষে 1; ফাঁকা = সীমাহীন | ফাঁকা | সংখ্যা **আপনার**। Owner সীমার বাইরে |
-| `inbox_pii_guard_on` (অংশ 19) | অনুমতি না থাকলে কিছুই দেখায় না | চালু/বন্ধ | বন্ধ | চালু (অংশ 19)। এটা বদলায়নি |
-
-**ঢাকা রূপ:** phone ও phone-ধরনের handle-এর শেষ 3 অক্ষর থাকে; নামের প্রথম অক্ষর থাকে; address, বার্তার লেখা, attachment পুরো ঢাকা। `mask_phone` = phone; `mask_phone_address` = + address; `mask_all_pii` = + নাম, handle, লেখা, attachment।
-
-**কোথায় প্রযোজ্য:** inbox তালিকা ও বার্তা, অনলাইন অর্ডার তালিকা ও অর্ডার, Telegram chat info। (Phase 103 এটা বাড়িয়েছে: অংশ 28।)
-
-**Unmask (খোলা):** `#/inboxpii`। শুধু যার ওই জায়গার contact right **এবং** grant `inbox_unmask` আছে (owner সবসময়)। একবারে একটি বার্তা/অর্ডার। প্রতিটি খোলা `inbox_unmask_log99`-এ (কে, কখন, কোনটা, কোন ঘর, কারণ, ফল) ও `audit_log`-এ। সীমা ছাড়ালে `rate_limited` ও `blocked` লগ। পরের সাধারণ পড়ায় আবার ঢাকা। Log দেখেন শুধু owner (tab "Reveal log")।
-
-**যা ঢাকে না:** `online_orders`-এর টেবিল সরাসরি পড়া (টেবিলের জন্য `inbox_pii_guard_on`), আর অর্ডার-edit ফর্ম (সেখানে আসল মান লাগে)।
-
-**[যাচাই হয়নি]** লাইভ ডাটাবেস, আসল ফোন, আসল browser (পেজ নকল DOM-এ পরীক্ষিত)। Bill-save hook নকল `sb.rpc`-এ পরীক্ষিত, আসল supabase-js-এ নয়। Phase 99 শুধু 72..98 তারপর 99 ক্রমে পরীক্ষিত।
+**অবস্থা: আসছে।** এই গাইড লেখার সময় repo-তে এর কোনো কোড, branch বা রিপোর্ট নেই। কী করবে তা এখানে লেখা হয়নি, কারণ অনুমান করে লেখা হবে না। ফাইল এলে অংশ আপডেট হবে। Paste-এর নিয়ম: 98-এর পরে (অংশ 18)। Inbox-এর PII-সম্পর্কিত বর্তমান সুইচ: `inbox_pii_guard_on` (অংশ 19, 4)।
 
 ---
 
-## 26. Setup advisor-এর advisor সারি (phase 101)
+## 26. Setup advisor-এর advisor সারি (phase 101, আসছে)
 
-**এক লাইনে:** `#/setupadvisor` এখন phase 82 থেকে 97-এর **প্রতিটি** নিয়মের জন্য একটি সারি দেখায়: প্রস্তাবিত মান (যদি থাকে) আর কারণ। (উৎস: `docs/briefs_p2p3/step_Rec_REPORT.md`)
-
-**সংখ্যা:** phase 82..97 মিলিয়ে 48টি নিয়ম। তার 6টির সারি আগে থেকেই ছিল (phase 94)। নতুন 42টি + `stock_negative_mode` = **43টি নতুন সারি**। আগের 38টি সারি অপরিবর্তিত।
-
-**কী করে না:** কোনো ফাংশন নতুন বানায়নি, কোনো web ফাইল বদলায়নি। কিছু নিজে চালু করে না। Apply চাপলে (owner) তবেই `set_rule` দিয়ে মান বসে।
-
-**তিন ধরনের সারি:**
-
-| ধরন | মানে |
-|---|---|
-| Apply-ready | এক ট্যাপে বসে (যেমন `pos_show_invoice_after_sale` = `always`) |
-| শর্তসহ | শুধু ready-check পরিষ্কার হলে (যেমন হিসাব-সুইচ তিনটি: `acc_start`, `acc_coa`, `acc_map` ঠিক থাকলে; `unit_conv_required`: `stk_conv` পরিষ্কার হলে) |
-| info | সিস্টেম কোনো মান প্রস্তাব করে না। ডিফল্ট ও সীমা দেখায়। সিদ্ধান্ত আপনার |
-
-**কখনো প্রস্তাব নেই (আপনি লেখেন):** সব সংখ্যা ও তারিখ-লেখার নিয়ম (12টি), যেমন `transit_open_hours`, `acct_pending_alert_days`, `acct_cost_wait_alert_days`, `scan_min_confidence`, `landed_reminder_days`, `acct_stock_moves_from`, `landed_base_currency`। দোকান বা বাইরের সেটআপের ওপর নির্ভর: `purchase_grn_guard`, `form_051_mode`, `acct_transfer_mode`, `acct_transit_loss`, `acct_scheduler_on` (pg_cron), `telegram_intake_on` (Edge function ও bot), `cash_drawer_mode`, `cash_drawer_method` (hardware), `landed_cost_mode`, `landed_cost_requires_approval`, `landed_reminder_on`, `stock_negative_mode`, `form_051_mode`।
-
-**কিছু বিশেষ কথা:**
-- হিসাবের backlog-সুইচ তিনটি (`acct_count_adjust`, `acct_issue_out`, `acct_purchase_variance`) চালু প্রস্তাবিত, শর্ত ঠিক থাকলে। কিন্তু **"Apply all recommended" চাপলে Dscr-এর confirm sheet আসে না।** তাই ওই তিনটি একা, সতর্কতা পড়ে চালান (ধাপ 8)। আগে `acct_stock_moves_from`-এ তারিখ দেওয়া যায়।
-- `acct_stock_opening` প্রস্তাবিত **বন্ধ** (opening দুবার গোনা হয়; `#/books96` ব্যবহার করুন)।
-- `expiry_sale_guard` = `warn` (বিক্রি আটকায় না)।
-- `purchase_grn_guard`: Phase 103 থেকে GRN-ই মালের উৎস হলে প্রস্তাব `skip` (অংশ 28)।
-- পুরো তালিকা (নিয়ম, মান, কারণ) `RECOMMENDED_SETTINGS.md`-এ।
-- প্রস্তাবগুলো আগের ধাপের রিপোর্ট ও বিদ্যমান পরামর্শ-ফাংশন থেকে। মালিক বা accountant নিশ্চিত করেননি।
-
-**[যাচাই হয়নি]** লাইভ ডাটাবেস; "Apply all" ব্রাউজারে (শুধু SQL পরীক্ষিত); পর্দায় নতুন সারি দেখতে কেমন।
-
----
-
-## 27. আইটেমের ছবি (phase 102)
-
-**এক লাইনে:** POS কার্ডে ও আইটেম বাছাইয়ে আইটেমের ছবি দেখা। ডিফল্ট বন্ধ = আজকের আচরণ। ছবি না থাকলে নামের প্রথম অক্ষর (রঙিন গোল)। (উৎস: `docs/briefs_p2p3/step_Img_REPORT.md`)
-
-| সুইচ | কী করে | অপশন | ডিফল্ট | প্রস্তাব ও কারণ |
-|---|---|---|---|---|
-| `item_images_mode` | কোথায় ছবি দেখাবে | `off` / `pos_only` / `everywhere` | `off` | **`pos_only`**। ছবি mobile data খায়। POS-এ একসঙ্গে কার্ড সীমিত, ব্যস্ত সময়ে ছবি ঠিক আইটেম বাছতে সাহায্য করে। লম্বা তালিকায় অনেক ছবি লোড হয়। ডাটা ভালো থাকলে পরে `everywhere` |
-| `item_images_thumb_only` | ছোট thumbnail আগে লোড | `on` / `off` | `on` | **`on`**। কম data। ছোট কপি না থাকলে আসল ছবি। `off` = সবসময় আসল ছবি |
-| `item_images_cache_hours` | ছবির link/cache কত ঘণ্টা রাখবে | সংখ্যা 1..720 (ঘণ্টা); ফাঁকা = শুধু এই session | ফাঁকা | সংখ্যা **আপনার**। বেশি ঘণ্টা দিলে ধীর নেটে বা offline-এ ছবি আসে, কিন্তু বদলানো ছবি দেরিতে দেখা যায়। কোনো MB সংখ্যা বানানো হয়নি |
-
-**পর্দা:** `#/itemimg` (owner): mode chip (Off / POS only / Everywhere) ও প্রস্তাব, thumbnail On/Off, hours ঘর (Save / Clear, 1..720), "Clear image cache", "Pictures loaded this session: N" (আসল গণনা)।
-
-**কোথায় দেখায়:**
-- `pos_only`: POS আইটেম কার্ড।
-- `everywhere`: + আইটেম তালিকা, stock lookup, scan match, আইটেম picker-এর পাশে 44px preview।
-- কিছু ঘটলে (rpc নেই, offline, storage বন্ধ) অক্ষর-গোল থাকে, বিক্রি আটকায় না।
-
-**নতুন ছবি:** এখন থেকে নতুন তোলা ছবির সঙ্গে ছোট কপি (`<path>.t.jpg`, প্রায় 160px) আপলোড হয়। **পুরনো ছবির ছোট কপি নেই।** আবার আপলোড না করা পর্যন্ত আসল সাইজে লোড হয়।
-
-**কার্ডের চেহারা:** POS কার্ডে 44px ঘর; চালু হলে কার্ড একবার একটু লম্বা হতে পারে (লম্বা নাম বেশি লাইনে ভাঙে)।
-
-**ঘাটতি (রিপোর্ট):** price list, landed, costing পর্দায় আইটেম id নেই, তাই ছবি নেই। Online order আইটেম select একই কোডে সাজানো, আলাদা browser পরীক্ষা হয়নি।
-
-**[যাচাই হয়নি]** আসল ফোন, আসল mobile data, আসল Supabase storage (কোনো bandwidth মাপা হয়নি); iOS-এ Cache API বা private mode; offline POS-এ Service Worker।
-
----
-
-## 28. End-to-end ঠিকঠাক (phase 103)
-
-**এক লাইনে:** একটি স্বাধীন end-to-end চালানোয় 8টি ভুল (D-1..D-8) পাওয়া গিয়েছিল। Phase 103 সব ঠিক করেছে। এটা এখন **শেষ ফাইল**। (উৎস: `docs/briefs_p2p3/step_E2E_REPORT.md`)
-
-**ফলাফল (রিপোর্ট):** আগে 195 pass / 8 fail, পরে 205 pass / 0 fail (প্রস্তাবিত মান)। ডিফল্ট মানে 206 pass / 0 fail। Journal সব balanced, trial balance পার্থক্য 0.00।
-
-| # | কী ঠিক হলো | আপনার জন্য মানে |
-|---|---|---|
-| D-1 | বিনামূল্যের উপাদান (যেমন পানি) এখন "জানা cost 0"। শুধু free উপাদানের production আর `cost_missing`-এ আটকে থাকে না | Cost-অপেক্ষা তালিকা ছোট হয়। দাম বসাতে হয় না |
-| D-2 | recipe ছাড়া production-in, cost নেই, এখন cost-অপেক্ষা তালিকায় **সবসময়** আসে। নতুন সুইচ `acct_manual_prod_in103` | নিচে |
-| D-3 | পরে cost বা opening দিলে একবারই খাতায় যায় (`opening_stock_apply96` আবার ডাকলে নতুন follow-up) | Opening stock এ দেরিতে cost দেওয়া যায়। দুবার গোনা হয় না। (রিপোর্টের সংখ্যা: 40 + 60 = 100) |
-| D-4 | `recipe_cost`: free উপাদান = জানা 0। complete = true | Recipe cost সঠিক দেখায় |
-| D-5 | **GRN double-count flow check:** নতুন check `flw_grn_double103` | নিচে |
-| D-6 | GRN-এর স্টক, যার bill নিজে স্টক বাড়ায়নি, আর `manual_in` গোনা হয় না। Guard বন্ধ থাকলে দ্বিগুণ গোনা লুকানো হয় না: `unexplained` -200 দেখায় | `inventory_vs_gl`-এর "unexplained" এখন সত্যিকারের সমস্যা দেখায় |
-| D-7 | PII mask এখন বার্তার লেখার ভেতরের phone-ধরনের সংখ্যাও ঢাকে | নিচে |
-| D-8 | `customer_directory` / `find_customer` `inbox_pii_mode` মানে | নিচে |
-
-### সুইচ `acct_manual_prod_in103`
-
-| সুইচ | কী করে | অপশন | ডিফল্ট | প্রস্তাব ও কারণ |
-|---|---|---|---|---|
-| `acct_manual_prod_in103` | recipe ছাড়া সরাসরি production-in journal-এ তোলা | চালু/বন্ধ | বন্ধ | **সিস্টেম-প্রস্তাব নেই (সিদ্ধান্ত আপনার ও accountant-এর)।** বন্ধ = আগের মতো: শুধু স্টক বাড়ে, journal-এ যায় না (`inventory_vs_gl`-এ `manual_in`)। চালু = লেখা cost ধরে প্রতি সারির জন্য এক entry: Dr inventory / Cr overhead absorbed। cost না থাকলে cost-অপেক্ষা তালিকায় থাকে |
-
-কেন বন্ধ রাখা: counter account (overhead absorbed) একটি **নকশার পছন্দ**, আপনি বা accountant বদলাতে চাইতে পারেন। চালু করলে কারও লাভ বদলে যায়, তাই মালিকের সিদ্ধান্ত ছাড়া হয় না। (রিপোর্টের হাতে-হিসাব: কেক 5 x 8 + বিস্কুট 3 x 80 = 280।)
-
-### GRN double-count check (D-5)
-
-- **সমস্যা:** GRN মালের উৎস, `purchase_grn_guard` বন্ধ, আর bill-ও নিজে স্টক বাড়ায়: একই মাল দুবার।
-- **এখন:** `setup_flow_check`-এ `flw_grn_double103` **warn** দেখায়, আটকায় না।
-- **প্রস্তাব:** `grn_receipt_source = grn` থাকলে `purchase_grn_guard` = `skip` প্রস্তাব। মালের উৎস purchase হলে এই প্রস্তাব নেই। আপনার নিজে বসানো মান (যেমন `link`) Apply কখনো বদলায় না।
-- **সীমা:** guard-বন্ধ bill-এর সঙ্গে "তার" GRN-এর বাঁধন নেই, তাই GRN উৎস থাকা অবস্থায় guard-বন্ধ **প্রতিটি** bill ডুপ্লিকেট ধরা হয়। আপনি চাইলে বদলাতে পারেন।
-
-### PII mask — লেখা ও গ্রাহক তালিকা (D-7, D-8)
-
-- Mask মোড চালু থাকলে বার্তার লেখা, নাম, ঠিকানা, attachment, অর্ডার note, draft note, বাতিলের কারণের ভেতরের phone-ধরনের সংখ্যা ঢাকা। শর্ত: 8 থেকে 15 অঙ্ক (ইংরেজি বা বাংলা), `+`, space, hyphen, bracket। শেষ 3 অঙ্ক থাকে। তারিখ (2026-10-14), 1500, 5 অঙ্কের বা 7 অঙ্কের সংখ্যা ঢাকে না।
-- **সীমা:** 8..15 অঙ্কের যেকোনো সংখ্যা-সারি ঢাকতে পারে, ফোন না হলেও (যেমন `1 2 3 4 5 6 7 8 9 0`)। অন্য লেখা দিয়ে ভাঙা বা কথায় লেখা নম্বর ধরা পড়ে না।
-- `mask_all_pii`-তে পুরো লেখা আগের মতো ঢাকা। `inbox_unmask` আগের মতো লগ হয়।
-- **গ্রাহক তালিকা:** `customer_directory` / `find_customer` এখন mobile, whatsapp, address, note ঢাকে, **owner ও grant `view_customer_mobile` যাদের আছে তাদের ছাড়া**। এই grant এখন সত্যিকারের grant (owner দিতে পারে)। Mode `off` (ডিফল্ট) হলে কিছু বদলায় না।
-- **দাম:** মোড চালু থাকলে grant ছাড়া ব্যবহারকারী গ্রাহক-তালিকায় নম্বরে click-to-call বা নম্বর দিয়ে খোঁজা হারায়।
-
-### যা ঠিক হয়নি (রিপোর্ট; মালিকের সিদ্ধান্ত বা নকশা)
-
-| # | বিষয় | অবস্থা |
-|---|---|---|
-| U-1 | `stk_opening`: "opening stock নেই" check নতুন আইটেম আর গুনে-না-রাখা আইটেম আলাদা করতে পারে না | মনে করিয়ে দেওয়া মাত্র। Opening (0 চলে) বা count দিন। `accounting_on`-এর ready-check থেকে সরানো হবে কিনা আপনার সিদ্ধান্ত |
-| U-2 | `forms_post_to_ledger`: কাগজের ফর্মই production/issue/count-এর record | নকশা, ইচ্ছাকৃত |
-| U-3 | `packaging_consume_on` একটাই global পছন্দ | নকশা; মিশ্র ক্ষেত্রে box recipe লাইনে দিন |
-| U-4 | `record_sale2` লাইনের unit দেখে না, পর্দা রূপান্তর করে। শুধু API থেকে ডাকলে base unit পাঠাতে হবে | পরিবর্তন করা হয়নি (টাকার পথ) |
-| U-5 | `inventory_vs_gl` `as_of` আজকের আগে হলে basis-পার্থক্য | নথিভুক্ত, বদলায়নি |
-| U-6 | `recipe_book` কারিগরের ব্যক্তিগত বই। `p_artisan` ছাড়া নিজের record না থাকলে not allowed | ভুল নয়; owner `p_artisan` দেয় |
-| U-7 | `packaging_return_mode = wastage` হারানো box COGS-এ রাখে | অপশনের মানেই এটা |
-
-**[যাচাই হয়নি]** আসল web UI, PostgREST/JWT, pg_cron, storage, print, AI scan, webhook। Auth নকল claim। লাইভ ডাটাবেসে বছরের ডাটা। দুটি follow-up একসঙ্গে। Phase 102-এর ওপর phase 103।
-
----
-
-## 29. Home badge, Undo, Landed GRN বাছাই, ক্রয় বিল Print, polish
-
-এগুলো সব **শুধু web**, কোনো SQL paste লাগে না। কোনো নতুন সুইচ নেই (বিদ্যমান সুইচ ও অনুমতি যেমন)।
-
-### Home-এর badge সারি (bos107, উৎস `step_Q4_REPORT.md`)
-
-Home (`#hv_main`) ও Owner board-এর ওপরে এক সারি chip। 7টি chip, সংখ্যা 0-এর বেশি হলে দেখায়, ট্যাপে ওই পর্দা খোলে:
-
-| Chip | খোলে |
-|---|---|
-| ledger problems | `#/ledgerlinks` |
-| cost waiting | `#/books96` |
-| pending auto-posts | `#/books85` |
-| unmatched forms | `#/unmatched` |
-| unknown-cost items | `#/costunknown` |
-| bills without payment | `#/billpay` |
-| inbox new | `#/inbox` |
-
-- Chip দেখায় শুধু যদি ওই পর্দার মেনু আপনার জন্য খোলা (owner বা সঠিক grant) আর সংখ্যা > 0। অনুমতি না থাকলে ওই RPC ডাকাই হয় না।
-- প্রতিটি call-এ 2 সেকেন্ড সীমা। ধীর বা ব্যর্থ হলে শুধু ওই chip লুকায়। 60 সেকেন্ড cache।
-- সীমা: unknown-cost chip দুটি call করে (সর্বোচ্চ 1000 tracked আইটেম); বড় catalog-এ ধীর হলে চুপচাপ বাদ পড়ে। Owner board-এ strip-এর ব্রাউজার পরীক্ষা হয়নি (শুধু Home)।
-
-### Setup advisor Undo
-
-`#/setupadvisor` > History tab: প্রতিটি apply-batch-এ owner-only **"Undo this apply"**। Sheet দেখায় প্রতি নিয়মের "এখন -> ফিরবে"। নিশ্চিত করলে প্রতিটি নিয়মে `set_rule(নিয়ম, পুরনো মান)` (পুরনো মান null হলে আপনার মান মুছে ডিফল্ট)। `set_rule` নিজেই owner-only ও audited।
-- সাবধান: একই নিয়মের **পরের** apply-ও ফিরিয়ে দিতে পারে। ফোনের rules copy পুরনো হলে "এখন" ভুল দেখাতে পারে। Undo-র আগে পাতা নতুন করে খুলুন।
-
-### Landed cost: GRN বাছাই
-
-`#/landed` > bill বাছার sheet-এর নিচে **"Add from a GRN"**: "Show GRNs" চাপুন (form 04-1-এর submitted/approved GRN), টিক দিন, "Add the bills of the ticked GRNs"। প্রতিটি GRN-এর bill বাছাই-তালিকায় টিক হয়। Bill-এর সঙ্গে বাঁধা না থাকলে `grn_not_linked` বার্তা।
-- মোড অনুযায়ী hint: `per_shipment`-এ একাধিক bill/GRN একসঙ্গে টিক; `per_bill`-এ একটি landed cost = একটি bill।
-- **অংশ 22-এর পুরনো সীমা ("GRN বাছার UI নেই") এখন আর সত্য নয়।** তবে lot-আইটেম বা লাইন-স্তরের বাছাই নেই (server bill-স্তরে কাজ করে)।
-- সীমা: GRN bill-এর সঙ্গে বাঁধা কিনা ব্রাউজার আগে জানে না, তাই না-বাঁধা GRN বাছলে ভুল-বার্তা আসে, লুকানো যায় না। 60-এর বেশি GRN পরীক্ষিত নয়।
-
-### Production: cost_missing বিস্তারিত
-
-Production-এ `production_requires_cost = refuse` হলে এখন বার্তার পরে বন্ধনীতে দেখায় কোন উপকরণের দাম নেই। `warn` (ডিফল্ট) থাকলে production সফল হয়, sheet-এ দেখানোর মতো কিছু নেই; তখন `#/books96`-এর cost-অপেক্ষা তালিকা দেখুন।
-
-### ক্রয় বিল Print / Send (bos104, `#/purchaseprint`, উৎস `step_PBill_REPORT.md`)
-
-ক্রয় বিলের পাতায় (`#/purchase/<id>`) **Print / Send** কার্ড: Print, Share, Download, Email, SMS, WhatsApp। `#/purchaseprint` পাতায় সাম্প্রতিক bill-এর তালিকা ও Print বোতাম (কার্ড না এলেও কাজ করে)।
-- Sheet-এ: Print, Print GRN (return ছাড়া), Share, Download, supplier-এর phone/email (জানা থাকলে phone আগে থেকে বসে)।
-- Layout: আপনার বাছা template (`purchase_bill`, `grn`; অংশ 16) নেয়। কিছু বাছা না থাকলে বা template ভাঙলে বিল্ট-ইন সাদাসিধা layout, তাই Print সবসময় চলে।
-- **Email/SMS/WhatsApp শুধু device-link** (`mailto:`, `sms:`, `wa.me`)। অ্যাপ নিজে কিছু পাঠায় না।
-- **Cost গোপন:** শুধু bill-এর rate ও amount (supplier-পক্ষের কাগজ), বিক্রির দাম বা margin কখনো নয়। GRN-এ শুধু পরিমাণ, rate/amount/total নেই। ক্রয়ের অনুমতি না থাকলে কিছুই দেখায় না।
-- খসড়া (DRAFT) বা বাতিল (VOID) bill লাল পটি, বার্তা ও mail subject-এ চিহ্নিত। Paid/due শুধু posted bill-এ।
-- অংশ 16-এর পুরনো সীমা ("ক্রয় বিলে template নেই") এখন আর সত্য নয়।
-- **[যাচাই হয়নি]** আসল printer (A4/A5), ফোনের print dialog, WhatsApp/SMS/Email অ্যাপ, আসল role-refusal।
-
-### কীবোর্ড-নিরাপদ sheet ও গোটানো footer
-
-অংশ 23-এ আছে। Footer এখন ডিফল্টে গোটানো; ভাষা বদলাতে বা Log out করতে আগে তীরে ট্যাপ করুন।
-
-### Polish (bos108, উৎস `step_Pol_REPORT.md`)
-
-Visual QA থেকে (27 route x 3 ভাষা x 3 theme):
-- নিচের bar 320/360/412 px-এ en/bn/mix ও Light/Classic-এ ঢোকে।
-- নতুন পর্দাগুলোর (costsources, costattrib, s1setup, scan, inbox, books85, books96, optionsx, billpay, inboxpii) প্রধান বোতাম কমপক্ষে 44px। ছোট বোতাম (< 44px) 419টি থেকে 18টি।
-- কাঁচা snake_case key পর্দায় 54টি থেকে 0টি। JS error লেখা 9টি থেকে 0টি।
-- Accounts-এ রিপোর্ট null হলে JS error দেখায় না।
-- ফর্ম-নিয়মের চারটি পাতা এক মেনু-গ্রুপে।
-- সীমা: Classic theme-এর পুরনো 40px ট্যাপ-এলাকা (`.ctl-trg`) আর 13px-এর checkbox এখনো আছে। Sheet-এর ভেতরের input-এ 16px নিয়ম নতুন পাতায় সীমাবদ্ধ।
-- **[যাচাই হয়নি]** আসল ফোন, iOS Safari zoom, আসল বাংলা ফন্ট।
-
-### Template-সংযোগ (bos98, উৎস `step_TplInv_REPORT.md`)
-
-আপনার বাছা template এখন ইনভয়েস (Print, Download, SMS/WhatsApp/Email), sale-return slip, pay slip, barcode label-এ কাজ করে। কিছু বাছা না থাকলে আগের মতোই। অংশ 15, 16 দেখুন।
-
----
-
-## 30. coming: নিরাপত্তা (phase 105), Owner dashboard, Liquid Glass
-
-নিচের কিছুই এখনো আসেনি। origin-এ এদের branch বা `_REPORT.md` নেই (`fix/phase-Sec2`, `feat/dash`, `feat/glass` পাওয়া যায়নি)। তাই কী করবে, কোন সুইচ, কী সংখ্যা: কিছু লেখা হয়নি। রিপোর্ট এলে এই অংশ আপডেট হবে।
-
-| ফিচার | অবস্থা |
-|---|---|
-| Phase 105 নিরাপত্তা-ঠিক (Sec2) | **coming।** `docs/briefs_p2p3/step_Sec2_REPORT.md` নেই। এলে 103-এর পরে paste |
-| Owner dashboard `#/dashx` (10 ধরনের chart) | **coming।** `feat/dash` নেই |
-| Liquid Glass theme | **coming।** `feat/glass` নেই |
-
-**মনে রাখুন:** নতুন phase এলে শেষ বসানো phase-এর পরে (অংশ 18)।
+**অবস্থা: আসছে।** এই গাইড লেখার সময় repo-তে কোনো কোড, branch বা রিপোর্ট নেই; কী সারি আসবে তা এখানে লেখা হয়নি। ফাইল এলে `#/setupadvisor` ও `RECOMMENDED_SETTINGS.md` আপডেট হবে। Paste-এর নিয়ম: 98-এর পরে (অংশ 18)।
 
 ---
 
@@ -1252,9 +982,4 @@ Visual QA থেকে (27 route x 3 ভাষা x 3 theme):
 | 18 | ক্যাশ ড্রয়ার কেনা ও `cash_drawer_*` | অংশ 20 |
 | 19 | Opening stock: প্রতি জায়গায় কোন অপশন (accountant-এর সঙ্গে)। `acct_cost_wait_alert_days` সংখ্যা | অংশ 21 |
 | 20 | Landed cost কি লাগবে; `landed_cost_mode`, অনুমোদনের অঙ্কসীমা | অংশ 22 |
-| 21 | Category: `category_required_on_item` (`off` / `warn` / `required`) | অংশ 24 |
-| 22 | Bill payment: `cost_bill_creates_payment`, `purchase_bill_creates_payment`, `bill_void_payment_mode`, `bill_pay_auto_credit_ok`; সংখ্যা `bill_pay_large_amount`, `bill_pay_small_cash_max` | অংশ 25 |
-| 23 | Inbox mask: `inbox_pii_mode`, কাকে grant `inbox_unmask` ও `view_customer_mobile`, `inbox_unmask_daily_max` | অংশ 25, 28 |
-| 24 | আইটেমের ছবি: `item_images_mode`, `item_images_thumb_only`, `item_images_cache_hours` | অংশ 27 |
-| 25 | `acct_manual_prod_in103` চালু করবেন কিনা (accountant-এর সঙ্গে); `stk_opening` ready-check থাকবে কিনা | অংশ 28 |
-| 26 | Setup advisor-এর হিসাব-backlog সুইচ তিনটি একা, সতর্কতা পড়ে চালানো | অংশ 26 |
+| 21 | Category: `category_required_on_item` (phase 100 এলে) | অংশ 24 |

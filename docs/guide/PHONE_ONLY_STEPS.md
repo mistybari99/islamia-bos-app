@@ -3,13 +3,12 @@
 ফোনের ব্রাউজারে Supabase ও অ্যাপ খুলে যা যা হয়, আর যা ফোনে হয় না।
 এই ফাইলের কোনো ধাপ লাইভ প্রজেক্টে বা আসল ফোনে চালিয়ে দেখা হয়নি। চিহ্ন `[যাচাই হয়নি]` সেখানে দেওয়া আছে।
 
-## ০. আগে জানুন (অবস্থা: DB-র সব phase 72 থেকে 103 paste হয়ে গেছে)
+## ০. আগে জানুন (অবস্থা: DB-র সব phase 72 থেকে 98 paste হয়ে গেছে)
 
-- **মালিক নিজে লাইভ ডাটাবেসে phase 72 থেকে 103 সব paste করেছেন।** তাই নিচের ১ নম্বর অংশ এখন শুধু রেকর্ড ও ভবিষ্যতের নিয়ম। নতুন কোনো ফাইল না এলে paste করার কিছু নেই।
-- ক্রমের উৎস: `docs/PASTE_ORDER.md`। **ক্রম: 72 থেকে 88, তারপর 90, 91, 89, 92, 93, 95, 94, 96, 97, 98, 99, 100, 101, 102, 103।**
-- **নতুন phase সবসময় শেষ বসানো phase-এর পরে (এখন 103-এর পরে)। আগের কোনো phase কখনো আবার paste করবেন না।** (কারণ: কিছু ফাংশন একাধিক phase আবার লেখে; পুরনো phase আবার paste করলে পুরনো রূপ ফিরে আসে। দুর্ঘটনা হলে phase 103 **একবার** আবার paste করুন; phase 103-এর পর phase 98 নিজেই থামে।)
-- **coming:** Phase 105 (নিরাপত্তা-ঠিক): `fix/phase-Sec2` branch ও `step_Sec2_REPORT.md` origin-এ এখনো নেই। এলে 103-এর পরে আলাদা ছোট paste। `#/dashx` (Owner dashboard) ও Liquid Glass theme: coming, এগুলোর branch নেই।
-- `phase104` নামে SQL নেই। `bos104` = ক্রয় বিল Print, শুধু web।
+- **মালিক নিজে লাইভ ডাটাবেসে phase 72 থেকে 98 সব paste করেছেন।** তাই নিচের ১ নম্বর অংশ এখন শুধু রেকর্ড ও ভবিষ্যতের নিয়ম। নতুন কোনো ফাইল না এলে paste করার কিছু নেই।
+- ক্রমের উৎস: `docs/PASTE_ORDER.md`। **ক্রম: 72 থেকে 88, তারপর 90, 91, 89, 92, 93, 95, 94, 96, 97, 98।**
+- **নতুন phase সবসময় 98-এর পরে। আগের কোনো phase কখনো আবার paste করবেন না।** (কারণ: কিছু ফাংশন একাধিক phase আবার লেখে; পুরনো phase আবার paste করলে পুরনো রূপ ফিরে আসে। দুর্ঘটনা হলে phase 98 আবার paste করুন।)
+- আসছে: **phase 99 (Opt: bill payment option + inbox PII mask), 100 (Cat: category/sub-category), 101 (Rec: advisor সারি)**। প্রতিটি আলাদা ছোট paste, 98-এর পরে। এই তিনটি এই গাইড লেখার সময় আপনার DB-তে নেই। 99 ও 101-এর কোনো ফাইল repo-তে এখনো নেই; 100 আছে `fix/phase-Cat` branch-এ।
 - প্রতিটি phase-এর শুরুতে নিজের guard আছে। আগের phase না থাকলে নিজেই থামে, কোন নম্বর নেই লেখে।
 - সব ফাইল দুবার paste করলেও ক্ষতি নেই (paste-twice safe)। তবু ওপরের নিয়ম মানুন।
 - `*_test.sql` ফাইল paste করবেন না।
@@ -37,13 +36,8 @@
 | 24 | **`phase94`** | নিরাপত্তা-ধাপ | 76, 80, 81, 85, 86, 89, 90, 92, 93 লাগে |
 | 25 | `phase96` | Opening stock সাহায্যকারী + cost-অপেক্ষা | 80, 85, 89 |
 | 26 | `phase97` | Landed cost | 72..88, 90, 91, 89 |
-| 27 | `phase98` | `_acct_docs` ও ৪টি ফাংশনের শেষ রূপ | 72..97 |
-| 28 | `phase99` | Bill payment option + inbox PII mask | 72..98 |
-| 29 | `phase100` | Category / Sub-category | 72..97 |
-| 30 | `phase101` | Setup advisor-এ সব নিয়মের সারি (43টি) | 72..98 |
-| 31 | `phase102` | আইটেমের ছবি | 72..98 |
-| 32 | **`phase103` - শেষ** | End-to-end ভুল ঠিক (D-1..D-8) | 72..101 |
-| 33+ | `phase105` | **coming** (নিরাপত্তা; রিপোর্ট নেই) | 103-এর পরে |
+| 27 | **`phase98` - শেষ** | `_acct_docs` ও ৪টি ফাংশনের শেষ রূপ | 72..97 |
+| 28+ | `phase99`, `phase100`, `phase101` | **আসছে** (আলাদা, 98-এর পরে) | |
 
 **নিয়ম:**
 - ক্রম ভাঙবেন না। **আগে paste হওয়া কোনো ফাইল আবার paste করবেন না।**
@@ -71,14 +65,7 @@
 | Card settlement, scheduler চালু/বন্ধ (pg_cron থাকলে), books সুইচ | `#/books85` |
 | Opening stock সিদ্ধান্ত, cost-অপেক্ষা তালিকা | `#/books96` |
 | Landed cost বানানো/approve/post | `#/landed` |
-| Category / Sub-category | `#/categories`, `#/catreport` |
-| Bill payment option, নিয়ম ও per-party ডিফল্ট | `#/optionsx` (owner), `#/billpay` |
-| Inbox mask মোড, Reveal (unmask), Reveal log | `#/optionsx` > Inbox privacy, `#/inboxpii` |
-| আইটেমের ছবি mode, thumbnail, cache ঘণ্টা, cache মোছা | `#/itemimg` |
-| ক্রয় বিল Print / Share / Email / SMS / WhatsApp | বিলের পাতা, `#/purchaseprint` |
-| Setup advisor Undo (owner) | `#/setupadvisor` > History |
-| Landed cost-এ GRN বাছা | `#/landed` > bill বাছার sheet |
-| Home badge সারি | Home (কোনো সেটিং নেই) |
+| Category / Sub-category (phase 100 এলে) | `#/categories`, `#/catreport` |
 | Phase 94 পরীক্ষা: `pii_exposure_report94()`, `anon_exec_audit94()`, `intake_proof_status94()` | Supabase SQL Editor (ফোনে সম্ভব) |
 
 ## ৩. কিছু ধাপ ফোনে সম্ভব, কিন্তু বাইরের অ্যাকাউন্টে

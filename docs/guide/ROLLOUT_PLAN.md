@@ -13,16 +13,16 @@
 
 ---
 
-## ধাপ ০ - SQL paste (মালিক সম্পন্ন করেছেন: phase 72 থেকে 103)
+## ধাপ ০ - SQL paste (মালিক সম্পন্ন করেছেন: phase 72 থেকে 98)
 
-DB-র সব phase 72 থেকে 103 এখন লাইভ ডাটাবেসে বসানো, canonical ক্রমে (72..88, 90, 91, 89, 92, 93, 95, 94, 96, 97, 98, 99, 100, 101, 102, 103; ক্রম `docs/PASTE_ORDER.md`)। **নিয়ম: নতুন phase সবসময় শেষ বসানো phase-এর পরে (এখন 103-এর পরে); আগের কোনো phase কখনো আবার paste নয়।** দুর্ঘটনায় হলে phase 103 একবার আবার paste করুন।
+DB-র সব phase এখন লাইভ ডাটাবেসে বসানো (ক্রম `docs/PASTE_ORDER.md`)। **নিয়ম: নতুন phase (99, 100, 101) সবসময় 98-এর পরে; আগের কোনো phase কখনো আবার paste নয়।**
 
 | কাজ | চেক |
 |---|---|
 | `#/setupadvisor` খুলুন। | কোনো সারি `not_installed` নয়। `setup_flow_check()` এ নতুন কিছু লাল নয়। |
 | একটা সাধারণ বিক্রি, একটা ক্রয়, দিনের শেষের রিপোর্ট করে দেখুন। `UAT_CHECKLIST.md` এর "ক" অংশ চালান। | সংখ্যা আগের দিনের মতো। (ব্যতিক্রম: ধাপ ২-এ রিপোর্ট cost উৎস বদলে যায়) |
 
-**থামার শর্ত:** নতুন কোনো paste-এ error এলে পরের phase paste করবেন না। প্রতিটি নতুন paste-এর (যেমন আসছে phase 105) পরে `UAT_CHECKLIST.md` চালান।
+**থামার শর্ত:** নতুন কোনো paste-এ error এলে পরের phase paste করবেন না। প্রতিটি নতুন paste-এর (99, 100, 101) পরে `UAT_CHECKLIST.md` চালান।
 
 ---
 
@@ -33,8 +33,6 @@ DB-র সব phase 72 থেকে 103 এখন লাইভ ডাটাব�
 | `pos_show_invoice_after_sale` (`#/switchboard`, ডিফল্ট `never`) | আগে `ask`, কয়েকদিন পরে **`always` (সুপারিশ)** | একটা ক্যাশ সেল করুন। ইনভয়েস আসে। নিজের নম্বরে WhatsApp/SMS/Email একবার পাঠিয়ে দেখুন। Offline সেল করে Q-নম্বর আর "Pending sync" দেখুন |
 | `#/templates` | একটা ধরনের ডিজাইন বাছুন (পরে বাকিগুলো) | `#/templates`-এ preview ঠিক। বাছা ডিজাইন এখন ইনভয়েস (Print/Download/SMS/WhatsApp/Email), বিক্রি-ফেরত স্লিপ, পে-স্লিপ ও লেবেলে বসে। ক্রয় বিল ও বাকি ধরন এখনো বসেনি (গাইড অংশ 16) |
 | মেনু-footer, কীবোর্ড-নিরাপদ sheet | কোনো সুইচ নেই। `UAT_CHECKLIST.md` এর পরীক্ষা চালান | মেনু-footer ডিফল্টে গোটানো। sheet-এ লেখার সময় Save বোতাম দেখা যায় (গাইড অংশ 23) |
-| Home-এর badge সারি (কোনো সুইচ নেই) | Home খুলুন | যেসব সংখ্যা 0-এর বেশি আর আপনার মেনুতে খোলা, শুধু সেই chip দেখায়। ট্যাপে ওই পর্দা খোলে। সব শূন্য হলে সারি লুকানো |
-| ক্রয় বিল Print (`#/purchaseprint`, কোনো সুইচ নেই) | একটা বিল খুলে Print / Send চাপুন | Print dialog বা Share/Download কাজ করে। DRAFT/VOID লাল পটিতে। বিলে বিক্রির দাম নেই |
 | `#/optviews` | প্রথমে একজন পরীক্ষামূলক ব্যবহারকারীর মেনু Hide/Locked করুন | তার ফোনে মেনু বদলেছে। Hide-করা পাতার সরাসরি লিংক এখনো খোলে (জানা)। অনুমতি বদলায়নি |
 
 ---
@@ -206,7 +204,6 @@ DB-র সব phase 72 থেকে 103 এখন লাইভ ডাটাব�
 | 12.3 | একটা সত্যিকারের বিলে save > approve > post | আইটেমের গড় cost বাড়ে। `inventory_vs_gl` মেলে |
 | 12.4 | `landed_cost_requires_approval` = `required` (বড় অঙ্কে) | যে বানায় সে নিজে approve পারে না |
 | 12.5 | (ঐচ্ছিক) `landed_reminder_on` | `#/landed/rem` তালিকা |
-| 12.6 | `#/landed` > bill বাছার sheet > "Add from a GRN" | GRN তালিকা আসে, টিক দিলে তার bill বাছাইয়ে যোগ হয়। বাঁধা না থাকলে `grn_not_linked` |
 
 **না লাগলে `off` রাখুন; কিছু বদলাবে না।**
 
@@ -220,66 +217,9 @@ DB-র সব phase 72 থেকে 103 এখন লাইভ ডাটাব�
 
 iPhone/iPad-এ সরাসরি সংযোগ চলে না (গাইড অংশ 20)।
 
-## ধাপ ১৪ - Category / Sub-category (phase 100)
+## ধাপ ১৪ - Category / Sub-category (phase 100, আসছে)
 
-| ক্রম | কাজ | চেক |
-|---|---|---|
-| 14.1 | `#/categories` খুলে তালিকা আপনার আইটেমের Category-র সঙ্গে মেলান | Category-গুলো আছে। "Category ছাড়া" তালিকা দেখুন |
-| 14.2 | POS, ক্রয়, স্টকে Category বেছে Sub বাছুন | বাছা যায়, filter কাজ করে |
-| 14.3 | `category_required_on_item` = `warn` (সিস্টেম প্রস্তাব) | Category ছাড়া আইটেমের তালিকা দেখায়, আটকায় না |
-| 14.4 | (পরে, চাইলে) `required` | নতুন আইটেম Category ছাড়া সেভ হয় না |
-| 14.5 | `#/catreport` | Category অনুযায়ী মোট = সাধারণ রিপোর্টের মোট |
-
-## ধাপ ১৫ - Bill payment option (phase 99)
-
-ডিফল্ট `off` = আজকের আচরণ। একটা একটা করে।
-
-| ক্রম | কাজ | চেক |
-|---|---|---|
-| 15.1 | `#/billpay` খুলুন | "Bills without payment" তালিকা খোলে। কিছু বদলায়নি |
-| 15.2 | `cost_bill_creates_payment` = `ask` (প্রস্তাব) | cost bill সেভের পর "Record payment now?" sheet। বন্ধ করলে bill আটকায় না। আংশিক payment চলে |
-| 15.3 | `purchase_bill_creates_payment` = `ask` | purchase bill পোস্টের পর একই sheet। `#/accounts` ও cash book-এ টাকা একবার |
-| 15.4 | `bill_void_payment_mode` = `void` (প্রস্তাব, ডিফল্টও) | bill void করলে payment-ও বাতিল |
-| 15.5 | (ঐচ্ছিক, accountant-এর সঙ্গে) `auto_cash` / `auto_bank`; `bill_pay_small_cash_max` নিজে লিখুন | credit-শর্তের পক্ষে auto হয় না। ব্যর্থ হলে bill আটকায় না, হলুদ চিহ্ন |
-
-**এড়ান:** Accountant-এর সঙ্গে না মিলিয়ে `auto_*`। Cost-bill payment আসল খরচ হয়, আবার একই bill product cost-এও যায়: P&L-এ utility একবার দেখাচ্ছে কিনা মিলিয়ে নিন।
-
-## ধাপ ১৬ - Inbox PII mask (phase 99)
-
-| ক্রম | কাজ | চেক |
-|---|---|---|
-| 16.1 | `inbox_pii_mode` = `mask_phone_address` (প্রস্তাব) | inbox-এ phone-এর শেষ 3 অক্ষর ছাড়া ঢাকা; address ঢাকা |
-| 16.2 | কে খুলতে পারবে: grant `inbox_unmask` দিন (অল্প মানুষকে) | `#/inboxpii`-এ Reveal কাজ করে, `Reveal log`-এ লেখা পড়ে |
-| 16.3 | `inbox_unmask_daily_max` নিজে লিখুন (ঐচ্ছিক) | সীমা ছাড়ালে `rate_limited` |
-| 16.4 | গ্রাহক তালিকা (`customer_directory`) | grant `view_customer_mobile` ছাড়া mobile ঢাকা। click-to-call ও নম্বরে খোঁজা তাদের জন্য বন্ধ |
-
-## ধাপ ১৭ - আইটেমের ছবি (phase 102)
-
-| ক্রম | কাজ | চেক |
-|---|---|---|
-| 17.1 | `#/itemimg` > `pos_only` (প্রস্তাব), thumbnail `On` | POS কার্ডে ছবি বা অক্ষর-গোল। বিক্রি আগের মতো |
-| 17.2 | ধীর নেটে দেখুন | ছবি ধীরে এলেও POS আটকায় না |
-| 17.3 | (ঐচ্ছিক) hours নিজে লিখুন (1..720), পরে `everywhere` | তালিকা ও picker-এ ছবি |
-
-পুরনো ছবির ছোট কপি নেই; আবার আপলোড না করা পর্যন্ত বড় ছবি লোড হয়।
-
-## ধাপ ১৮ - End-to-end (phase 103)
-
-| ক্রম | কাজ | চেক |
-|---|---|---|
-| 18.1 | `#/setupadvisor` > "Is it all flowing" | `flw_grn_double103` লাল/হলুদ হলে কারণ পড়ুন (GRN উৎস + guard বন্ধ + bill-ও স্টক বাড়ায়) |
-| 18.2 | `purchase_grn_guard`: GRN উৎস হলে `skip` (সিস্টেম প্রস্তাব) | দুবার গোনা থামে |
-| 18.3 | `#/books96` cost-অপেক্ষা তালিকা | recipe-ছাড়া production-in এখন তালিকায় আসে |
-| 18.4 | `acct_manual_prod_in103` (ডিফল্ট বন্ধ) | accountant-এর সঙ্গে ঠিক করে চালান। চালু করলে `inventory_vs_gl` `manual_in` কমে |
-
-## ধাপ ১৯ - Setup advisor সারি (phase 101) ও Undo
-
-| ক্রম | কাজ | চেক |
-|---|---|---|
-| 19.1 | `#/setupadvisor`-এ প্রতিটি নিয়মের সারি ও কারণ পড়ুন | সংখ্যার নিয়মে "info", আপনার সংখ্যা লিখতে হয় |
-| 19.2 | নিরাপদ সুইচে Apply | সুইচ বসে, History-তে লাইন |
-| 19.3 | **"Apply all recommended" এড়ান** (হিসাব-backlog সুইচ তিনটির জন্য: Dscr confirm আসে না) | সুইচ তিনটি একা চালান (ধাপ 8) |
-| 19.4 | History > "Undo this apply" (owner) | নিয়ম আগের মানে ফেরে। পাতা নতুন করে খুলে নিন |
+Paste 98-এর পরে। তারপর `#/categories`-এ তালিকা মিলিয়ে নিন, `category_required_on_item` আগে `warn` (সিস্টেম প্রস্তাব), পরে চাইলে `required`। চেক: POS/ক্রয়/স্টকে Category বেছে নেওয়া যায়, `#/catreport` মোট = সাধারণ রিপোর্টের মোট। **এখনো পরীক্ষার ফল নেই (রিপোর্ট অসম্পূর্ণ)।** Phase 99 ও 101 এলে এখানে ধাপ যুক্ত হবে।
 
 ---
 
@@ -293,10 +233,11 @@ iPhone/iPad-এ সরাসরি সংযোগ চলে না (গাই�
 ## যা এখনো তৈরি হয়নি (তাই এই ক্রমে নেই)
 
 - `production_recost` (production পরে cost সংশোধন)।
+- `cost_bill_creates_payment`।
 - Meta (Facebook/Instagram/WhatsApp) এর আসল সংযোগ ও Telegram এর আসল পরীক্ষা।
-- **coming:** Phase 105 নিরাপত্তা-ঠিক (`step_Sec2_REPORT.md` নেই), Owner dashboard `#/dashx` (10 chart), Liquid Glass theme। রিপোর্ট এলে ধাপ যুক্ত হবে।
-- `kiosk_url` ড্রয়ার পদ্ধতি।
+- Phase 99 (bill payment option + inbox PII mask) ও 101 (advisor সারি): কোনো কোড এখনো নেই।
+- `kiosk_url` ড্রয়ার পদ্ধতি; ক্রয় বিল ছাপায় template; landed cost-এ GRN বাছার পর্দা।
 
-(আগের তালিকা থেকে সরানো: বিল-স্তরের landed cost, card settlement/scheduler পর্দা, `cost_bill_creates_payment`, ক্রয় বিল ছাপা, landed cost-এ GRN বাছা, phase 99/101: সবই এখন আছে।)
+(আগের তালিকা থেকে সরানো: বিল-স্তরের landed cost ও card settlement/scheduler পর্দা, দুটোই এখন আছে।)
 
 সব ধাপ `[যাচাই হয়নি]`: লাইভ ডাটাবেস ও আসল ফোনে এই ক্রম চালানো হয়নি।
