@@ -277,3 +277,10 @@ Every replaced text is in `public._union_fn_backup` (`def` = the full `create or
 - **Effect today:** none. With the switch OFF the trigger returns at once; the local fingerprint of the scenario is the same with and without phase 545.
 - **Steps (owner):** 1. backup (Home > Backup). 2. paste `supabase/phase545.sql` once in the SQL editor (it is paste-twice safe). 3. run `select * from public._i2_state() where not present;` (must return no rows). 4. leave the switch OFF, or switch it on in Rules after your own test.
 - **Rollback:** `drop trigger landed_costs_price_freight545 on public.landed_costs;` and `delete from public.rules where key = 'price_check_include_freight';` (no data is changed by the phase itself).
+
+## Phase 546: `stock_transfer` carries all four switch behaviours again (switches stay OFF)
+
+- **Why:** phase 544 re-created `stock_transfer` from the phase 499 text and so dropped the "a transfer needs stock" check (rule `transfer_needs_stock`, bos114) and the "tell the receiving place" notice (rule `transfer_notify_receiver`, bos115) that phases 114, 115 and 533 had put in. A normal paste order (544 after 533) ended with the weaker function. Both rules are OFF, so staff saw no change; the owner could not switch them on and get the behaviour.
+- **What it does:** re-creates only `stock_transfer(integer,integer,uuid,numeric,text,text,uuid)`: the phase 544 text plus the two missing blocks, exactly as phase 533 has them. No new rule, table, column, privilege or data. With every switch OFF the function behaves as before (same answers, same stock, no notice).
+- **Steps (owner):** 1. backup (Home > Backup). 2. paste `supabase/phase546.sql` once in the SQL editor, after phase 545 (it is paste-twice safe). 3. run `select * from public._i2_state() where not present;` (must return no rows). 4. leave the switches OFF, or switch them on in Rules after your own test.
+- **Rollback:** paste `supabase/phase544.sql` again (it re-creates the previous function text). No data is changed by phase 546 itself.
