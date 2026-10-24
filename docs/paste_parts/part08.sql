@@ -1,5 +1,5 @@
 -- ============================================================================
--- FRESH part 8 of 20. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
+-- FRESH part 8 of 21. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
 -- Phases in this part, in this order: phase515 phase518 phase519 phase521 phase520 phase522
 -- Never paste: any *_test.sql, the phase84 / 84b / 84c TEST-PROJECT files, ALL_NEW2..ALL_NEW11*. Commit: see docs/PASTE_ORDER.md.
 -- ============================================================================
@@ -3938,4 +3938,4 @@ grant execute on function public.opening_stock_check96(int), public.opening_stoc
   public.cost_wait_supply96(text, text, text, jsonb, text, uuid, boolean) to authenticated;
 
 -- ============================================================================
--- End of FRESH part 8 of 20.
+-- End of FRESH part 8 of 21.

@@ -1,5 +1,5 @@
 -- ============================================================================
--- FRESH part 18 of 20. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
+-- FRESH part 18 of 21. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
 -- Phases in this part, in this order: phase471 phase472 phase473 phase474 phase475 phase476 phase477 phase478 phase479 phase480 phase481 phase482 phase483 phase484 phase485 phase486 phase487 phase488 phase489 phase490
 -- Never paste: any *_test.sql, the phase84 / 84b / 84c TEST-PROJECT files, ALL_NEW2..ALL_NEW11*. Commit: see docs/PASTE_ORDER.md.
 -- ============================================================================
@@ -5543,4 +5543,4 @@ grant execute on function public.mi_research_gate(uuid, text), public.mi_adapter
 notify pgrst, 'reload schema';
 
 -- ============================================================================
--- End of FRESH part 18 of 20.
+-- End of FRESH part 18 of 21.

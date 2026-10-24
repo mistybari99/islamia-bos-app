@@ -1,5 +1,5 @@
 -- ============================================================================
--- FRESH part 17 of 20. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
+-- FRESH part 17 of 21. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
 -- Phases in this part, in this order: phase442 phase443 phase444 phase445 phase446 phase447 phase448 phase449 phase450 phase451 phase452 phase453 phase454 phase455 phase456 phase457 phase458 phase459 phase460 phase461 phase462 phase463 phase464 phase465 phase466 phase467 phase468 phase470
 -- Never paste: any *_test.sql, the phase84 / 84b / 84c TEST-PROJECT files, ALL_NEW2..ALL_NEW11*. Commit: see docs/PASTE_ORDER.md.
 -- ============================================================================
@@ -4606,4 +4606,4 @@ revoke all on function public.rpt_hub_perms() from public, anon;
 grant execute on function public.rpt_hub_perms() to authenticated;
 
 -- ============================================================================
--- End of FRESH part 17 of 20.
+-- End of FRESH part 17 of 21.

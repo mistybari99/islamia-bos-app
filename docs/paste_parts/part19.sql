@@ -1,5 +1,5 @@
 -- ============================================================================
--- FRESH part 19 of 20. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
+-- FRESH part 19 of 21. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
 -- Phases in this part, in this order: phase491 phase492 phase493 phase494 phase495 phase496 phase497 phase498 phase499 phase501 phase502 phase503 phase504 phase505 phase530 phase531 phase532 phase533 phase534
 -- Never paste: any *_test.sql, the phase84 / 84b / 84c TEST-PROJECT files, ALL_NEW2..ALL_NEW11*. Commit: see docs/PASTE_ORDER.md.
 -- ============================================================================
@@ -4523,4 +4523,4 @@ end $u534$;
 drop table if exists _u_plan;
 
 -- ============================================================================
--- End of FRESH part 19 of 20.
+-- End of FRESH part 19 of 21.

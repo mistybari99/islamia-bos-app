@@ -27,6 +27,7 @@ import hashlib
 import io
 import json
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -40,30 +41,42 @@ def now_iso():
     return datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
-def gz_bytes(lines):
-    """Deterministic gzip (mtime 0, no file name) of the given text lines, in memory. Returns (rows, data)."""
+def rows_digest(line_digests):
+    """Order-independent digest of a table: sha256 over the sorted per-row sha256 values. Two databases that hold the same rows give the same digest
+    whatever their sort order or compression (used by tools/verify_restore.py to compare a restored database with the backup)."""
+    return hashlib.sha256(b''.join(sorted(line_digests))).hexdigest()
+
+
+def line_digest(line):
+    return hashlib.sha256(line.encode('utf-8')).digest()
+
+
+def gz_bytes(lines, digests=None):
+    """Deterministic gzip (mtime 0, no file name) of the given text lines, in memory. Returns (rows, data). When a list is given, the sha256 of every line is appended to it."""
     buf = io.BytesIO()
     with gzip.GzipFile(filename='', mode='wb', fileobj=buf, mtime=0, compresslevel=9) as z:
         n = 0
         for ln in lines:
             z.write(ln.encode('utf-8'))
             z.write(b'\n')
+            if digests is not None:
+                digests.append(line_digest(ln))
             n += 1
     return n, buf.getvalue()
 
 
-def write_gz(path, lines):
+def write_gz(path, lines, digests=None):
     """Deterministic gzip (mtime 0, no file name) of the given text lines. Returns (rows, bytes, sha256-of-the-file)."""
-    n, data = gz_bytes(lines)
+    n, data = gz_bytes(lines, digests)
     with open(path, 'wb') as f:
         f.write(data)
     return n, len(data), hashlib.sha256(data).hexdigest()
 
 
-def write_enc(path, lines, keys, label):
+def write_enc(path, lines, keys, label, digests=None):
     """Same gzip, encrypted (BOSENC1, deterministic: unchanged content = identical bytes). Only the encrypted file is written. Returns (rows, plain_gz_bytes,
     sha256-of-the-plain-gz, encrypted_bytes, sha256-of-the-encrypted-file)."""
-    n, data = gz_bytes(lines)
+    n, data = gz_bytes(lines, digests)
     blob = bc.encrypt_bytes(keys, label, data)
     with open(path, 'wb') as f:
         f.write(blob)
@@ -119,6 +132,72 @@ def dump_table(api, table, page):
         seen.add(cursor)
 
 
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ENV_RE = re.compile(r'Deno\.env\.get\(\s*[\'"]([A-Za-z0-9_]+)[\'"]')
+PLATFORM_ENV = {'SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_DB_URL'}      # set by Supabase itself in every edge function
+
+
+def edge_secret_names(root=None):
+    """NAMES (never values) of the secrets the edge functions in supabase/functions read with Deno.env.get. A static list from the source code: the anon-key
+    bot cannot read the real secrets of the project, so this is what the owner has to set again in a new project (supabase secrets set NAME=...)."""
+    base = os.path.join(root or REPO_ROOT, 'supabase', 'functions')
+    found = {}
+    if os.path.isdir(base):
+        for fn in sorted(os.listdir(base)):
+            p = os.path.join(base, fn, 'index.ts')
+            if os.path.isfile(p):
+                with open(p, encoding='utf-8', errors='replace') as f:
+                    for name in ENV_RE.findall(f.read()):
+                        found.setdefault(name, set()).add(fn)
+    return {k: {'functions': sorted(v), 'set_by_supabase': k in PLATFORM_ENV} for k, v in sorted(found.items())}
+
+
+def paste_order_sha256(root=None):
+    p = os.path.join(root or REPO_ROOT, 'tests', 'sql', 'paste_order.env')
+    try:
+        with open(p, 'rb') as f:
+            return hashlib.sha256(f.read()).hexdigest()
+    except OSError:
+        return None
+
+
+def fetch_accounts(api):
+    """The staff / login manifest (phase547 backup_accounts_manifest). Returns (dict or None, note). None = not available or switched OFF: the run goes on, the
+    manifest says so. Any other error is a failure (a half backup of the logins must not look like a good one)."""
+    try:
+        r = api.rpc('backup_accounts_manifest')
+    except oc.ApiError as e:
+        if _function_missing(e):
+            return None, 'phase547 is not pasted yet (no backup_accounts_manifest): staff logins are NOT in this backup'
+        raise RuntimeError('staff / login manifest failed: ' + str(e)) from e
+    if not isinstance(r, dict):
+        raise RuntimeError('staff / login manifest: unexpected answer')
+    if not r.get('enabled'):
+        return None, 'rule backup_accounts_on is OFF: staff logins are NOT in this backup'
+    r.pop('generated_at', None)                         # keeps an unchanged list byte-identical from night to night
+    return r, 'ok'
+
+
+def write_extra(out_dir, name, obj, keys):
+    """Writes one small JSON document (canonical, sorted keys) plain or, when keys are given, only encrypted. Returns the manifest entry."""
+    data = (oc.dumps_exact(obj) + '\n').encode('utf-8')
+    plain, enc = os.path.join(out_dir, name), os.path.join(out_dir, name + '.enc')
+    for stale in (plain, enc):
+        if os.path.exists(stale):
+            os.remove(stale)
+    entry = {'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()}
+    if keys is None:
+        with open(plain, 'wb') as f:
+            f.write(data)
+        entry['file'] = name
+    else:
+        blob = bc.encrypt_bytes(keys, name, data)
+        with open(enc, 'wb') as f:
+            f.write(blob)
+        entry.update({'file': name + '.enc', 'enc_bytes': len(blob), 'enc_sha256': hashlib.sha256(blob).hexdigest(), 'encrypted': True})
+    return entry
+
+
 def run(api, out_dir, page=2000, only=None, log_run=True, destination='github', clock=now_iso, encrypt='auto', env=None):
     """Returns the manifest dict. Raises on any failure (after trying to record the failure with backup_log)."""
     started = clock()
@@ -144,13 +223,15 @@ def run(api, out_dir, page=2000, only=None, log_run=True, destination='github', 
             for stale in (plain_name, plain_name + '.enc'):      # the folder is an exact picture of this run: no plain copy next to an encrypted one, and the other way round
                 if os.path.exists(os.path.join(out_dir, stale)):
                     os.remove(os.path.join(out_dir, stale))
+            digests = []
             if keys is None:
-                n, size, sha = write_gz(os.path.join(out_dir, plain_name), dump_table(api, t, page))
+                n, size, sha = write_gz(os.path.join(out_dir, plain_name), dump_table(api, t, page), digests)
                 files[t] = {'file': plain_name, 'rows': n, 'bytes': size, 'sha256': sha}
             else:
-                n, size, sha, esize, esha = write_enc(os.path.join(out_dir, plain_name + '.enc'), dump_table(api, t, page), keys, plain_name)
+                n, size, sha, esize, esha = write_enc(os.path.join(out_dir, plain_name + '.enc'), dump_table(api, t, page), keys, plain_name, digests)
                 files[t] = {'file': plain_name + '.enc', 'rows': n, 'bytes': size, 'sha256': sha, 'enc_bytes': esize, 'enc_sha256': esha, 'encrypted': True}
                 size = esize                                       # the size on disk decides the git warning
+            files[t]['rows_sha256'] = rows_digest(digests)
             total_rows += n
             total_bytes += size
             if size > BIG_FILE_BYTES:
@@ -167,9 +248,25 @@ def run(api, out_dir, page=2000, only=None, log_run=True, destination='github', 
                 problems.append(f'{t}: dumped {got} rows but the server counted {lo}..{hi}')
         if problems:
             raise RuntimeError('; '.join(problems))
+        extras, extra_notes = {}, []
+        if not only:
+            accts, note = fetch_accounts(api)
+            for stale in ('accounts.json', 'accounts.json.enc'):
+                if os.path.exists(os.path.join(out_dir, stale)):
+                    os.remove(os.path.join(out_dir, stale))
+            if accts is None:
+                extra_notes.append('accounts: ' + note)
+                oc.log('accounts:', note)
+            else:
+                e = write_extra(out_dir, 'accounts.json', accts, keys)
+                e['items'] = int(accts.get('logins') or 0)
+                extras['accounts'] = e
+                oc.log(f"accounts: {e['items']} login(s) (no passwords, no PIN hashes)")
         finished = clock()
         manifest = {
-            'tool': 'backup_dump.py', 'format': 1, 'schema_version': m0.get('schema_version'), 'schema_fingerprint': m0.get('fingerprint'),
+            'tool': 'backup_dump.py', 'format': 2, 'manifest_version': 2, 'extras': extras, 'extra_notes': extra_notes,
+            'edge_function_secret_names_expected': edge_secret_names(),
+            'code': {'commit': os.environ.get('GITHUB_SHA'), 'paste_order_sha256': paste_order_sha256()}, 'schema_version': m0.get('schema_version'), 'schema_fingerprint': m0.get('fingerprint'),
             'started_at': started, 'finished_at': finished, 'table_count': len(names), 'rows': total_rows, 'bytes': total_bytes,
             'tables': {t: {**files[t], 'rows_at_start': start_rows[t], 'rows_at_end': end_rows.get(t)} for t in names},
             'warnings': warnings,

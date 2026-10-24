@@ -25,6 +25,7 @@ import hashlib
 import hmac
 import json
 import os
+import shutil
 import sys
 
 MAGIC = b'BOSENC1\n'
@@ -140,7 +141,28 @@ def decrypt_dir(src, dst, keys, write=True):
         e['file'] = plain_name
         for k in ('enc_sha256', 'enc_bytes', 'encrypted'):
             e.pop(k, None)
+    for name_, info in (m.get('extras') or {}).items():           # accounts.json.enc etc.: same rules as a table file
+        if not info.get('encrypted'):
+            continue
+        fname = info['file']
+        with open(os.path.join(src, fname), 'rb') as f:
+            blob = f.read()
+        if info.get('enc_sha256') and hashlib.sha256(blob).hexdigest() != info['enc_sha256']:
+            raise CryptoError(f'{fname}: the stored file does not match the manifest (damaged)')
+        plain = decrypt_bytes(keys, label_of(fname), blob)
+        if hashlib.sha256(plain).hexdigest() != info['sha256']:
+            raise CryptoError(f'{fname}: decrypted content does not match the manifest sha256')
+        if write:
+            with open(os.path.join(dst, label_of(fname)), 'wb') as f:
+                f.write(plain)
+        e = out['extras'][name_]
+        e['file'] = label_of(fname)
+        for k in ('enc_sha256', 'enc_bytes', 'encrypted'):
+            e.pop(k, None)
     if write:
+        for f_ in sorted(os.listdir(src)):                             # the plain storage manifests travel with the backup
+            if f_.endswith('.json') and f_ != 'manifest.json' and (f_ == 'photos_manifest.json' or f_.startswith('storage_')):
+                shutil.copyfile(os.path.join(src, f_), os.path.join(dst, f_))
         with open(os.path.join(dst, 'manifest.json'), 'w', encoding='utf-8') as f:
             json.dump(out, f, ensure_ascii=False, indent=1, sort_keys=True)
             f.write('\n')

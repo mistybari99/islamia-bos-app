@@ -1,5 +1,5 @@
 -- ============================================================================
--- FRESH part 5 of 20. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
+-- FRESH part 5 of 21. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
 -- Phases in this part, in this order: phase50 phase51 phase52 phase53 phase54 phase60 phase61 phase62 phase70 phase71 phase72
 -- Never paste: any *_test.sql, the phase84 / 84b / 84c TEST-PROJECT files, ALL_NEW2..ALL_NEW11*. Commit: see docs/PASTE_ORDER.md.
 -- ============================================================================
@@ -5342,4 +5342,4 @@ grant execute on function public.inventory_vs_gl(date, integer) to authenticated
 revoke execute on function public.inventory_vs_gl(date, integer) from anon, public;
 
 -- ============================================================================
--- End of FRESH part 5 of 20.
+-- End of FRESH part 5 of 21.

@@ -1,5 +1,5 @@
 -- ============================================================================
--- FRESH part 20 of 20. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
+-- FRESH part 20 of 21. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
 -- Phases in this part, in this order: phase535 phase536 phase537 phase538 phase539 phase543 phase544 phase545 phase546
 -- Never paste: any *_test.sql, the phase84 / 84b / 84c TEST-PROJECT files, ALL_NEW2..ALL_NEW11*. Commit: see docs/PASTE_ORDER.md.
 -- ============================================================================
@@ -6099,6 +6099,4 @@ begin
 end $function$;
 
 -- ============================================================================
--- End of FRESH part 20 of 20.
--- Now run this check (it only reads):
--- select * from public._i2_state() where not present;   -- must return no rows
+-- End of FRESH part 20 of 21.

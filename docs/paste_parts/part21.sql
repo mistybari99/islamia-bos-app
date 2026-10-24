@@ -1,0 +1,146 @@
+-- ============================================================================
+-- FRESH part 21 of 21. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
+-- Phases in this part, in this order: phase547
+-- Never paste: any *_test.sql, the phase84 / 84b / 84c TEST-PROJECT files, ALL_NEW2..ALL_NEW11*. Commit: see docs/PASTE_ORDER.md.
+-- ============================================================================
+
+-- ---------------------------------------------------------------- phase547.sql
+-- ============================================================
+-- Phase 547 - Backup coverage: AI settings tables, the staff / login manifest, extra Storage buckets, per-device list
+-- Run AFTER phase46, phase98 and phase106 (and after phase539 if you use _union_audit). Paste-twice safe. Earlier phase files are not edited. Nothing is deleted.
+-- Audit that led here: docs/BACKUP_COVERAGE.md. Owner steps: docs/BACKUP_AND_RESTORE_GUIDE.md.
+--
+--   1. public._backup_tables() is re-created from its LATEST body (phase106) with ONE change: the columns monthly_token_budget and max_output_tokens (AI token
+--      numbers, not credentials) no longer count as secret-looking. Before this change ai_agents and ai_providers (the owner's AI settings) were silently
+--      missing from every nightly backup. Everything else is identical: *_secret*, ops_*, login_*, backup_runs, notifications, notification_reads and every
+--      table with a password / pin_hash / secret / token / salt / api_key / private_key column stay out. Pure addition of two settings tables to the dump.
+--   2. Two rules, both OFF (new behaviour starts only when the owner switches it on):
+--        backup_accounts_on  the nightly backup also saves the staff / login MANIFEST (see 3)
+--        backup_buckets_on   the backup bot may also READ the other Storage buckets (web-refs, payproof, web-public); bucket photos is always readable (phase46)
+--   3. public.backup_accounts_manifest()  backup bot only. Returns, per login: id, staff id, e-mail, name, status, language, created_at, roles, locations,
+--      grants (code, location, valid_until, note), whether a second factor (2FA) is enrolled, which bot purposes it has - plus the attendance devices WITHOUT
+--      token_hash and the ops_accounts marks. It NEVER reads a password, a PIN hash, a token or an MFA secret (auth.users.encrypted_password is not selected).
+--      With the rule OFF it answers {"enabled": false} and nothing else.
+--   4. public.backup_storage_buckets()  backup bot only: the buckets (id, public, size limit, mime types), number of objects and bytes, and whether the bot can
+--      read them. Used by tools/backup_photos.py --all-buckets.
+--   5. Storage policy ops_buckets_read on storage.objects (select): the backup bot, rule backup_buckets_on = true, buckets web-refs / payproof / web-public.
+--   6. public._union_fn_expected: the expected md5 of _backup_tables() is moved to the new text so that _union_audit() keeps saying "merged".
+-- ============================================================
+
+do $g$
+begin
+  if to_regprocedure('public._backup_tables()') is null or to_regprocedure('public._is_ops(text)') is null or to_regprocedure('public.rule_on(text)') is null then
+    raise exception 'phase547 needs phase 46 (backup functions) and the rules engine first';
+  end if;
+  if to_regclass('public.ops_accounts') is null or to_regclass('public.user_grants') is null or to_regclass('public.attendance_devices') is null then
+    raise exception 'phase547 needs the tables ops_accounts, user_grants and attendance_devices (phases 46, 28, 8x) first';
+  end if;
+end $g$;
+
+-- 1. identical to phase106 except monthly_token_budget (AI budget numbers of ai_agents / ai_providers) is not secret-looking
+create or replace function public._backup_tables() returns text[]
+language sql stable security definer set search_path = public as $$
+  select coalesce(array_agg(c.relname::text order by c.relname), '{}'::text[])
+    from pg_class c join pg_namespace n on n.oid = c.relnamespace
+   where n.nspname = 'public' and c.relkind in ('r', 'p') and not c.relispartition
+     and c.relname::text not like '%\_secret%' escape '\'
+     and c.relname::text not like 'ops\_%' escape '\'
+     and c.relname::text not in ('login_failures', 'login_attempts', 'login_throttle', 'backup_runs', 'notifications', 'notification_reads')
+     and not exists (select 1 from pg_attribute a where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
+                      and a.attname::text !~ '^(tokens_(in|out)|token_[ab]|monthly_token_budget|max_output_tokens)$'
+                      and a.attname::text ~* '(password|passwd|pin_hash|secret|token|salt|api_key|private_key)');
+$$;
+comment on function public._backup_tables() is 'bos547: backup / restore-drill table list (computed). token_a/token_b (perm_conflict) and monthly_token_budget, max_output_tokens (ai_agents, ai_providers) are not secrets.';
+
+-- 2. the two switches (OFF)
+insert into public.rules (key, module, kind, default_value, unit, choices, min_value, max_value, label_bn, label_mix, label_en, hint_bn, hint_mix, hint_en, sort) values
+ ('backup_accounts_on', 'notify', 'switch', 'false'::jsonb, null, null, null, null,
+  'ব্যাকআপে স্টাফ লগইনের তালিকা রাখুন', 'Backup-এ Staff login-এর তালিকা রাখুন', 'Save the staff login list in the backup',
+  'বন্ধ = আগের মতোই। চালু = রাতের ব্যাকআপে প্রতিজনের staff id, নাম, role, জায়গা, grant থাকবে (পাসওয়ার্ড বা PIN কখনো নয়)। নতুন project-এ লগইন আবার বানাতে লাগে।',
+  'OFF = as before. ON = the nightly backup also holds every person''s staff id, name, roles, locations and grants (never a password or PIN). Needed to re-create the logins in a new project.',
+  'OFF = as before. ON = the nightly backup also holds every person''s staff id, name, roles, locations and grants (never a password or PIN). Needed to re-create the logins in a new project.', 922),
+ ('backup_buckets_on', 'notify', 'switch', 'false'::jsonb, null, null, null, null,
+  'ব্যাকআপ-bot অন্য ছবির bucket-ও পড়তে পারবে', 'Backup bot অন্য ছবির bucket-ও পড়তে পারবে', 'Backup bot may also read the other photo buckets',
+  'বন্ধ = শুধু photos bucket। চালু = web-refs, payproof, web-public bucketও ব্যাকআপে যাবে (শুধু পড়ার অনুমতি)।',
+  'OFF = only the photos bucket is read (as before). ON = the backup bot may also read web-refs, payproof and web-public (read only) so that they are in the backup.',
+  'OFF = only the photos bucket is read (as before). ON = the backup bot may also read web-refs, payproof and web-public (read only) so that they are in the backup.', 923)
+ on conflict (key) do nothing;
+
+-- 3. the staff / login manifest (no password, no PIN hash, no token, no MFA secret)
+create or replace function public.backup_accounts_manifest() returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare accts jsonb; devs jsonb; ops jsonb; mfa_ids uuid[] := '{}'::uuid[]; has_mfa boolean := false; cols text;
+begin
+  if not public._is_ops('backup') then raise exception 'not allowed'; end if;
+  if not public.rule_on('backup_accounts_on') then
+    return jsonb_build_object('enabled', false, 'note', 'rule backup_accounts_on is OFF');
+  end if;
+  if to_regclass('auth.mfa_factors') is not null then
+    has_mfa := true;
+    execute 'select coalesce(array_agg(distinct user_id), ''{}''::uuid[]) from auth.mfa_factors' into mfa_ids;
+  end if;
+  select coalesce(jsonb_agg(jsonb_build_object(
+      'id', p.id, 'staff_id', p.staff_id, 'email', lower(u.email), 'full_name', p.full_name, 'status', p.status, 'lang', p.lang, 'created_at', p.created_at,
+      'roles', coalesce((select jsonb_agg(r.role_code order by r.role_code) from public.user_roles r where r.user_id = p.id), '[]'::jsonb),
+      'locations', coalesce((select jsonb_agg(l.location_id order by l.location_id) from public.user_locations l where l.user_id = p.id), '[]'::jsonb),
+      'grants', coalesce((select jsonb_agg(jsonb_build_object('grant_code', g.grant_code, 'location_id', g.location_id, 'valid_until', g.valid_until, 'note', g.note) order by g.grant_code, g.location_id, g.id)
+                            from public.user_grants g where g.user_id = p.id), '[]'::jsonb),
+      'bot_purposes', coalesce((select jsonb_agg(o.purpose order by o.purpose) from public.ops_accounts o where o.user_id = p.id and o.active), '[]'::jsonb),
+      'has_2fa', p.id = any (mfa_ids)) order by p.staff_id, p.id), '[]'::jsonb)
+    into accts
+    from public.profiles p left join auth.users u on u.id = p.id;
+  -- attendance devices WITHOUT token_hash: the device has to be enrolled again after a restore (a new token is made then)
+  select coalesce(jsonb_agg(jsonb_build_object('id', d.id, 'name', d.name, 'location_id', d.location_id, 'vendor', d.vendor, 'serial', d.serial, 'active', d.active, 'created_at', d.created_at) order by d.id), '[]'::jsonb)
+    into devs from public.attendance_devices d;
+  select coalesce(jsonb_agg(jsonb_build_object('user_id', o.user_id, 'purpose', o.purpose, 'active', o.active) order by o.user_id, o.purpose), '[]'::jsonb) into ops from public.ops_accounts o;
+  return jsonb_build_object('enabled', true, 'version', 1, 'generated_at', now(), 'mfa_table_present', has_mfa,
+    'logins', jsonb_array_length(accts), 'accounts', accts, 'attendance_devices', devs, 'ops_accounts', ops,
+    'never_included', jsonb_build_array('passwords', 'PIN hashes', 'device token hashes', 'MFA secrets', 'sessions'));
+end $$;
+
+-- 4. buckets
+create or replace function public.backup_storage_buckets() returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare arr jsonb := '[]'::jsonb; b record; n bigint; sz bigint; on_ boolean; readable boolean;
+begin
+  if not public._is_ops('backup') then raise exception 'not allowed'; end if;
+  if to_regclass('storage.buckets') is null or to_regclass('storage.objects') is null then
+    return jsonb_build_object('buckets', '[]'::jsonb, 'note', 'no storage schema here');
+  end if;
+  on_ := public.rule_on('backup_buckets_on');
+  for b in execute 'select id::text id, coalesce(public, false) pub, file_size_limit, allowed_mime_types from storage.buckets order by id' loop
+    execute 'select count(*), coalesce(sum(coalesce((to_jsonb(o) -> ''metadata'' ->> ''size'')::bigint, 0)), 0) from storage.objects o where o.bucket_id = $1' into n, sz using b.id;
+    readable := b.id = 'photos' or (on_ and b.id in ('web-refs', 'payproof', 'web-public'));
+    arr := arr || jsonb_build_object('id', b.id, 'public', b.pub, 'file_size_limit', b.file_size_limit, 'allowed_mime_types', to_jsonb(b.allowed_mime_types),
+                                     'objects', n, 'bytes', sz, 'bot_can_read', readable);
+  end loop;
+  return jsonb_build_object('buckets', arr, 'buckets_rule_on', on_);
+end $$;
+
+-- 5. the read policy for the other buckets (rule backup_buckets_on, default OFF)
+do $$ begin
+  if to_regclass('storage.objects') is not null then
+    execute 'drop policy if exists ops_buckets_read on storage.objects';
+    execute 'create policy ops_buckets_read on storage.objects for select to authenticated using (bucket_id in (''web-refs'', ''payproof'', ''web-public'') and public._is_ops(''backup'') and public.rule_on(''backup_buckets_on''))';
+  end if;
+end $$;
+
+-- grants: only a signed-in user may call; the function itself refuses everybody but the backup bot
+revoke all on function public.backup_accounts_manifest() from public, anon, authenticated;
+revoke all on function public.backup_storage_buckets() from public, anon, authenticated;
+grant execute on function public.backup_accounts_manifest() to authenticated;
+grant execute on function public.backup_storage_buckets() to authenticated;
+
+-- 6. keep _union_audit() honest about the new text of _backup_tables()
+do $u$ begin
+  if to_regclass('public._union_fn_expected') is not null then
+    update public._union_fn_expected set md5_text = md5(rtrim(pg_get_functiondef(to_regprocedure('public._backup_tables()')), E'\n')) where fn = 'public._backup_tables()';
+  end if;
+end $u$;
+
+notify pgrst, 'reload schema';
+
+-- ============================================================================
+-- End of FRESH part 21 of 21.
+-- Now run this check (it only reads):
+-- select * from public._i2_state() where not present;   -- must return no rows

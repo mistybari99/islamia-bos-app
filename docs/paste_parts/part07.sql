@@ -1,5 +1,5 @@
 -- ============================================================================
--- FRESH part 7 of 20. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
+-- FRESH part 7 of 21. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
 -- Phases in this part, in this order: phase507 phase508 phase509 phase510 phase511 phase512 phase513 phase514 phase516 phase517
 -- Never paste: any *_test.sql, the phase84 / 84b / 84c TEST-PROJECT files, ALL_NEW2..ALL_NEW11*. Commit: see docs/PASTE_ORDER.md.
 -- ============================================================================
@@ -5149,4 +5149,4 @@ revoke all on function public._ov_mode(text), public._ov_key(text, text), public
 notify pgrst, 'reload schema';
 
 -- ============================================================================
--- End of FRESH part 7 of 20.
+-- End of FRESH part 7 of 21.
