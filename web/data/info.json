@@ -7870,6 +7870,19 @@
    ],
    "verified": true,
    "src": "phase552.sql"
+  },
+  "rule:pin_all_set_confirmed": {
+   "title": "Owner confirms: every login has a PIN",
+   "does": "A confirmation only. While OFF the setup advisor will not switch pin_signature_on on (its row is 'not ready'). When ON the advisor may. The switch changes no behaviour by itself.",
+   "why": "The system cannot see whether every login has a PIN; with the PIN signature on, a person without a PIN could not sign.",
+   "default": "OFF.",
+   "change": "Takes effect at the next advisor apply.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:pin_signature_on"
+   ],
+   "verified": true,
+   "src": "phase553.sql"
   }
  }
 }
