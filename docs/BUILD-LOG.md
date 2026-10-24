@@ -776,3 +776,9 @@ Checks run: infohint_test exit 0 (on a snapshot); crm_feedback_test and crm_lead
 - Changed: `supabase/phase550.sql` (+ `phase550_test.sql`, 5 checks): patch at anchors in `_rptb1_agg_wrap` (returned costed revenue and COGS subtracted per group from `_cogs_lines72`, only when the existing rule `reports_net_of_returns` is ON, its default; OFF = unchanged). No new rule, table or column. Registered in ORDER.txt, paste_order.env, PASTE_ORDER.md, paste parts.
 - Readiness scenario after 549 -> after 550: def 126/17 -> 127/16, rec 130/13 -> 131/12, recx 141/2 -> 142/1. All 120 catalogue reports still run without error (R21). uncosted_pct is not netted (documented).
 - Not confirmed: reports grouped by a dimension that rpt_ret_b does not carry (item, category) - those definitions have no returns column and do not take this path.
+
+## 24 Oct 2026 - phase 551: staff-cost report t3_payroll reads the app payroll runs (READINESS D7)
+- Reproduced first (readiness R18c, all modes): after two paid payroll runs (net pay 9,613) `report_run2('t3_payroll')` showed 0 (paper sheets 21-1 / 35-1 only).
+- Changed: `supabase/phase551.sql` (+ `phase551_test.sql`, 8 checks): `_r3q_t3_payroll` follows the existing salary switch (`report_salary_source` = app_first or `payroll_accrual_on`): months with a paid run come from `payroll_lines`, their paper sheets are left out. T4 already used the same source through `_p27_pl`. Default (legacy) is unchanged, so the readiness default and `rec` runs still show 0 until the owner (or the advisor row of phase 553) sets the source. No new rule.
+- Readiness after 550 -> after 551: def 127/16 -> 127/16, rec 131/12 -> 131/12, recx 142/1 -> 143/0 (R18c passes where the source is app_first).
+- Not confirmed: months mixing runs and sheets for the same person in one range (sheets of the run months are dropped by design); payroll with several runs for one month and place.
