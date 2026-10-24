@@ -10,7 +10,7 @@ Three parts: **A** the readiness matrix (section 1-2), **B** the calculation pro
 2. With the **default settings** the scenario still shows 19 mismatches of 141 checks, most because the safe default books nothing for a stock, count or cash loss, the rest are defects D1, D4, D7, D8. The advisor's "recommended values" fix part of it (16 left). Adding six switches the advisor does not know leaves **5**, which are real defects (section 4).
 3. Matrix: 281 rows, **76 DONE, 64 DONE-OFF, 107 PARTIAL, 11 MISSING, 23 DESIGN-NEEDED**. The 99 percent target is not reached yet: the open items are listed in order of business risk in section 6.
 4. Biggest risks are not calculations: backup and restore never run for real, no real phone, printer or offline test, server-side PIN lockout not enabled, VAT not in the ledger, repository visibility undecided.
-5. Nothing in this branch changes a phase file. Defects are written up with proposed new phases (section 4). One small fix is drafted as `supabase/phase547.sql` in a separate commit (see section 4, D8).
+5. Nothing in this branch changes a phase file. Defects are written up with proposed new phases (section 4). One small fix is drafted as `supabase/phase548.sql` in a separate commit (see section 4, D8).
 
 ## 1. How to read the matrix
 
@@ -488,7 +488,7 @@ The advisor skipped five rules as `not_ready` (`accounting_on`, `cost_attrib_in_
 
 ## 4. Confirmed mismatches and defects, with a proposed fix
 
-No phase file was edited. Each fix below is a **new phase** (numbers 547 onward are free: `tests/sql/ORDER.txt` ends at 546). "Runs" = the runs in which the check fails.
+No phase file was edited. Each fix below is a **new phase** (numbers 548 onward are free (547 is the backup coverage phase): `tests/sql/ORDER.txt` ends at 546 on the branch this audit was made on). "Runs" = the runs in which the check fails.
 
 | ID | Function and inputs | Expected (hand) | Actual | Runs | Proposed new phase / fix | Effort |
 |---|---|---|---|---|---|---|
@@ -499,7 +499,7 @@ No phase file was edited. Each fix below is a **new phase** (numbers 547 onward 
 | D5 | `count_save(<06-1 entry>, 'drawer', {...})` called by the showroom manager | maker gets only `saved` and `counted` (BUILD-RULES 9, owner decision 11 Oct "mandatory by default") | returns `expected` 2,350 and `diff` -10 while `blind_count_on` = false (default and advisor); hidden only in recx (scenario D1) | def, rec | advisor change (D6) and an owner decision on the default; no code bug | S |
 | D6 | `setup_recommend_apply` (twice) | the advisor's set should make the books equal the stock and the count blind | applies 51 rules, omits `acct_transit_loss`, `acct_transfer_mode`, `blind_count_on`, `report_salary_source`, `rpt131_on`, `stock_negative_mode=block`, `production_requires_recipe`, `payroll_accrual_on`, `pin_signature_on` | def, rec | phase 550: add these as recommendations (each with its readiness check and reason text); the owner still taps apply | S |
 | D7 | `report_run2('t3_payroll', {month})` after two paid payroll runs | net pay 9,613 | totals net_pay null / 0 (reads paper sheets 02-2/02-3 only); `l1_pnl` carries salary only when `report_salary_source=app_first`; `c2_salary_basis` does show runs_paid 9,613 (scenario R18b passes, R18c fails) | def, rec, recx | phase 551: T3/T4 read `payroll_lines` when runs exist for the month (same switch as L1) | M |
-| D8 | `stock_recon_period(from,to,3)` after `transit_short_mode=loss` | unclassified 0 | row test_sweet_a place 3: `unclassified` -0.5, state `unclassified` because reason `transit_loss` is not in the list of movement reasons (scenario R17) | rec, recx | draft written and tested: `supabase/phase547.sql` (separate commit, NOT yet in `tests/sql/ORDER.txt` or `docs/PASTE_ORDER.md`): reads the function text, adds `transit_loss` as a listed movement; on a clone of the recx database the unclassified row went from 0.5 to 0, paste twice clean, grants unchanged (anon no, authenticated yes) | S |
+| D8 | `stock_recon_period(from,to,3)` after `transit_short_mode=loss` | unclassified 0 | row test_sweet_a place 3: `unclassified` -0.5, state `unclassified` because reason `transit_loss` is not in the list of movement reasons (scenario R17) | rec, recx | draft written and tested: `supabase/phase548.sql` (separate commit, NOT yet in `tests/sql/ORDER.txt` or `docs/PASTE_ORDER.md`): reads the function text, adds `transit_loss` as a listed movement; on a clone of the recx database the unclassified row went from 0.5 to 0, paste twice clean, grants unchanged (anon no, authenticated yes) | S |
 | D9 | Sheet 06-1 drawer count | expected cash filled from the POS day close (2,350) | expected is computed from typed sheet figures (`_count_expected18`); POS day-close report gives the same 2,350 (scenario D2) but nothing compares or fills it | all | phase 552 or a screen change: prefill and compare, exception when typed totals differ from POS | M |
 | D10 | `tests/sql/e2e` and `tests/sql/audit2` | pass on the current tree | use pre-renumber form codes (04-1 = old GRN, now Cash Position and Budget; 10-2 = old expense voucher): `entries_form_code_fkey` violations, 'form is switched off'; audit2 'switches ON' pass switches on all 165 switches including mutually conflicting ones (`lot_required`); 84 unmapped FAILs in that pass | n/a | update fixtures to the NN-1 codes through the mapping in `docs/FORM_SEQUENCE.md`; separate pass for conflicting switches | M |
 
@@ -539,7 +539,7 @@ Effort: S = under a day, M = a few days, L = a week or more (agent work; owner o
 
 1. **Owner actions that need no code** (rows 1, 3 part one, 2 planning): private repository or private backup repo, secrets, one restore drill, enable the Auth hook, start the phone/printer UAT.
 2. **Small settings phase** (rows 4, 5 part one, D6): phase 550 adds the missing recommendations; decide location-tagged vs company-wide first. Re-run the scenario: expect recx-like result with the advisor alone.
-3. **Small fixes** (D4, D8): phase 549 and 547 (drafted). Re-run the scenario.
+3. **Small fixes** (D4, D8): phase 549 and 548 (drafted; first drafted as 547, renamed because 547 is the backup coverage phase). Re-run the scenario.
 4. **Freight payable** (row 6) and **staff-cost reports** (row 8, D7): phases 548 and 551.
 5. **Cash close**: prefill from POS (D9), then switch blind count on in the live routine.
 6. **Test refresh** (row 12) so every later phase is checked automatically.
