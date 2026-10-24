@@ -218,6 +218,17 @@ class Unit(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 ra.load_accounts(w)
 
+    def test_logins_can_be_derived_from_profiles_when_there_is_no_accounts_json(self):
+        with tempfile.TemporaryDirectory() as w:
+            with gzip.open(os.path.join(w, 'profiles.ndjson.gz'), 'wt') as f:
+                f.write(json.dumps({'id': CLERK, 'staff_id': 'Test_A', 'full_name': 'test_a', 'status': 'active'}) + '\n')
+            with self.assertRaises(SystemExit):
+                ra.load_accounts(w)                                   # no domain: refuses and says what to do
+            with T_quiet():
+                d = ra.load_accounts(w, 'staff.example.test')
+            self.assertEqual(d['accounts'][0]['email'], 'test_a@staff.example.test')
+            self.assertEqual(d['accounts'][0]['id'], CLERK)
+
     def test_reset_pin_rules(self):
         old = os.environ.get('SUPABASE_SERVICE_KEY')
         os.environ['SUPABASE_SERVICE_KEY'] = 'test-admin-key-not-real'

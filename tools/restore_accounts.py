@@ -77,13 +77,34 @@ class Admin:
             page += 1
 
 
-def load_accounts(folder):
+def accounts_from_profiles(folder, domain):
+    """Fallback when the backup has no accounts.json: the app builds every login e-mail as <staff id>@<emailDomain> (web/app.js emailOf), so the logins can be derived
+    from the backed-up profiles table (same ids). Roles, locations and grants come back with the data restore, not from here."""
+    import gzip
+    p = os.path.join(folder, 'profiles.ndjson.gz')
+    if not domain or not os.path.isfile(p):
+        return None
+    out = []
+    with gzip.open(p, 'rt', encoding='utf-8') as f:
+        for line in f:
+            if line.strip():
+                r = json.loads(line)
+                out.append({'id': r['id'], 'staff_id': r['staff_id'], 'email': f"{r['staff_id'].lower()}@{domain}", 'full_name': r.get('full_name') or '', 'status': r.get('status', ''),
+                            'roles': [], 'locations': [], 'grants': [], 'derived_from_profiles': True})
+    return {'accounts': out, 'ops_accounts': [], 'attendance_devices': []}
+
+
+def load_accounts(folder, domain=''):
     p = os.path.join(folder, 'accounts.json')
     if os.path.isfile(p + '.enc') and not os.path.isfile(p):
         raise SystemExit('accounts.json.enc is encrypted: run  python3 tools/backup_crypto.py decrypt <folder> <plain_folder>  first')
     if not os.path.isfile(p):
-        raise SystemExit(f'no accounts.json in {folder}: that backup was made with the rule backup_accounts_on OFF (or before phase547). The logins must be created by hand '
-                         '(docs/BACKUP_AND_RESTORE_GUIDE.md, section "if there is no accounts.json").')
+        d = accounts_from_profiles(folder, domain)
+        if d is not None:
+            print(f"NOTE: no accounts.json in this backup: the {len(d['accounts'])} logins are derived from the profiles table with the e-mail domain {domain}. Bot marks and attendance machines are NOT known.")
+            return d
+        raise SystemExit(f'no accounts.json in {folder}: that backup was made with the rule backup_accounts_on OFF (or before phase547). Add --email-domain <the emailDomain of web/config.js> '
+                         'to derive the logins from the profiles table, or create them by hand (docs/BACKUP_AND_RESTORE_GUIDE.md).')
     with open(p, encoding='utf-8') as f:
         d = json.load(f)
     m = os.path.join(folder, 'manifest.json')
@@ -116,7 +137,7 @@ def followup_sql(d):
 
 
 def cmd_plan(a):
-    d = load_accounts(a.folder)
+    d = load_accounts(a.folder, a.email_domain)
     print(f"{len(d['accounts'])} login(s) in the backup:")
     for x in d['accounts']:
         print('  ' + describe(x))
@@ -124,7 +145,7 @@ def cmd_plan(a):
 
 
 def cmd_create(a):
-    d = load_accounts(a.folder)
+    d = load_accounts(a.folder, a.email_domain)
     key = oc.env('SUPABASE_SERVICE_KEY', required=True)
     adm = Admin(a.url, key)
     only = {x.strip().lower() for x in a.only.split(',') if x.strip()}
@@ -181,10 +202,12 @@ def main(argv=None):
     sub = ap.add_subparsers(dest='cmd', required=True)
     p = sub.add_parser('plan')
     p.add_argument('folder')
+    p.add_argument('--email-domain', default='', help='only when the backup has no accounts.json: the emailDomain of web/config.js')
     c = sub.add_parser('create')
     c.add_argument('folder')
     c.add_argument('--url', required=True)
     c.add_argument('--only', default='')
+    c.add_argument('--email-domain', default='', help='only when the backup has no accounts.json: the emailDomain of web/config.js')
     c.add_argument('--follow-up', default='')
     r = sub.add_parser('reset-pin')
     r.add_argument('staff_id')

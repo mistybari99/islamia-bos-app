@@ -22,8 +22,8 @@ SECRET_COL = re.compile(r'(password|passwd|pin_hash|secret|token|salt|api_key|pr
 SECRET_OK = re.compile(r'^(tokens_(in|out)|token_[ab]|monthly_token_budget|max_output_tokens)$')
 BEGIN, END = '<!-- matrix:begin -->', '<!-- matrix:end -->'
 
-HIGH_T = re.compile(r'(salary|payroll|wage|employee|attend|shift_pay|loan|advance|benefit|nid|bank|pay_?req|staff_pay|tip)', re.I)
-HIGH_C = re.compile(r'(salary|wage|nid|tin|bank_acc|bkash|nagad|account_no)', re.I)
+HIGH_T = re.compile(r'(salary|payroll|wage|employee|attend|shift_pay|loan|advance|benefit|(^|_)nid(_|$)|bank|pay_?req|staff_pay|(^|_)tips?(_|$))', re.I)
+HIGH_C = re.compile(r'(salary|wage|(^|_)nid(_|$)|(^|_)tin(_|$)|bank_acc|bkash|nagad|account_no)', re.I)
 PERS_T = re.compile(r'(customer|supplier|party|crm|inbound|web_order|message|contact|lead|birthday|loyalty|inbox|whatsapp|telegram|donor|vendor)', re.I)
 PERS_C = re.compile(r'(mobile|phone|email|address|birthday|anniversary|whatsapp|full_name|customer_name|contact)', re.I)
 FIN_T = re.compile(r'(sale|purchase|journal|coa|acct|cash|payment|stock|cost|price|invoice|bill|order|ledger|expense|asset|receiv|payab|tax|vat|grn|landed|refund|return|wastage|batch|recipe|production|transfer|budget|period|bank)', re.I)
