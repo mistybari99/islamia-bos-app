@@ -1,0 +1,163 @@
+PASS S0 opening journal posted 
+RULES_SET_AFTER_S1: accounting_autopost=true, accounting_on=true, accounting_start_date="2026-10-19", vat_on=true, vat_prices_include=true, vat_rate=5
+PASS P1 bill total = 100*40+60*80+200*5 exp=9800 act=9800.00
+PASS P1 flour qty exp=100 act=100.0000
+PASS P1 flour avg cost exp=40 act=40.000000
+PASS P1 supplier owes 9800 (supplier_dues) exp=9800 act=9800.00
+PASS P1 GL inventory raw + packaging (1320+1330) = 9800 exp=9800 act=9800.00
+PASS P1 GL supplier payable 2100 credit 9800 exp=-9800 act=-9800.00
+PASS P2 landed stock_added = freight 490 exp=490 act=490.00
+PASS P2 flour landed avg = 40 + 0.05*40 exp=42 act=42.000000
+PASS P2 sugar landed avg = 80 + 0.05*80 exp=84 act=84.000000
+PASS P2 box landed avg = 5 + 0.05*5 exp=5.25 act=5.250000
+PASS P2 GL inventory 1320+1330 = 9800 + 490 exp=10290 act=10290.00
+FAIL P2 transporter payable 490 (supplier_dues of the second supplier) exp=490 act=0
+PASS G1 GRN 13-1 approved exp=approved act=approved
+PASS G1 tape qty after GRN exp=10 act=10.0000
+PASS G1 bill without GRN link refused (grn_link_required)
+PASS G1 tape qty after linked bill (counted once) exp=10 act=10.0000
+PASS G1 GL inventory incl tape = 10290 + 30 exp=10320 act=10320.00
+PASS G1 supplier one owes 9800 + 30 exp=9830 act=9830.00
+FAIL P3 pay_supplier for the transporter owed 490 by the party ledger (DEFECT D1 if this errors: supplier_dues does not see landed charges) (overpaid)
+PASS M1 recipe_cost A unit cost = (5*42+4*84+2*5.25+100+50)/10 exp=70.6500000000000000 act=70.650000
+PASS M2 yield A = 3 batches x 10 kg exp=30 act=30.0000
+PASS M2 yield B = 2 x 5 kg exp=10 act=10.0000
+PASS M2 flour left 100 - (5*3 + 3*2) exp=79 act=79.0000
+PASS M2 sugar left 60 - (4*3 + 2*2) exp=44 act=44.0000
+PASS M2 box left 200 - (2*3 + 1*2) exp=192 act=192.0000
+PASS M2 cost A = (5*42+4*84+2*5.25+150)/10 exp=70.65 act=70.650000
+PASS M2 cost B = (3*42+2*84+5.25+80)/5 exp=75.85 act=75.850000
+PASS M3 GL finished goods 1310 = 30*70.65 + 10*75.85 exp=2878.00 act=2878.00
+PASS M3 GL raw+packaging after use = 10320 - 2268 (incl. test_tape 30) exp=8052.00 act=8052.00
+PASS M3 overhead absorbed (5950 credit) = 3*150 + 2*80 exp=-610 act=-610.00
+PASS T1 factory A after send 30-20-8 exp=2 act=2.0000
+PASS T1 showroom 1 A not yet received exp=0 act=0
+PASS T1 in transit A = 28 kg (stock_in_transit) exp=28 act=28
+PASS T2 showroom 1 A = 20 exp=20 act=20.0000
+PASS T2 showroom 1 B = 8 exp=8 act=8.0000
+PASS T2 showroom 3 A = 7.5 (short 0.5) exp=7.5 act=7.5000
+PASS T2 showroom 1 A cost carried = 70.65 exp=70.65 act=70.650000
+PASS T2 showroom 3 A cost carried = 70.65 (short kg does not change unit cost) exp=70.65 act=70.650000
+PASS T2 transit_short exception count exp=1 act=1
+FAIL T3 per-place stock valuation total (stock_valuation all places) = GL inventory 1310+1320+1330 [short kg 0.5 x 70.65 is lost: stock gone, GL must show 5130 or stay in inventory] exp=10894.6750000000 act=10930.00
+FAIL T3 short loss to 5130 (hand 0.5 x 70.65 = 35.325) - on by default? exp=35.325 act=0
+PASS X0 a salesperson cannot give a discount of 50 when no limit is written (control works: discount_needs_approval) (discount_needs_approval)
+PASS X1 S1 total exp=800 act=800.00
+PASS X1 S3 wallet total exp=600 act=600.00
+PASS X1 S4 total 1200 exp=1200 act=1200.00
+PASS X1 S4 due = 1200 - 500 exp=700 act=700.00
+PASS X1 S5 total after discount 50 exp=950 act=950.00
+PASS X1 S6 total exp=1600 act=1600.00
+PASS X2 showroom 1 A exp=13.6 act=13.6000
+PASS X2 showroom 1 B exp=5 act=5.0000
+PASS X2 showroom 3 A exp=3.5 act=3.5000
+PASS X2 customer due after collection = 700 - 300 exp=400 act=400.00
+PASS A1 GL sales 4100 (gross at list price) = 2600+1500 at showroom 1 + 1600 at showroom 3 exp=-5700 act=-5700.00
+PASS A1 GL discount 4120 exp=50 act=50.00
+PASS A1 GL returns 4110 exp=200 act=200.00
+PASS A1 cash 1110 showroom 1 exp=22350 act=22350.00
+PASS A1 cash 1110 showroom 3 exp=1600 act=1600.00
+PASS A1 card receivable 1140 = card sale exp=500 act=500.00
+PASS A1 wallet 1130 (bKash-style) exp=600 act=600.00
+PASS A1 customer receivable 1210 = 700 due - 300 collected exp=400 act=400.00
+PASS A1 COGS 5000 = A 6.5kg*70.65 + B 3kg*75.85 + loc3 A 4kg*70.65 - return 0.5kg*70.65 exp=934.050 act=934.05
+PASS A1 wastage 5100 = 0.4 kg x 70.65 exp=28.260 act=28.26
+PASS A1 trial balance: unbalanced entries exp=0 act=0
+PASS A1 trial balance report: debit = credit 136630.00 vs 136630.00
+FAIL A2 inventory: ledger value (all places) = GL 1310+1320+1330 exp=9932.3650000000 act=9967.69
+FAIL A2 inventory place 6 (factory): ledger value = GL tagged to place 6 exp=8345.0000000000 act=10930.00
+FAIL A2 inventory place 1 (showroom 1): ledger value = GL tagged to place 1 exp=1340.0900000000 act=-679.71
+FAIL A2 inventory place 3 (showroom 3): ledger value = GL tagged to place 3 exp=247.2750000000 act=-282.60
+PASS G2 biz_daily place 1 revenue (after returns) exp=3850 act=3850.00
+PASS G2 biz_daily place 1 COGS exp=651.45 act=651.45
+PASS G2 biz_daily place 3 revenue exp=1600 act=1600.00
+PASS G2 biz_daily place 3 COGS exp=282.60 act=282.60
+FAIL G3 sales_summary place 1 gp = revenue after returns - COGS after returns (3850 - 651.45) exp=3198.55 act=3363.22
+PASS G3 sales_summary place 3 gp = 1600 - 282.6 exp=1317.40 act=1317.40
+PASS D1 daily sheet saved 
+COUNT_SAVE_RESULT_FOR_MAKER: {"diff": -10, "match": false, "counted": 2340, "section": "drawer", "expected": 2350}
+FAIL D1 maker sees no expected figure after counting (blind) 
+PASS D2 stored expected drawer cash exp=2350 act=2350
+PASS D2 stored counted exp=2340 act=2340
+PASS D2 stored difference (short) exp=-10 act=-10
+PASS D2 expected cash by the POS day-close report equals the typed expectation exp=2350 act=2350.00
+PASS D2 exception cash_short_over raised with amount -10 exp=1 act=1
+PASS D2 sheet approved by the owner (a different login) exp=approved act=approved
+FAIL D3 the 10 short is in the books (5800 cash short/over, Dr 10) - posted by default? exp=10 act=0
+FAIL D3 cash 1110 showroom 1 after the short exp=22340 act=22350.00
+PASS D4 day book vs journal: total difference for place 1 on the day exp=0 act=0.00
+PASS P4 supplier one owes 9830 - 5000 exp=4830 act=4830.00
+PASS P4 GL supplier payable 2100 (supplier one 4830) exp=-4830 act=-4830.00
+PASS P4 bank 1120 = 100000 - 5000 exp=95000 act=95000.00
+PASS P4 pay more than owed is refused (overpaid)
+PASS W1 worker A net pay = round(6000 - 2*6000/days) exp=5613 act=5613
+PASS W1 staff B net pay exp=4000 act=4000
+PASS W2 GL salaries 5200 = net pay of both (payroll_accrual_on off = expense at payment) exp=9613 act=9613.00
+PASS W2 bank after salary of A and supplier payment exp=89387 act=89387.00
+FAIL W2 cash showroom 1 after salary of B exp=18340 act=18350.00
+PASS W2 payroll sheet: both runs paid exp=2 act=2
+PASS V1 output VAT = round(5650*5/105,2) - round(200*5/105,2) exp=259.53 act=259.53
+PASS V1 input VAT = round(9830*5/105,2) (freight 490 is not in the bills) exp=468.10 act=468.10
+PASS V1 net VAT payable exp=-208.57 act=-208.57
+PASS V2 VAT is a memo only: GL VAT payable 2800 and input 1240 stay 0 exp=0 act=0
+PASS F1 P&L revenue (net of returns and discount) exp=5450 act=5450.00
+PASS F1 P&L COGS exp=934.05 act=934.05
+PASS F1 P&L gross profit exp=4515.95 act=4515.95
+FAIL F1 P&L net profit (every cost the stock and drawer lost is in) exp=-4560.635 act=-4515.31
+PASS F2 balance sheet balances (difference 0) 0.00
+PASS F2 retained earnings = P&L net profit exp=-4515.31 act=-4515.31
+FAIL F2 total assets = cash 18340+1600, bank 89387, wallet 600, card 500, receivable 400, inventory 9932.365 (all costs booked) exp=120759.365 act=120804.69
+PASS F2 total liabilities = supplier 4830 + freight payable 490 exp=5320 act=5320.00
+FAIL F2 equity + earnings = 120000 + correct net profit exp=115439.365 act=115484.69
+PASS R1 payment_modes: sale cash+card+mobile = money taken = 5650 net of discount less 700 on credit exp=4950 act=4950.00
+PASS R2 customer_dues report = receivable account 1210 exp=400.00 act=400.00
+PASS R3 supplier_ageing = supplier payable 2100 exp=4830.00 act=4830.00
+PASS R4 stock_balance report value = ledger value by hand (3318+3696+1008+30+141.3+151.7+960.84+379.25+247.275) exp=9932.365 act=9932.37
+PASS R5 l1_pnl profit, both places = revenue after returns - COGS (less salaries only when report_salary_source = app_first) exp=4515.95 act=4515.95
+PASS R6 l3_shop_pnl profit place 3 exp=1317.40 act=1317.40
+PASS R7 l2_margin sweet A, both places: margin = 4000 - 10 kg*70.65 exp=3293.50 act=3293.50
+PASS R7 l2_margin sweet B, margin = 1450 - 3*75.85 exp=1222.45 act=1222.45
+PASS R8 l2_margin place 1 only, sweet A: margin = 2400 - 6*70.65 exp=1976.10 act=1976.10
+PASS R9 wastage report value exp=28.260 act=28.26
+PASS R10 wastage in GL 5100 = wastage report exp=28.26 act=28.26
+PASS R11 transfers_gap short qty exp=0.5 act=0.500
+FAIL R12 transfers short value in the books = 0.5 kg x 70.65 (5130) exp=35.325 act=0
+PASS R13 wallet_recon bKash total exp=600 act=600.00
+PASS R14 cash_short_over report = -10 exp=-10 act=-10
+PASS R15 w1_cash_flow cash in (both places, sales cash + collection) exp=4150 act=4150.00
+PASS R16 acct_overview / inventory_vs_gl unexplained difference exp=0 act=0.00
+PASS R17 stock_recon_period: every item row obeys opening + movements = closing (sum of identity_diff and unclassified) exp=0 act=0.0000
+PASS R18 stock_reconcile: items whose cached balance differs from the ledger exp=0 act=0
+PASS R18b c2_salary_basis (paid payroll runs) = 9613 net pay + advance recovery exp=9613 act=9613
+FAIL R18c t3_payroll (staff cost report) shows the paid payroll runs exp=9613 act=0
+PASS R19 profit_source_check agrees (report COGS = journal COGS) exp=1 act=1
+PASS R20 acct_party_ledger customer: balance 400 exp=400 act=400.00
+PASS R21 catalogue reports that raise an error exp=0 act=0
+PASS R22 report hub metrics call works 
+PASS K1 flour counted 78 against book 79: book becomes 78 exp=78 act=78.0000
+FAIL K2 count loss in the books 5110 = 1 kg x 42 (posted by default? switch acct_count_adjust) exp=42 act=0
+PASS K3 voided sale: showroom 3 stock back to 7.5 exp=7.5 act=7.5000
+PASS K3 voided sale: cash showroom 3 back to 0 exp=0 act=0.00
+PASS K3 trial balance still balanced exp=0 act=0
+PASS Z1 unbalanced journal entries exp=0 act=0
+PASS Z2 journal total debit = credit exp=0 act=0.00
+SUMMARY mode=def pass=122 fail=19
+FAILLIST 13 | P2 transporter payable 490 (supplier_dues of the second supplier) | exp=490 | act=0
+FAILLIST 20 | P3 pay_supplier for the transporter owed 490 by the party ledger (DEFECT D1 if this errors: supplier_dues does not see landed charges) | exp=error zzz_expect_success | act=overpaid
+FAILLIST 41 | T3 per-place stock valuation total (stock_valuation all places) = GL inventory 1310+1320+1330 [short kg 0.5 x 70.65 is lost: stock gone, GL must show 5130 or stay in inventory] | exp=10894.6750000000 | act=10930.00
+FAILLIST 42 | T3 short loss to 5130 (hand 0.5 x 70.65 = 35.325) - on by default? | exp=35.325 | act=0
+FAILLIST 66 | A2 inventory: ledger value (all places) = GL 1310+1320+1330 | exp=9932.3650000000 | act=9967.69
+FAILLIST 67 | A2 inventory place 6 (factory): ledger value = GL tagged to place 6 | exp=8345.0000000000 | act=10930.00
+FAILLIST 68 | A2 inventory place 1 (showroom 1): ledger value = GL tagged to place 1 | exp=1340.0900000000 | act=-679.71
+FAILLIST 69 | A2 inventory place 3 (showroom 3): ledger value = GL tagged to place 3 | exp=247.2750000000 | act=-282.60
+FAILLIST 74 | G3 sales_summary place 1 gp = revenue after returns - COGS after returns (3850 - 651.45) | exp=3198.55 | act=3363.22
+FAILLIST 77 | D1 maker sees no expected figure after counting (blind) | exp=true | act=false
+FAILLIST 84 | D3 the 10 short is in the books (5800 cash short/over, Dr 10) - posted by default? | exp=10 | act=0
+FAILLIST 85 | D3 cash 1110 showroom 1 after the short | exp=22340 | act=22350.00
+FAILLIST 95 | W2 cash showroom 1 after salary of B | exp=18340 | act=18350.00
+FAILLIST 104 | F1 P&L net profit (every cost the stock and drawer lost is in) | exp=-4560.635 | act=-4515.31
+FAILLIST 107 | F2 total assets = cash 18340+1600, bank 89387, wallet 600, card 500, receivable 400, inventory 9932.365 (all costs booked) | exp=120759.365 | act=120804.69
+FAILLIST 109 | F2 equity + earnings = 120000 + correct net profit | exp=115439.365 | act=115484.69
+FAILLIST 122 | R12 transfers short value in the books = 0.5 kg x 70.65 (5130) | exp=35.325 | act=0
+FAILLIST 130 | R18c t3_payroll (staff cost report) shows the paid payroll runs | exp=9613 | act=0
+FAILLIST 136 | K2 count loss in the books 5110 = 1 kg x 42 (posted by default? switch acct_count_adjust) | exp=42 | act=0
