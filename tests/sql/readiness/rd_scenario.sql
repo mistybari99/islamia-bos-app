@@ -146,7 +146,9 @@ select tt.eq('G1 GL inventory incl tape = 10290 + 30', 10320, tt.bal('1320')+tt.
 select tt.eq('G1 supplier one owes 9800 + 30', 9830, (select balance from supplier_dues(6) where supplier_id=:'sup1'::uuid));
 
 \echo == P3 pay the transporter (freight payable, credited to 2150 with the transporter as party)
-select tt.err('P3 pay_supplier for the transporter owed 490 by the party ledger (DEFECT D1 if this errors: supplier_dues does not see landed charges)', format($$select pay_supplier('%s'::uuid,6,'[{"mode":"cash","amount":490}]'::jsonb)$$, :'sup2'), 'zzz_expect_success');
+select pay_supplier(:'sup2'::uuid,6,'[{"mode":"cash","amount":490}]'::jsonb) as p3 \gset
+select tt.eq('P3 pay_supplier pays the transporter 490 (phase 549; before it raised overpaid, defect D1) and nothing is left owed', 0, (:'p3'::jsonb->>'balance')::numeric);
+select tt.eq('P3 the payment settles landed charges 490 (landed_part)', 490, (select coalesce(sum(landed_part),0) from supplier_payments where supplier_id=:'sup2'::uuid and not voided));
 
 \echo == M production at the factory (place 6): recipe cost + overhead (conversion) per batch
 select tt.as(:'o');
@@ -245,6 +247,7 @@ select tt.eq('A1 customer receivable 1210 = 700 due - 300 collected', 400, tt.ba
 select tt.eq('A1 COGS 5000 = A 6.5kg*70.65 + B 3kg*75.85 + loc3 A 4kg*70.65 - return 0.5kg*70.65', 6.5*70.65+3*75.85+4*70.65-0.5*70.65, tt.bal('5000'), 0.01);
 select tt.eq('A1 wastage 5100 = 0.4 kg x 70.65', 0.4*70.65, tt.bal('5100'), 0.01);
 select tt.eq('A1 trial balance: unbalanced entries', 0, tt.unbalanced());
+select tt.eq('P3b account 2150 freight payable is 0 after the payment (Dr 2150, Cr cash)', 0, tt.bal('2150'));
 select acct_trial_balance(tt.today()-5, tt.today(), null) as tb \gset
 select tt.t('A1 trial balance report: debit = credit', (:'tb'::jsonb->>'balanced')::boolean, 'balanced', (:'tb'::jsonb->>'total_debit')||' vs '||(:'tb'::jsonb->>'total_credit'));
 -- inventory: quantity ledger value = GL, in total and place by place
@@ -346,8 +349,8 @@ select tt.eq('F1 P&L net profit (every cost the stock and drawer lost is in)', 5
 select acct_balance_sheet(tt.today(), null) as bs \gset
 select tt.t('F2 balance sheet balances (difference 0)', (:'bs'::jsonb->>'difference')::numeric = 0 and not (:'bs'::jsonb->>'unbalanced')::boolean, 'diff 0', :'bs'::jsonb->>'difference');
 select tt.eq('F2 retained earnings = P&L net profit', (:'ist'::jsonb->>'net_profit')::numeric, (:'bs'::jsonb->>'retained_earnings')::numeric, 0.01);
-select tt.eq('F2 total assets = cash 18340+1600, bank 89387, wallet 600, card 500, receivable 400, inventory 9932.365 (all costs booked)', 18340+1600+89387+600+500+400+9932.365, (:'bs'::jsonb->>'total_assets')::numeric, 0.02, 'def: transit short and cash short unbooked, inventory overstated by 35.325 and cash by 10');
-select tt.eq('F2 total liabilities = supplier 4830 + freight payable 490', 4830+490, (:'bs'::jsonb->>'total_liabilities')::numeric, 0.01);
+select tt.eq('F2 total assets (less the 490 cash paid to the transporter in P3) = cash 18340+1600, bank 89387, wallet 600, card 500, receivable 400, inventory 9932.365 (all costs booked)', 18340+1600+89387+600+500+400+9932.365-490, (:'bs'::jsonb->>'total_assets')::numeric, 0.02, 'def: transit short and cash short unbooked, inventory overstated by 35.325 and cash by 10');
+select tt.eq('F2 total liabilities = supplier 4830 (freight payable 490 was paid in P3)', 4830, (:'bs'::jsonb->>'total_liabilities')::numeric, 0.01);
 select tt.eq('F2 equity + earnings = 120000 + correct net profit', 120000 + (5450-934.05-28.26-0.5*70.65-10-:sal+610), (:'bs'::jsonb->>'total_equity_and_earnings')::numeric, 0.02);
 select acct_cash_flow(tt.today()-5, tt.today(), null) as cf \gset
 \echo CASH_FLOW_JSON: :cf
