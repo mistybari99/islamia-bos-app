@@ -1,3 +1,5 @@
+> **Finished 24 Oct 2026** on branch `Main-Img-v2`: the full `tests/web` suite was run (177 files, 16 superseded skipped), the two remaining failures were fixed (`form_names_test` regex, `info.json` backup_accounts_on why), the BUILD-LOG entry was added. Result 177 of 177 pass. The notes below are the earlier state.
+
 # WIP handoff: web test fixes (branch fix/web-tests, from Main-Img 8ff9d92). Nothing pushed.
 
 Rerun one test: `node tests/web/<name>_test.js` (from the repo root; no argument needed). Tests overwrite tracked PNGs in tests/web: run `git checkout -- '*.png'; git clean -fq -- 'tests/web/*.png'` afterwards.

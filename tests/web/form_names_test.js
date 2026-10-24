@@ -45,7 +45,7 @@ ok(noKit.length === 0, 'every NN-1 form has a form-kit title' + (noKit.length ? 
 
 // 4. the kit title is the short name from the map (Bangla and English), to review
 const titleOf = (code) => {
-  const m = kitSrc.match(new RegExp("B\\.forms\\['" + code + "'\\]\\s*=\\s*\\{\\s*title:\\s*L\\(('(?:[^'\\\\]|\\\\.)*'),\\s*('(?:[^'\\\\]|\\\\.)*')\\)"));
+  const m = kitSrc.match(new RegExp("B\\.forms\\['" + code + "'\\]\\s*=\\s*\\{\\s*title:\\s*L\\(('(?:[^'\\\\]|\\\\.)*'),\\s*('(?:[^'\\\\]|\\\\.)*')(?:,\\s*'(?:[^'\\\\]|\\\\.)*')?\\)"));
   if (!m) return null;
   const unq = (q) => q.slice(1, -1).replace(/\\'/g, "'").replace(/\\\\/g, '\\');
   return { bn: unq(m[1]), en: unq(m[2]) };
