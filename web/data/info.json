@@ -7843,6 +7843,33 @@
    "warn": "Payment screenshots are personal. Photos are not encrypted in the backup; the repository must stay private.",
    "verified": true,
    "src": "phase547.sql; docs/BACKUP_AND_RESTORE_GUIDE.md"
+  },
+  "rule:blind_count_on": {
+   "title": "Count first: hide the expected figure until the count is saved",
+   "does": "When ON, the person who counts the cash drawer (06-1, 03-1) or the goods (13-1, 36-1) types the counted figure first; the expected figure and the difference appear only after the count is saved.",
+   "why": "The owner's rule of 11 Oct 2026: handovers are counted first, so a short or an over is never adjusted to the system figure.",
+   "default": "ON (since phase 552; before it was OFF). The owner can switch it OFF here, or per form and place in the count settings.",
+   "change": "Applies to the next count. A count already saved is not changed. A value the owner set earlier stays as set.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:owner_sees_expected_first",
+    "rule:drawer_expected_source"
+   ],
+   "verified": true,
+   "src": "phase18.sql; phase552.sql; docs/DECISIONS.md"
+  },
+  "rule:drawer_expected_source": {
+   "title": "Where the drawer's expected cash comes from",
+   "does": "typed: from the figures typed on the daily sheet (as before). pos_compare: the same, and an exception when the sheet differs from the POS. pos: taken from the POS day close.",
+   "why": "A typed expectation can hide a short; the POS already knows the cash taken.",
+   "default": "typed. Nothing changes until the owner picks another value.",
+   "change": "Applies to the next count and the next submit.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:blind_count_on"
+   ],
+   "verified": true,
+   "src": "phase552.sql"
   }
  }
 }

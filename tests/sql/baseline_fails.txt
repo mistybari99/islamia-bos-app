@@ -8,7 +8,7 @@ phase14 0 153
 phase15 1 113
 phase16 0 167
 phase17 0 147
-phase18 0 108
+phase18 1 107   # 24 Oct 2026: T0 "switches default OFF" fails by design since phase 552 (blind_count_on default ON, owner decision 11 Oct)
 phase19 1 93
 phase20 0 63
 phase21 1 75

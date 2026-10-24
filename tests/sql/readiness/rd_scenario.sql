@@ -284,6 +284,13 @@ select tt.eq('D2 stored expected drawer cash', 4050-1100+300-200-700, (select ex
 select tt.eq('D2 stored counted', 2340, (select counted from entry_counts where entry_id=:'dc'::uuid and section='drawer'));
 select tt.eq('D2 stored difference (short)', -10, (select diff from entry_counts where entry_id=:'dc'::uuid and section='drawer'));
 select tt.eq('D2 expected cash by the POS day-close report equals the typed expectation', 4050-1100+300-200-700, (select (x->>'expected_cash_after_refunds')::numeric from jsonb_array_elements(report_run('pos_day_close', jsonb_build_object('from',tt.today(),'to',tt.today()), null,null,1,false)->'rows') x where (x->>'location_id')::int=1));
+select tt.eq('D9 POS cash of the place and day (cash taken + collections - cash refunds) = the typed expectation 2350 (phase 552)', 4050-1100+300-200-700, _p552_pos_cash(1, tt.today()));
+select tt.eq('D9 POS-based expectation of the sheet = 2350', 2350, (select _p552_pos_expected(e, _count_inputs18(e,'drawer')) from entries e where e.id=:'dc'::uuid));
+select tt.t('D9 pos_compare: no exception when the typed expectation equals the POS', (select jsonb_array_length(_p552_flags(e, 2350, '[]'::jsonb)) = 0 from entries e where e.id=:'dc'::uuid));
+select set_rule('drawer_expected_source','"pos_compare"') is null as d9a \gset
+select tt.t('D9 pos_compare: exception drawer_typed_vs_pos when the typed expectation (2400) differs from the POS (2350)', (select _p552_flags(e, 2400, '[]'::jsonb) -> 0 ->> 'code' = 'drawer_typed_vs_pos' and (_p552_flags(e, 2400, '[]'::jsonb) -> 0 ->> 'amount')::numeric = 50 from entries e where e.id=:'dc'::uuid));
+select set_rule('drawer_expected_source','"typed"') is null as d9b \gset
+select tt.t('D9 typed (default): never an exception', (select jsonb_array_length(_p552_flags(e, 2400, '[]'::jsonb)) = 0 from entries e where e.id=:'dc'::uuid));
 select tt.eq('D2 exception cash_short_over raised with amount -10', 1, (select count(*) from exceptions where entry_id=:'dc'::uuid and flag_code='cash_short_over' and amount=-10));
 select decide_entry(:'dc'::uuid, true, null, null, '[]') ->> 'status' as dd \gset
 select tt.is('D2 sheet approved by the owner (a different login)', 'approved', :'dd');
