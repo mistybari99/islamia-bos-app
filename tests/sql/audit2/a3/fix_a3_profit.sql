@@ -33,8 +33,8 @@ with x as (insert into payroll_runs (month, location_id, status) values (date_tr
 with x as (insert into payroll_lines (run_id, month, employee_id, location_id, net, advance_recovery, gross) values (:'fx_run', date_trunc('month', tt.today())::date, :'fx_emp', 3, 1000, 0, 1000) returning id) select id as fx_ln from x \gset
 select payroll_pay(:'fx_run'::bigint, array[:'fx_ln'::bigint], 'cash', tt.today(), 'fx3', null, gen_random_uuid(), 1000) is not null as fx_pay \gset
 select format('{"month":"%s","year":"%s","pay":[{"name":"S2 Clerk - Clerk","due":400}]}', extract(month from tt.today())::int, extract(year from tt.today())::int) as fx_sheetdata \gset
-insert into entries (form_code,location_id,serial,entry_date,status,data,flags,created_by,created_staff) values ('02-2',3,8193,tt.today(),'approved',:'fx_sheetdata'::jsonb,'[]',:'o','st');
-select id as fx_sheet from entries where form_code='02-2' and serial=8193 \gset
+insert into entries (form_code,location_id,serial,entry_date,status,data,flags,created_by,created_staff) values ('21-1',3,8193,tt.today(),'approved',:'fx_sheetdata'::jsonb,'[]',:'o','st');
+select id as fx_sheet from entries where form_code='21-1' and serial=8193 \gset
 select tt.t('FX3-G2 S2 salary is ONE of the two records (1000 app or 400 sheet), never 1400',
   coalesce(tt.safe_num(format($q$select (r->>'salary')::numeric from jsonb_array_elements(profit_truth112('%s'::date,'%s'::date,3)->'rows') r where r->>'location_id'='3'$q$, :'fm1', :'fm2')) in (1000, 400), false));
 select tt.t('FX3-G2 the sheet and the app record were linked as one expense by the system (shadow_links)',

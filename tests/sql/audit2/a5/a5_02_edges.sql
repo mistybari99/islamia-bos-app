@@ -154,7 +154,7 @@ select tt.eq('E11e GL wastage account 5100 at A includes 8 x 40 = 320 more (70 e
 \echo == E12 form 03-1 (transfer challan) vs screen: default primary = screen, form is a reference
 select tt.as(:'o');
 select tt.is('E12-0 forms_post_to_ledger is OFF by default', 'false', rule_on('forms_post_to_ledger')::text);
-select save_entry(null,'03-1',1,tt.today(),'{"from_loc":"1","to_loc":"2","ttype":"f2s","items":[{"item":"A5-Y","sent":"3"}]}','[]') ->> 'id' as f1 \gset
+select save_entry(null,'39-1',1,tt.today(),'{"from_loc":"1","to_loc":"2","ttype":"f2s","items":[{"item":"A5-Y","sent":"3"}]}','[]') ->> 'id' as f1 \gset
 select submit_entry(:'f1'::uuid) is not null as fs \gset
 select decide_entry(:'f1'::uuid, true, null, '{"items":[{"received":"3"}]}'::jsonb, '[]') ->> 'status' as fd \gset
 select tt.is('E12a approved 03-1 with the switch OFF moves no stock (0 ledger posts)', '0', (select count(*) from entry_ledger_posts where entry_id=:'f1'::uuid)::text);
@@ -162,7 +162,7 @@ select set_rule('forms_post_to_ledger','true') is null as fp \gset
 select tt.is('E12b with the switch ON the path_primary for stock_transfer flips to b (form posts)', 'b', path_primary('stock_transfer',1));
 select count(*) as xs0 from exceptions where flag_code='transit_short' \gset
 select qty as a_before from stock_balance where item_id=tt.iid('A5-Y') and location_id=2 \gset
-select save_entry(null,'03-1',1,tt.today(),'{"from_loc":"1","to_loc":"2","ttype":"f2s","items":[{"item":"A5-Y","sent":"10"}]}','[]') ->> 'id' as f2 \gset
+select save_entry(null,'39-1',1,tt.today(),'{"from_loc":"1","to_loc":"2","ttype":"f2s","items":[{"item":"A5-Y","sent":"10"}]}','[]') ->> 'id' as f2 \gset
 select submit_entry(:'f2'::uuid) is not null as fs2 \gset
 select decide_entry(:'f2'::uuid, true, null, '{"items":[{"received":"7"}]}'::jsonb, '[]') ->> 'status' as fd2 \gset
 select tt.eq('E12c form with sent 10 / received 7 puts +7 at A at once (one-step challan)', 7, (select qty from stock_balance where item_id=tt.iid('A5-Y') and location_id=2)-:'a_before'::numeric);

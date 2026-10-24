@@ -39,8 +39,10 @@ select tt.eq('L1 flour qty unchanged', 300, tt.qty('RM-F'));
 \echo -- GRN vs bill guard on Salt (source=grn)
 select set_rule('forms_post_to_ledger','true') is null as fpl \gset
 select set_rule('grn_receipt_source','"grn"') is null as grs \gset
+-- phase 552: count-first is ON by default (owner decision 11 Oct 2026), so a goods receipt (13-1) needs its sealed count. This block tests the GRN guard, not the count: count-first is switched off here and back to its default below.
+select set_rule('blind_count_on','false') is null as bco \gset
 -- guard OFF: GRN 10 kg @20 + bill 10 kg @20 -> hand: 20 kg (double count is the documented risk)
-select save_entry(null,'04-1',1,tt.today(),'{"supplier":"Sup Main","lines":[{"item":"RM-SALT","counted":"10","rate":"20","quality":"accept"}]}','[]') ->> 'id' as g1 \gset
+select save_entry(null,'13-1',1,tt.today(),'{"supplier":"Sup Main","lines":[{"item":"RM-SALT","counted":"10","rate":"20","quality":"accept"}]}','[]') ->> 'id' as g1 \gset
 select submit_entry(:'g1'::uuid) is not null as sg1 \gset
 select decide_entry(:'g1'::uuid, true, null, null, '[]') ->> 'status' as dg1 \gset
 select tt.eq('G1 after GRN only salt', 10, tt.qty('RM-SALT'));
@@ -51,7 +53,7 @@ select rule_txt('purchase_grn_guard') as grd0 \gset
 \echo GRN_GUARD_DEFAULT_RULE=:grd0
 -- guard SKIP: GRN 5 + bill 5 -> +5 only
 select set_rule('purchase_grn_guard','"skip"') is null as gs \gset
-select save_entry(null,'04-1',1,tt.today(),'{"supplier":"Sup Main","lines":[{"item":"RM-SALT","counted":"5","rate":"20","quality":"accept"}]}','[]') ->> 'id' as g2 \gset
+select save_entry(null,'13-1',1,tt.today(),'{"supplier":"Sup Main","lines":[{"item":"RM-SALT","counted":"5","rate":"20","quality":"accept"}]}','[]') ->> 'id' as g2 \gset
 select submit_entry(:'g2'::uuid) is not null as sg2 \gset
 select decide_entry(:'g2'::uuid, true, null, null, '[]') ->> 'status' as dg2 \gset
 select save_purchase(null,null,:'s1'::uuid,1,'B-SALT2',tt.today(),format('[{"item_id":"%s","qty":5,"unit":"kg","unit_cost":20}]',tt.iid('RM-SALT'))::jsonb) ->> 'id' as bs2 \gset
@@ -60,7 +62,7 @@ select tt.eq('G2 guard SKIP: GRN 5 + bill 5 -> 25 total (+5, not +10)', 25, tt.q
 select tt.is('G2 bill says stock came from the GRN', 'true', :'flag');
 -- guard LINK: bill without link refused, with link posts +7 once
 select set_rule('purchase_grn_guard','"link"') is null as gl \gset
-select save_entry(null,'04-1',1,tt.today(),'{"supplier":"Sup Main","lines":[{"item":"RM-SALT","counted":"7","rate":"20","quality":"accept"}]}','[]') ->> 'id' as g3 \gset
+select save_entry(null,'13-1',1,tt.today(),'{"supplier":"Sup Main","lines":[{"item":"RM-SALT","counted":"7","rate":"20","quality":"accept"}]}','[]') ->> 'id' as g3 \gset
 select submit_entry(:'g3'::uuid) is not null as sg3 \gset
 select decide_entry(:'g3'::uuid, true, null, null, '[]') ->> 'status' as dg3 \gset
 select save_purchase(null,null,:'s1'::uuid,1,'B-SALT3',tt.today(),format('[{"item_id":"%s","qty":7,"unit":"kg","unit_cost":20}]',tt.iid('RM-SALT'))::jsonb) ->> 'id' as bs3 \gset
@@ -71,6 +73,7 @@ select tt.eq('G3 guard LINK after link: +7 once -> 32', 32, tt.qty('RM-SALT'));
 select set_rule('purchase_grn_guard','"off"') is null as go \gset
 select set_rule('grn_receipt_source','"purchase"') is null as grs2 \gset
 select set_rule('forms_post_to_ledger',null) is null as fpl2 \gset
+select set_rule('blind_count_on',null) is null as bco2 \gset   -- back to the default (ON)
 
 \echo -- auto_cash: bill posts and pays itself (Salt 4 kg @ 20 = 80)
 select set_rule('purchase_bill_creates_payment','"auto_cash"') is null as ac \gset

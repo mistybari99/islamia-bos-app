@@ -124,12 +124,12 @@ select tt.as(:'o');
 
 \echo -- show / hide / locked does not change grants
 select md5((select coalesce(string_agg(t::text,',' order by t::text),'') from user_grants t)||(select string_agg(t::text,',' order by t::text) from role_form_perms t)||(select string_agg(t::text,',' order by t::text) from rule_grants t)||(select string_agg(t::text,',' order by t::text) from user_roles t)) as snap0 \gset
-select set_option_view(:'sp'::uuid,'f:14-1','hide',gen_random_uuid()) is not null as h1 \gset
-select set_option_view(:'sp'::uuid,'f:20-1','locked',gen_random_uuid()) is not null as h2 \gset
+select set_option_view(:'sp'::uuid,'f:06-1','hide',gen_random_uuid()) is not null as h1 \gset
+select set_option_view(:'sp'::uuid,'f:05-1','locked',gen_random_uuid()) is not null as h2 \gset
 select option_views_for_user(:'sp'::uuid) as ov \gset
 select md5((select coalesce(string_agg(t::text,',' order by t::text),'') from user_grants t)||(select string_agg(t::text,',' order by t::text) from role_form_perms t)||(select string_agg(t::text,',' order by t::text) from rule_grants t)||(select string_agg(t::text,',' order by t::text) from user_roles t)) as snap1 \gset
 select tt.is('Y3 grants / form perms / role grants identical after hide + locked', :'snap0', :'snap1');
-select tt.t('Y3 hidden/locked recorded as views only', (:'ov'::jsonb->'overrides')::text like '%14-1%', 'recorded', left((:'ov'::jsonb->'overrides')::text,100));
+select tt.t('Y3 hidden/locked recorded as views only', (:'ov'::jsonb->'overrides')::text like '%06-1%', 'recorded', left((:'ov'::jsonb->'overrides')::text,100));
 select tt.t('Y3 effective permission POS enter unchanged for sp', (:'ov'::jsonb->'perms'->'POS'->>'enter')='true', 'true', (:'ov'::jsonb->'perms'->'POS'->>'enter'));
 select tt.as(:'sp');
 select tt.t('Y3 the seller can still sell with a hidden/locked form (permission untouched)', record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":1,"price":300}]',tt.iid('FG-CAKE'))::jsonb,0,'[{"mode":"cash","amount":300}]',null,null,'retail',null,false) is not null);

@@ -59,8 +59,8 @@ select stock_wastage(tt.iid('FG-A'),3,1,'spoiled','a3 waste') is not null as wg 
 select card_settle(2, tt.today(), 360, 7.2, 'a3 batch', gen_random_uuid()) is not null as cs \gset
 -- salary: S1 300 (booked to showroom 1), factory 200 ; sheet 02-2 is what the P&L reads
 insert into entries (form_code,location_id,serial,entry_date,status,data,flags,created_by,created_staff) values
- ('02-2',2,8101,tt.today(),'approved','{"pay":[{"name":"S1 Clerk - Clerk","due":300}]}','[]',:'o','st'),
- ('02-2',6,8102,tt.today(),'approved','{"pay":[{"name":"F Cook - Cook","due":200}]}','[]',:'o','st');
+ ('21-1',2,8101,tt.today(),'approved','{"pay":[{"name":"S1 Clerk - Clerk","due":300}]}','[]',:'o','st'),
+ ('21-1',6,8102,tt.today(),'approved','{"pay":[{"name":"F Cook - Cook","due":200}]}','[]',:'o','st');
 -- operating costs: S1 rent 150 (quick expense, head rent), S2 delivery 40 (head transport)
 select quick_expense_add(2, tt.today(), 'rent', 'landlord', 150, 'cash', true, 'a3 rent S1', gen_random_uuid()) is not null as q1 \gset
 select quick_expense_add(3, tt.today(), 'transport', 'rider', 40, 'cash', true, 'a3 delivery S2', gen_random_uuid()) is not null as q2 \gset

@@ -53,3 +53,17 @@ cost_supply_to_avg116 = true             # 116
 pool_gl_post117 = true                   # 117
 factory_labour_absorbed117 = true        # 117
 # phase118 (batch 4, read-only reports): profit_variable_heads and branch_stmt_ageing_hours are text parameters, not switches - they stay at their defaults.
+
+# --- 24 Oct 2026 (D10): switches that cannot be ON together with the scenario setup (strict / pause / kill switches); they stay at their default in the "switches ON" pass.
+#     Each is tested by its own phase test. Without these lines the whole A1..A5 setup fails and 76 probes fail only because of the cascade.
+!receipt_lot_required
+!receipt_expiry_required
+!stock_unit_unknown_block
+!item_unit_change_needs_zero
+!item_lifecycle_needs_zero
+!return_needs_receipt
+!accounting_on_needs_reason
+!start_date_lock_after_opening
+!social_stop_all
+!ai_pause_all
+!transfer_paused_block

@@ -50,10 +50,10 @@ select cash_move_add(1,'cust_advance_used',200,:'dd'::date,null,:'c2'::uuid,null
 -- 6 return 1 unit of sale 1, refunded in cash (100)
 select sale_return(gen_random_uuid(), :'s1id'::uuid, format('[{"item_id":"%s","qty":1}]',tt.iid('FG-X'))::jsonb, 'damaged','a4 return','cash') as ret1 \gset
 -- 7 expenses: 10-2 voucher transport 150 paid by BANK (pay_mode), voucher repair 70 (cash, no pay_mode), quick expense transport 50 cash
-select save_entry(null,'10-2',1,:'dd'::date,'{"pay_mode":"bank","lines":[{"head":"transport","to":"courier","receipt":"yes","amount":"150"}]}','[]') ->> 'id' as v1 \gset
+select save_entry(null,'11-1',1,:'dd'::date,'{"pay_mode":"bank","lines":[{"head":"transport","to":"courier","receipt":"yes","amount":"150"}]}','[]') ->> 'id' as v1 \gset
 select submit_entry(:'v1'::uuid) is not null as sv1 \gset
 select decide_entry(:'v1'::uuid, true, null, null, '[]') ->> 'status' as dv1 \gset
-select save_entry(null,'10-2',1,:'dd'::date,'{"lines":[{"head":"repair","to":"fixer","receipt":"yes","amount":"70"}]}','[]') ->> 'id' as v2 \gset
+select save_entry(null,'11-1',1,:'dd'::date,'{"lines":[{"head":"repair","to":"fixer","receipt":"yes","amount":"70"}]}','[]') ->> 'id' as v2 \gset
 select submit_entry(:'v2'::uuid) is not null as sv2 \gset
 select decide_entry(:'v2'::uuid, true, null, null, '[]') ->> 'status' as dv2 \gset
 select tt.is('S7 vouchers approved', 'approved/approved', :'dv1'||'/'||:'dv2');
@@ -68,7 +68,7 @@ select tt.as(:'o');
 select cash_move_add(1,'bank_deposit',400,:'dd'::date,null,null,null,'dep',gen_random_uuid()) ->> 'id' as dep \gset
 -- 10 drawer closing form 14-1 for D: float 1000, typed day figures, cash counted 1770 (expected 1780 => shortage 10)
 select tt.as(:'o');
-select save_entry(null,'14-1',1,:'dd'::date,'{"open_counted":1000,"total_entered":1180,"d_card":200,"d_bkash":100,"dues":0,"new_adv":500,"prior_adv":0,"refund":100,"credit_sales":500,"cash_count":{"n1000":1,"n500":1,"n200":1,"n50":1,"n20":1}}','[]') ->> 'id' as dr \gset
+select save_entry(null,'06-1',1,:'dd'::date,'{"open_counted":1000,"total_entered":1180,"d_card":200,"d_bkash":100,"dues":0,"new_adv":500,"prior_adv":0,"refund":100,"credit_sales":500,"cash_count":{"n1000":1,"n500":1,"n200":1,"n50":1,"n20":1}}','[]') ->> 'id' as dr \gset
 select count_save(:'dr'::uuid,'drawer','{"n1000":1,"n500":1,"n200":1,"n50":1,"n20":1}'::jsonb) as cnt \gset
 \echo DRAWER_COUNT: :cnt
 -- 11 card settlement NEXT DAY (today): gross 200, fee 4 (2%)

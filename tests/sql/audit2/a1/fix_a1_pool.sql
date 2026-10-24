@@ -33,7 +33,7 @@ select recipe_approve(:'rc'::uuid,'ok') is not null as ap \gset
 -- recipe mode: 2 batches full yield 20 kg -> labour 2 x 2h x 50 = 200 absorbed. Factory sheet salary 200 (02-2).
 select loc_cost_cfg_set(1,'recipe') is null as lc \gset
 select production_post(1, :'rc'::uuid, 2, gen_random_uuid(), null, 'recipe mode', null) as pr1 \gset
-insert into entries (form_code,location_id,serial,entry_date,status,data,flags,created_by,created_staff) values ('02-2',1,9101,tt.today(),'approved','{"pay":[{"name":"F Cook - Cook","due":200}]}','[]',:'o','st');
+insert into entries (form_code,location_id,serial,entry_date,status,data,flags,created_by,created_staff) values ('21-1',1,9101,tt.today(),'approved','{"pay":[{"name":"F Cook - Cook","due":200}]}','[]',:'o','st');
 update entries set data = '{"pay":[{"name":"F Cook - Cook","due":300}]}' where serial = 9101;
 
 \echo == T2 pool is a memo today (A1 b8): absorbed credit with no expense in the books

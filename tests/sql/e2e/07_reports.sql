@@ -1,14 +1,14 @@
-\echo == 07 shadow engine: same expense via quick entry and form 10-2
+\echo == 07 shadow engine: same expense via quick entry and form 11-1
 select tt.as(:'o');
 select bal_before from (select tt.bal('5700') as bal_before) z \gset
 select (quick_expense_add(1, tt.today(), 'transport', 'rickshaw', 300, 'cash', true, 'e2e transport', gen_random_uuid())) as qe \gset
 \echo QUICK_EXPENSE: :qe
 select count(*) as pend from shadow_links where state='pending' \gset
-select tt.eq('H1 quick entry creates one pending shadow link for form 10-2', 1, :pend);
-select save_entry(null,'10-2',1,tt.today(),'{"lines":[{"head":"transport","to":"rickshaw","receipt":"yes","amount":"300"}]}','[]') ->> 'id' as f102 \gset
+select tt.eq('H1 quick entry creates one pending shadow link for form 11-1', 1, :pend);
+select save_entry(null,'11-1',1,tt.today(),'{"lines":[{"head":"transport","to":"rickshaw","receipt":"yes","amount":"300"}]}','[]') ->> 'id' as f102 \gset
 select submit_entry(:'f102'::uuid) is not null as sub \gset
 select decide_entry(:'f102'::uuid, true, null, null, '[]') ->> 'status' as dec \gset
-select tt.is('H1 form 10-2 approved', 'approved', :'dec');
+select tt.is('H1 form 11-1 approved', 'approved', :'dec');
 select id as lnk from shadow_links where state='pending' limit 1 \gset
 select shadow_confirm(:lnk, :'f102') ->> 'state' as sc \gset
 select tt.is('H1 shadow link confirmed to the form', 'confirmed', :'sc');
