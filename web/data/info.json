@@ -7849,10 +7849,9 @@
    "does": "When ON, the person who counts the cash drawer (06-1, 03-1) or the goods (13-1, 36-1) types the counted figure first; the expected figure and the difference appear only after the count is saved.",
    "why": "The owner's rule of 11 Oct 2026: handovers are counted first, so a short or an over is never adjusted to the system figure.",
    "default": "ON (since phase 552; before it was OFF). The owner can switch it OFF here, or per form and place in the count settings.",
-   "change": "Applies to the next count. A count already saved is not changed. A value the owner set earlier stays as set.",
+   "change": "Applies to the next count; a count already saved and a value the owner set earlier stay as they are.",
    "who": "Only the owner, in the Switchboard.",
    "related": [
-    "rule:owner_sees_expected_first",
     "rule:drawer_expected_source"
    ],
    "verified": true,
@@ -7873,14 +7872,12 @@
   },
   "rule:pin_all_set_confirmed": {
    "title": "Owner confirms: every login has a PIN",
-   "does": "A confirmation only. While OFF the setup advisor will not switch pin_signature_on on (its row is 'not ready'). When ON the advisor may. The switch changes no behaviour by itself.",
+   "does": "A confirmation only: while OFF the setup advisor will not switch pin_signature_on on, when ON it may; the switch changes no behaviour by itself.",
    "why": "The system cannot see whether every login has a PIN; with the PIN signature on, a person without a PIN could not sign.",
    "default": "OFF.",
    "change": "Takes effect at the next advisor apply.",
    "who": "Only the owner, in the Switchboard.",
-   "related": [
-    "rule:pin_signature_on"
-   ],
+   "related": [],
    "verified": true,
    "src": "phase553.sql"
   }

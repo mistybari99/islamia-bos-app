@@ -5,6 +5,7 @@ Last updated 23 Oct 2026. The repository is `islamia-bos-app`, branch `Main-Img`
 ## Read first (23 Oct 2026)
 - `docs/SINGLE_REPO.md`: one repository, what is published and what is not, branch rules, rollback, the checklist of GitHub settings only the owner can change.
 - `docs/NEW_PROJECT_SETUP.md`: how to build the new clean Supabase project step by step, with checks after each SQL part, what to re-apply, how to switch the staff over.
+- `docs/GAP_CLOSING_REPORT_24OCT.md`: the readiness defects D1 to D10 closed on Main-Img-v3, before and after, with proof.
 - `docs/INTEGRATION_REPORT_24OCT.md`: what Main-Img-v2 added to Main-Img (backup coverage, web test fixes, readiness audit, phase 548), conflicts, counts.
 - `docs/NO_LOSS_REPORT_23OCT.md`: proof that nothing was lost when the branches were joined (diff, functions, rules, web build).
 - `docs/DECISIONS.md` (last section, "Update 23 Oct 2026"): the owner decisions of this session.

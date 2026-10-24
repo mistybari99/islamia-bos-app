@@ -503,6 +503,25 @@ No phase file was edited. Each fix below is a **new phase** (numbers 548 onward 
 | D9 | Sheet 06-1 drawer count | expected cash filled from the POS day close (2,350) | expected is computed from typed sheet figures (`_count_expected18`); POS day-close report gives the same 2,350 (scenario D2) but nothing compares or fills it | all | phase 552 or a screen change: prefill and compare, exception when typed totals differ from POS | M |
 | D10 | `tests/sql/e2e` and `tests/sql/audit2` | pass on the current tree | use pre-renumber form codes (04-1 = old GRN, now Cash Position and Budget; 10-2 = old expense voucher): `entries_form_code_fkey` violations, 'form is switched off'; audit2 'switches ON' pass switches on all 165 switches including mutually conflicting ones (`lot_required`); 84 unmapped FAILs in that pass | n/a | update fixtures to the NN-1 codes through the mapping in `docs/FORM_SEQUENCE.md`; separate pass for conflicting switches | M |
 
+### Status of the defects on 24 Oct 2026 (branch `Main-Img-v3`; evidence in `docs/GAP_CLOSING_REPORT_24OCT.md` and `docs/BUILD-LOG.md`)
+
+Readiness scenario (pass / fail): before = the scenario as audited on `Main-Img-v2`: default 122/19, rec 126/15, recx 137/4. After (final chain, scenario extended by the checks named below): default 133/15, rec 148/0, recx 148/0.
+
+| ID | Status | Phase and evidence |
+|---|---|---|
+| D1 | **CLOSED** | phase 549: `supplier_dues`, `supplier_open_bills`, `supplier_ledger` show the transporter's 490; `pay_supplier` pays it (journal Dr 2150, Cr cash); checks P2, P3, P3b, F2 pass; `phase549_test` 10/10. No new rule. |
+| D2 | **CLOSED in rec** | phase 553: the advisor now recommends `acct_transit_loss` = true (gated by accounting readiness checks). Default stays OFF (owner taps apply). `rec` run: books equal stock (R12, F1, F2 pass). |
+| D3 | **CLOSED in rec; owner decision open** | phase 553: advisor row `acct_transfer_mode` = location_tagged. location_tagged vs company_wide remains the owner's decision (open since 14 Oct); the row says so. |
+| D4 | **CLOSED** | phase 550: gross profit of the cost-join reports is net of returns under the existing rule `reports_net_of_returns` (default ON); G3 passes (3,198.55); 120 catalogue reports still run (R21). |
+| D5 | **CLOSED (default per recorded decision)** | phase 552: `blind_count_on` default is now ON (DECISIONS.md 11 Oct 2026, BUILD-RULES 9); D1 passes in the default run. A value the owner set stays. |
+| D6 | **CLOSED** | phase 553: advisor recommended values/rows for transit_loss, transfer mode, blind count, salary source, rpt131, negative-stock block, recipe required, PIN signature (gated by the owner confirmation switch `pin_all_set_confirmed`), payroll accrual (row without a value: accountant and owner decide). `rec` run 148/0. |
+| D7 | **CLOSED under the switch** | phase 551: `t3_payroll` reads the paid app payroll runs when `report_salary_source` = app_first or `payroll_accrual_on` is on; R18c passes in `recx` and `rec` (the advisor sets the source). The default run (legacy source) still shows the paper sheets only, by design. |
+| D8 | **CLOSED** | phase 548 (see above). |
+| D9 | **CLOSED as an option** | phase 552: new rule `drawer_expected_source` (typed | pos_compare | pos), default typed = unchanged. POS expectation 2,350 equals the typed one; pos_compare raises `drawer_typed_vs_pos`; five D9 checks pass. The sheet screen does not yet prefill from the POS (no web change made). |
+| D10 | **CLOSED (fixtures)** | tests only: `tests/sql/e2e` 206 pass / 0 fail / 0 error (was 195 / 10 / 7); `tests/sql/audit2` defaults 512 pass / 190 fail, unmapped FAIL probes 13 -> 2; "switches ON" pass A1 79/104 -> 163/24, unmapped 76 -> 27. |
+
+Still open from this audit: the top-15 gaps other than 4, 5, 6, 8 and 12 (backup proof on the new project, phone and printer test, PIN lockout, VAT in the ledger, payroll deductions, overhead true-up, security review, purchase orders, transfers extras, contribution margin), and the screen change for D9.
+
 Items that look like defects but are **safe defaults** (documented, owner chooses): cash short/over and count loss unbooked by default (`drawer_short_post`, `acct_count_adjust`), salary expense at payment (`payroll_accrual_on`), blind count off, stock negative mode warn, GRN as source off, `rpt131_on` off.
 
 The scenario also confirmed these controls working as designed: GRN link guard (no double count), discount refused without a written limit, overpayment of a supplier refused, expired-stock rules not triggered, journal always balanced, replay by client id (earlier e2e).
