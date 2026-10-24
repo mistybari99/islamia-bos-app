@@ -35,11 +35,11 @@ Export steps, all read-only on the old project:
 
 Proven on a throwaway local PostgreSQL 16.15 (own cluster, no network, not Supabase), on the branch `Main-Img`:
 
-- The canonical paste chain (`tests/sql/paste_order.env` = `docs/PASTE_ORDER.md` section B, 259 files, now ending with `phase546`) builds with **0 errors**: `bash tests/sql/final_build.sh <db>`. Result: 2894 public functions, 478 tables, 486 policies, 625 rules, row level security on for every table.
-- Every file pasted **twice in a row** (518 pastes): **0 errors**, same result (same function count and identical function-text hashes).
-- The 21 generated paste parts `docs/paste_parts/part01.sql ... part21.sql`, run one after another (the way the owner will paste them), give the same 2894 functions with **identical text hashes** to the chain build, and 0 errors. The "Expected" numbers in section 4 come from that run.
+- The canonical paste chain (`tests/sql/paste_order.env` = `docs/PASTE_ORDER.md` section B, 261 files, now ending with `phase548`) builds with **0 errors**: `bash tests/sql/final_build.sh <db>`. Result (re-measured 24 Oct 2026 on `Main-Img-v2`): 2896 public functions, 478 tables, 486 policies, 627 rules, row level security on for every table.
+- Every file pasted **twice in a row** (522 pastes, re-measured 24 Oct 2026): **0 errors**, same result (same function count and identical function-text hashes).
+- The 21 generated paste parts `docs/paste_parts/part01.sql ... part21.sql`, run one after another (the way the owner will paste them), give the same 2896 functions with **identical text hashes** to the chain build, and 0 errors. The "Expected" numbers in section 4 come from that run.
 - `select count(*) from public._i2_state() where not present` = 0. `_union_audit()`: 145 `merged`, 11 `other` (the file `docs/LIVE_DELTA.md` quotes 156 `merged` for the older chain; `stock_transfer` is one of the 11 `other` rows because phase 546 now owns its text on purpose; the other ten were also not `merged` before this work and were not looked at again here).
-- A fresh build starts with: 7 locations, 57 items, 46 forms, 625 rules (none set by an owner), 13 roles, 0 profiles, 0 customers.
+- A fresh build starts with: 7 locations, 57 items, 46 forms, 627 rules (none set by an owner), 13 roles, 0 profiles, 0 customers.
 
 NOT proven (UNVERIFIED): a paste into a real Supabase project (the SQL editor, Auth hooks, Storage policies, extensions, the 500 KB size of each part in a phone browser), any screen of the app against the new project, and the restore of a real backup (`docs/RESTORE_DRILL.md` says the same). The local run used small stand-ins for the Supabase `auth` and `storage` schemas and for the roles `anon`, `authenticated` and `service_role`; on Supabase these already exist.
 
@@ -91,9 +91,9 @@ Expected numbers measured on the local build (a real Supabase project may show a
 | part18.sql | phase471 to phase490 | 495 KB | 2822 | 459 | 471 | 594 |
 | part19.sql | phase491 to phase534 | 398 KB | 2890 | 476 | 486 | 623 |
 | part20.sql | phase535 to phase546 | 493 KB | 2894 | 478 | 486 | 625 |
-| part21.sql | phase547 (backup coverage, 13 KB; counts below not re-measured after it was added) | 13 KB | - | - | - | - |
+| part21.sql | phase547 to phase548 (backup coverage; stock_recon_period lists transit_loss) | 15 KB | 2896 | 478 | 486 | 627 |
 
-Final checks after part21 (both read-only; the expected counts in this table were measured after part20, phase547 adds two functions and no table):
+Final checks after part21 (both read-only; all counts in this table were measured part by part on 24 Oct 2026):
 
 ```sql
 select * from public._i2_state() where not present;          -- must return no rows
@@ -109,7 +109,7 @@ Then list the switches that are ON by factory default: `select key from public.r
 
 ## 5. Seed items, locations and rules from the owner's own backup
 
-What is seeded by SQL itself: 7 locations (main showroom and sweet factory, 2nd branch, cake factory, godown, AL-CAKIZ, MISTY BARI, Mujgunni sweet factory), 57 old seed items, 46 forms, roles, the chart of accounts, option lists and the 625 rules with safe defaults.
+What is seeded by SQL itself: 7 locations (main showroom and sweet factory, 2nd branch, cake factory, godown, AL-CAKIZ, MISTY BARI, Mujgunni sweet factory), 57 old seed items, 46 forms, roles, the chart of accounts, option lists and the 627 rules with safe defaults.
 
 What you bring from your own files:
 
@@ -137,7 +137,7 @@ Read from the owner's live rules extract of 23 Oct 2026 (phone numbers redacted;
 
 That is 56 keys (two of them equal their factory default). In words, the switches that were ON in the old project: accounting_on from 2026-10-14, acct_count_adjust, acct_issue_out, acct_transit_loss, acct_purchase_variance, manual_journal_guard = on, journal_loc_check, mapping_type_guard, online_orders_on, web_form_on, inbox_on, pay_requests_on, order_promise_required, cash_short_post_on, the xc_* switches and xb_delivery_on, with pos_offline_hours = 2, item_images_mode = pos_only and party_request_approver_mode = owner.
 
-Two rules exist in the fresh build but not in the old project: `price_check_include_freight` and `transfer_client_reuse_block` (from phases after the old project's last paste). Both are OFF in the fresh build (checked); read their (i) text before changing them. Phase 546 (the stock-transfer fix that puts back the stock check and receiver notice) adds no switch that is ON.
+Four rules exist in the fresh build but not in the old project: `price_check_include_freight`, `transfer_client_reuse_block`, `backup_accounts_on` and `backup_buckets_on` (the last two come from phase 547 and are OFF; see `docs/BACKUP_AND_RESTORE_GUIDE.md`) (from phases after the old project's last paste). Both are OFF in the fresh build (checked); read their (i) text before changing them. Phase 546 (the stock-transfer fix that puts back the stock check and receiver notice) adds no switch that is ON.
 
 Do not switch `accounting_on` on before the opening balances, the chart of accounts and the item costs of the new project are entered and the readiness check in `#/setupadvisor` shows no red row.
 

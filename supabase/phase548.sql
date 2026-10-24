@@ -1,6 +1,7 @@
 -- Phase 548 (READINESS D8) - stock_recon_period: the movement reason transit_loss is a listed movement.
--- Paste AFTER phase546. Paste-twice safe (a second paste finds the text already patched and does nothing). Earlier phase files are not edited.
--- DRAFT from the readiness audit of 23 Oct 2026 (docs/READINESS_99.md, defect D8). Tested on a LOCAL throwaway PostgreSQL 16 only; the owner pastes it himself after review.
+-- Paste AFTER phase547 (last file of the canonical order). Paste-twice safe (a second paste finds the text already patched and does nothing). Earlier phase files are not edited.
+-- From the readiness audit of 23 Oct 2026 (docs/READINESS_99.md, defect D8; first drafted as phase 547, renamed 548 on 24 Oct). Tested on a LOCAL throwaway PostgreSQL 16 only (supabase/phase548_test.sql, readiness scenario R17); the owner pastes it himself after review.
+-- Ordered into the canonical chain on 24 Oct 2026 because the test proves: only stock_recon_period changes, no other function, no rule, no table, and with default settings the scenario output is identical except R17 (the fix).
 -- Problem (reproduced): with transit_short_mode = loss (the setup advisor sets it), a short receipt writes a ledger row with reason transit_loss
 --   (phase 499 / 114). stock_recon_period (phase 423) does not know that reason, so the period statement shows "unclassified -0.5" and state
 --   "unclassified" for the receiving place although opening + movements = closing holds. Nothing is lost; the statement is just not able to say so.

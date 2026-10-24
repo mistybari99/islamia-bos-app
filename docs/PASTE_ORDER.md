@@ -336,6 +336,7 @@ Columns: # = paste position (1 = the first file after the foundation), file, lin
 | 217 | `phase545.sql` | ours | STEP1 | Purchase price check: freight counted when a landed cost is posted (switch price_check_include_freight, OFF; test phase545_test.sql) |
 | 218 | `phase546.sql` | ours | FIX | `stock_transfer` carries all four switch behaviours again: phase 544 text + bos114 `transfer_needs_stock` check + bos115 `transfer_notify_receiver` notice (no new rule, all OFF; test phase546_test.sql) |
 | 219 | `phase547.sql` | ours | BACKUP | Backup coverage: ai_agents / ai_providers join the dump; staff / login manifest `backup_accounts_manifest()` (switch backup_accounts_on, OFF); other Storage buckets readable by the backup bot (switch backup_buckets_on, OFF); test phase547_test.sql |
+| 220 | `phase548.sql` | ours | READINESS-D8 | `stock_recon_period` lists the movement reason `transit_loss` (the period statement no longer calls a costed transit loss "unclassified"). Changes only that one function; no new rule or table; test `phase548_test.sql` and readiness scenario R17. If an old phase that rewrites `stock_recon_period` (423) is ever pasted again, paste 548 again (paste-twice safe). |
 
 ## Old phase files: if you ever paste one again
 
