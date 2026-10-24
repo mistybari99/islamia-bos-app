@@ -1,5 +1,5 @@
 -- ============================================================================
--- FRESH part 15 of 20. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
+-- FRESH part 15 of 21. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
 -- Phases in this part, in this order: phase316 phase317 phase318 phase319 phase323 phase324 phase325 phase326 phase327 phase328 phase329 phase400 phase401 phase402 phase403 phase404 phase405 phase406 phase407 phase408
 -- Never paste: any *_test.sql, the phase84 / 84b / 84c TEST-PROJECT files, ALL_NEW2..ALL_NEW11*. Commit: see docs/PASTE_ORDER.md.
 -- ============================================================================
@@ -5619,4 +5619,4 @@ end $p$;
 notify pgrst, 'reload schema';
 
 -- ============================================================================
--- End of FRESH part 15 of 20.
+-- End of FRESH part 15 of 21.

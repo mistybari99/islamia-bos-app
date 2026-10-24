@@ -7814,6 +7814,35 @@
    "who": "Anyone who can open Settings sees the choice for this device only. It does not change what other devices or staff see.",
    "verified": false,
    "src": "DESKTOP_LAYOUT 4.2 (docs/DESKTOP_LAYOUT.md)"
+  },
+  "rule:backup_accounts_on": {
+   "title": "Save the staff login list in the backup",
+   "does": "When ON, the nightly backup also saves each person's staff ID, name, e-mail, roles, locations, grants, whether 2FA is on, and which logins are bots. It never saves a password, a PIN or a token.",
+   "why": "A new Supabase project can only get the same logins back if the list is in the backup. Passwords cannot be exported, so every person gets a new PIN after a restore.",
+   "default": "OFF. The backup holds the staff tables but not the login e-mails.",
+   "change": "Applies from the next nightly backup. Earlier backups stay as they are.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:backup_encrypt_on",
+    "rule:backup_buckets_on"
+   ],
+   "warn": "The list holds names and e-mails. Switch backup_encrypt_on ON too, or keep the backup repository private (it must stay private).",
+   "verified": true,
+   "src": "phase547.sql; docs/BACKUP_AND_RESTORE_GUIDE.md"
+  },
+  "rule:backup_buckets_on": {
+   "title": "Backup bot may also read the other photo buckets",
+   "does": "When ON, the backup bot may read the buckets web-refs, payproof and web-public (read only) so that their files go into the backup.",
+   "why": "Payment screenshots and customer reference pictures are not in the photos bucket and were not backed up.",
+   "default": "OFF. Only the photos bucket is backed up.",
+   "change": "Applies from the next nightly backup. A bucket that is not readable is listed in storage_buckets.json with its file count, never skipped silently.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:backup_accounts_on"
+   ],
+   "warn": "Payment screenshots are personal. Photos are not encrypted in the backup; the repository must stay private.",
+   "verified": true,
+   "src": "phase547.sql; docs/BACKUP_AND_RESTORE_GUIDE.md"
   }
  }
 }

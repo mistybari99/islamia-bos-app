@@ -1,5 +1,5 @@
 -- ============================================================================
--- FRESH part 14 of 20. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
+-- FRESH part 14 of 21. Paste the WHOLE of this file into the Supabase SQL editor, press Run, wait for "Success", then paste the next part.
 -- Phases in this part, in this order: phase98 phase99 phase120 phase130 phase131 phase132 phase140 phase141 phase142 phase143 phase300 phase301 phase302 phase303 phase304 phase305 phase306 phase307 phase308
 -- Never paste: any *_test.sql, the phase84 / 84b / 84c TEST-PROJECT files, ALL_NEW2..ALL_NEW11*. Commit: see docs/PASTE_ORDER.md.
 -- ============================================================================
@@ -5751,4 +5751,4 @@ grant execute on function public.crmc_overview(int), public.crmc_rfm_summary(), 
   public.crmc_customer_value(uuid), public.crmc_profit(date, date, text, int, int), public.crmc_export(uuid, bigint, jsonb, text, text[]), public.crmc_export_log_list(int) to authenticated;
 
 -- ============================================================================
--- End of FRESH part 14 of 20.
+-- End of FRESH part 14 of 21.

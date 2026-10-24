@@ -4,7 +4,7 @@ Written 23 Oct 2026. Status: **a plan, nothing has been run on any Supabase proj
 
 **বাংলা সারাংশ (সংক্ষেপে):**
 - একটা নতুন, পরিষ্কার Supabase project বানাবেন। পুরনো project (`Islamiya-Bos`) আগে কিছুই বদলাবে না; নতুনটা ঠিক হলে তবেই স্টাফ সরবে।
-- SQL বসাবেন `docs/paste_parts/part01.sql` থেকে `part20.sql` পর্যন্ত, ক্রমে, একটা একটা করে। প্রতিটির পরে নিচের শুধু-পড়ার CHECK চালিয়ে সংখ্যা মেলাবেন। error এলে থামুন, পরেরটা বসাবেন না।
+- SQL বসাবেন `docs/paste_parts/part01.sql` থেকে `part21.sql` পর্যন্ত, ক্রমে, একটা একটা করে। প্রতিটির পরে নিচের শুধু-পড়ার CHECK চালিয়ে সংখ্যা মেলাবেন। error এলে থামুন, পরেরটা বসাবেন না।
 - নতুন project-এ আইটেম (1369), লোকেশন (7), ও আপনার সেট-করা 56টি নিয়ম নিজে থেকে আসে না। 7টি লোকেশন ও 57টি পুরনো আইটেম SQL থেকেই বসে; বাকি 1312 আইটেম অ্যাপ থেকে "Item master import" দিয়ে আনবেন। 56টি নিয়ম (সুইচ) নিচের তালিকা দেখে নিজে চালু করবেন। সব সুইচ ডিফল্টে বন্ধ।
 - লগইন (Auth users) ব্যাকআপে থাকে না। নতুন project-এ প্রথম রেজিস্টার করা ব্যক্তিই মালিক হবে; স্টাফদের আবার তৈরি/অনুমোদন করতে হবে।
 - `web/config.js`-এ নতুন project-এর URL ও publishable key বসবে; GitHub Secrets নতুন করে দিতে হবে; তারপর ধাপে ধাপে স্টাফ সরানো (সেকশন 8)।
@@ -37,7 +37,7 @@ Proven on a throwaway local PostgreSQL 16.15 (own cluster, no network, not Supab
 
 - The canonical paste chain (`tests/sql/paste_order.env` = `docs/PASTE_ORDER.md` section B, 259 files, now ending with `phase546`) builds with **0 errors**: `bash tests/sql/final_build.sh <db>`. Result: 2894 public functions, 478 tables, 486 policies, 625 rules, row level security on for every table.
 - Every file pasted **twice in a row** (518 pastes): **0 errors**, same result (same function count and identical function-text hashes).
-- The 20 generated paste parts `docs/paste_parts/part01.sql ... part20.sql`, run one after another (the way the owner will paste them), give the same 2894 functions with **identical text hashes** to the chain build, and 0 errors. The "Expected" numbers in section 4 come from that run.
+- The 21 generated paste parts `docs/paste_parts/part01.sql ... part21.sql`, run one after another (the way the owner will paste them), give the same 2894 functions with **identical text hashes** to the chain build, and 0 errors. The "Expected" numbers in section 4 come from that run.
 - `select count(*) from public._i2_state() where not present` = 0. `_union_audit()`: 145 `merged`, 11 `other` (the file `docs/LIVE_DELTA.md` quotes 156 `merged` for the older chain; `stock_transfer` is one of the 11 `other` rows because phase 546 now owns its text on purpose; the other ten were also not `merged` before this work and were not looked at again here).
 - A fresh build starts with: 7 locations, 57 items, 46 forms, 625 rules (none set by an owner), 13 roles, 0 profiles, 0 customers.
 
@@ -52,7 +52,7 @@ NOT proven (UNVERIFIED): a paste into a real Supabase project (the SQL editor, A
 
 ## 4. Paste the SQL parts, one at a time, with a check after each
 
-Files: `docs/paste_parts/part01.sql` to `part20.sql` (each at most 500 KB; they are built by `tools/build_paste_parts.py` from `tests/sql/paste_order.env`; the same parts, ready to copy, are in `docs/paste_parts/setup-all.html`). If the phase list ever changes, regenerate with `python3 tools/build_paste_parts.py` and check with `python3 tools/build_paste_parts.py --check` (it passes today: "paste parts are up to date").
+Files: `docs/paste_parts/part01.sql` to `part21.sql` (each at most 500 KB; they are built by `tools/build_paste_parts.py` from `tests/sql/paste_order.env`; the same parts, ready to copy, are in `docs/paste_parts/setup-all.html`). If the phase list ever changes, regenerate with `python3 tools/build_paste_parts.py` and check with `python3 tools/build_paste_parts.py --check` (it passes today: "paste parts are up to date").
 
 Rules for the owner: paste in order, one part per query, press Run, wait for "Success". If any part shows an error, STOP and send the message to the lead; do not paste the next part. A part may be pasted twice safely. Never paste `*_test.sql`, `phase84_test_project_only.sql`, or any file not in the parts. Never paste the old live-delta files (`delta01.sql`, `delta02.sql`) into the new project: those exist only to bring the OLD project up to date.
 
@@ -91,8 +91,9 @@ Expected numbers measured on the local build (a real Supabase project may show a
 | part18.sql | phase471 to phase490 | 495 KB | 2822 | 459 | 471 | 594 |
 | part19.sql | phase491 to phase534 | 398 KB | 2890 | 476 | 486 | 623 |
 | part20.sql | phase535 to phase546 | 493 KB | 2894 | 478 | 486 | 625 |
+| part21.sql | phase547 (backup coverage, 13 KB; counts below not re-measured after it was added) | 13 KB | - | - | - | - |
 
-Final checks after part20 (both read-only):
+Final checks after part21 (both read-only; the expected counts in this table were measured after part20, phase547 adds two functions and no table):
 
 ```sql
 select * from public._i2_state() where not present;          -- must return no rows
@@ -150,7 +151,7 @@ Do not switch `accounting_on` on before the opening balances, the chart of accou
 ## 8. Order to switch the staff over without losing data
 
 1. Old project stays untouched and in use. Export everything in section 1 and note the date and time.
-2. Create the new project and paste parts 01 to 20 with the checks (sections 3 and 4). Stop at the first error.
+2. Create the new project and paste parts 01 to 21 with the checks (sections 3 and 4). Stop at the first error.
 3. Register the owner in the new project; import the 1312 items; enter or restore the data the owner wants (section 5).
 4. Apply the settings from section 6 in the order of `docs/guide/ROLLOUT_PLAN.md`; keep `accounting_on` for last.
 5. Run the user acceptance list `docs/guide/UAT_CHECKLIST.md` on the new project with the owner login only. Optionally rehearse a restore with `tools/restore_drill.py` on a scratch local database (steps in `docs/RESTORE_DRILL.md`).
