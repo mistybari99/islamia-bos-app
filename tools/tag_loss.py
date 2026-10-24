@@ -31,6 +31,16 @@ for f in S[stages[0]]:
     if f in S[stages[-1]]:
         l = S[stages[0]][f][1] - S[stages[-1]][f][1]
         if l: print("   ", f, sorted(l)); n += 1
-    else: print("    DROPPED", f); n += 1
+    else:
+        # a signature that went away because a later phase re-created the function with more (defaulted) arguments is a REPLACEMENT, not a loss:
+        # only the tags that no same-name function of the last stage carries are lost. No same-name function left = DROPPED (counts).
+        name = f.split("(")[0]
+        succ = [g for g in S[stages[-1]] if g.split("(")[0] == name and g not in S[stages[0]]]
+        if succ:
+            kept = set().union(*[S[stages[-1]][g][1] for g in succ])
+            l = S[stages[0]][f][1] - kept
+            print("    REPLACED", f, "->", ", ".join(succ), ("LOST TAGS " + str(sorted(l))) if l else "(no tag lost)")
+            if l: n += 1
+        else: print("    DROPPED", f); n += 1
 print("NET LOST TAGS:", n, "| per-step losses seen:", lost_any)
 sys.exit(1 if n else 0)

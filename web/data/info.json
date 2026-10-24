@@ -6218,7 +6218,7 @@
   "rule:price_check_include_freight": {
    "title": "Include freight in the purchase price check",
    "does": "When ON, after a landed cost (freight, duty, clearing and other charges) is posted, each item it touches is compared with its last purchase, using the invoice price plus the freight allocated to that item. A jump above the threshold (Purchase cost jump %) gives a yellow flag in the exceptions list.",
-   "why": "A freight rise is a real rise in what the goods cost. The price check that runs at bill posting sees only the invoice price, so it misses it.",
+   "why": "A freight rise is a real rise in what the goods cost, but the price check that runs at bill posting sees only the invoice price, so it misses it.",
    "default": "Off. The price check uses the invoice price only, as before.",
    "change": "On: the flag appears when the landed cost is posted, because the freight is not known before that. The check at bill posting does not change.",
    "who": "Owner, in Settings (purchase rules).",

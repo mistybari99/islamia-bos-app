@@ -16,7 +16,11 @@ const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css
 const serveDir = (root, port) => http.createServer((q, r) => { const f = path.join(root, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'application/octet-stream' }); r.end(b); }); }).listen(port);
 
 // base commit web/ exported to a temp dir (never touches other worktrees)
-const BASE_REF = process.env.BASE_REF || '35f8f7d';
+// BASE_REF = the accepted look of the three old themes. It was 35f8f7d (pre-glass). Later INTENDED steps changed the old themes on purpose
+// (header Back/Main buttons and announce bar -> taller header on pos; S2 form codes + S3/S4 names make '#/form/37-1' a real form, so its page
+// is not the same page as at 35f8f7d). Measured with BASE_REF: pos matches the tip from c178730 on; form/37-1 matches from 36254db on (it differs at ed3bac3). The guard now freezes the look at
+// 36254db (tip of Main-Img before the test fixes); move it forward deliberately when the old themes are changed on purpose. BASE_REF=35f8f7d runs the old check.
+const BASE_REF = process.env.BASE_REF || '36254db';
 const baseDir = fs.mkdtempSync(path.join(os.tmpdir(), 'glassbase-'));
 cp.execSync(`git -C "${_P.REPO_DIR}" archive ${BASE_REF} web | tar -x -C "${baseDir}"`);
 const BASE_PORT = PORT + 1;

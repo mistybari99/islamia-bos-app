@@ -90,7 +90,7 @@ print('index.html refs: %d scripts/links checked, %d scripts'%(len(refs),len(sc)
 sys.exit(bad)
 PY
 # 6b) syntax of every js (sw.js too); no conflict markers anywhere
-for f in $(git ls-files -co --exclude-standard | grep -E '\.js$'); do node --check "$f" 2>/dev/null || bad "node --check $f"; done
+for f in $(git ls-files -co --exclude-standard | grep -E '\.js$' | sort -u); do [ -f "$f" ] || continue; node --check "$f" 2>/dev/null || bad "node --check $f"; done
 if grep -rnE '^(<<<<<<< |=======$|>>>>>>> )' --include='*' --exclude-dir=.git . | grep -v 'vendor/'; then bad "conflict markers (above)"; fi
 # 6c) secrets. sb_publishable_ in config.js is public by design. Keyword MENTIONS in comments/docs are listed as INFO; real-looking values fail.
 grep -rnIoE 'service_role|sb_secret' --exclude-dir=.git --exclude='setup-*.html' --exclude=audit-a.html --exclude=PUBLISH_NOTES.md --exclude=DEPLOY_CHECKLIST.md . | sort | uniq -c | sed 's/^/INFO keyword mention: /' || true

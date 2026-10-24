@@ -28,7 +28,7 @@ const OWNER_NOTE = L('মালিকের ব্যক্তিগত টা�
 /* ============ 13-1 · Goods received note (GRN) ============ */
 const QUALITY = [['accept', L('গ্রহণ', 'Accept')], ['reduced', L('দর কমিয়ে গ্রহণ', 'Accept at a lower rate')], ['hold', L('আটক', 'Hold')], ['return', L('ফেরত', 'Return')]];
 B.forms['13-1'] = {
-  title: L('মালামাল গ্রহণ (GRN)', 'Goods Received (GRN)'),
+  title: L('মালামাল গ্রহণ (GRN)', 'Goods Received (GRN)', 'Goods গ্রহণ (GRN)'),
   head: [TM('time', L('সময়', 'Time')), SUP('supplier', L('সাপ্লায়ার', 'Supplier'), { req: true }), T('memo_no', L('তাদের মেমো / চালান নং', 'Their memo / challan no.')),
     CH('paper', L('যে কাগজে ক্রয়', 'Purchase made on'), [['po', L('পারচেজ অর্ডার (PO)', 'Purchase order (PO)')], ['pr', L('জরুরি ক্রয় — পারচেজ রিকুইজিশন (PR)', 'Urgent purchase — purchase requisition (PR)')], ['direct', L('শোরুমে সরাসরি ক্রয়', 'Direct purchase at the showroom')]], { req: true }),
     T('po_no', L('পারচেজ অর্ডার (PO) নং', 'Purchase order (PO) no.'), { show: (x) => x.d.paper === 'po', req: (x) => x.d.paper === 'po' }),
@@ -94,7 +94,7 @@ B.forms['13-1'] = {
 /* ============ 18-1 · Material issue slip ============ */
 const PURPOSE = [['prod', L('উৎপাদনের জন্য', 'For production')], ['staff', L('স্টাফ / ব্যক্তিগত ব্যবহারে', 'Staff / personal use')], ['sample', L('স্যাম্পল', 'Sample')], ['trial', L('ট্রায়াল (নতুন পণ্য)', 'Trial (new product)')]];
 B.forms['18-1'] = {
-  title: L('মালামাল ইস্যু', 'Material Issue'),
+  title: L('মালামাল ইস্যু', 'Material Issue', 'Goods Issue'),
   head: [CH('shift', L('শিফট', 'Shift'), SHIFTS), T('batch_no', L('ব্যাচ / ক্রম নং', 'Batch / serial no.')), T('product', L('তৈরির পণ্য', 'Product being made')),
     CH('purpose', L('ইস্যুর উদ্দেশ্য', 'Purpose of the issue'), PURPOSE, { req: true })],
   sections: [
@@ -138,7 +138,7 @@ B.forms['18-1'] = {
 /* ============ 37-1 · Store ledger (one page per item) ============ */
 const OTHER_PAPERS = [['return', L('ফেরত', 'Return')], ['count_adj', L('কাউন্টের সমন্বয়', 'Count adjustment')], ['other', L('অন্য', 'Other')]];
 B.forms['37-1'] = {
-  title: L('স্টোর লেজার', 'Store Ledger'),
+  title: L('স্টোর লেজার', 'Store Ledger', 'Store Ledger'),
   head: [ITEM('item', L('আইটেম কোড / নাম', 'Item code / name'), { req: true, wide: true }), CALC('unit', L('একক (Unit)', 'Unit'), 'text'),
     T('bin', L('বিন লোকেশন (Bin Location — তাক / জায়গা)', 'Bin location (shelf / place)')), ST('storekeeper', L('স্টোরকিপার (ডিউটি স্লট)', 'Storekeeper (duty slot)'), { req: true }),
     N('opening', L('আগের পাতার বাকি (Opening)', 'Balance from the previous page (opening)'))],
@@ -184,7 +184,7 @@ B.forms['37-1'] = {
 
 /* ============ 28-1 · Purchase requisition (PR) ============ */
 B.forms['28-1'] = {
-  title: L('পারচেজ রিকুইজিশন', 'Purchase Requisition'),
+  title: L('পারচেজ রিকুইজিশন', 'Purchase Requisition', 'Purchase রিকুইজিশন'),
   head: [ST('requester', L('অনুরোধকারী (নাম)', 'Requested by (name)'), { req: true }), D('required_date', L('প্রয়োজনের তারিখ (Required Date)', 'Required date'), { req: true }),
     CH('urgency', L('ধরন', 'Type'), [['normal', L('স্বাভাবিক', 'Normal')], ['urgent', L('জরুরি', 'Urgent')]], { req: true })],
   sections: [
@@ -244,7 +244,7 @@ B.forms['28-1'] = {
 
 /* ============ 29-1 · Quotation comparison & supplier choice (CS) ============ */
 B.forms['29-1'] = {
-  title: L('কোটেশন তুলনা', 'Quotation Comparison'),
+  title: L('কোটেশন তুলনা', 'Quotation Comparison', 'কোটেশন তুলনা'),
   head: [T('pr_no', L('সংশ্লিষ্ট পারচেজ রিকুইজিশন (PR) নং', 'Related purchase requisition (PR) no.')), T('what', L('প্রয়োজনীয় আইটেম', 'Item needed'), { req: true }),
     N('qty', L('পরিমাণ', 'Quantity'), { req: true }), ST('collector', L('দর সংগ্রহকারী (Rates Collected by)', 'Rates collected by'), { req: true })],
   sections: [
@@ -286,7 +286,7 @@ B.forms['29-1'] = {
 
 /* ============ 27-1 · Purchase order (PO) ============ */
 B.forms['27-1'] = {
-  title: L('পারচেজ অর্ডার', 'Purchase Order'),
+  title: L('পারচেজ অর্ডার', 'Purchase Order', 'Purchase Order'),
   head: [T('cs_no', L('সংশ্লিষ্ট কোটেশন তুলনা (CS) নং', 'Related quotation comparison (CS) no.')), T('pr_no', L('পারচেজ রিকুইজিশন (PR) নং', 'Purchase Requisition (PR) no.')),
     SUP('supplier', L('সাপ্লায়ার', 'Supplier'), { req: (x) => !x.d.cancel }), T('phone', L('ফোন', 'Phone')), D('delivery_date', L('ডেলিভারির তারিখ (Delivery Date)', 'Delivery date'), { req: (x) => !x.d.cancel }),
     T('place', L('ডেলিভারির স্থান', 'Delivery place')),
@@ -330,7 +330,7 @@ B.forms['27-1'] = {
 /* ============ 02-1 · Bill check & payment request ============ */
 const BILLPAYS = [['cash', L('নগদ', 'Cash')], ['bank', L('ব্যাংক', 'Bank')], ['cheque', L('চেক', 'Cheque')], ['mobile', L('মোবাইল', 'Mobile')], ['owner', L('মালিকের ব্যক্তিগত', "Owner's personal money")], ['other', L('অন্য', 'Other')]];
 B.forms['02-1'] = {
-  title: L('বিল যাচাই ও পেমেন্ট', 'Bill Check and Payment'),
+  title: L('বিল যাচাই ও পেমেন্ট', 'Bill Check and Payment', 'বিল Check ও Payment'),
   head: [SUP('supplier', L('সাপ্লায়ার', 'Supplier'), { req: true }), T('bill_no', L('সাপ্লায়ারের বিল নং', "Supplier's bill no."), { req: true }), D('bill_date', L('বিলের তারিখ', 'Bill date'), { req: true }), M('bill_amount', L('বিলের অঙ্ক ৳', 'Bill amount ৳'), { req: true })],
   sections: [
     { title: L('তিন কাগজ মিলিয়ে দেখা', 'Three papers matched'), fields: [
@@ -382,7 +382,7 @@ B.forms['02-1'] = {
 
 /* ============ 38-1 · Supplier ledger (one page per supplier) ============ */
 B.forms['38-1'] = {
-  title: L('সাপ্লায়ার লেজার', 'Supplier Ledger'),
+  title: L('সাপ্লায়ার লেজার', 'Supplier Ledger', 'Supplier Ledger'),
   head: [T('page_no', L('পাতা নং', 'Page no.')), ST('keeper', L('হিসাবরক্ষক (Ledger Keeper)', 'Ledger keeper')), SUP('supplier', L('সাপ্লায়ারের নাম', 'Supplier name'), { req: true }), T('items', L('সরবরাহের আইটেম (Items Supplied)', 'Items supplied')),
     CH('kind', L('ধরন', 'Type'), [['supplier', L('সাপ্লায়ার', 'Supplier')], ['outside', L('বাইরের সোর্সিং', 'Outside sourcing')], ['other', L('অন্য', 'Other')]]),
     T('kind_other', L('অন্য — লিখুন', 'Other — write it'), { show: (x) => x.d.kind === 'other' }),

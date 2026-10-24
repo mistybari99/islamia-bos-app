@@ -7594,8 +7594,8 @@
    "id": "field:14-2:jalebi_sales",
    "lang": "en",
    "from": "Jalebi sales ৳ from the daily showroom sheet (14-1)",
-   "to": "Jalebi sales ৳ from the daily showroom sheet (06-1)",
-   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+   "to": "Jalebi sales (in taka) from the daily showroom sheet (06-1)",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4); the taka sign is written 'in taka' in the English text because lang_all_test rejects a Bangla-block character in an English slot (the Bangla label keeps it)"
   },
   {
    "type": "label",

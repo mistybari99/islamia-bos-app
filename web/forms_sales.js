@@ -27,7 +27,7 @@ const PAYMODES = [['cash', L('নগদ', 'Cash')], ['bkash', L('বিকাশ
 const notCol = (x) => x.d.not_collected;
 const handover = (x) => !x.d.not_collected;
 B.forms['05-1'] = {
-  title: L('কাস্টমার অর্ডার', 'Customer Order'),
+  title: L('কাস্টমার অর্ডার', 'Customer Order', 'কাস্টমার Order'),
   head: [ST('taker', L('অর্ডার গ্রহণকারী (Order Taker)', 'Order taker'), { req: true }),
     CH('order_type', L('ধরন', 'Type'), [['normal', L('সাধারণ পণ্য', 'Normal goods')], ['custom', L('কাস্টম-মেইড', 'Custom-made')]], { req: true }),
     CH('channel', L('মাধ্যম (Channel)', 'Channel'), CHANNELS, { req: true }), T('channel_other', L('অন্য মাধ্যম', 'Other channel'), { show: (x) => x.d.channel === 'other' }),
@@ -99,7 +99,7 @@ B.forms['05-1'] = {
 
 /* ============ 08-1 · Discount approval slip ============ */
 B.forms['08-1'] = {
-  title: L('ডিসকাউন্ট অনুমোদন', 'Discount Approval'),
+  title: L('ডিসকাউন্ট অনুমোদন', 'Discount Approval', 'Discount Approval'),
   head: [TM('time', L('সময়', 'Time')), T('sheet_no', L('দৈনিক শোরুম শিট নং', 'Daily showroom sheet no.')), T('memo_no', L('অর্ডার / মেমো নং (থাকলে)', 'Order / memo no. (if any)'))],
   sections: [
     { title: L('ডিসকাউন্টের পণ্য', 'Discounted items'), fields: [
@@ -137,7 +137,7 @@ B.forms['08-1'] = {
 /* ============ 32-1 · Return & complaint register ============ */
 const COMPLAINTS = [['taste', L('স্বাদ', 'Taste')], ['smell', L('গন্ধ / নষ্ট', 'Smell / spoiled')], ['broken', L('ভাঙা / চেহারা', 'Broken / appearance')], ['short', L('পরিমাণে কম', 'Short quantity')], ['wrong', L('ভুল পণ্য', 'Wrong goods')], ['late', L('দেরি', 'Late')], ['staff', L('কর্মীর আচরণ', 'Staff behaviour')]];
 B.forms['32-1'] = {
-  title: L('রিটার্ন ও অভিযোগ', 'Return and Complaint'),
+  title: L('রিটার্ন ও অভিযোগ', 'Return and Complaint', 'Return ও অভিযোগ'),
   head: [TM('time', L('সময়', 'Time')), T('cust_name', L('কাস্টমারের নাম', "Customer's name"), { req: true }), T('cust_phone', L('ফোন', 'Phone')), T('sheet_no', L('দৈনিক শোরুম শিট নং', 'Daily showroom sheet no.'))],
   sections: [
     { title: L('পণ্য', 'Item'), fields: [
@@ -195,7 +195,7 @@ B.forms['32-1'] = {
 const isInv = (x) => x.d.doc === 'invoice';
 const isQuote = (x) => x.d.doc === 'quote';
 B.forms['24-1'] = {
-  title: L('পার্টি ও পাইকারি ইনভয়েস', 'Party and Wholesale Invoice'),
+  title: L('পার্টি ও পাইকারি ইনভয়েস', 'Party and Wholesale Invoice', 'Party ও পাইকারি Invoice'),
   head: [CH('doc', L('কোটেশন না ইনভয়েস', 'Quotation or invoice'), [['quote', L('কোটেশন (Quotation)', 'Quotation')], ['invoice', L('ইনভয়েস (Invoice) — মালামাল যাচ্ছে', 'Invoice — goods are going')]], { req: true }),
     T('party', L('পার্টির নাম', 'Party name'), { req: true }), T('phone', L('ফোন', 'Phone')), T('order_no', L('অর্ডার নং (থাকলে)', 'Order no. (if any)'))],
   sections: [
@@ -251,7 +251,7 @@ B.forms['24-1'] = {
 /* ============ 16-1 · Maintenance request & record ============ */
 const PROBLEMS = [['p_stop', L('চলছে না', 'Not running')], ['p_cool', L('ঠান্ডা হচ্ছে না', 'Not cooling')], ['p_noise', L('শব্দ', 'Noise')], ['p_leak', L('লিক', 'Leak')], ['p_power', L('বিদ্যুৎ', 'Electrical')], ['p_other', L('অন্য', 'Other')]];
 B.forms['16-1'] = {
-  title: L('মেইনটেন্যান্স অনুরোধ', 'Maintenance Request'),
+  title: L('মেইনটেন্যান্স অনুরোধ', 'Maintenance Request', 'মেইনটেন্যান্স অনুরোধ'),
   head: [T('machine', L('যন্ত্রের নাম', 'Machine name'), { req: true }), T('machine_id', L('যন্ত্রের নং / পরিচয়', 'Machine no. / ID'), { req: true }),
     D('found_date', L('সমস্যা শনাক্তের তারিখ', 'Date problem found'), { req: true }), TM('found_time', L('সময়', 'Time'), { req: true }), ST('reported_by', L('রিপোর্টকারী (Reported by)', 'Reported by'), { req: true }), ST('requested_by', L('অনুরোধকারী (Requested by)', 'Requested by'))],
   sections: [
@@ -299,7 +299,7 @@ const SHOWROOMS_FALLBACK = [L('ইসলামিয়া মিষ্টি �
 const SHOWROOMS = () => { const ls = ((B.ENV && B.ENV.locs) || []).filter((l) => l.kind === 'showroom' && l.is_active !== false && ['live', 'setting_up', null, undefined].includes(l.status));
   return [...(ls.length ? ls.map((l) => ({ bn: l.name_bn, en: l.name_en || l.name_bn, mix: l.name_mix || l.name_bn })) : SHOWROOMS_FALLBACK), L('অন্য', 'Other')]; };
 B.forms['40-1'] = {
-  title: L('সাপ্তাহিক রিভিউ', 'Weekly Review'),
+  title: L('সাপ্তাহিক রিভিউ', 'Weekly Review', 'সাপ্তাহিক রিভিউ'),
   head: [D('week_from', L('সপ্তাহ — থেকে', 'Week — from'), { req: true }), D('week_to', L('সপ্তাহ — পর্যন্ত', 'Week — to'), { req: true })],
   sections: [
     { title: L('A · সব শোরুম পাশাপাশি', 'A · All showrooms side by side'), fields: [
@@ -356,7 +356,7 @@ const KPIS = [
   L('অনলাইন — অর্ডার · বিক্রি · প্রতি অর্ডারে খরচ', 'Online — orders · sales · cost per order'), L('জরুরি ক্রয়ের ভাগ % = জরুরি ক্রয় ÷ মোট ক্রয়', 'Emergency purchase share % = emergency purchases ÷ total purchases')];
 const daysInMonth = (m) => { const mm = /^(\d{4})-(\d{1,2})$/.exec(String(m || '').trim()); if (!mm) return null; return new Date(Number(mm[1]), Number(mm[2]), 0).getDate(); };
 B.forms['20-1'] = {
-  title: L('মাসিক P&L ও KPI', 'Monthly P&L and KPI'),
+  title: L('মাসিক P&L ও KPI', 'Monthly P&L and KPI', 'মাসিক P&L ও KPI'),
   head: [T('month', L('মাস (বছর-মাস, যেমন 2026-10)', 'Month (year-month, e.g. 2026-10)'), { req: true }),
     CH('scope', L('পরিধি', 'Scope'), [['all', L('সব লোকেশন', 'All locations')], ['loc', L('একটি লোকেশন', 'One location')], ['other', L('অন্য', 'Other')]]), T('scope_name', L('লোকেশন / অন্য — নাম', 'Location / other — name'), { show: (x) => x.d.scope === 'loc' || x.d.scope === 'other' })],
   sections: [

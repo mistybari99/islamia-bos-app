@@ -12,7 +12,6 @@ setupadvisor_test  setupadvisor_b2_test
 invoiceview_test  invoiceview_b2_test
 scan_test  scan_b2_test
 catpick_test  catpick_b2_test
-catpick_pw_test  catpick_pw_b2_test
 itemimg_static_test  itemimg_static_b2_test
 optionsx_b_test  optionsx_b_b2_test
 q4_test  q4_b2_test

@@ -1,13 +1,14 @@
-// Step SW: the OLD public web bundle (islamia-bos-app origin/main) is replaced by the NEW one (this checkout's web/ through make_bundle.sh).
+// Step SW: the OLD public web bundle (islamia-bos-app origin/main) is replaced by the NEW one (this checkout's web/ through tools/build_web.sh --to, the real deploy path since bos114).
 // Proves what the owner's phones see: no mixed versions, old caches dropped, offline POS, queued sale (old shape) sent once, signed-URL expiry, no forced reload mid-sale, Fast 3G load.
-// Run: node tests/web/swupdate_test.js          (needs: git, openssl, python3; the committed web/ must be clean because make_bundle.sh refuses a dirty source)
-// Env: PUB_REPO (default /home/user/islamia-bos-app) OLD_REF (default origin/main) MAKE_BUNDLE (default tests/web/fixtures/make_bundle.sh) ONLY=1,2,.. (scenario filter) JSON_OUT=path
+// Run: node tests/web/swupdate_test.js          (needs: git, openssl, python3; the committed web/ must be clean because build_web.sh --to refuses a dirty source)
+// Env: PUB_REPO (default /home/user/islamia-bos-app) OLD_REF (default origin/main) BUILD_WEB (default tools/build_web.sh) ONLY=1,2,.. (scenario filter) JSON_OUT=path
 // HTTPS (self-signed, h2) is used on purpose: web/swreg.js registers the service worker on https only, so http://localhost would test nothing.
 const _P = require('./_paths');
 const fs = require('fs'), os = require('os'), path = require('path'), http2 = require('http2'), https = require('https'), zlib = require('zlib'), crypto = require('crypto'), cp = require('child_process');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const PUB = process.env.PUB_REPO || '/home/user/islamia-bos-app';
-const MAKE = process.env.MAKE_BUNDLE || path.join(__dirname, 'fixtures', 'make_bundle.sh');
+const MAKE = process.env.BUILD_WEB || path.join(_P.REPO_DIR, 'tools', 'build_web.sh');
+const h10 = (buf) => crypto.createHash('sha256').update(buf).digest('hex').slice(0, 10);   // same as tools/web_build.js: ?v= is the hash of the file's own bytes
 const ONLY = process.env.ONLY ? process.env.ONLY.split(',') : null;
 const want = (n) => !ONLY || ONLY.includes(String(n));
 let pass = 0, failn = 0; const F = [];   // F = findings (info / risk) for the report
@@ -24,10 +25,12 @@ function buildBundles() {
   const oldD = path.join(TMP, 'old'), newD = path.join(TMP, 'new'); extract(ref, oldD); extract(ref, newD);
   sh('git', ['init', '-q', '-b', 'tmpnew'], { cwd: newD }); sh('git', ['add', '-A'], { cwd: newD });
   sh('git', ['-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-q', '-m', 'base'], { cwd: newD });
-  const out = sh('bash', [MAKE, _P.WEB_DIR, newD]);
-  const build = (out.match(/build: ([0-9a-f]{10})/) || [])[1];
-  const oldBuild = (fs.readFileSync(path.join(oldD, 'sw.js'), 'utf8').match(/bos-sw-([\w]+)'/) || [])[1];
-  if (!build) throw new Error('make_bundle gave no build id:\n' + out);
+  fs.copyFileSync(path.join(_P.WEB_DIR, 'config.js'), path.join(newD, 'config.js'));   // build_web.sh --to refuses a deploy whose config.js differs from web/config.js
+  const dist = path.join(TMP, 'dist');
+  const out = sh('bash', [MAKE, '--out', dist, '--to', newD], { cwd: _P.REPO_DIR });
+  const build = fs.existsSync(path.join(dist, '.build-id')) ? fs.readFileSync(path.join(dist, '.build-id'), 'utf8').trim() : undefined;
+  const oldBuild = (fs.readFileSync(path.join(oldD, 'sw.js'), 'utf8').match(/bos-sw-([\w]+)['"]/) || [])[1];
+  if (!build) throw new Error('build_web gave no build id:\n' + out);
   return { oldD, newD, build, oldBuild, makeOut: out.trim().split('\n').slice(-3).join(' | ') };
 }
 
@@ -74,14 +77,17 @@ function makeServer(root) {
 }
 // image host on ANOTHER origin (real signed URLs live on supabase.co, the service worker must never see them)
 function makeImgHost() {
-  const I = { hits: [], n: 0, ttl: 3600 };
+  // The page's Content-Security-Policy (img-src 'self' data: blob: https://*.supabase.co) rightly blocks any other image host, so the photo host is a
+  // *.supabase.co name answered by Playwright (ctx.route) instead of a localhost server. I.install(ctx) must be called on the context.
+  const I = { hits: [], n: 0, ttl: 3600, base: 'https://img.test.supabase.co' };
   const GIF = Buffer.from('R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==', 'base64');
-  I.srv = https.createServer({ key: fs.readFileSync(KEY), cert: fs.readFileSync(CRT) }, (req, res) => {
-    const u = new URL(req.url, 'https://x'); const tok = u.searchParams.get('t'), exp = Number(u.searchParams.get('exp'));
+  I.srv = { close() {} };
+  I.install = (ctx) => ctx.route('https://img.test.supabase.co/**', (r) => {
+    const u = new URL(r.request().url()); const tok = u.searchParams.get('t'), exp = Number(u.searchParams.get('exp'));
     I.hits.push({ path: u.pathname, tok: Number(tok), exp, at: Date.now() });
-    res.writeHead(200, { 'content-type': 'image/gif', 'access-control-allow-origin': '*', 'cache-control': 'no-store' }); res.end(GIF);
+    return r.fulfill({ status: 200, contentType: 'image/gif', headers: { 'access-control-allow-origin': '*', 'cache-control': 'no-store' }, body: GIF });
   });
-  return new Promise((ok) => I.srv.listen(0, () => { I.base = 'https://localhost:' + I.srv.address().port; ok(I); }));
+  return Promise.resolve(I);
 }
 
 // context.setOffline() does NOT reach the service worker's own fetches in Chromium, so "no internet" = the page is told offline AND the server drops every connection.
@@ -118,13 +124,19 @@ const waitSW = async (p, sub, ms, noEntries) => { const t0 = Date.now(); let i; 
     if (i && i.keys.length === 1 && i.keys[0] === 'bos-sw-' + sub && i.controlled && i.state === 'activated' && (noEntries || i.entries['bos-sw-' + sub].length > 5)) return i; await sleep(150); } return i; };
 const scriptUrls = (p) => p.evaluate(() => [...document.querySelectorAll('script[src],link[rel=stylesheet]')].map((e) => e.getAttribute('src') || e.getAttribute('href')).filter((u) => !/^https?:/.test(u)));
 const vOf = (u) => (u.match(/[?&]v=([0-9a-f]{10})/) || [])[1] || null;
+// (the <head> file theme_glass.js carries the build id instead of its own hash)
+// ?v= is the hash of each file's own bytes (bos114), so "same build" means: every stamped URL carries the hash of THAT file in the bundle dir.
+const fileOf = (u) => u.split('?')[0].replace(/^\//, '');
+const stampOkIn = (dir, bid) => (u) => { const v = vOf(u); if (!v) return true; if (v === bid) return true; if (fileOf(u) === 'config.js') return true;   // config.js is the public repo's own protected file (build_web.sh never overwrites it): its ?v= is the hash of the built copy, not of the file kept there
+     try { return h10(fs.readFileSync(path.join(dir, fileOf(u)))) === v; } catch (e) { return false; } };
+const stampedFiles = (urls) => urls.filter((u) => /\.(js|css)\?/.test(u));
 const lsq = (p, k) => p.evaluate((k) => JSON.parse(localStorage.getItem(k) || '[]'), k);
 async function sellItem(p, itemId) {   // POS: one item card -> cart -> pay cash in full
   await p.click(`.pos-item[data-v="${itemId}"]`); await p.waitForTimeout(100);
   const q = await p.$('[data-act=pos_q_ok]'); if (q) await q.click();
   await p.click('[data-act=pos_cart]'); await p.waitForSelector('#cart_ok'); await p.click('#cart_ok'); await p.waitForTimeout(500);
 }
-let firstVisitEntries = null;
+let firstVisitEntries = null, PRECACHE_N = 0;
 async function firstVisit(p, url, sub) {   // first ever visit, then the second load that really fills the cache (clients.claim() comes after the first load's requests)
   await p.goto(url); await boot(p); await p.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 10000 }).catch(() => {});
   const i = await swInfo(p); const n = i.keys.length ? i.entries[i.keys[0]].length : 0; if (firstVisitEntries === null) firstVisitEntries = n;
@@ -134,6 +146,8 @@ const piece = data.tables.items.filter((i) => i.unit === 'pc');
 
 (async () => {
   const B = buildBundles();
+  const swNew = fs.readFileSync(path.join(B.newD, 'sw.js'), 'utf8');
+  PRECACHE_N = (JSON.parse((swNew.match(/PRECACHE\s*=\s*(\[[^\]]*\])/) || [, '[]'])[1]) || []).length;
   console.log('OLD build', B.oldBuild, '| NEW build', B.build, '|', B.makeOut);
   br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--ignore-certificate-errors'] }).catch(() => chromium.launch({ args: ['--ignore-certificate-errors'] }));
   const results = { oldBuild: B.oldBuild, newBuild: B.build };
@@ -144,34 +158,34 @@ const piece = data.tables.items.filter((i) => i.unit === 'pc');
     const srv = await makeServer(B.oldD); const { ctx, errs } = await newCtx(srv); const p = await ctx.newPage();
     const i0 = await firstVisit(p, srv.url, B.oldBuild);
     chk('first visit: cache holds ' + firstVisitEntries + ' files before the 2nd load (SW-3 if 0)', true);
-    chk('old index carries old build stamp', (await scriptUrls(p)).filter((u) => /\.js\?/.test(u)).every((u) => vOf(u) === B.oldBuild), (await scriptUrls(p)).slice(0, 3));
+    { const ou = await scriptUrls(p); chk('old index: every stamped js/css carries the hash of its own file in the OLD bundle, and one carries the old build id', stampedFiles(ou).length > 0 && ou.every(stampOkIn(B.oldD, B.oldBuild)) && ou.some((u) => vOf(u) === B.oldBuild), ou.slice(0, 4)); }
     const oldEntries = i0 ? i0.entries['bos-sw-' + B.oldBuild].length : 0; results.oldCacheEntries = oldEntries; results.cacheEntriesAfterVeryFirstLoad = firstVisitEntries;
     if (firstVisitEntries === 0) find('SW-3', 'OLD bundle (sw.js without bos110): on the very first visit the SW installs after the page has fetched everything, so the cache is EMPTY (0 files) until the 2nd load; offline start only works after a second online open.');
     srv.root = B.newD; srv.log.length = 0; errs.length = 0;   // DEPLOY
     await p.reload(); await boot(p);                           // reload 1
     await sleep(1500);
     let urls = await scriptUrls(p); const vs = new Set(urls.filter((u) => /\.(js|css)\?/.test(u)).map(vOf));
-    chk('reload 1: index.html is the NEW one (stamp ' + B.build + ')', vs.size === 1 && vs.has(B.build), [...vs]);
-    chk('reload 1: every local script/css has ?v= (none unstamped)', urls.every((u) => /\?v=/.test(u)), urls.filter((u) => !/\?v=/.test(u)));
+    chk('reload 1: index.html is the NEW one (a file carries build id ' + B.build + ', every stamp is the hash of its file in the NEW bundle)', vs.has(B.build) && urls.every(stampOkIn(B.newD, B.build)), [...vs]);
+    chk('reload 1: every local script/css has ?v= (none unstamped; vendor/supabase.js is never stamped on purpose)', urls.every((u) => /\?v=/.test(u) || /^vendor\//.test(u)), urls.filter((u) => !/\?v=/.test(u) && !/^vendor\//.test(u)));
     const i1 = await waitSW(p, B.build, 15000, true); results.afterReload1 = i1 && { keys: i1.keys, entries: i1.entries['bos-sw-' + B.build] ? i1.entries['bos-sw-' + B.build].length : 0 };
     chk('reload 1: SW updated (script ' + (i1 && /sw\.js/.test(i1.script || '')) + ') and the old cache bos-sw-' + B.oldBuild + ' is gone', !!i1 && !i1.keys.includes('bos-sw-' + B.oldBuild) && i1.keys.every((k) => k === 'bos-sw-' + B.build), i1 && i1.keys);
-    chk('reload 1: new cache already holds the loaded files (not empty)', results.afterReload1.entries > 50, results.afterReload1);
+    chk('reload 1: new cache already holds the precache list (' + PRECACHE_N + ' files, core only since bos114; lazy screens are cached when used)', results.afterReload1.entries >= PRECACHE_N, results.afterReload1);
     const e1 = i1 && i1.entries['bos-sw-' + B.build] ? i1.entries['bos-sw-' + B.build].length : 0;
     await p.reload(); await boot(p);                           // reload 2
     urls = await scriptUrls(p);
     const res = await p.evaluate(() => performance.getEntriesByType('resource').map((r) => r.name.replace(location.origin, '')).filter((n) => /\.(js|css)(\?|$)/.test(n)));
-    const rv = new Set(res.map(vOf).filter(Boolean)); const unst = res.filter((n) => !vOf(n) && !/sw\.js/.test(n));
-    chk('reload 2: all loaded js/css carry the same build (no mixed versions)', rv.size === 1 && rv.has(B.build) && unst.length === 0, { versions: [...rv], unstamped: unst.slice(0, 5) });
+    const rv = new Set(res.map(vOf).filter(Boolean)); const unst = res.filter((n) => !vOf(n) && !/sw\.js|^\/?vendor\//.test(n));   // vendor/ is never stamped (SW serves it stale-while-revalidate)
+    chk('reload 2: every loaded js/css is the NEW file (its ?v= is the hash of that file in the NEW bundle; none from the old one)', rv.has(B.build) && res.every(stampOkIn(B.newD, B.build)) && unst.length === 0, { versions: [...rv], unstamped: unst.slice(0, 5), wrong: res.filter((n) => !stampOkIn(B.newD, B.build)(n)).slice(0, 5) });
     const i2 = await waitSW(p, B.build);
     chk('reload 2: exactly one cache, bos-sw-' + B.build + ', no old keys', i2 && i2.keys.length === 1 && i2.keys[0] === 'bos-sw-' + B.build, i2 && i2.keys);
     const ents = (i2 && i2.entries['bos-sw-' + B.build]) || [];
-    chk('reload 2: new cache holds no js/css of another build', ents.filter((u) => /\.(js|css)\?/.test(u)).every((u) => vOf(u) === B.build), ents.filter((u) => vOf(u) && vOf(u) !== B.build).slice(0, 3));
+    chk('reload 2: new cache holds no js/css of another build (every stamp is the hash of its file in the NEW bundle)', ents.filter((u) => /\.(js|css)\?/.test(u)).every(stampOkIn(B.newD, B.build)), ents.filter((u) => !stampOkIn(B.newD, B.build)(u)).slice(0, 3));
     results.cacheEntries = { old: oldEntries, afterReload1: e1, afterReload2: ents.length };
     chk('reload 2: cache is complete (>= 90% of old cache entry count)', ents.length >= oldEntries * 0.9, { old: oldEntries, now: ents.length });
     chk('no console / page errors through the whole update', errs.length === 0, errs.slice(0, 5));
     chk('app boots on the new bundle (BOS_APP + a screen)', await p.evaluate(() => !!(window.BOS_APP && document.querySelector('#app').children.length)));
     results.swControlsNewScript = i2 && i2.script;
-    chk('registered SW script is /sw.js and its VERSION is the new build', /\/sw\.js/.test(i2.script || '') && fs.readFileSync(path.join(B.newD, 'sw.js'), 'utf8').includes("'bos-sw-" + B.build + "'"));
+    chk('registered SW script is /sw.js and its VERSION is the new build', /\/sw\.js/.test(i2.script || '') && fs.readFileSync(path.join(B.newD, 'sw.js'), 'utf8').includes("bos-sw-" + B.build));
     await ctx.close(); srv.srv.close();
   }
 
@@ -197,7 +211,7 @@ const piece = data.tables.items.filter((i) => i.unit === 'pc');
     await p.goto(srv.url); await boot(p); await p.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 10000 }).catch(() => {}); await sleep(2500);
     const i = await swInfo(p); const n = i.keys.length ? i.entries[i.keys[0]].length : 0; results.newBundleCacheAfterOneVisit = n;
     await offline(ctx, srv, true); let ok = true; try { await p.reload({ timeout: 8000 }); await p.waitForFunction(() => window.BOS_APP, null, { timeout: 8000 }); } catch (e) { ok = false; }
-    chk('NEW bundle: after a single visit the cache holds the app (' + n + ' files) and the shell opens offline', ok && n > 50, { n, ok });
+    chk('NEW bundle: after a single visit the cache holds the precache list (' + n + ' of ' + PRECACHE_N + ' files) and the shell opens offline', ok && n >= PRECACHE_N, { n, ok });
     await ctx.close(); srv.srv.close();
   }
 
@@ -215,8 +229,8 @@ const piece = data.tables.items.filter((i) => i.unit === 'pc');
     results.freshNavSameUrlStamp = [...vs].join();
     console.log('  stamps after goto(/?x=1):', results.freshNavStamp, '| goto(/):', results.freshNavSameUrlStamp);
     if (vs.has(B.oldBuild) && !vs.has(B.build)) find('SW-2', 'A normal visit (not a reload) to the same URL within Pages max-age (600 s) still gets the OLD index.html from the HTTP cache (stamp ' + B.oldBuild + '); the phone keeps the old, internally consistent version for up to 10 minutes. Not a mix; it is a delay.');
-    else chk('fresh visit after deploy shows the NEW bundle (or a consistent set)', vs.size === 1, [...vs]);
-    chk('no mixed versions on a fresh visit', vs.size === 1, [...vs]);
+    else chk('fresh visit after deploy shows the NEW bundle', vs.has(B.build), [...vs]);
+    { const fu = await scriptUrls(p); chk('no mixed versions on a fresh visit (all stamps from the OLD bundle or all from the NEW one)', fu.every(stampOkIn(B.oldD, B.oldBuild)) || fu.every(stampOkIn(B.newD, B.build)), fu.slice(0, 6)); }
     await ctx.close(); srv.srv.close();
   }
 
@@ -284,7 +298,7 @@ const piece = data.tables.items.filter((i) => i.unit === 'pc');
   // ===== 4. signed-URL expiry in itemimg.js =====
   if (want(4)) {
     console.log('\n[4] item photos: signed URL is not reused after expiry');
-    const srv = await makeServer(B.newD); const img = await makeImgHost(); const { ctx, state } = await newCtx(srv, { skew: true }); state.imgBase = img.base;
+    const srv = await makeServer(B.newD); const img = await makeImgHost(); const { ctx, state } = await newCtx(srv, { skew: true }); state.imgBase = img.base; await img.install(ctx);
     const p = await ctx.newPage(); const it = data.tables.items[0];   // first card = on screen, so the lazy loader fires
     await p.addInitScript(`window.__IMGS=[{item_id:'${it.id}',path:'items/${it.id}/1.jpg'}];`);
     await p.goto(srv.url + '#/pos'); await boot(p); await p.waitForSelector('.pos-item');
