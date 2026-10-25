@@ -1,1 +1,202 @@
-(()=>{"use strict";const e=window.BOS_APP,t=window.BOS,{sb:a,S:n,esc:o,toast:s,fail:i,shell:r,openSheet:l,closeSheet:c,H:d}=e,p=(e,t=document)=>t.querySelector(e),u=e=>((p("#"+e)||{}).value||"").trim(),_=e=>String(e??"").replace(/[০-৯]/g,e=>"০১২৩৪৫৬৭৮৯".indexOf(e)).replace(/,/g,"").trim(),m=e=>{const t=Number(e);return Number.isFinite(t)?(t<0?"-":"")+Math.abs(t).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2}):"-"},v=e=>String(e||"").slice(0,10),y=[["settings","Settings"],["requests","Requests"],["exceptions","Exceptions"],["checks","Checks"],["types","Mapping types"]],w=[["Owner money",["owner_money_entry_mode"]],["Bank deposits and withdrawals",["bank_slip_required","bank_move_large_over","bank_move_backdate_days"]],["Supplier payments",["supplier_pay_dup_mode","supplier_pay_dup_hours","supplier_pay_over"]],["Suppliers and employees",["supplier_dup_mode","employee_pay_dup_mode","employee_pay_change_flag"]],["Journals",["journal_loc_check","journal_attach_over","journal_control_acct_mode","journal_control_prefixes"]],["Chart mapping",["mapping_type_guard"]],["Purchases (existing setting)",["purchase_separate_poster"]]],h=w.reduce((e,t)=>e.concat(t[1]),[]),b={owner_money:"Owner money",supplier_pay:"Supplier payment",journal_control:"Journal on a control account"},$=[["w1e_owner_money","Owner draw or top-up by someone who is not the owner"],["w1e_bank_slip","Bank move without a slip number"],["w1e_dup_payment","Repeat supplier payment"],["w1e_pay_over","Supplier payment above the limit"],["w1e_vendor_dup","Second supplier with the same name, mobile or TIN"],["w1e_pay_account","Employee pay account used by another employee"],["w1e_journal_loc","Journal line in a place the person may not use"],["w1e_journal_attach","Journal above the total without an attachment"],["w1e_journal_control","Journal on a control account (block mode)"],["w1e_mapping","Mapping to an account type that is not listed"]],g={w1e_bank_move_flag:"Bank move flagged",w1e_duplicate_payment:"Repeat supplier payment",w1e_pay_over_request:"Supplier payment waits",w1e_vendor_duplicate:"Duplicate supplier",w1e_pay_account_duplicate:"Pay account shared",w1e_pay_account_changed:"Pay account changed",w1e_owner_money_request:"Owner money waits",w1e_journal_request:"Journal waits",override_exception:"One-off exception used",approver_exception:"Approver exception used"},f={not_allowed:"You do not have permission.",owner_money_owner_only:"Only the owner may record an owner draw or top-up. The owner can allow one exception.",bank_slip_required:"Write the slip number in the reference.",duplicate_payment:"This supplier was paid the same total just now. The owner can allow one exception.",vendor_duplicate:"A supplier with the same name, mobile or TIN exists.",pay_account_duplicate:"Another employee uses this pay account.",journal_place_not_allowed:"A line is in a place you may not use.",attachment_required:"Add the attachment: the total is above the limit.",control_account_blocked:"A journal on a cash, bank, receivable, payable or inventory account is blocked.",mapping_type_mismatch:"That account type does not fit this mapping.",self_approval:"You made this request, so you cannot decide it.",approver_only:"Only the approver chosen by the owner can decide this.",request_not_pending:"This request was already decided.",note_required:"Write a reason.",reason_required:"Write a reason.",approver_is_maker:"The maker cannot be the approver.",unknown_user:"Unknown or inactive person.",bad_bad:"Not valid.",overpaid:"The payment is more than the supplier balance now.",period_closed:"This period is closed.",bad_value:"That value is not allowed for this setting.",bad_key:"Not valid."},k={tab:"settings",st:null,rules:[],rq:null,rqAll:!1,ex:null,ck:null,ty:null,people:[],roles:[]};async function x(e,t){const n=await a.rpc(e,t||{});if(n.error){const e=new Error((e=>{const t=String(e&&e.message||""),a=Object.keys(f).find(e=>t.includes(e));return a?f[a]:t||"error"})(n.error));throw e.raw=n.error,e}return n.data}const q=(e,t)=>`<span class="chip ${t||""}">${o(e)}</span>`,S=(e,t,a)=>`<div><label for="${e}">${o(t)}</label>${a}</div>`,j=(e,t,a)=>`<input id="${e}" autocomplete="off" value="${o(t??"")}" ${a||""}>`,A=()=>!(!n.ctx||!n.ctx.is_owner),N=e=>{const t=k.people.find(t=>t.id===e);return t?t.full_name||t.staff_id:String(e||"").slice(0,8)};function O(e){const t=(e=>null!==e.value&&void 0!==e.value?e.value:e.default_value)(e),a="mc_r_"+e.key,n=A()?"":"disabled";let s;s="switch"===e.kind?`<select id="${a}" ${n}><option value="false" ${!0===t?"":"selected"}>Off</option><option value="true" ${!0===t?"selected":""}>On</option></select>`:"choice"===e.kind?`<select id="${a}" ${n}>${(e.choices||[]).map(e=>`<option value="${o(e)}" ${e===t?"selected":""}>${o(e)}</option>`).join("")}</select>`:"number"===e.kind?`<div class="row" style="gap:.4rem">${j(a,null===e.value||void 0===e.value?"":e.value,`inputmode="decimal" placeholder="blank = off" ${n}`)}${e.unit?`<span class="muted">${o(e.unit)}</span>`:""}</div>`:j(a,t??"",`maxlength="120" ${n}`);const i=null===e.default_value||void 0===e.default_value?"blank (off)":String(e.default_value);return`<div class="card stack mc-rule" data-key="${o(e.key)}"><b>${o(e.label_en)}</b><div class="muted" style="font-size:.85rem">${o(e.hint_en||"")}</div>\n    <div class="row between wrap">${s}${A()?`<button type="button" class="mini" data-act="mc_save" data-v="${o(e.key)}">Save</button>`:""}</div>\n    <div class="muted" style="font-size:.8rem">Default (today): ${o(i)}</div></div>`}function T(){const e=k.st||{},t=e.hooks||{},a=e.approver||{},n=(e,t)=>e?q(t+": ready","ok"):q(t+": waiting for the hook of docs/integration/W1-E.md","warn");return`<div class="card stack" id="mc_head"><b>Approver</b><div>Owner's own entries and the requests below are decided by: mode <b>${o(a.mode||"self")}</b>${a.role?" · role <b>"+o(a.role)+"</b>":""}${(a.users||[]).length?" · "+a.users.map(e=>o(N(e))).join(", "):""}.\n      <a href="#/moneyaccounts" data-act="mc_goapprovers">Change under Money Accounts &gt; Approvers</a>.</div>\n    <div class="row wrap">${n(t.pay_supplier,"Supplier payment guard")}${n(t.cash_move_add,"Cash move answer")}${n(t.acct_journal_post,"Journal gate")}</div>\n    ${A()?"":'<div class="muted">Only the owner can change a setting.</div>'}</div>`+w.map(([e,t])=>{const a=t.map(e=>k.rules.find(t=>t.key===e)).filter(Boolean);return a.length?`<h3>${o(e)}</h3>${a.map(O).join("")}`:""}).join("")}function W(){const e=(k.rq||{}).rows||[];return`<div class="row wrap"><button type="button" class="tog ${k.rqAll?"":"on"}" data-act="mc_rqf" data-v="pending">Waiting</button><button type="button" class="tog ${k.rqAll?"on":""}" data-act="mc_rqf" data-v="all">All</button></div>`+(e.map(e=>`<div class="card stack mc-req" data-id="${e.id}" data-status="${o(e.status)}"><div class="row between"><b>${o(b[e.kind]||e.kind)}</b><b>${m(e.amount)}</b></div>\n      <div>${o(e.summary)}</div><div class="muted">${o(v(e.ref_date))} · asked by ${o(e.requested_staff||N(e.requested_by))} · ${o(v(e.requested_at))}${e.approver_user||e.approver_role?" · approver: "+o(e.approver_role||N(e.approver_user)):""}</div>\n      <div class="row wrap">${q(e.status,"pending"===e.status?"warn":"approved"===e.status?"ok":"")}${e.decision_note?`<span class="muted">${o(e.decision_note)}</span>`:""}</div>\n      ${e.can_decide?`<div class="row wrap"><button type="button" class="btn primary" data-act="mc_approve" data-v="${e.id}">Approve</button><button type="button" class="btn" data-act="mc_reject" data-v="${e.id}">Reject</button></div>`:""}\n      ${"pending"===e.status&&!e.can_decide&&e.mine?'<div class="muted">You asked for this. The approver decides it; you cannot decide your own request.</div>':""}\n      ${"pending"===e.status&&(e.can_cancel||A())?`<div class="row wrap"><button type="button" class="mini" data-act="mc_cancel" data-v="${e.id}">⋮ Cancel</button>${A()?`<button type="button" class="mini" data-act="mc_setap" data-v="${e.id}">⋮ Set approver for this one</button>`:""}</div>`:""}</div>`).join("")||'<p class="muted">Nothing here.</p>')}function B(){const e=k.ex||{rows:[],grants:[]},t=e.rows.map(e=>`<div class="card stack mc-ex" data-level="${o(e.level)}"><div class="row between"><b>${o(g[e.kind]||e.kind)}</b>${q("red"===e.level?"Red":"Yellow","red"===e.level?"bad":"warn")}</div>\n      <div>${o(e.reason||"")}</div><div class="muted">${o(v(e.at))}${null!==e.amount&&void 0!==e.amount?" · "+m(e.amount):""} · ${o(e.event_type||"")}</div>\n      ${"open"===e.status?`<div class="row"><button type="button" class="mini" data-act="mc_exres" data-v="${e.id}">Mark as looked at</button></div>`:`<div class="muted">Looked at: ${o(e.resolve_note||"")}</div>`}</div>`).join("");return(A()?`<div class="card stack" id="mc_grant"><b>Allow one exception</b><div class="muted">For one person (24 hours, used once). A reason is required. It is written to the change log and shown in this list. A journal that does not balance is never excepted.</div>\n      ${S("gx_ev","What",`<select id="gx_ev">${$.map(([e,t])=>`<option value="${e}">${o(t)}</option>`).join("")}</select>`)}\n      ${S("gx_rule","Kind",'<select id="gx_rule"><option value="override">Let the entry through</option><option value="approver">Let me decide a request (approver exception)</option></select>')}\n      ${S("gx_user","For this person",`<select id="gx_user"><option value="">—</option>${k.people.map(e=>`<option value="${o(e.id)}">${o(e.full_name||e.staff_id||e.id)}</option>`).join("")}</select>`)}\n      ${S("gx_reason","Reason",j("gx_reason","",'maxlength="200"'))}<button type="button" class="btn primary" data-act="mc_grant">Allow once</button></div>`:"")+"<h3>Flags and exceptions</h3>"+(t||'<p class="muted">Nothing flagged.</p>')+((e.grants||[]).length?`<h3>Exceptions allowed</h3>${e.grants.map(e=>`<div class="card"><b>${o(e.event_type||"any")}</b> · ${o(e.rule)} · ${o(N(e.for_user))}<div class="muted">${o(e.reason)} · ${e.used_at?"used":e.revoked?"revoked":"open until "+o(v(e.expires_at))}</div></div>`).join("")}`:"")}function C(){const e=k.ck||{vendors:[],pay_accounts:[]};return`<h3>Suppliers that look the same</h3>${e.vendors.map(e=>`<div class="card mc-vd"><b>${o(e.a_name)}</b> and <b>${o(e.b_name)}</b><div class="muted">same ${o(e.by)}</div></div>`).join("")||'<p class="muted">None.</p>'}<h3>Employees on one pay account</h3>${e.pay_accounts.map(e=>`<div class="card mc-pa"><b>${o(e.a_no)}</b> and <b>${o(e.b_no)}</b><div class="muted">same ${o(e.by)} · ${o(e.account)}</div></div>`).join("")||'<p class="muted">None. Account numbers are shown with the last 4 characters only.</p>'}`}function R(){return`<div class="muted">A mapping key (for example sales) may only point to the account types listed here, when the setting "Check the account type when a mapping is changed" is on. Types: asset, liability, equity, income, expense. Rows are switched off, never deleted.</div>${(k.ty||[]).map((e,t)=>`<div class="card stack mc-ty ${e.active?"":"muted"}" data-k="${o(e.key_like)}"><div class="row between"><b>${o(e.key_like.replace(/\\/g,""))}</b>${e.active?"":q("Switched off")}</div>\n      <div class="muted">${o(e.note||"")}</div>\n      <div class="row wrap">${j("mt_"+t,(e.allowed||[]).join(", "),(A()?"":"disabled")+' aria-label="allowed account types"')}${A()?`<button type="button" class="mini" data-act="mc_tysave" data-v="${t}">Save</button><button type="button" class="mini" data-act="mc_tytog" data-v="${t}">⋮ ${e.active?"Switch off":"Switch on"}</button>`:""}</div></div>`).join("")}`}function E(){const e=p("#mc_body");e&&(e.innerHTML=`<div class="row wrap" id="mc_tabs" style="gap:.3rem">${y.map(([e,t])=>`<button type="button" class="tog ${k.tab===e?"on":""}" data-act="mc_tab" data-v="${e}">${o(t)}${"requests"===e&&k.st&&k.st.pending?" ("+k.st.pending+")":""}</button>`).join("")}</div>`+({settings:T,requests:W,exceptions:B,checks:C,types:R}[k.tab]||T)())}async function P(e){e&&(k.tab=e);try{await async function(){if(!k.people.length)try{const e=await a.from("profiles").select("id,full_name,staff_id,status").eq("status","active").order("full_name");k.people=e.data||[]}catch(e){k.people=[]}if(k.st=await x("w1e_state",{}),"settings"===k.tab){const e=await a.from("rules").select("key,kind,value,default_value,choices,unit,label_en,hint_en,min_value,max_value").in("key",h);k.rules=e.data||[]}"requests"===k.tab&&(k.rq=await x("w1e_requests_list",{p_status:k.rqAll?null:"pending",p_limit:200})),"exceptions"===k.tab&&(k.ex=await x("w1e_exceptions_list",{p_status:null,p_limit:200})),"checks"===k.tab&&(k.ck=await x("w1e_checks",{})),"types"===k.tab&&(k.ty=await x("w1e_mapping_types_list",{}))}(),E()}catch(e){s(e.message),E()}}const F=e=>async t=>{try{await e(t)}catch(e){s(e.message||"error")}},J=e=>{const t=window.prompt(e);return t&&t.trim().length>=3?t.trim():null};Object.assign(d,{mc_tab:e=>P(e.dataset.v),mc_goapprovers:()=>{},mc_save:F(async e=>{const t=e.dataset.v,a=k.rules.find(e=>e.key===t);if(!a)return;const n=u("mc_r_"+t);let o;if("switch"===a.kind)o="true"===n;else if("number"===a.kind){if(""===_(n))o=null;else if(o=Number(_(n)),!Number.isFinite(o))return s(f.bad_value)}else o=""===n?null:n;await x("set_rule",{p_key:t,p_value:o}),s("Saved"),await P("settings")}),mc_rqf:e=>(k.rqAll="all"===e.dataset.v,P("requests")),mc_approve:F(async e=>{await x("w1e_request_decide",{p_id:Number(e.dataset.v),p_approve:!0,p_note:null}),s("Approved"),await P("requests")}),mc_reject:F(async e=>{const t=J("Why is this rejected?");t&&(await x("w1e_request_decide",{p_id:Number(e.dataset.v),p_approve:!1,p_note:t}),s("Rejected"),await P("requests"))}),mc_cancel:F(async e=>{const t=J("Why is this cancelled?");t&&(await x("w1e_request_cancel",{p_id:Number(e.dataset.v),p_note:t}),s("Cancelled"),await P("requests"))}),mc_setap:e=>{const t=e.dataset.v;l(`<h3>Approver for this request</h3><div class="stack">${S("sa_user","Person",`<select id="sa_user"><option value="">—</option>${k.people.map(e=>`<option value="${o(e.id)}">${o(e.full_name||e.staff_id||e.id)}</option>`).join("")}</select>`)}\n      ${S("sa_role","or role",'<input id="sa_role" autocomplete="off" maxlength="40" placeholder="role code">')}${S("sa_why","Reason",j("sa_why","",'maxlength="200"'))}\n      <button type="button" class="btn primary" data-act="mc_setapgo" data-v="${o(t)}">Save</button></div>`)},mc_setapgo:F(async e=>{if(u("sa_why").length<3)return s(f.reason_required);await x("w1e_request_approver_set",{p_id:Number(e.dataset.v),p_user:u("sa_user")||null,p_role:u("sa_role")||null,p_reason:u("sa_why")}),c(),s("Saved"),await P("requests")}),mc_exres:F(async e=>{const t=J("Note: what did you check?");t&&(await x("money_exception_resolve",{p_id:Number(e.dataset.v),p_note:t}),await P("exceptions"))}),mc_grant:F(async()=>{if(u("gx_reason").length<3)return s(f.reason_required);if(!u("gx_user"))return s("Choose the person.");const e=u("gx_ev");await x("money_exception_grant",{p_rule:u("gx_rule"),p_reason:u("gx_reason"),p_for_user:u("gx_user"),p_client:null,p_event:e,p_account:null,p_max:null,p_date:null,p_hours:24}),s("Saved"),await P("exceptions")}),mc_tysave:F(async e=>{const t=Number(e.dataset.v),a=(k.ty||[])[t];if(!a)return;const n=a.key_like,o=u("mt_"+t).split(",").map(e=>e.trim().toLowerCase()).filter(Boolean);if(!o.length)return s(f.bad_value);const i=J("Why is this list changed?");i&&(await x("w1e_mapping_type_set",{p_key_like:n,p_allowed:o,p_active:a.active,p_reason:i}),s("Saved"),await P("types"))}),mc_tytog:F(async e=>{const t=(k.ty||[])[Number(e.dataset.v)];if(!t)return;const a=t.key_like,n=J(t.active?"Why is this row switched off?":"Why is this row switched on?");n&&(await x("w1e_mapping_type_set",{p_key_like:a,p_allowed:t.allowed,p_active:!t.active,p_reason:n}),s("Saved"),await P("types"))})}),window.BOS_PAGES=Object.assign(window.BOS_PAGES||{},{moneycontrols:async function(){t.loadStatic&&await t.loadStatic(),r("Money controls",'<div id="mc_body"><p class="muted">…</p></div>',!0);try{k.st=null,await P(k.tab)}catch(e){i(e)}}})})();
+/* Islamia BOS · Money controls (#/moneycontrols). One screen for the cash, payment, journal and mapping controls of phases 94 and 95:
+   Settings (every policy choice is a setting the owner can change at any time; each change is written to the change log by the server),
+   Requests (owner money, supplier payments over the limit and journals on control accounts that wait for the approver chosen under Money Accounts > Approvers),
+   Exceptions (what the controls flagged, and the one-off exceptions the owner may allow with a reason), Checks (shared supplier identity or pay account) and Mapping types.
+   Server: supabase/phase94.sql and phase95.sql (w1e_state, w1e_requests_list, w1e_request_decide / cancel / approver_set, w1e_exceptions_list, w1e_checks, w1e_mapping_types_list / set,
+   money_exception_grant / resolve from phase 87, set_rule). Nothing is decided in the browser: a hidden button is also a refused request on the server.
+   English labels only for now (the owner will translate them later). UNVERIFIED on a real phone and on a real Supabase project. */
+(() => {
+'use strict';
+const A = window.BOS_APP, B = window.BOS;
+const { sb, S, esc, toast, fail, shell, openSheet, closeSheet, H } = A;
+const $ = (s, el = document) => el.querySelector(s);
+const val = (id) => (($('#' + id) || {}).value || '').trim();
+const norm = (v) => String(v ?? '').replace(/[০-৯]/g, (d) => '০১২৩৪৫৬৭৮৯'.indexOf(d)).replace(/,/g, '').trim();
+const fm = (n) => { const v = Number(n); if (!Number.isFinite(v)) return '-'; return (v < 0 ? '-' : '') + Math.abs(v).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+const dt = (s) => String(s || '').slice(0, 10);
+
+const TABS = [['settings', 'Settings'], ['requests', 'Requests'], ['exceptions', 'Exceptions'], ['checks', 'Checks'], ['types', 'Mapping types']];
+const GROUPS = [
+  ['Owner money', ['owner_money_entry_mode']],
+  ['Bank deposits and withdrawals', ['bank_slip_required', 'bank_move_large_over', 'bank_move_backdate_days']],
+  ['Supplier payments', ['supplier_pay_dup_mode', 'supplier_pay_dup_hours', 'supplier_pay_over']],
+  ['Suppliers and employees', ['supplier_dup_mode', 'employee_pay_dup_mode', 'employee_pay_change_flag']],
+  ['Journals', ['journal_loc_check', 'journal_attach_over', 'journal_control_acct_mode', 'journal_control_prefixes']],
+  ['Chart mapping', ['mapping_type_guard']],
+  ['Purchases (existing setting)', ['purchase_separate_poster']],
+];
+const KEYS = GROUPS.reduce((a, g) => a.concat(g[1]), []);
+const KIND = { owner_money: 'Owner money', supplier_pay: 'Supplier payment', journal_control: 'Journal on a control account' };
+const EVENTS = [
+  ['w1e_owner_money', 'Owner draw or top-up by someone who is not the owner'], ['w1e_bank_slip', 'Bank move without a slip number'], ['w1e_dup_payment', 'Repeat supplier payment'],
+  ['w1e_pay_over', 'Supplier payment above the limit'], ['w1e_vendor_dup', 'Second supplier with the same name, mobile or TIN'], ['w1e_pay_account', 'Employee pay account used by another employee'],
+  ['w1e_journal_loc', 'Journal line in a place the person may not use'], ['w1e_journal_attach', 'Journal above the total without an attachment'], ['w1e_journal_control', 'Journal on a control account (block mode)'],
+  ['w1e_mapping', 'Mapping to an account type that is not listed'],
+];
+const KIND_LABEL = { w1e_bank_move_flag: 'Bank move flagged', w1e_duplicate_payment: 'Repeat supplier payment', w1e_pay_over_request: 'Supplier payment waits', w1e_vendor_duplicate: 'Duplicate supplier',
+  w1e_pay_account_duplicate: 'Pay account shared', w1e_pay_account_changed: 'Pay account changed', w1e_owner_money_request: 'Owner money waits', w1e_journal_request: 'Journal waits',
+  override_exception: 'One-off exception used', approver_exception: 'Approver exception used' };
+const ERR = {
+  not_allowed: 'You do not have permission.', owner_money_owner_only: 'Only the owner may record an owner draw or top-up. The owner can allow one exception.', bank_slip_required: 'Write the slip number in the reference.',
+  duplicate_payment: 'This supplier was paid the same total just now. The owner can allow one exception.', vendor_duplicate: 'A supplier with the same name, mobile or TIN exists.', pay_account_duplicate: 'Another employee uses this pay account.',
+  journal_place_not_allowed: 'A line is in a place you may not use.', attachment_required: 'Add the attachment: the total is above the limit.', control_account_blocked: 'A journal on a cash, bank, receivable, payable or inventory account is blocked.',
+  mapping_type_mismatch: 'That account type does not fit this mapping.', self_approval: 'You made this request, so you cannot decide it.', approver_only: 'Only the approver chosen by the owner can decide this.',
+  request_not_pending: 'This request was already decided.', note_required: 'Write a reason.', reason_required: 'Write a reason.', approver_is_maker: 'The maker cannot be the approver.', unknown_user: 'Unknown or inactive person.',
+  bad_bad: 'Not valid.', overpaid: 'The payment is more than the supplier balance now.', period_closed: 'This period is closed.', bad_value: 'That value is not allowed for this setting.', bad_key: 'Not valid.',
+};
+const eText = (e) => { const m = String((e && e.message) || ''); const k = Object.keys(ERR).find((x) => m.includes(x)); return k ? ERR[k] : m || 'error'; };
+const D = { tab: 'settings', st: null, rules: [], rq: null, rqAll: false, ex: null, ck: null, ty: null, people: [], roles: [] };
+
+async function call(fn, args) {
+  const r = await sb.rpc(fn, args || {});
+  if (r.error) { const e = new Error(eText(r.error)); e.raw = r.error; throw e; }
+  return r.data;
+}
+const chip = (txt, cls) => `<span class="chip ${cls || ''}">${esc(txt)}</span>`;
+const fld = (id, label, inner) => `<div><label for="${id}">${esc(label)}</label>${inner}</div>`;
+const inp = (id, v, extra) => `<input id="${id}" autocomplete="off" value="${esc(v ?? '')}" ${extra || ''}>`;
+const isOwner = () => !!(S.ctx && S.ctx.is_owner);
+const who = (id) => { const p = D.people.find((x) => x.id === id); return p ? (p.full_name || p.staff_id) : String(id || '').slice(0, 8); };
+const cur = (r) => (r.value !== null && r.value !== undefined ? r.value : r.default_value);
+
+// ---------------- tabs ----------------
+function tabsBar() { return `<div class="row wrap" id="mc_tabs" style="gap:.3rem">${TABS.map(([k, l]) => `<button type="button" class="tog ${D.tab === k ? 'on' : ''}" data-act="mc_tab" data-v="${k}">${esc(l)}${k === 'requests' && D.st && D.st.pending ? ' (' + D.st.pending + ')' : ''}</button>`).join('')}</div>`; }
+
+function ruleCtl(r) {
+  const v = cur(r), id = 'mc_r_' + r.key, ro = isOwner() ? '' : 'disabled';
+  let ctl;
+  if (r.kind === 'switch') ctl = `<select id="${id}" ${ro}><option value="false" ${v === true ? '' : 'selected'}>Off</option><option value="true" ${v === true ? 'selected' : ''}>On</option></select>`;
+  else if (r.kind === 'choice') ctl = `<select id="${id}" ${ro}>${(r.choices || []).map((c) => `<option value="${esc(c)}" ${c === v ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select>`;
+  else if (r.kind === 'number') ctl = `<div class="row" style="gap:.4rem">${inp(id, r.value === null || r.value === undefined ? '' : r.value, `inputmode="decimal" placeholder="blank = off" ${ro}`)}${r.unit ? `<span class="muted">${esc(r.unit)}</span>` : ''}</div>`;
+  else ctl = inp(id, v === null || v === undefined ? '' : v, `maxlength="120" ${ro}`);
+  const d = r.default_value === null || r.default_value === undefined ? 'blank (off)' : String(r.default_value);
+  return `<div class="card stack mc-rule" data-key="${esc(r.key)}"><b>${esc(r.label_en)}</b><div class="muted" style="font-size:.85rem">${esc(r.hint_en || '')}</div>
+    <div class="row between wrap">${ctl}${isOwner() ? `<button type="button" class="mini" data-act="mc_save" data-v="${esc(r.key)}">Save</button>` : ''}</div>
+    <div class="muted" style="font-size:.8rem">Default (today): ${esc(d)}</div></div>`;
+}
+function settingsHTML() {
+  const st = D.st || {}, h = st.hooks || {}, ap = st.approver || {};
+  const hook = (ok, name) => (ok ? chip(name + ': ready', 'ok') : chip(name + ': waiting for the hook of docs/integration/W1-E.md', 'warn'));
+  const head = `<div class="card stack" id="mc_head"><b>Approver</b><div>Owner's own entries and the requests below are decided by: mode <b>${esc(ap.mode || 'self')}</b>${ap.role ? ' · role <b>' + esc(ap.role) + '</b>' : ''}${(ap.users || []).length ? ' · ' + ap.users.map((u) => esc(who(u))).join(', ') : ''}.
+      <a href="#/moneyaccounts" data-act="mc_goapprovers">Change under Money Accounts &gt; Approvers</a>.</div>
+    <div class="row wrap">${hook(h.pay_supplier, 'Supplier payment guard')}${hook(h.cash_move_add, 'Cash move answer')}${hook(h.acct_journal_post, 'Journal gate')}</div>
+    ${isOwner() ? '' : '<div class="muted">Only the owner can change a setting.</div>'}</div>`;
+  const body = GROUPS.map(([title, keys]) => {
+    const rows = keys.map((k) => D.rules.find((r) => r.key === k)).filter(Boolean);
+    return rows.length ? `<h3>${esc(title)}</h3>${rows.map(ruleCtl).join('')}` : '';
+  }).join('');
+  return head + body;
+}
+
+function requestsHTML() {
+  const rows = ((D.rq || {}).rows || []);
+  const filt = `<div class="row wrap"><button type="button" class="tog ${D.rqAll ? '' : 'on'}" data-act="mc_rqf" data-v="pending">Waiting</button><button type="button" class="tog ${D.rqAll ? 'on' : ''}" data-act="mc_rqf" data-v="all">All</button></div>`;
+  const cards = rows.map((q) => `<div class="card stack mc-req" data-id="${q.id}" data-status="${esc(q.status)}"><div class="row between"><b>${esc(KIND[q.kind] || q.kind)}</b><b>${fm(q.amount)}</b></div>
+      <div>${esc(q.summary)}</div><div class="muted">${esc(dt(q.ref_date))} · asked by ${esc(q.requested_staff || who(q.requested_by))} · ${esc(dt(q.requested_at))}${q.approver_user || q.approver_role ? ' · approver: ' + esc(q.approver_role || who(q.approver_user)) : ''}</div>
+      <div class="row wrap">${chip(q.status, q.status === 'pending' ? 'warn' : q.status === 'approved' ? 'ok' : '')}${q.decision_note ? `<span class="muted">${esc(q.decision_note)}</span>` : ''}</div>
+      ${q.can_decide ? `<div class="row wrap"><button type="button" class="btn primary" data-act="mc_approve" data-v="${q.id}">Approve</button><button type="button" class="btn" data-act="mc_reject" data-v="${q.id}">Reject</button></div>` : ''}
+      ${q.status === 'pending' && !q.can_decide && q.mine ? '<div class="muted">You asked for this. The approver decides it; you cannot decide your own request.</div>' : ''}
+      ${q.status === 'pending' && (q.can_cancel || isOwner()) ? `<div class="row wrap"><button type="button" class="mini" data-act="mc_cancel" data-v="${q.id}">⋮ Cancel</button>${isOwner() ? `<button type="button" class="mini" data-act="mc_setap" data-v="${q.id}">⋮ Set approver for this one</button>` : ''}</div>` : ''}</div>`).join('');
+  return filt + (cards || '<p class="muted">Nothing here.</p>');
+}
+
+function exceptionsHTML() {
+  const ex = D.ex || { rows: [], grants: [] };
+  const rows = ex.rows.map((x) => `<div class="card stack mc-ex" data-level="${esc(x.level)}"><div class="row between"><b>${esc(KIND_LABEL[x.kind] || x.kind)}</b>${chip(x.level === 'red' ? 'Red' : 'Yellow', x.level === 'red' ? 'bad' : 'warn')}</div>
+      <div>${esc(x.reason || '')}</div><div class="muted">${esc(dt(x.at))}${x.amount !== null && x.amount !== undefined ? ' · ' + fm(x.amount) : ''} · ${esc(x.event_type || '')}</div>
+      ${x.status === 'open' ? `<div class="row"><button type="button" class="mini" data-act="mc_exres" data-v="${x.id}">Mark as looked at</button></div>` : `<div class="muted">Looked at: ${esc(x.resolve_note || '')}</div>`}</div>`).join('');
+  const grant = isOwner() ? `<div class="card stack" id="mc_grant"><b>Allow one exception</b><div class="muted">For one person (24 hours, used once). A reason is required. It is written to the change log and shown in this list. A journal that does not balance is never excepted.</div>
+      ${fld('gx_ev', 'What', `<select id="gx_ev">${EVENTS.map(([k, l]) => `<option value="${k}">${esc(l)}</option>`).join('')}</select>`)}
+      ${fld('gx_rule', 'Kind', '<select id="gx_rule"><option value="override">Let the entry through</option><option value="approver">Let me decide a request (approver exception)</option></select>')}
+      ${fld('gx_user', 'For this person', `<select id="gx_user"><option value="">—</option>${D.people.map((p) => `<option value="${esc(p.id)}">${esc(p.full_name || p.staff_id || p.id)}</option>`).join('')}</select>`)}
+      ${fld('gx_reason', 'Reason', inp('gx_reason', '', 'maxlength="200"'))}<button type="button" class="btn primary" data-act="mc_grant">Allow once</button></div>` : '';
+  const used = (ex.grants || []).length ? `<h3>Exceptions allowed</h3>${ex.grants.map((g) => `<div class="card"><b>${esc(g.event_type || 'any')}</b> · ${esc(g.rule)} · ${esc(who(g.for_user))}<div class="muted">${esc(g.reason)} · ${g.used_at ? 'used' : g.revoked ? 'revoked' : 'open until ' + esc(dt(g.expires_at))}</div></div>`).join('')}` : '';
+  return grant + `<h3>Flags and exceptions</h3>` + (rows || '<p class="muted">Nothing flagged.</p>') + used;
+}
+
+function checksHTML() {
+  const c = D.ck || { vendors: [], pay_accounts: [] };
+  const v = c.vendors.map((x) => `<div class="card mc-vd"><b>${esc(x.a_name)}</b> and <b>${esc(x.b_name)}</b><div class="muted">same ${esc(x.by)}</div></div>`).join('');
+  const p = c.pay_accounts.map((x) => `<div class="card mc-pa"><b>${esc(x.a_no)}</b> and <b>${esc(x.b_no)}</b><div class="muted">same ${esc(x.by)} · ${esc(x.account)}</div></div>`).join('');
+  return `<h3>Suppliers that look the same</h3>${v || '<p class="muted">None.</p>'}<h3>Employees on one pay account</h3>${p || '<p class="muted">None. Account numbers are shown with the last 4 characters only.</p>'}`;
+}
+
+function typesHTML() {
+  const rows = (D.ty || []).map((t, i) => `<div class="card stack mc-ty ${t.active ? '' : 'muted'}" data-k="${esc(t.key_like)}"><div class="row between"><b>${esc(t.key_like.replace(/\\/g, ''))}</b>${t.active ? '' : chip('Switched off')}</div>
+      <div class="muted">${esc(t.note || '')}</div>
+      <div class="row wrap">${inp('mt_' + i, (t.allowed || []).join(', '), `${isOwner() ? '' : 'disabled'} aria-label="allowed account types"`)}${isOwner() ? `<button type="button" class="mini" data-act="mc_tysave" data-v="${i}">Save</button><button type="button" class="mini" data-act="mc_tytog" data-v="${i}">⋮ ${t.active ? 'Switch off' : 'Switch on'}</button>` : ''}</div></div>`).join('');
+  return `<div class="muted">A mapping key (for example sales) may only point to the account types listed here, when the setting "Check the account type when a mapping is changed" is on. Types: asset, liability, equity, income, expense. Rows are switched off, never deleted.</div>${rows}`;
+}
+
+function draw() {
+  const el = $('#mc_body'); if (!el) return;
+  el.innerHTML = tabsBar() + ({ settings: settingsHTML, requests: requestsHTML, exceptions: exceptionsHTML, checks: checksHTML, types: typesHTML }[D.tab] || settingsHTML)();
+}
+async function loadTab() {
+  if (!D.people.length) { try { const p = await sb.from('profiles').select('id,full_name,staff_id,status').eq('status', 'active').order('full_name'); D.people = p.data || []; } catch (e) { D.people = []; } }
+  D.st = await call('w1e_state', {});
+  if (D.tab === 'settings') { const r = await sb.from('rules').select('key,kind,value,default_value,choices,unit,label_en,hint_en,min_value,max_value').in('key', KEYS); D.rules = r.data || []; }
+  if (D.tab === 'requests') D.rq = await call('w1e_requests_list', { p_status: D.rqAll ? null : 'pending', p_limit: 200 });
+  if (D.tab === 'exceptions') D.ex = await call('w1e_exceptions_list', { p_status: null, p_limit: 200 });
+  if (D.tab === 'checks') D.ck = await call('w1e_checks', {});
+  if (D.tab === 'types') D.ty = await call('w1e_mapping_types_list', {});
+}
+async function show(tab) { if (tab) D.tab = tab; try { await loadTab(); draw(); } catch (e) { toast(e.message); draw(); } }
+const act = (fn) => async (a) => { try { await fn(a); } catch (e) { toast(e.message || 'error'); } };
+const ask = (q) => { const n = window.prompt(q); return n && n.trim().length >= 3 ? n.trim() : null; };
+
+Object.assign(H, {
+  mc_tab: (a) => show(a.dataset.v),
+  mc_goapprovers: () => {},
+  mc_save: act(async (a) => {
+    const k = a.dataset.v, r = D.rules.find((x) => x.key === k); if (!r) return;
+    const raw = val('mc_r_' + k); let v;
+    if (r.kind === 'switch') v = raw === 'true';
+    else if (r.kind === 'number') { if (norm(raw) === '') v = null; else { v = Number(norm(raw)); if (!Number.isFinite(v)) return toast(ERR.bad_value); } }
+    else v = raw === '' ? null : raw;
+    await call('set_rule', { p_key: k, p_value: v });
+    toast('Saved'); await show('settings');
+  }),
+  mc_rqf: (a) => { D.rqAll = a.dataset.v === 'all'; return show('requests'); },
+  mc_approve: act(async (a) => { await call('w1e_request_decide', { p_id: Number(a.dataset.v), p_approve: true, p_note: null }); toast('Approved'); await show('requests'); }),
+  mc_reject: act(async (a) => { const n = ask('Why is this rejected?'); if (!n) return; await call('w1e_request_decide', { p_id: Number(a.dataset.v), p_approve: false, p_note: n }); toast('Rejected'); await show('requests'); }),
+  mc_cancel: act(async (a) => { const n = ask('Why is this cancelled?'); if (!n) return; await call('w1e_request_cancel', { p_id: Number(a.dataset.v), p_note: n }); toast('Cancelled'); await show('requests'); }),
+  mc_setap: (a) => {
+    const id = a.dataset.v;
+    openSheet(`<h3>Approver for this request</h3><div class="stack">${fld('sa_user', 'Person', `<select id="sa_user"><option value="">—</option>${D.people.map((p) => `<option value="${esc(p.id)}">${esc(p.full_name || p.staff_id || p.id)}</option>`).join('')}</select>`)}
+      ${fld('sa_role', 'or role', `<input id="sa_role" autocomplete="off" maxlength="40" placeholder="role code">`)}${fld('sa_why', 'Reason', inp('sa_why', '', 'maxlength="200"'))}
+      <button type="button" class="btn primary" data-act="mc_setapgo" data-v="${esc(id)}">Save</button></div>`);
+  },
+  mc_setapgo: act(async (a) => {
+    if (val('sa_why').length < 3) return toast(ERR.reason_required);
+    await call('w1e_request_approver_set', { p_id: Number(a.dataset.v), p_user: val('sa_user') || null, p_role: val('sa_role') || null, p_reason: val('sa_why') });
+    closeSheet(); toast('Saved'); await show('requests');
+  }),
+  mc_exres: act(async (a) => { const n = ask('Note: what did you check?'); if (!n) return; await call('money_exception_resolve', { p_id: Number(a.dataset.v), p_note: n }); await show('exceptions'); }),
+  mc_grant: act(async () => {
+    if (val('gx_reason').length < 3) return toast(ERR.reason_required);
+    if (!val('gx_user')) return toast('Choose the person.');
+    const ev = val('gx_ev');
+    await call('money_exception_grant', { p_rule: val('gx_rule'), p_reason: val('gx_reason'), p_for_user: val('gx_user'), p_client: null, p_event: ev, p_account: null, p_max: null, p_date: null, p_hours: 24 });
+    toast('Saved'); await show('exceptions');
+  }),
+  mc_tysave: act(async (a) => {
+    const i = Number(a.dataset.v), t = (D.ty || [])[i]; if (!t) return; const k = t.key_like;
+    const list = val('mt_' + i).split(',').map((s) => s.trim().toLowerCase()).filter(Boolean); if (!list.length) return toast(ERR.bad_value);
+    const n = ask('Why is this list changed?'); if (!n) return;
+    await call('w1e_mapping_type_set', { p_key_like: k, p_allowed: list, p_active: t.active, p_reason: n }); toast('Saved'); await show('types');
+  }),
+  mc_tytog: act(async (a) => {
+    const t = (D.ty || [])[Number(a.dataset.v)]; if (!t) return; const k = t.key_like;
+    const n = ask(t.active ? 'Why is this row switched off?' : 'Why is this row switched on?'); if (!n) return;
+    await call('w1e_mapping_type_set', { p_key_like: k, p_allowed: t.allowed, p_active: !t.active, p_reason: n }); toast('Saved'); await show('types');
+  }),
+});
+
+async function view() {
+  if (B.loadStatic) await B.loadStatic();
+  shell('Money controls', '<div id="mc_body"><p class="muted">…</p></div>', true);
+  try { D.st = null; await show(D.tab); } catch (e) { fail(e); }
+}
+window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { moneycontrols: view });
+})();

@@ -1,1 +1,703 @@
-(()=>{"use strict";const e=window.BOS_CONFIG,t=window.BOS_T,a=window.supabase.createClient(e.url,e.key,{auth:{persistSession:!0,autoRefreshToken:!0}}),n={get(e){try{return localStorage.getItem(e)}catch(e){return null}},set(e,t){try{localStorage.setItem(e,t)}catch(e){}}},s={bn:"ইসলামিয়া মিষ্টি ঘর",en:"ISLAMIYA MISTY GHAR"};window.BOS=Object.assign(window.BOS||{},{});const o={offline:!1,csNeeds:!1,ctx:null,lang:n.get("bos_lang")||"bn",items:[],itemQ:"",itemCat:"",matrixRole:null,logTable:""},i=(e,t=document)=>t.querySelector(e),r=e=>String(e??"").replace(/[&<>"']/g,e=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[e])),c=e=>t[e]&&(t[e][o.lang]||t[e].bn)||e,l=e=>e?"en"===o.lang?e.name_en||e.name_bn:"mix"===o.lang&&e.name_mix||e.name_bn:"",d=(()=>{try{return new Intl.NumberFormat("en-IN",{maximumFractionDigits:2})}catch(e){return null}})(),u=e=>null==e?"—":d?d.format(Number(e)):Number(e).toLocaleString("en-IN",{maximumFractionDigits:2}),p=["master","showroom","cash","stock","purchase","factory","sales","staff","assets","owner","settings"],m={sweet_kg:{bn:"মিষ্টি (কেজি)",mix:"মিষ্টি (KG)",en:"Sweets (KG)"},sweet_pc:{bn:"মিষ্টি (পিস)",mix:"মিষ্টি (Piece)",en:"Sweets (Piece)"},doi:{bn:"দই",mix:"Doi (দই)",en:"Doi (Curd)"},cake_lb:{bn:"কেক (পাউন্ড)",mix:"Cake (Pound)",en:"Cake (Pound)"},cake_pc:{bn:"কেক (পিস)",mix:"Cake (Piece)",en:"Cake (Piece)"}},_={kg:{bn:"কেজি",mix:"KG",en:"KG"},pc:{bn:"পিস",mix:"Piece",en:"Piece"},lb:{bn:"পাউন্ড",mix:"Pound",en:"Pound"}},f=e=>m[e.category]&&m[e.category][o.lang]||e.category_bn||e.category||"",v=e=>_[e]&&_[e][o.lang]||e||"";let h;function w(e){const t=i("#toast");t.textContent=e,t.classList.add("show"),clearTimeout(h),h=setTimeout(()=>t.classList.remove("show"),2600)}function g(e){console.error(e);const t=e&&e.message||"";if(/at least one active owner/.test(t))return w("কমপক্ষে একজন সক্রিয় মালিক থাকতে হবে / At least one active owner is required");if(/period_closed/.test(t)){const e="এই তারিখের হিসাব বন্ধ — অনুমতি লাগবে / This date is closed — permission needed";return window.BOS&&window.BOS.emergency?window.BOS.emergency.offer({grant:"closed_period_edit",loc:null,context:{date:window.BOS.curDate||(new Date).toLocaleDateString("en-CA",{timeZone:"Asia/Dhaka"})},message:e}):w(e)}return/entries_paper_no_uq/.test(t)?w("এই ছাপা নম্বর আগেই নেওয়া হয়েছে / This printed number was already entered"):/permission|row-level|denied/i.test(t)?w(c("err_perm")):void w(c("err_generic")+(t?" · "+t.slice(0,80):""))}function b(){return'<div class="lang">'+["bn","mix","en"].map(e=>`<button data-act="lang" data-v="${e}" class="${o.lang===e?"on":""}">${r(t["lang_"+e][e])}</button>`).join("")+"</div>"}function $(e,t,a){const n=window.BOS_NAV&&o.ctx&&o.ctx.profile&&"active"===o.ctx.profile.status,l=(location.hash.replace(/^#\/?/,"")||"home").split("/")[0],d=a?`<button data-act="go" data-v="${"string"==typeof a?a:"home"}" aria-label="${r(c("back"))}">←</button>`:n&&"home"!==l?`<button data-act="goback" aria-label="${r(c("back"))}">←</button>`:'<img class="brand" src="mark.svg" alt="">',u=n&&"home"!==l&&window.BOS_NAVSTACK?`<button type="button" class="navmain" data-act="navmain" aria-label="${r(c("mainscr"))}">${r(c("mainscr"))}</button>`:"",p=n&&"home"!==l&&window.BOS_NAVSTACK?window.BOS_NAVSTACK.depth():0,m=[2,3].filter(e=>p>e).map(e=>`<button type="button" class="navback" data-act="goback" data-n="${e}" aria-label="${r(c("back"+e))}">${r(c("back"+e))}</button>`).join(""),_=window.BOS.biz&&window.BOS.biz.brand()||s,f=e===c("app")?`<span class="bn">${r(_.bn)}</span><span class="lat">${r(_.en)}</span>`:r(e);i("#app").innerHTML=`<header class="top">${n?window.BOS_NAV.menuBtn():""}${d}${u}${m}<h1 class="${e===c("app")?"brandh":""}"${l&&"home"!==l&&/^[a-z0-9_]+$/.test(l)?` data-info="screen:${l}"`:""}>${f}</h1>${n?window.BOS_NAV.headExtra():b()}</header>${n&&window.BOS_NAV.crumb?window.BOS_NAV.crumb():""}${t}`,window.BOS_NAV&&window.BOS_NAV.sync(!!n);const v="form"===location.hash.replace(/^#\/?/,"").split("/")[0]?{pat:"form"}:window.BOS&&window.BOS.ia&&window.BOS.ia.resolve(location.hash)||{};v.pat?document.body.dataset.pat=v.pat:delete document.body.dataset.pat}function y(e){k();const t=document.createElement("div");t.className="sheet-bg",t.id="sheet",t.innerHTML=`<div class="sheet"><button type="button" class="sheet-x" data-act="closesheet" aria-label="${"en"===o.lang?"Close":"বন্ধ করুন"}">✕</button>${e}</div>`,t.addEventListener("click",e=>{e.target===t&&k()}),document.body.appendChild(t),window.BOS_KBD&&window.BOS_KBD.sheet(t)}function k(){const e=i("#sheet");e&&e.remove()}const x=(e,t,a="",n)=>`<button class="tog ${e?"on":""}" data-act="${t}" ${a}>${r(n||c(e?"on":"off"))}</button>`,S={rulehub:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3l11 4v8c0 7-5 12-11 14C10 27 5 22 5 15V7z"/><path d="M11 15l4 4 7-8"/></svg>',emergency:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="16" r="12"/><path d="M16 9v8M16 22v1"/></svg>',lists:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M11 8h16M11 16h16M11 24h16"/><path d="M4.5 8h2M4.5 16h2M4.5 24h2" stroke-width="3.4"/></svg>',dues:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="11" r="5"/><path d="M6 27c1-6 5-9 10-9s9 3 10 9"/><path d="M22 6h5M24.5 3.5v5" stroke-width="2"/></svg>',numaudit:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h6M20 8h6M6 16h4M14 16h4M22 16h4M6 24h6M20 24h6"/></svg>',biz:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 27h24"/><rect x="6" y="16" width="5" height="8" rx="1"/><rect x="14" y="10" width="5" height="14" rx="1"/><rect x="22" y="4" width="5" height="20" rx="1"/></svg>',pos:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="20" height="26" rx="3"/><path d="M10 9h12M10 15h3M16 15h3M22 15h0M10 21h3M16 21h3M22 21h0"/></svg>',items:'<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="16" cy="16" r="4.6" fill="currentColor"/></svg>',itemreq:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h20l-5-5M27 21H7l5 5"/></svg>',staff:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="11" r="5"/><circle cx="23" cy="13" r="3.4"/><path d="M3 27c0-5 4-8 9-8s9 3 9 8M21 20c4 0 8 2 8 7"/></svg>',matrix:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="currentColor"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="12.5" y="4" width="7" height="7" rx="1.5" opacity=".45"/><rect x="21" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="12.5" width="7" height="7" rx="1.5" opacity=".45"/><rect x="12.5" y="12.5" width="7" height="7" rx="1.5"/><rect x="21" y="12.5" width="7" height="7" rx="1.5" opacity=".45"/><rect x="4" y="21" width="7" height="7" rx="1.5"/><rect x="12.5" y="21" width="7" height="7" rx="1.5" opacity=".45"/><rect x="21" y="21" width="7" height="7" rx="1.5"/></svg>',rules:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="24" height="24" rx="4"/><path d="M10 16.5l4 4 8-9"/></svg>',settings:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M4 9h24M4 16h24M4 23h24"/><circle cx="11" cy="9" r="3.2" fill="var(--ink)"/><circle cx="21" cy="16" r="3.2" fill="var(--ink)"/><circle cx="13" cy="23" r="3.2" fill="var(--ink)"/></svg>',logs:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M10 8h18M10 16h18M10 24h18"/><circle cx="4.5" cy="8" r="1.4" fill="currentColor"/><circle cx="4.5" cy="16" r="1.4" fill="currentColor"/><circle cx="4.5" cy="24" r="1.4" fill="currentColor"/></svg>',exceptions:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4l13 23H3z"/><path d="M16 13v7M16 24h.01"/></svg>',releases:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="14" width="20" height="14" rx="3"/><path d="M10 14V9a6 6 0 0 1 11-3"/></svg>',locset:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 29s9-8 9-15a9 9 0 0 0-18 0c0 7 9 15 9 15z"/><circle cx="16" cy="14" r="3.2"/></svg>',locations:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14l12-9 12 9v13H4z"/><path d="M12 27v-8h8v8"/></svg>',control:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><rect x="4" y="4" width="10" height="10" rx="2"/><rect x="18" y="4" width="10" height="10" rx="2"/><rect x="4" y="18" width="10" height="10" rx="2"/><path d="M18 23h10M23 18v10"/></svg>',backup:'<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4v16M9 14l7 7 7-7M5 27h22"/></svg>'},M={rulehub:"t-ink",emergency:"t-ruby",lists:"t-ink",dues:"t-gold",numaudit:"t-ink",biz:"t-gold",pos:"t-ruby",items:"t-gold",itemreq:"t-gold",staff:"t-ruby",matrix:"t-ruby",rules:"",settings:"t-ink",logs:"t-ink",backup:"t-ink",exceptions:"t-ruby",releases:"t-gold",locset:"t-ink",locations:"t-ink",control:"t-ruby"},O=t=>`${t.toLowerCase()}@${e.emailDomain}`,B=e=>`${e}-bos`,C=/^[a-z0-9]{3,20}$/i,T=/^\d{4,6}$/;function j(e){let t=i("#a_err");if(!t){t=document.createElement("div"),t.id="a_err",t.className="notice bad";const e=i(".card");e.parentNode.insertBefore(t,e)}t.textContent=e}function A(e="login",t=""){const a="register"===e;$(c("app"),`\n    <img class="login-logo" src="logo.webp" alt="${r(c("app"))}"><p class="muted center" style="margin:0 0 4px">${r(c("login_sub"))}</p>\n    <div class="tabs">\n      <button data-act="authmode" data-v="login" class="${a?"":"on"}">${r(c("login"))}</button>\n      <button data-act="authmode" data-v="register" class="${a?"on":""}">${r(c("register"))}</button>\n    </div>\n    ${t?`<div class="notice bad" id="a_err">${r(t)}</div>`:""}\n    <div class="card panel stack">\n      ${a?`<div><label>${r(c("full_name"))}</label><input id="a_name" autocomplete="name"></div>`:""}\n      <div><label>${r(c("staff_id"))}</label><input id="a_sid" autocapitalize="none" autocomplete="username" inputmode="latin"><div class="muted" style="font-size:.8rem">${r(c("staff_id_hint"))}</div></div>\n      <div><label>${r(c("pin"))}</label><input id="a_pin" type="password" inputmode="numeric" maxlength="6" autocomplete="${a?"new-password":"current-password"}"></div>\n      <button class="primary full" data-act="${a?"doregister":"dologin"}">${r(c(a?"register":"login"))}</button>\n    </div>`)}const N=e=>i(e)?i(e).value.trim():"";async function L(){const{data:e,error:t}=await a.rpc("my_context");if(t)throw t;o.ctx=e,e&&q()&&q().save(e),e&&e.profile&&!n.get("bos_lang")&&(o.lang=e.profile.lang||"bn")}const q=()=>window.BOS_CS;let E=null,I=!1;function P(){E&&clearInterval(E),E=null}function D(e){const t=q()?q().load(e):{refused:"none"};return t.ctx?(o.ctx=t.ctx,o.offline=!0,t.ctx.profile&&!n.get("bos_lang")&&(o.lang=t.ctx.profile.lang||"bn"),q().envApply(),q().paint(),E||(E=setInterval(V,3e4)),G(),!0):(A("login",q()?q().T("old"===t.refused?"old":"first"):""),!1)}async function z(e){q().clear(),o.ctx=null,o.offline=!1,P(),q().paint();try{await a.auth.signOut()}catch(e){}const t=location.hash;location.hash="",t&&await new Promise(e=>setTimeout(e,60)),A("login",e)}async function V(){if(o.offline&&!I){I=!0;try{let e;try{e=await a.auth.getSession()}catch(t){e={data:{},error:t}}if(!(e&&e.data&&e.data.session)){if(e&&e.error&&q().isNet(e.error)||!1===navigator.onLine)return;return await z(q().T("out"))}const{data:t,error:n}=await a.rpc("my_context");if(n){if(q().isNet(n))return;return await z(q().T("out"))}if(!t||!t.profile||"active"!==t.profile.status)return await z(c("err_disabled"));o.ctx=t,q().save(t),o.offline=!1,P(),q().paint(),window.dispatchEvent(new Event("online")),o.csNeeds&&G()}catch(e){}finally{I=!1}}}async function H(){let e=null;try{const t=await a.auth.getSession();e=t&&t.data&&t.data.session}catch(t){e=null}if(!e){const e=q()&&q().storedUid();return e?void D(e):A("login",!1===navigator.onLine&&q()?q().T("first"):"")}try{await L()}catch(t){return q()&&q().isNet(t)?void D(e.user.id):(g(t),A())}if(!o.ctx)return await a.auth.signOut(),A();G(),q()&&setTimeout(()=>{try{!async function(){const e=window.BOS,t=o.ctx,a=t&&t.perms&&t.perms.POS;if(o.offline||!e||!e.loadStatic||!(t.is_owner||a&&(a.view||a.enter)))return;let s=0;try{s=Number(n.get("bos_cs_warm_"+t.profile.id)||0)}catch(e){}if(Date.now()-s<864e5)return;await e.loadStatic(),n.set("bos_cs_warm_"+t.profile.id,String(Date.now()))}()}catch(e){}},4e3)}window.addEventListener("online",()=>{o.offline&&V()});const K=new Set(["rulehub","emergency","lists","staff","matrix","rules","settings","logs","backup","releases","locset","locsheet","locations","control"]),R={releases:["release_decide"],lists:["list_manage"],locset:["settings_approve","head_management","location_manage"],locsheet:["settings_approve","head_management","location_manage"],locations:["location_manage","head_management"],control:["head_management","location_manage","settings_approve","list_manage","rollout_manage"]};function U(e){location.hash="#/"+e}async function Y(e){if(!o.ctx)return!1;if(o.ctx.is_owner)return!0;const t=o.ctx.profile.id;o.gcache&&o.gcache.uid===t||(o.gcache={uid:t,v:{}});const n=(o.ctx.locations||[]).length?[null,...o.ctx.locations]:[null];for(const t of e){const e=o.gcache.v[t];if(e&&(e.ok||Date.now()-e.at<3e4)){if(e.ok)return!0;continue}let s=!1,i=!1;for(const e of n)try{const n=await a.rpc("has_grant",{p_code:t,p_loc:e});if(n&&!n.error&&!0===n.data){s=!0;break}n&&!n.error||(i=!0)}catch(e){i=!0}if(s||!i?o.gcache.v[t]={ok:s,at:Date.now()}:delete o.gcache.v[t],s)return!0}return!1}function G(){if(o.lzTok=(o.lzTok||0)+1,!o.ctx)return A();o.csNeeds=!1,q()&&q().paint();const e=o.ctx.profile.status;if("pending"===e)return void $(c("app"),`<div class="card stack center"><h2>${r(c("pending_title"))}</h2>\n    <p>${r(c("pending_text"))}</p>\n    <button class="primary full" data-act="recheck">${r(c("check_again"))}</button>\n    <button class="full" data-act="logout">${r(c("logout"))}</button></div>`);if("disabled"===e)return q()&&q().clear(),a.auth.signOut(),o.ctx=null,A("login",c("err_disabled"));const t=(location.hash.replace(/^#\/?/,"")||"home").split("/")[0];if(o.offline&&q()&&!q().allowed(t))return q().needsNet(t);if(K.has(t)&&!o.ctx.is_owner){const e=R[t];return e?Y(e).then(e=>{(location.hash.replace(/^#\/?/,"")||"home").split("/")[0]===t&&(e?F(t):Z())}):Z()}F(t)}function F(e){const t={home:Z,items:Q,staff:ne,matrix:ie,rules:ce,settings:de,logs:ue,backup:me,itemreq:ae},a=window.BOS_PAGES||{};if("exceptions"===e&&!o.ctx.is_owner&&!Object.values(o.ctx.perms).some(e=>e.approve))return Z();if("items"===e&&a.items)return a.items();const n=window.BOS_LAZY;if(n&&(n.first(),n.need(e))){const t=o.lzTok=(o.lzTok||0)+1;return n.track(n.load(e).then(()=>{t===o.lzTok&&(location.hash.replace(/^#\/?/,"")||"home").split("/")[0]===e&&F(e)},()=>{t===o.lzTok&&n.fail(e)}),e)}(()=>{const s=(t[e]||a[e]||Z)();n&&n.track(s,e)})()}window.__navCount=1,window.addEventListener("hashchange",()=>{window.__navCount=(window.__navCount||1)+1,G()});try{a.auth.onAuthStateChange&&a.auth.onAuthStateChange(e=>{"SIGNED_OUT"===e&&window.BOS_CS&&window.BOS_CS.clear()})}catch(e){}async function Z(){if(window.BOS_NAV&&window.BOS_NAV.home)return window.BOS_NAV.home();const e=o.ctx.profile,t=o.ctx.perms||{},n=o.ctx.is_owner;$(c("app"),`<div class="banner"><div class="roundel"><img src="mark.svg" alt=""></div><div><div class="bn-t">${r(c("hello"))}, <b>${r(e.full_name||e.staff_id)}</b></div><div class="bn-s"><span class="since">Since 1988</span> <span class="sid">${r(e.staff_id)}</span></div></div></div><div id="home"><p class="muted">${r(c("loading"))}</p></div>\n    <button class="full" style="margin-top:18px" data-act="logout">${r(c("logout"))}</button>`);const s=n||t.ITEMS&&t.ITEMS.approve,d=n||Object.values(t).some(e=>e.approve),[u,m,_,f,v,h]=await Promise.all([a.from("forms").select("code,area,name_bn,name_mix,name_en,sort,enabled").order("sort"),n?a.from("profiles").select("id",{count:"exact",head:!0}).eq("status","pending"):Promise.resolve({count:0}),s?a.from("item_changes").select("id",{count:"exact",head:!0}).eq("status","pending"):Promise.resolve({count:0}),d?a.from("exceptions").select("id",{count:"exact",head:!0}).eq("status","open"):Promise.resolve({count:0}),n?a.from("release_requests").select("id",{count:"exact",head:!0}).eq("status","pending"):Promise.resolve({count:0}),n?a.from("emergency_requests").select("id",{count:"exact",head:!0}).eq("status","pending").then(e=>e,()=>({count:0})):Promise.resolve({count:0})]);if(u.error)return g(u.error);const w=[];(n||t.POS&&(t.POS.enter||t.POS.view))&&w.push(["pos",c("pos"),""],["dues",c("dues"),""]),(n||t.POS&&t.POS.approve)&&w.push(["biz",c("biz"),""]),t.ITEMS&&t.ITEMS.view&&w.push(["items",c("items"),""]),t.ITEMS&&(t.ITEMS.enter||t.ITEMS.approve)&&w.push(["itemreq",c("item_req"),_.count?`<span class="badge">${_.count}</span>`:""]),d&&w.push(["exceptions",c("exceptions"),f.count?`<span class="badge">${f.count}</span>`:""],["numaudit",c("numaudit"),""]),n&&(w.push(["emergency",c("emergency"),h.count?`<span class="badge">${h.count}</span>`:""],["releases",c("releases"),v.count?`<span class="badge">${v.count}</span>`:""]),w.push(["staff",c("staff"),m.count?`<span class="badge">${m.count}</span>`:""],["rulehub",c("rulehub"),""]));const b=u.data.filter(e=>"master"!==e.area&&"POS"!==e.code&&t[e.code]&&t[e.code].view),y=p.map(e=>[e,b.filter(t=>t.area===e)]).filter(([,e])=>e.length);i("#home").innerHTML=`<div id="dash"></div><div class="grid">${w.map(([e,t,a])=>`<button class="tile ${M[e]||""}" data-act="go" data-v="${e}">${S[e]||""}<span>${r(t)}</span>${a}</button>`).join("")}</div>\n    <div class="orn">${r(c("forms_title"))}</div>\n    ${y.length?y.map(([e,a])=>`<div class="card panel"><h3>${r(c("area_"+e))}</h3>${a.map(e=>{const a=t[e.code],s="0-1"===e.code?n:window.BOS&&window.BOS.forms&&window.BOS.forms[e.code];return`<div class="perm"><div class="row between" ${s?`data-act="openform" data-v="${e.code}" style="cursor:pointer;min-height:44px"`:'style="opacity:.6"'}><span><b>${r(e.code)}</b> · ${r(l(e))}</span><span class="row">${s?"":`<span class="chip">${r(c("soon"))}</span>`}${a.enter?`<span class="chip ok">${r(c("can_enter"))}</span>`:`<span class="chip">${r(c("can_view"))}</span>`}${a.approve?`<span class="chip warn">${r(c("can_approve"))}</span>`:""}</span></div></div>`}).join("")}</div>`).join(""):`<p class="muted">${r(c("no_forms"))}</p>`}`,window.BOS&&window.BOS.dash&&window.BOS.dash.render().catch(()=>{})}async function Q(){const e=o.ctx.perms.ITEMS||{};$(c("items"),`<div class="notice ok">${r(c("price_note"))}</div>\n    <div class="row"><input id="i_q" placeholder="${r(c("search"))}" value="${r(o.itemQ)}">${e.enter?'<button class="primary" data-act="itemnew">＋</button>':""}</div>\n    <div id="i_cats" class="row wrap" style="margin:10px 0"></div><div id="i_list"><p class="muted">${r(c("loading"))}</p></div>`,!0),await X(),ee()}window.BOS_APP={hasAnyGrant:Y,sb:a,S:o,t:c,esc:r,toast:w,fail:g,shell:$,openSheet:y,closeSheet:k,nm:l,fmt:u,store:n,ICON:S,langBar:b,go:U,H:null};const J=()=>!(!o.ctx.perms.ITEM_COST||!o.ctx.perms.ITEM_COST.view),W=()=>!(!o.ctx.perms.ITEM_COST||!o.ctx.perms.ITEM_COST.enter);async function X(){const[e,t]=await Promise.all([window.BOS_ALL(a.from("items").select("*").order("code")),J()?a.from("item_costs").select("*"):Promise.resolve({data:[]})]);if(e.error)return g(e.error);if(t.error)return g(t.error);const n=new Map((t.data||[]).map(e=>[e.item_id,e.cost_price]));o.items=e.data.map(e=>({...e,cost_price:J()?n.has(e.id)?n.get(e.id):null:void 0}))}function ee(){const e=o.ctx.perms.ITEMS||{},t=[...new Set(o.items.map(e=>e.category).filter(Boolean))],a=o.itemQ.toLowerCase(),n=o.items.filter(e=>(!o.itemCat||e.category===o.itemCat)&&(!a||[e.name_bn,e.name_en,e.name_mix,e.code].some(e=>(e||"").toLowerCase().includes(a))));i("#i_cats").innerHTML=[["",c("all")],...t.map(e=>[e,f(o.items.find(t=>t.category===e))])].map(([e,t])=>`<button class="tog ${o.itemCat===e?"on":""}" data-act="itemcat" data-v="${r(e)}">${r(t)}</button>`).join(""),i("#i_list").innerHTML=n.map(t=>{const a=null!=t.cost_price&&null!=t.sell_price&&Number(t.cost_price)>=Number(t.sell_price);return`<div class="card item" ${e.enter?`data-act="itemedit" data-v="${t.id}"`:""}>\n      <div><div class="nm">${r(l(t))} ${t.is_active?"":`<span class="chip bad">${r(c("inactive"))}</span>`}</div>\n        <div class="muted" style="font-size:.85rem">${r(t.code)} · ${r(f(t))} · ${r(v(t.unit))}</div>\n        ${a?`<div class="chip warn" style="margin-top:4px">${r(c("loss_warn"))}</div>`:""}</div>\n      <div class="pr"><div><b>৳ ${u(t.sell_price)}</b></div>${void 0===t.cost_price?"":`<div class="muted" style="font-size:.85rem">${u(t.cost_price)}</div>`}</div></div>`}).join("")||'<p class="muted center">—</p>'}function te(e){const t=[...new Set(o.items.map(e=>e.category).filter(Boolean))],a=(e,t,a)=>`<option value="${r(e)}" ${e===t?"selected":""}>${r(a)}</option>`,n=e||{name_bn:"",name_en:"",name_mix:"",category:t[0]||"",unit:"kg",sell_price:"",cost_price:"",is_active:!0};y(`<h2>${r(c(e?"edit_item":"add_item"))}${e?" · "+r(e.code):""}</h2><div class="stack">\n    <div><label>${r(c("name_bn"))}</label><input id="f_bn" value="${r(n.name_bn)}"></div>\n    <div><label>${r(c("name_en"))}</label><input id="f_en" value="${r(n.name_en)}"></div>\n    <div><label>${r(c("name_mix"))}</label><input id="f_mix" value="${r(n.name_mix)}"></div>\n    <div class="row"><div style="flex:1"><label>${r(c("category"))}</label><select id="f_cat">${t.map(e=>a(e,n.category,f(o.items.find(t=>t.category===e)))).join("")}</select></div>\n      <div style="flex:1"><label>${r(c("unit"))}</label><select id="f_unit">${Object.keys(_).map(e=>a(e,n.unit,v(e))).join("")}</select></div></div>\n    <div class="row"><div style="flex:1"><label>${r(c("sell_price"))}</label><input id="f_sell" inputmode="decimal" value="${r(n.sell_price)}"></div>\n      ${J()?`<div style="flex:1"><label>${r(c("cost_price"))}</label><input id="f_cost" inputmode="decimal" value="${r(n.cost_price)}" ${W()?"":"readonly"}></div>`:""}</div>\n    <div class="row between"><span>${r(c("active"))}</span>${x(n.is_active,"sheettog",'id="f_act"')}</div>\n    ${o.ctx.is_owner?"":`<div class="notice warn">${r(c("needs_approval"))}</div>`}\n    <div><label>${r(c("reason_note"))}</label><input id="f_note"></div>\n    <div class="row"><button class="full" data-act="closesheet">${r(c("cancel"))}</button>\n      <button class="primary full" data-act="itemsave" data-v="${e?e.id:""}">${r(c("save"))}</button></div></div>`)}async function ae(){$(c("item_req"),`<div id="ir_body"><p class="muted">${r(c("loading"))}</p></div>`,!0);const[e]=await Promise.all([a.from("item_changes").select("*").order("id",{ascending:!1}).limit(60),X()]);if(e.error)return g(e.error);const t=o.ctx.is_owner||o.ctx.perms.ITEMS&&o.ctx.perms.ITEMS.approve,n={name_bn:c("name_bn"),name_en:c("name_en"),name_mix:c("name_mix"),category:c("category"),unit:c("unit"),sell_price:c("sell_price"),cost_price:c("cost_price"),is_active:c("active"),category_bn:null,...window.BOS_ITEM_LABELS?window.BOS_ITEM_LABELS():{}},s=(e,t)=>null==t?"—":"boolean"==typeof t?c(t?"yes":"no"):"images"===e?Array.isArray(t)?t.length:t:Array.isArray(t)?t.join(", ")||"—":t,d=e.data.map(e=>{const a=e.item_id?o.items.find(t=>t.id===e.item_id):null,i=Object.entries(e.patch).filter(([e])=>n[e]).map(([e,t])=>{const o=a?"cost_price"===e&&void 0===a.cost_price?"":s(e,a[e]):null;return`<div class="row between"><span class="muted">${r(n[e])}</span><span>${null===o||""===o?"":r(o)+" → "}<b>${r(s(e,t))}</b></span></div>`}).join(""),d="approved"===e.status?"ok":"rejected"===e.status?"bad":"warn";return`<div class="card stack"><div class="row between"><b>${r(a?l(a)+" · "+a.code:c("add_item")+" · "+(e.patch.name_bn||""))}</b><span class="chip ${d}">${r(c("req_"+e.status))}</span></div>\n      ${i}<div class="muted" style="font-size:.82rem">${r(e.requested_staff||"")} · ${r(new Date(e.requested_at).toLocaleString("en-GB",{timeZone:"Asia/Dhaka"}))}${e.note?" · "+r(e.note):""}</div>\n      ${"pending"!==e.status?`<div class="muted" style="font-size:.82rem">${r(e.decided_staff||"")}${e.decision_note?" · "+r(e.decision_note):""}</div>`:""}\n      ${"pending"===e.status&&t?`<input id="dn_${e.id}" placeholder="${r(c("reason_note"))}"><div class="row"><button class="danger full" data-act="itemdecide" data-v="${e.id}" data-ok="0">${r(c("reject"))}</button><button class="primary full" data-act="itemdecide" data-v="${e.id}" data-ok="1">${r(c("approve"))}</button></div>`:""}</div>`}).join("");i("#ir_body").innerHTML=d||`<p class="muted center">${r(c("no_requests"))}</p>`}async function ne(){$(c("staff"),`<div id="s_list"><p class="muted">${r(c("loading"))}</p></div>`,!0),await se()}async function se(){let e;try{e=await async function(){const[e,t,n,s,o,i]=await Promise.all([a.from("profiles").select("*").order("created_at"),a.from("user_roles").select("*"),a.from("user_locations").select("*"),a.from("roles").select("*").order("sort"),a.from("locations").select("*").order("sort"),a.from("login_failures").select("*")]);for(const a of[e,t,n,s,o,i])if(a.error)throw a.error;return{profiles:e.data,ur:t.data,ul:n.data,roles:s.data,locs:o.data,locked:new Set(i.data.filter(e=>e.locked).map(e=>e.staff_id))}}()}catch(e){return g(e)}o.staff=e;const t={pending:0,active:1,disabled:2},n=[...e.profiles].sort((e,a)=>t[e.status]-t[a.status]);i("#s_list").innerHTML=n.map(t=>{const a=e.ur.filter(e=>e.user_id===t.id).map(t=>l(e.roles.find(e=>e.code===t.role_code))),n="active"===t.status?"ok":"pending"===t.status?"warn":"bad";return`<div class="card item" data-act="staffopen" data-v="${t.id}"><div><div class="nm">${r(t.full_name||t.staff_id)}</div>\n      <div class="muted" style="font-size:.85rem">${r(t.staff_id)}${a.length?" · "+r(a.join(", ")):""}</div></div>\n      <div><span class="chip ${n}">${r(c("status_"+t.status))}</span>${e.locked.has(t.staff_id)?' <span class="chip bad">🔒</span>':""}</div></div>`}).join(""),i("#sheet")&&o.staffOpen&&oe(o.staffOpen)}function oe(e){o.staffOpen=e;const t=o.staff,a=t.profiles.find(t=>t.id===e);if(!a)return k();const n=new Set(t.ur.filter(t=>t.user_id===e).map(e=>e.role_code)),s=new Set(t.ul.filter(t=>t.user_id===e).map(e=>e.location_id));y(`<h2>${r(a.full_name||a.staff_id)} <span class="muted">· ${r(a.staff_id)}</span></h2>\n    <div class="row wrap">${"active"!==a.status?`<button class="primary" data-act="setstatus" data-v="${e}" data-s="active">${r("pending"===a.status?c("approve"):c("enable"))}</button>`:""}\n      ${"active"===a.status?`<button class="danger" data-act="setstatus" data-v="${e}" data-s="disabled">${r(c("disable"))}</button>`:""}\n      ${t.locked.has(a.staff_id)?`<button data-act="unlock" data-v="${r(a.staff_id)}">🔒 ${r(c("unlock"))}</button>`:""}</div>\n    <h2>${r(c("roles"))}</h2>${t.roles.map(t=>`<div class="row between perm"><span>${r(l(t))}</span>${x(n.has(t.code),"userrole",`data-u="${e}" data-r="${t.code}"`)}</div>`).join("")}\n    <h2>${r(c("locations"))}</h2>${t.locs.map(t=>`<div class="row between perm"><span>${r(l(t))}</span>${x(s.has(t.id),"userloc",`data-u="${e}" data-l="${t.id}"`)}</div>`).join("")}\n    <button class="full" style="margin-top:14px" data-act="closesheet">${r(c("done"))}</button>`)}async function ie(){$(c("matrix"),`<div id="m_body"><p class="muted">${r(c("loading"))}</p></div>`,!0);const[e,t,n]=await Promise.all([a.from("roles").select("*").order("sort"),a.from("forms").select("*").order("sort"),a.from("role_form_perms").select("*")]);for(const a of[e,t,n])if(a.error)return g(a.error);o.m={roles:e.data.filter(e=>"owner"!==e.code),forms:t.data,perms:n.data},o.matrixRole&&o.m.roles.find(e=>e.code===o.matrixRole)||(o.matrixRole=o.m.roles[0].code),re()}function re(){const{roles:e,forms:t,perms:a}=o.m,n=e.find(e=>e.code===o.matrixRole);i("#m_body").innerHTML=`<div class="notice warn">${r(c("hint_defaults"))}</div><div class="notice ok">${r(c("owner_note"))}</div>\n    <div class="row wrap">${e.map(e=>`<button class="tog ${e.code===n.code?"on":""}" data-act="mrole" data-v="${e.code}">${r(l(e))}</button>`).join("")}</div>\n    <div class="card"><div class="row between"><div><b>${r(c("self_approve"))}</b><div class="muted" style="font-size:.8rem">${r(c("self_approve_hint"))}</div></div>\n      ${x(n.allow_self_approve,"selfapprove",`data-v="${n.code}"`)}</div></div>\n    <p class="muted">${r(c("hint_matrix"))}</p>\n    ${p.map(e=>[e,t.filter(t=>t.area===e)]).filter(([,e])=>e.length).map(([e,t])=>`<div class="card"><b>${r(c("area_"+e))}</b>${t.map(e=>{const t=(s=e.code,a.find(e=>e.role_code===n.code&&e.form_code===s)||{can_view:!1,can_enter:!1,can_approve:!1});var s;return`<div class="perm"><div class="nm">${r("ITEMS"===e.code?"":e.code+" · ")}${r(l(e))}</div><div class="row wrap">\n        ${x(t.can_view,"perm",`data-f="${e.code}" data-k="view"`,c("can_view"))}${x(t.can_enter,"perm",`data-f="${e.code}" data-k="enter"`,c("can_enter"))}${x(t.can_approve,"perm",`data-f="${e.code}" data-k="approve"`,c("can_approve"))}</div></div>`}).join("")}</div>`).join("")}`}async function ce(){$(c("rules"),`<div id="r_body"><p class="muted">${r(c("loading"))}</p></div>`,!0);const{data:e,error:t}=await a.from("forms").select("*").order("sort");if(t)return g(t);o.rules=e.filter(e=>"ITEMS"!==e.code),le()}function le(){i("#r_body").innerHTML=p.map(e=>[e,o.rules.filter(t=>t.area===e)]).filter(([,e])=>e.length).map(([e,t])=>`<div class="card"><b>${r(c("area_"+e))}</b>${t.map(e=>`<div class="perm"><div class="nm">${r(e.code)} · ${r(l(e))}</div><div class="row wrap">\n      ${x(e.count_first,"rule",`data-f="${e.code}" data-k="count_first"`,c("rule_count_first"))}${x(e.red_block,"rule",`data-f="${e.code}" data-k="red_block"`,c("rule_red_block"))}${x(e.enabled,"rule",`data-f="${e.code}" data-k="enabled"`,c("rule_enabled"))}</div></div>`).join("")}</div>`).join("")}async function de(){$(c("settings"),`<div id="st_body"><p class="muted">${r(c("loading"))}</p></div>`,!0);const{data:e,error:t}=await a.from("settings").select("*").order("key");if(t)return g(t);i("#st_body").innerHTML=function(){const e=function(){try{const e=localStorage.getItem("bos_layout");return"phone"===e||"desktop"===e?e:"auto"}catch(e){return"auto"}}();return`<div class="card stack" id="lay_row"><div class="row between"><b data-info="feature:layout_choice">${r(c("layout_title"))}</b></div>\n    <div class="row wrap" role="group" aria-label="${r(c("layout_title"))}" style="gap:8px">${["auto","phone","desktop"].map(t=>`<button type="button" class="tog ${e===t?"on":""}" aria-pressed="${e===t}" data-act="layout_set" data-v="${t}">${r(c("layout_"+t))}</button>`).join("")}</div>\n    <div class="muted" style="font-size:.9rem">${r(c("layout_hint"))}</div></div>`}()+e.map(e=>`<div class="card stack"><div class="row between"><b>${r((e=>("en"===o.lang?e.label_en:"mix"===o.lang?e.label_mix:e.label_bn)||e.label_bn||e.key)(e))}</b>${null===e.value?`<span class="chip warn">${r(c("need_data"))}</span>`:""}</div>\n    <div class="row"><input id="sv_${r(e.key)}" value="${r(null===e.value?"":"string"==typeof e.value?e.value:JSON.stringify(e.value))}">\n    <button class="primary" data-act="setsave" data-v="${r(e.key)}">${r(c("save"))}</button></div></div>`).join("")}async function ue(){$(c("logs"),`<div class="row"><select id="l_t"><option value="">${r(c("all_tables"))}</option>${["items","profiles","user_roles","user_locations","role_form_perms","roles","forms","locations","settings"].map(e=>`<option ${o.logTable===e?"selected":""}>${e}</option>`).join("")}</select></div>\n    <div id="l_body"><p class="muted">${r(c("loading"))}</p></div>`,!0);let e=a.from("audit_log").select("*").order("id",{ascending:!1}).limit(100);o.logTable&&(e=e.eq("table_name",o.logTable));const{data:t,error:n}=await e;if(n)return g(n);const s=e=>{const t=JSON.stringify(e);return t.length>260?t.slice(0,260)+"…":t};i("#l_body").innerHTML=t.map(e=>{const t=e.detail||{},a="update"===e.action?`${s(t.old)}\n→ ${s(t.new)}`:s(t.new||t.old);return`<div class="card log"><div class="row between"><b>${r(e.table_name)} · ${r(e.action)}</b><span class="k">${r((n=e.at,new Date(n).toLocaleString("en-GB",{timeZone:"Asia/Dhaka",hour12:!0})))}</span></div>\n      <div class="k">${r(e.staff_id||"system")} · ${r(e.record_id||"")}</div><pre class="diff">${r(a)}</pre></div>`;var n}).join("")||`<p class="muted center">${r(c("logs_empty"))}</p>`}const pe=["profiles","roles","user_roles","locations","user_locations","forms","role_form_perms","items","item_costs","item_changes","item_price_history","settings","audit_log","corrections","location_settings","entries","exceptions","release_requests","emergency_requests","rules","rule_grants","grant_defs","user_grants","option_lists","customers","suppliers","sales","sale_payments","stock_ledger","stock_balance","stock_batches","stock_transfers","stock_wastage","purchase_bills","purchase_lines","supplier_payments","unit_conversions","shelf_life_rules","invoice_templates","print_profiles","report_brand_map","role_favourites","login_failures","login_attempts","wastage_requests","supplier_refunds","sale_returns","location_setup_steps","settings_sheets","settings_values","list_defs","option_requests","list_other_entries","list_managers","item_types","item_class_map","item_import_batches","item_mapping_review","item_master_links","item_bulk_batches","item_map_actions","assets","asset_costs","form_rollout","entry_change_requests","entry_revisions","entry_counts","entry_count_peeks","entry_signatures","blind_count_cfg","pin_sig_cfg","recipes","recipe_lines","product_packaging","production_runs","forms_ledger_cfg","entry_ledger_posts"];function me(){$(c("backup"),`<div class="card stack"><p>${r(c("backup_text"))}</p>\n    <button class="primary full" data-act="bk_all">${r(c("backup_all"))}</button>\n    <button class="full" data-act="bk_items">${r(c("backup_items"))}</button></div>`,!0)}async function _e(e){if("stock_balance"===e){const e=await a.rpc("backup_stock_balance");if(e.error)throw e.error;return e.data||[]}if("stock_ledger"===e){const e=[];let t=0;for(;;){const n=await a.rpc("backup_stock_ledger",{p_from:t,p_limit:1e3});if(n.error)throw n.error;const s=n.data||[];if(e.push(...s),s.length<1e3)break;t=s[s.length-1].id}return e}const t=[];for(let n=0;;n+=1e3){const{data:s,error:o}=await a.from(e).select("*").range(n,n+999);if(o)throw o;if(t.push(...s),s.length<1e3)break}return t}function fe(e,t,a){const n=document.createElement("a");n.href=URL.createObjectURL(new Blob([t],{type:a})),n.download=e,document.body.appendChild(n),n.click(),n.remove(),setTimeout(()=>URL.revokeObjectURL(n.href),4e3)}const ve=()=>(new Date).toLocaleDateString("en-CA",{timeZone:"Asia/Dhaka"});const he={lang:e=>async function(e){o.lang=e,n.set("bos_lang",e),o.ctx&&a.rpc("set_my_lang",{p_lang:e}),k(),G()}(e.dataset.v),go:e=>U(e.dataset.v),authmode:e=>A(e.dataset.v),dologin:async function(){const e=N("#a_sid"),t=N("#a_pin");if(!C.test(e))return j(c("err_staff_id"));if(!T.test(t))return j(c("err_pin"));if(!1===navigator.onLine&&q())return j(q().T("first"));const n=await a.rpc("login_precheck",{p_staff:e});if(n.data&&n.data.locked)return j(c("err_locked"));const{error:s}=await a.auth.signInWithPassword({email:O(e),password:B(t)});return s&&q()&&q().isNet(s)?j(q().T("first")):s?(await a.rpc("login_failed",{p_staff:e}),j(c("err_login"))):(await a.rpc("login_success"),void await H())},doregister:async function(){const e=N("#a_sid"),t=N("#a_pin"),n=N("#a_name");if(!n)return j(c("err_name"));if(!C.test(e))return j(c("err_staff_id"));if(!T.test(t))return j(c("err_pin"));const{data:s,error:o}=await a.auth.signUp({email:O(e),password:B(t),options:{data:{full_name:n}}});return o?j(/already|registered/i.test(o.message)?c("err_exists"):c("err_generic")+" · "+o.message):s.session?void await H():j(c("err_confirm"))},logout:async function(){q()&&q().clear(),o.offline=!1,P(),q()&&q().paint();try{await a.auth.signOut(),q()&&q().storedUid()&&await a.auth.signOut({scope:"local"})}catch(e){try{await a.auth.signOut({scope:"local"})}catch(e){}}o.ctx=null,location.hash="",A()},recheck:async()=>{await L(),G()},closesheet:k,goback:e=>{const t=Math.max(1,Number(e&&e.dataset&&e.dataset.n)||1);window.BOS_NAVSTACK?window.BOS_NAVSTACK.back(t):(window.__navCount||1)>1?(window.__navCount-=2,history.back()):U("home")},navmain:()=>{window.BOS_NAVSTACK?window.BOS_NAVSTACK.main():U("home")},sheettog:e=>e.classList.toggle("on"),itemcat:e=>{o.itemCat=e.dataset.v,ee()},itemnew:()=>te(null),itemedit:e=>te(o.items.find(t=>t.id===e.dataset.v)),itemsave:e=>async function(e){const t=e=>""===e?null:Number(e),n=e?o.items.find(t=>t.id===e):null,s={name_bn:N("#f_bn"),name_en:N("#f_en")||null,name_mix:N("#f_mix")||null,category:N("#f_cat")||null,unit:N("#f_unit")||null,sell_price:t(N("#f_sell")),is_active:i("#f_act").classList.contains("on")};if(i("#f_cost")&&W()&&(s.cost_price=t(N("#f_cost"))),!s.name_bn)return w(c("err_item_name"));for(const e of["sell_price","cost_price"])if(e in s&&null!==s[e]&&(!Number.isFinite(s[e])||s[e]<0))return w(c("err_price"));const r=o.items.find(e=>e.category===s.category);r&&(s.category_bn=r.category_bn);const l=(e,t)=>(e??null)===(t??null)||("number"==typeof e||"number"==typeof t)&&Number(e)===Number(t),d={};for(const e of Object.keys(s))n&&l(n[e],s[e])||(d[e]=s[e]);if(n&&!Object.keys(d).length)return k();const{data:u,error:p}=await a.rpc("submit_item_change",{p_item:e||null,p_patch:d,p_note:N("#f_note")||null});if(p)return g(p);k(),w(u&&"applied"===u.status?c("saved"):c("sent_for_approval")),await X(),ee()}(e.dataset.v),itemdecide:async e=>{const t=Number(e.dataset.v),n="1"===e.dataset.ok,{error:s}=await a.rpc("decide_item_change",{p_id:t,p_approve:n,p_note:N("#dn_"+t)||null});if(s)return/own request/.test(s.message)?w(c("err_own_request")):g(s);w(c("saved")),ae()},staffopen:e=>oe(e.dataset.v),setstatus:async e=>{const{error:t}=await a.from("profiles").update({status:e.dataset.s}).eq("id",e.dataset.v);if(t)return g(t);w(c("saved")),await se()},unlock:async e=>{const{error:t}=await a.rpc("unlock_staff",{p_staff:e.dataset.v});if(t)return g(t);w(c("saved")),await se()},userrole:async e=>{const t=e.classList.contains("on"),n=e.dataset.u,s=e.dataset.r,{error:o}=t?await a.from("user_roles").delete().eq("user_id",n).eq("role_code",s):await a.from("user_roles").insert({user_id:n,role_code:s});if(o)return g(o);await se()},userloc:async e=>{const t=e.classList.contains("on"),n=e.dataset.u,s=Number(e.dataset.l),{error:o}=t?await a.from("user_locations").delete().eq("user_id",n).eq("location_id",s):await a.from("user_locations").insert({user_id:n,location_id:s});if(o)return g(o);await se()},mrole:e=>{o.matrixRole=e.dataset.v,re()},selfapprove:async e=>{const t=o.m.roles.find(t=>t.code===e.dataset.v),n=!t.allow_self_approve,{error:s}=await a.from("roles").update({allow_self_approve:n}).eq("code",t.code);if(s)return g(s);t.allow_self_approve=n,re()},perm:e=>async function(e,t){const n=o.matrixRole,s=o.m.perms.find(t=>t.role_code===n&&t.form_code===e)||{can_view:!1,can_enter:!1,can_approve:!1},i={view:s.can_view,enter:s.can_enter,approve:s.can_approve};i[t]=!i[t],"view"!==t||i.view?(i.enter||i.approve)&&(i.view=!0):(i.enter=!1,i.approve=!1);const r={role_code:n,form_code:e,can_view:i.view,can_enter:i.enter,can_approve:i.approve},{error:c}=await a.from("role_form_perms").upsert(r,{onConflict:"role_code,form_code"});if(c)return g(c);const l=o.m.perms.findIndex(t=>t.role_code===n&&t.form_code===e);l>=0?o.m.perms[l]=r:o.m.perms.push(r),re()}(e.dataset.f,e.dataset.k),rule:e=>async function(e,t){const n=o.rules.find(t=>t.code===e),s=!n[t],{error:i}=await a.from("forms").update({[t]:s}).eq("code",e);if(i)return g(i);n[t]=s,le()}(e.dataset.f,e.dataset.k),setsave:e=>async function(e){let t,n=N("#sv_"+e);if("books_closed_until"===e&&""!==n){const e=/^(\d{4})-(\d{2})-(\d{2})$/.exec(n),t=e&&new Date(Date.UTC(+e[1],+e[2]-1,+e[3]));if(!e||t.getUTCFullYear()!==+e[1]||t.getUTCMonth()!==+e[2]-1||t.getUTCDate()!==+e[3])return w("তারিখ YYYY-MM-DD ফরম্যাটে লিখুন, যেমন 2026-09-30 / Write the date as YYYY-MM-DD, e.g. 2026-09-30")}t=""===n?null:/^-?\d+(\.\d+)?$/.test(n)?Number(n):"true"===n||"false"===n?"true"===n:n;const{error:s}=await a.from("settings").update({value:t,updated_at:(new Date).toISOString(),updated_by:o.ctx.profile.id}).eq("key",e);if(s)return g(s);w(c("saved"))}(e.dataset.v),layout_set:e=>function(e){const t="phone"===e||"desktop"===e;try{t?localStorage.setItem("bos_layout",e):localStorage.removeItem("bos_layout")}catch(e){}t?document.documentElement.setAttribute("data-layout",e):document.documentElement.removeAttribute("data-layout"),document.querySelectorAll('#lay_row [data-act="layout_set"]').forEach(a=>{const n=a.dataset.v===(t?e:"auto");a.classList.toggle("on",n),a.setAttribute("aria-pressed",String(n))}),w(c("layout_saved"))}(e.dataset.v),bk_all:async function(){try{const e={exported_at:(new Date).toISOString(),note:"row_counts = rows saved per table; errors = tables that could not be read (not included)",tables:{}};await async function(e,t){e.errors=e.errors||{},e.row_counts=e.row_counts||{};for(const a of t)try{e.tables[a]=await _e(a),e.row_counts[a]=e.tables[a].length}catch(t){e.errors[a]=String(t&&t.message||t),e.row_counts[a]=null}return e}(e,pe),fe(`bos-backup-${ve()}.json`,JSON.stringify(e,null,1),"application/json"),w(c("done"))}catch(e){g(e)}},bk_items:async function(){try{const e=await _e("items"),t=["code","name_bn","name_en","name_mix","category","unit","sell_price","cost_price","is_active"],a=e=>{let t=String(e??"");return/^[=+\-@\t\r]/.test(t)&&!/^-?\d+(\.\d+)?$/.test(t)&&(t="'"+t),'"'+t.replace(/"/g,'""')+'"'};fe(`bos-items-${ve()}.csv`,"\ufeff"+[t.join(","),...e.map(e=>t.map(t=>a(e[t])).join(","))].join("\n"),"text/csv"),w(c("done"))}catch(e){g(e)}}};window.BOS_APP.H=he,document.addEventListener("click",e=>{const t=e.target.closest("[data-act]");t&&he[t.dataset.act]&&Promise.resolve(he[t.dataset.act](t)).catch(g)}),document.addEventListener("input",e=>{"i_q"===e.target.id&&(o.itemQ=e.target.value,ee())}),document.addEventListener("change",e=>{"l_t"===e.target.id&&(o.logTable=e.target.value,ue())});const we=()=>H().catch(g);"loading"===document.readyState?document.addEventListener("DOMContentLoaded",we):we()})();
+/* Islamia BOS · Phase 1 · plain JavaScript, no build step. */
+(() => {
+'use strict';
+const C = window.BOS_CONFIG, T = window.BOS_T;
+const sb = window.supabase.createClient(C.url, C.key, { auth: { persistSession: true, autoRefreshToken: true } });
+
+// ---------- tiny helpers ----------
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* private mode */ } },
+};
+// the brand name is fixed in every language: never translated, never re-spelled
+const BRAND = { bn: 'ইসলামিয়া মিষ্টি ঘর', en: 'ISLAMIYA MISTY GHAR' };
+window.BOS = Object.assign(window.BOS || {}, {});   // bos B2: the old BRAND {hub,bari,cakiz} constant (unused) is gone; brands come from report_brand_map via B.biz.brandOpts
+const S = { offline: false, csNeeds: false, ctx: null, lang: store.get('bos_lang') || 'bn', items: [], itemQ: '', itemCat: '', matrixRole: null, logTable: '' };
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const t = (k) => (T[k] && (T[k][S.lang] || T[k].bn)) || k;
+const nm = (o) => !o ? '' : (S.lang === 'en' ? (o.name_en || o.name_bn) : S.lang === 'mix' ? (o.name_mix || o.name_bn) : o.name_bn);
+const NF_IN = (() => { try { return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }); } catch (e) { return null; } })();   // bos114: one formatter (toLocaleString built a new one on every call: 1369 POS cards = 200 ms on a phone)
+const fmt = (n) => (n === null || n === undefined) ? '—' : (NF_IN ? NF_IN.format(Number(n)) : Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 }));
+const AREAS = ['master', 'showroom', 'cash', 'stock', 'purchase', 'factory', 'sales', 'staff', 'assets', 'owner', 'settings'];
+const CAT = {
+  sweet_kg: { bn: 'মিষ্টি (কেজি)', mix: 'মিষ্টি (KG)', en: 'Sweets (KG)' },
+  sweet_pc: { bn: 'মিষ্টি (পিস)', mix: 'মিষ্টি (Piece)', en: 'Sweets (Piece)' },
+  doi: { bn: 'দই', mix: 'Doi (দই)', en: 'Doi (Curd)' },
+  cake_lb: { bn: 'কেক (পাউন্ড)', mix: 'Cake (Pound)', en: 'Cake (Pound)' },
+  cake_pc: { bn: 'কেক (পিস)', mix: 'Cake (Piece)', en: 'Cake (Piece)' },
+};
+const UNIT = { kg: { bn: 'কেজি', mix: 'KG', en: 'KG' }, pc: { bn: 'পিস', mix: 'Piece', en: 'Piece' }, lb: { bn: 'পাউন্ড', mix: 'Pound', en: 'Pound' } };
+const catName = (it) => (CAT[it.category] && CAT[it.category][S.lang]) || it.category_bn || it.category || '';
+const unitName = (u) => (UNIT[u] && UNIT[u][S.lang]) || u || '';
+
+let toastTimer;
+function toast(msg) {
+  const el = $('#toast'); el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+function fail(e) {
+  console.error(e);
+  const m = (e && e.message) || '';
+  if (/at least one active owner/.test(m)) return toast('কমপক্ষে একজন সক্রিয় মালিক থাকতে হবে / At least one active owner is required');
+  if (/period_closed/.test(m)) { const msg = 'এই তারিখের হিসাব বন্ধ — অনুমতি লাগবে / This date is closed — permission needed'; if (window.BOS && window.BOS.emergency) return window.BOS.emergency.offer({ grant: 'closed_period_edit', loc: null, context: { date: window.BOS.curDate || new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' }) }, message: msg }); return toast(msg); }
+  if (/entries_paper_no_uq/.test(m)) return toast('এই ছাপা নম্বর আগেই নেওয়া হয়েছে / This printed number was already entered');
+  if (/permission|row-level|denied/i.test(m)) return toast(t('err_perm'));
+  toast(t('err_generic') + (m ? ' · ' + m.slice(0, 80) : ''));
+}
+function langBar() {
+  return '<div class="lang">' + ['bn', 'mix', 'en'].map((l) =>
+    `<button data-act="lang" data-v="${l}" class="${S.lang === l ? 'on' : ''}">${esc(T['lang_' + l][l])}</button>`).join('') + '</div>';
+}
+function shell(title, body, back) {
+  const nav = window.BOS_NAV && S.ctx && S.ctx.profile && S.ctx.profile.status === 'active';   // drawer UI only for signed-in, approved users
+  // every screen except Home gets a back arrow, even when the caller forgot to ask for one: it goes to the screen the person came from (or Home)
+  const pg = (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0];
+  const lead = back ? `<button data-act="go" data-v="${typeof back === 'string' ? back : 'home'}" aria-label="${esc(t('back'))}">←</button>`
+    : (nav && pg !== 'home' ? `<button data-act="goback" aria-label="${esc(t('back'))}">←</button>` : '<img class="brand" src="mark.svg" alt="">');
+  // "main" jumps to the nearest top-level screen of the chain (navstack.js); shown next to the back arrow on every deep screen
+  const mainBtn = nav && pg !== 'home' && window.BOS_NAVSTACK ? `<button type="button" class="navmain" data-act="navmain" aria-label="${esc(t('mainscr'))}">${esc(t('mainscr'))}</button>` : '';
+  // back 2 / back 3 steps: shown only when the chain is deep enough (BOS_NAVSTACK.depth() counts the current screen)
+  const depth = nav && pg !== 'home' && window.BOS_NAVSTACK ? window.BOS_NAVSTACK.depth() : 0;
+  const backN = [2, 3].filter((n) => depth > n).map((n) => `<button type="button" class="navback" data-act="goback" data-n="${n}" aria-label="${esc(t('back' + n))}">${esc(t('back' + n))}</button>`).join('');
+  const bnd = (window.BOS.biz && window.BOS.biz.brand()) || BRAND;   // bizctx: the chosen business name when the owner set one, else the legacy name
+  const h1 = title === t('app') ? `<span class="bn">${esc(bnd.bn)}</span><span class="lat">${esc(bnd.en)}</span>` : esc(title);
+  $('#app').innerHTML = `<header class="top">${nav ? window.BOS_NAV.menuBtn() : ''}${lead}${mainBtn}${backN}<h1 class="${title === t('app') ? 'brandh' : ''}"${pg && pg !== 'home' && /^[a-z0-9_]+$/.test(pg) ? ` data-info="screen:${pg}"` : ''}>${h1}</h1>${nav ? window.BOS_NAV.headExtra() : langBar()}</header>${nav && window.BOS_NAV.crumb ? window.BOS_NAV.crumb() : ''}${body}`;
+
+  if (window.BOS_NAV) window.BOS_NAV.sync(!!nav);
+  // desktop page pattern (docs/DESKTOP_LAYOUT.md 3.1): ia.js gives each screen a pat; desktop.css reads body[data-pat] on PCs (>= 1024px) only
+  const hp = location.hash.replace(/^#\/?/, '').split('/')[0];
+  const pr = hp === 'form' ? { pat: 'form' } : ((window.BOS && window.BOS.ia && window.BOS.ia.resolve(location.hash)) || {});
+  if (pr.pat) document.body.dataset.pat = pr.pat; else delete document.body.dataset.pat;
+}
+function openSheet(html) {
+  closeSheet();
+  const d = document.createElement('div'); d.className = 'sheet-bg'; d.id = 'sheet';
+  d.innerHTML = `<div class="sheet"><button type="button" class="sheet-x" data-act="closesheet" aria-label="${S.lang === 'en' ? 'Close' : 'বন্ধ করুন'}">✕</button>${html}</div>`;
+  d.addEventListener('click', (e) => { if (e.target === d) closeSheet(); });
+  document.body.appendChild(d);
+  if (window.BOS_KBD) window.BOS_KBD.sheet(d); // bos102: sticky action bar + keyboard-aware sizing
+}
+function closeSheet() { const d = $('#sheet'); if (d) d.remove(); }
+const tog = (on, act, attrs = '', label) => `<button class="tog ${on ? 'on' : ''}" data-act="${act}" ${attrs}>${esc(label || (on ? t('on') : t('off')))}</button>`;
+
+const ICON = {
+  rulehub: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3l11 4v8c0 7-5 12-11 14C10 27 5 22 5 15V7z"/><path d="M11 15l4 4 7-8"/></svg>',
+  emergency: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="16" r="12"/><path d="M16 9v8M16 22v1"/></svg>',
+  lists: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M11 8h16M11 16h16M11 24h16"/><path d="M4.5 8h2M4.5 16h2M4.5 24h2" stroke-width="3.4"/></svg>',
+  dues: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="11" r="5"/><path d="M6 27c1-6 5-9 10-9s9 3 10 9"/><path d="M22 6h5M24.5 3.5v5" stroke-width="2"/></svg>',
+  numaudit: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h6M20 8h6M6 16h4M14 16h4M22 16h4M6 24h6M20 24h6"/></svg>',
+  biz: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 27h24"/><rect x="6" y="16" width="5" height="8" rx="1"/><rect x="14" y="10" width="5" height="14" rx="1"/><rect x="22" y="4" width="5" height="20" rx="1"/></svg>',
+  pos: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="20" height="26" rx="3"/><path d="M10 9h12M10 15h3M16 15h3M22 15h0M10 21h3M16 21h3M22 21h0"/></svg>',
+  items: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="16" cy="16" r="4.6" fill="currentColor"/></svg>',
+  itemreq: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h20l-5-5M27 21H7l5 5"/></svg>',
+  staff: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="11" r="5"/><circle cx="23" cy="13" r="3.4"/><path d="M3 27c0-5 4-8 9-8s9 3 9 8M21 20c4 0 8 2 8 7"/></svg>',
+  matrix: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="currentColor"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="12.5" y="4" width="7" height="7" rx="1.5" opacity=".45"/><rect x="21" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="12.5" width="7" height="7" rx="1.5" opacity=".45"/><rect x="12.5" y="12.5" width="7" height="7" rx="1.5"/><rect x="21" y="12.5" width="7" height="7" rx="1.5" opacity=".45"/><rect x="4" y="21" width="7" height="7" rx="1.5"/><rect x="12.5" y="21" width="7" height="7" rx="1.5" opacity=".45"/><rect x="21" y="21" width="7" height="7" rx="1.5"/></svg>',
+  rules: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="24" height="24" rx="4"/><path d="M10 16.5l4 4 8-9"/></svg>',
+  settings: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M4 9h24M4 16h24M4 23h24"/><circle cx="11" cy="9" r="3.2" fill="var(--ink)"/><circle cx="21" cy="16" r="3.2" fill="var(--ink)"/><circle cx="13" cy="23" r="3.2" fill="var(--ink)"/></svg>',
+  logs: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M10 8h18M10 16h18M10 24h18"/><circle cx="4.5" cy="8" r="1.4" fill="currentColor"/><circle cx="4.5" cy="16" r="1.4" fill="currentColor"/><circle cx="4.5" cy="24" r="1.4" fill="currentColor"/></svg>',
+  exceptions: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4l13 23H3z"/><path d="M16 13v7M16 24h.01"/></svg>',
+  releases: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="14" width="20" height="14" rx="3"/><path d="M10 14V9a6 6 0 0 1 11-3"/></svg>',
+  locset: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 29s9-8 9-15a9 9 0 0 0-18 0c0 7 9 15 9 15z"/><circle cx="16" cy="14" r="3.2"/></svg>',
+  locations: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14l12-9 12 9v13H4z"/><path d="M12 27v-8h8v8"/></svg>',
+  control: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><rect x="4" y="4" width="10" height="10" rx="2"/><rect x="18" y="4" width="10" height="10" rx="2"/><rect x="4" y="18" width="10" height="10" rx="2"/><path d="M18 23h10M23 18v10"/></svg>',
+  backup: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4v16M9 14l7 7 7-7M5 27h22"/></svg>',
+};
+const TONE = { rulehub: 't-ink', emergency: 't-ruby', lists: 't-ink', dues: 't-gold', numaudit: 't-ink', biz: 't-gold', pos: 't-ruby', items: 't-gold', itemreq: 't-gold', staff: 't-ruby', matrix: 't-ruby', rules: '', settings: 't-ink', logs: 't-ink', backup: 't-ink', exceptions: 't-ruby', releases: 't-gold', locset: 't-ink', locations: 't-ink', control: 't-ruby' };
+const MARK = '<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#14173a"/><circle cx="32" cy="29" r="16.5" fill="none" stroke="#f2a900" stroke-width="3"/><circle cx="32" cy="29" r="8.8" fill="#f2a900"/><path d="M12 51h40" stroke="#f7eedc" stroke-width="3.2" stroke-linecap="round"/></svg>';
+
+// ---------- auth ----------
+const emailOf = (sid) => `${sid.toLowerCase()}@${C.emailDomain}`;
+const pwOf = (pin) => `${pin}-bos`;            // lets a 4-digit PIN meet Supabase's minimum password length
+const SID_RE = /^[a-z0-9]{3,20}$/i, PIN_RE = /^\d{4,6}$/;
+
+function authErr(msg) {
+  let el = $('#a_err');
+  if (!el) { el = document.createElement('div'); el.id = 'a_err'; el.className = 'notice bad'; const c = $('.card'); c.parentNode.insertBefore(el, c); }
+  el.textContent = msg;
+}
+function viewAuth(mode = 'login', msg = '') {
+  const reg = mode === 'register';
+  shell(t('app'), `
+    <img class="login-logo" src="logo.webp" alt="${esc(t('app'))}"><p class="muted center" style="margin:0 0 4px">${esc(t('login_sub'))}</p>
+    <div class="tabs">
+      <button data-act="authmode" data-v="login" class="${reg ? '' : 'on'}">${esc(t('login'))}</button>
+      <button data-act="authmode" data-v="register" class="${reg ? 'on' : ''}">${esc(t('register'))}</button>
+    </div>
+    ${msg ? `<div class="notice bad" id="a_err">${esc(msg)}</div>` : ''}
+    <div class="card panel stack">
+      ${reg ? `<div><label>${esc(t('full_name'))}</label><input id="a_name" autocomplete="name"></div>` : ''}
+      <div><label>${esc(t('staff_id'))}</label><input id="a_sid" autocapitalize="none" autocomplete="username" inputmode="latin"><div class="muted" style="font-size:.8rem">${esc(t('staff_id_hint'))}</div></div>
+      <div><label>${esc(t('pin'))}</label><input id="a_pin" type="password" inputmode="numeric" maxlength="6" autocomplete="${reg ? 'new-password' : 'current-password'}"></div>
+      <button class="primary full" data-act="${reg ? 'doregister' : 'dologin'}">${esc(reg ? t('register') : t('login'))}</button>
+    </div>`);
+}
+const val = (id) => ($(id) ? $(id).value.trim() : '');
+
+async function doLogin() {
+  const sid = val('#a_sid'), pin = val('#a_pin');
+  if (!SID_RE.test(sid)) return authErr(t('err_staff_id'));
+  if (!PIN_RE.test(pin)) return authErr(t('err_pin'));
+  if (navigator.onLine === false && CS()) return authErr(CS().T('first'));   // bos112: no internet = say so, do not count a wrong PIN
+  const pre = await sb.rpc('login_precheck', { p_staff: sid });
+  if (pre.data && pre.data.locked) return authErr(t('err_locked'));
+  const { error } = await sb.auth.signInWithPassword({ email: emailOf(sid), password: pwOf(pin) });
+  if (error && CS() && CS().isNet(error)) return authErr(CS().T('first'));   // bos112: the server was not reached: not a wrong PIN
+  if (error) { await sb.rpc('login_failed', { p_staff: sid }); return authErr(t('err_login')); }
+  await sb.rpc('login_success');
+  await start();
+}
+async function doRegister() {
+  const sid = val('#a_sid'), pin = val('#a_pin'), name = val('#a_name');
+  if (!name) return authErr(t('err_name'));
+  if (!SID_RE.test(sid)) return authErr(t('err_staff_id'));
+  if (!PIN_RE.test(pin)) return authErr(t('err_pin'));
+  const { data, error } = await sb.auth.signUp({ email: emailOf(sid), password: pwOf(pin), options: { data: { full_name: name } } });
+  if (error) return authErr(/already|registered/i.test(error.message) ? t('err_exists') : t('err_generic') + ' · ' + error.message);
+  if (!data.session) return authErr(t('err_confirm'));
+  await start();
+}
+async function logout() {
+  if (CS()) CS().clear();   // bos112: sign-out forgets the saved offline context
+  S.offline = false; csStop(); if (CS()) CS().paint();
+  try { await sb.auth.signOut(); if (CS() && CS().storedUid()) await sb.auth.signOut({ scope: 'local' }); } catch (e) { /* offline: the saved session is dropped on this phone below */ try { await sb.auth.signOut({ scope: 'local' }); } catch (e2) { /* ignore */ } }
+  S.ctx = null; location.hash = ''; viewAuth();
+}
+
+async function loadCtx() {
+  const { data, error } = await sb.rpc('my_context');
+  if (error) throw error;
+  S.ctx = data; if (data && CS()) CS().save(data);   // bos112: remember the last good sign-in (active profiles only) for an offline cold start
+  if (data && data.profile && !store.get('bos_lang')) S.lang = data.profile.lang || 'bn';
+}
+// bos112: offline cold start. See coldstart.js for what is kept and why.
+const CS = () => window.BOS_CS;
+let csTimer = null, csBusy = false;
+function csStop() { if (csTimer) clearInterval(csTimer); csTimer = null; }
+function offlineBoot(uid) {
+  const c = CS() ? CS().load(uid) : { refused: 'none' };
+  if (!c.ctx) { viewAuth('login', CS() ? CS().T(c.refused === 'old' ? 'old' : 'first') : ''); return false; }
+  S.ctx = c.ctx; S.offline = true;
+  if (c.ctx.profile && !store.get('bos_lang')) S.lang = c.ctx.profile.lang || 'bn';
+  CS().envApply(); CS().paint();
+  if (!csTimer) csTimer = setInterval(csRecheck, 30000);
+  route(); return true;
+}
+async function csLockout(msg) {
+  CS().clear(); S.ctx = null; S.offline = false; csStop(); CS().paint();
+  try { await sb.auth.signOut(); } catch (e) { /* offline again: the cache is already gone */ }
+  const had = location.hash; location.hash = ''; if (had) await new Promise((r) => setTimeout(r, 60));   // let the hashchange render finish, then show the message
+  viewAuth('login', msg);
+}
+async function csRecheck() {   // background retry: every 30 s and on 'online'. Never reloads the page; a removed / inactive user is signed out here.
+  if (!S.offline || csBusy) return; csBusy = true;
+  try {
+    let r; try { r = await sb.auth.getSession(); } catch (e) { r = { data: {}, error: e }; }
+    const session = r && r.data && r.data.session;
+    if (!session) { if ((r && r.error && CS().isNet(r.error)) || navigator.onLine === false) return; return await csLockout(CS().T('out')); }
+    const { data, error } = await sb.rpc('my_context');
+    if (error) { if (CS().isNet(error)) return; return await csLockout(CS().T('out')); }
+    if (!data || !data.profile || data.profile.status !== 'active') return await csLockout(t('err_disabled'));
+    S.ctx = data; CS().save(data); S.offline = false; csStop(); CS().paint();
+    window.dispatchEvent(new Event('online'));   // the queues (POS sales, outbox) resend now; every resend carries its client id, so nothing is written twice
+    if (S.csNeeds) route();
+  } catch (e) { /* still offline */ } finally { csBusy = false; }
+}
+window.addEventListener('online', () => { if (S.offline) csRecheck(); });
+async function start() {
+  let session = null;
+  try { const r = await sb.auth.getSession(); session = r && r.data && r.data.session; } catch (e) { session = null; }
+  if (!session) {
+    const u = CS() && CS().storedUid();   // bos112: supabase-js gives no session when the token is expired and cannot refresh offline; the stored sign-in is still there
+    if (u) { offlineBoot(u); return; }
+    return viewAuth('login', navigator.onLine === false && CS() ? CS().T('first') : '');
+  }
+  try { await loadCtx(); } catch (e) { if (CS() && CS().isNet(e)) { offlineBoot(session.user.id); return; } fail(e); return viewAuth(); }
+  if (!S.ctx) { await sb.auth.signOut(); return viewAuth(); }
+  route();
+  if (CS()) setTimeout(() => { try { csWarm(); } catch (e) { /* convenience only */ } }, 4000);
+}
+// keep the offline snapshot of locations / rules / items for POS users (once a day at most; reads what POS reads anyway)
+async function csWarm() {
+  const B = window.BOS, c = S.ctx, p = c && c.perms && c.perms.POS;
+  if (S.offline || !B || !B.loadStatic || !(c.is_owner || (p && (p.view || p.enter)))) return;
+  let last = 0; try { last = Number(store.get('bos_cs_warm_' + c.profile.id) || 0); } catch (e) { /* ignore */ }
+  if (Date.now() - last < 86400000) return;
+  await B.loadStatic(); store.set('bos_cs_warm_' + c.profile.id, String(Date.now()));
+}
+
+// ---------- routing ----------
+const OWNER_ONLY = new Set(['rulehub', 'emergency', 'lists', 'staff', 'matrix', 'rules', 'settings', 'logs', 'backup', 'releases', 'locset', 'locsheet', 'locations', 'control']);
+// owner-only screens that a delegated grant also opens (the server still decides on every call; this only stops the page bouncing a grant holder to Home)
+const ROUTE_GRANTS = {
+  releases: ['release_decide'],
+  lists: ['list_manage'],
+  locset: ['settings_approve', 'head_management', 'location_manage'],
+  locsheet: ['settings_approve', 'head_management', 'location_manage'],
+  locations: ['location_manage', 'head_management'],
+  control: ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage'],
+};
+function go(p) { location.hash = '#/' + p; }
+// does the signed-in person hold any of these grants (role grant, personal grant, emergency window)?  Cached per person for the session.
+async function hasAnyGrant(codes) {
+  if (!S.ctx) return false;
+  if (S.ctx.is_owner) return true;
+  const uidv = S.ctx.profile.id; if (!S.gcache || S.gcache.uid !== uidv) S.gcache = { uid: uidv, v: {} };
+  const locs = (S.ctx.locations || []).length ? [null, ...S.ctx.locations] : [null];
+  for (const c of codes) {
+    const hit = S.gcache.v[c];                       // {ok, at}: a grant is remembered; a clean "no" only for 30 s; an error is never remembered
+    if (hit && (hit.ok || Date.now() - hit.at < 30000)) { if (hit.ok) return true; continue; }
+    let ok = false, failed = false;
+    for (const l of locs) { try { const r = await sb.rpc('has_grant', { p_code: c, p_loc: l }); if (r && !r.error && r.data === true) { ok = true; break; } if (!r || r.error) failed = true; } catch (e) { failed = true; } }
+    if (ok || !failed) S.gcache.v[c] = { ok, at: Date.now() }; else delete S.gcache.v[c];
+    if (ok) return true;
+  }
+  return false;
+}
+function route() {
+  S.lzTok = (S.lzTok || 0) + 1;   // bos114: a screen script that arrives late for an older route must not draw
+  if (!S.ctx) return viewAuth();
+  S.csNeeds = false; if (CS()) CS().paint();   // bos112
+  const st = S.ctx.profile.status;
+  if (st === 'pending') return viewPending();
+  if (st === 'disabled') { if (CS()) CS().clear(); sb.auth.signOut(); S.ctx = null; return viewAuth('login', t('err_disabled')); }
+  const page = (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0];
+  if (S.offline && CS() && !CS().allowed(page)) return CS().needsNet(page);   // bos112: server-only screens say "Needs internet" instead of failing
+  if (OWNER_ONLY.has(page) && !S.ctx.is_owner) {
+    const gs = ROUTE_GRANTS[page];
+    if (!gs) return viewHome();
+    return hasAnyGrant(gs).then((ok) => { if ((location.hash.replace(/^#\/?/, '') || 'home').split('/')[0] !== page) return; ok ? dispatch(page) : viewHome(); });
+  }
+  dispatch(page);
+}
+function dispatch(page) {
+  const local = { home: viewHome, items: viewItems, staff: viewStaff, matrix: viewMatrix, rules: viewRules,
+     settings: viewSettings, logs: viewLogs, backup: viewBackup, itemreq: viewItemReq };
+  const extra = window.BOS_PAGES || {};
+  if (page === 'exceptions' && !S.ctx.is_owner && !Object.values(S.ctx.perms).some((p) => p.approve)) return viewHome();
+  if (page === 'items' && extra.items) return extra.items();           // products v2 (items2.js) takes over #/items; the old screen stays as the fallback
+  const Z = window.BOS_LAZY;   // bos114: lazy.js - fetch the screen's script first when the build made it lazy; loading bar / "slow connection" notice for every screen that waits
+  const draw = () => { const r = (local[page] || extra[page] || viewHome)(); if (Z) Z.track(r, page); };
+  if (Z) { Z.first(); if (Z.need(page)) { const tok = (S.lzTok = (S.lzTok || 0) + 1); return Z.track(Z.load(page).then(() => { if (tok === S.lzTok && (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0] === page) dispatch(page); }, () => { if (tok === S.lzTok) Z.fail(page); }), page); } }
+  draw();
+}
+window.__navCount = 1; window.addEventListener('hashchange', () => { window.__navCount = (window.__navCount || 1) + 1; route(); });
+try { if (sb.auth.onAuthStateChange) sb.auth.onAuthStateChange((ev) => { if (ev === 'SIGNED_OUT' && window.BOS_CS) window.BOS_CS.clear(); }); } catch (e) { /* bos112: stub or old client */ }
+window.BOS_APP = { hasAnyGrant, sb, S, t, esc, toast, fail, shell, openSheet, closeSheet, nm, fmt, store, ICON, langBar, go, H: null };
+
+function viewPending() {
+  shell(t('app'), `<div class="card stack center"><h2>${esc(t('pending_title'))}</h2>
+    <p>${esc(t('pending_text'))}</p>
+    <button class="primary full" data-act="recheck">${esc(t('check_again'))}</button>
+    <button class="full" data-act="logout">${esc(t('logout'))}</button></div>`);
+}
+
+// ---------- home ----------
+async function viewHome() {
+  if (window.BOS_NAV && window.BOS_NAV.home) return window.BOS_NAV.home();   // Home v2 (nav.js); the code below is the legacy fallback
+  const p = S.ctx.profile, perms = S.ctx.perms || {}, owner = S.ctx.is_owner;
+  shell(t('app'), `<div class="banner"><div class="roundel"><img src="mark.svg" alt=""></div><div><div class="bn-t">${esc(t('hello'))}, <b>${esc(p.full_name || p.staff_id)}</b></div><div class="bn-s"><span class="since">Since 1988</span> <span class="sid">${esc(p.staff_id)}</span></div></div></div><div id="home"><p class="muted">${esc(t('loading'))}</p></div>
+    <button class="full" style="margin-top:18px" data-act="logout">${esc(t('logout'))}</button>`);
+  const canDecide = owner || (perms.ITEMS && perms.ITEMS.approve);
+  const anyApprove = owner || Object.values(perms).some((p) => p.approve);
+  const [forms, pend, itemPending, exOpen, relPend, emPend] = await Promise.all([
+    sb.from('forms').select('code,area,name_bn,name_mix,name_en,sort,enabled').order('sort'),
+    owner ? sb.from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'pending') : Promise.resolve({ count: 0 }),
+    canDecide ? sb.from('item_changes').select('id', { count: 'exact', head: true }).eq('status', 'pending') : Promise.resolve({ count: 0 }),
+    anyApprove ? sb.from('exceptions').select('id', { count: 'exact', head: true }).eq('status', 'open') : Promise.resolve({ count: 0 }),
+    owner ? sb.from('release_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending') : Promise.resolve({ count: 0 }),
+    owner ? sb.from('emergency_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending').then((r) => r, () => ({ count: 0 })) : Promise.resolve({ count: 0 }),
+  ]);
+  if (forms.error) return fail(forms.error);
+  const tiles = [];
+  if (owner || (perms.POS && (perms.POS.enter || perms.POS.view))) tiles.push(['pos', t('pos'), ''], ['dues', t('dues'), '']);
+  if (owner || (perms.POS && perms.POS.approve)) tiles.push(['biz', t('biz'), '']);
+  if (perms.ITEMS && perms.ITEMS.view) tiles.push(['items', t('items'), '']);
+  if (perms.ITEMS && (perms.ITEMS.enter || perms.ITEMS.approve)) tiles.push(['itemreq', t('item_req'), itemPending.count ? `<span class="badge">${itemPending.count}</span>` : '']);
+  if (anyApprove) tiles.push(['exceptions', t('exceptions'), exOpen.count ? `<span class="badge">${exOpen.count}</span>` : ''], ['numaudit', t('numaudit'), '']);
+  if (owner) {
+    tiles.push(['emergency', t('emergency'), emPend.count ? `<span class="badge">${emPend.count}</span>` : ''], ['releases', t('releases'), relPend.count ? `<span class="badge">${relPend.count}</span>` : '']);
+    tiles.push(['staff', t('staff'), pend.count ? `<span class="badge">${pend.count}</span>` : ''], ['rulehub', t('rulehub'), '']);
+  }
+  const mine = forms.data.filter((f) => f.area !== 'master' && f.code !== 'POS' && perms[f.code] && perms[f.code].view);
+  const byArea = AREAS.map((a) => [a, mine.filter((f) => f.area === a)]).filter(([, l]) => l.length);
+  $('#home').innerHTML = `<div id="dash"></div><div class="grid">${tiles.map(([go_, label, badge]) =>
+      `<button class="tile ${TONE[go_] || ''}" data-act="go" data-v="${go_}">${ICON[go_] || ''}<span>${esc(label)}</span>${badge}</button>`).join('')}</div>
+    <div class="orn">${esc(t('forms_title'))}</div>
+    ${byArea.length ? byArea.map(([a, l]) => `<div class="card panel"><h3>${esc(t('area_' + a))}</h3>${l.map((f) => {
+      const pr = perms[f.code], live = f.code === '0-1' ? owner : (window.BOS && window.BOS.forms && window.BOS.forms[f.code]);
+      return `<div class="perm"><div class="row between" ${live ? `data-act="openform" data-v="${f.code}" style="cursor:pointer;min-height:44px"` : 'style="opacity:.6"'}><span><b>${esc(f.code)}</b> · ${esc(nm(f))}</span><span class="row">${
+        live ? '' : `<span class="chip">${esc(t('soon'))}</span>`}${pr.enter ? `<span class="chip ok">${esc(t('can_enter'))}</span>` : `<span class="chip">${esc(t('can_view'))}</span>`}${
+        pr.approve ? `<span class="chip warn">${esc(t('can_approve'))}</span>` : ''}</span></div></div>`; }).join('')}</div>`).join('')
+      : `<p class="muted">${esc(t('no_forms'))}</p>`}`;
+  if (window.BOS && window.BOS.dash) window.BOS.dash.render().catch(() => {});
+}
+
+// ---------- items ----------
+async function viewItems() {
+  const can = S.ctx.perms.ITEMS || {};
+  shell(t('items'), `<div class="notice ok">${esc(t('price_note'))}</div>
+    <div class="row"><input id="i_q" placeholder="${esc(t('search'))}" value="${esc(S.itemQ)}">${can.enter ? `<button class="primary" data-act="itemnew">＋</button>` : ''}</div>
+    <div id="i_cats" class="row wrap" style="margin:10px 0"></div><div id="i_list"><p class="muted">${esc(t('loading'))}</p></div>`, true);
+  await loadItems(); drawItems();
+}
+const canCostView = () => !!(S.ctx.perms.ITEM_COST && S.ctx.perms.ITEM_COST.view);
+const canCostEnter = () => !!(S.ctx.perms.ITEM_COST && S.ctx.perms.ITEM_COST.enter);
+async function loadItems() {
+  const [it, co] = await Promise.all([window.BOS_ALL(sb.from('items').select('*').order('code')), canCostView() ? sb.from('item_costs').select('*') : Promise.resolve({ data: [] })]);
+  if (it.error) return fail(it.error);
+  if (co.error) return fail(co.error);
+  const cm = new Map((co.data || []).map((c) => [c.item_id, c.cost_price]));
+  S.items = it.data.map((i) => ({ ...i, cost_price: canCostView() ? (cm.has(i.id) ? cm.get(i.id) : null) : undefined }));
+}
+function drawItems() {
+  const can = S.ctx.perms.ITEMS || {};
+  const cats = [...new Set(S.items.map((i) => i.category).filter(Boolean))];
+  const q = S.itemQ.toLowerCase();
+  const list = S.items.filter((i) => (!S.itemCat || i.category === S.itemCat) &&
+    (!q || [i.name_bn, i.name_en, i.name_mix, i.code].some((x) => (x || '').toLowerCase().includes(q))));
+  $('#i_cats').innerHTML = [['', t('all')], ...cats.map((c) => [c, catName(S.items.find((i) => i.category === c))])].map(([c, l]) =>
+    `<button class="tog ${S.itemCat === c ? 'on' : ''}" data-act="itemcat" data-v="${esc(c)}">${esc(l)}</button>`).join('');
+  $('#i_list').innerHTML = list.map((i) => {
+    const loss = i.cost_price != null && i.sell_price != null && Number(i.cost_price) >= Number(i.sell_price);
+    return `<div class="card item" ${can.enter ? `data-act="itemedit" data-v="${i.id}"` : ''}>
+      <div><div class="nm">${esc(nm(i))} ${i.is_active ? '' : `<span class="chip bad">${esc(t('inactive'))}</span>`}</div>
+        <div class="muted" style="font-size:.85rem">${esc(i.code)} · ${esc(catName(i))} · ${esc(unitName(i.unit))}</div>
+        ${loss ? `<div class="chip warn" style="margin-top:4px">${esc(t('loss_warn'))}</div>` : ''}</div>
+      <div class="pr"><div><b>৳ ${fmt(i.sell_price)}</b></div>${i.cost_price === undefined ? '' : `<div class="muted" style="font-size:.85rem">${fmt(i.cost_price)}</div>`}</div></div>`;
+  }).join('') || `<p class="muted center">—</p>`;
+}
+function itemSheet(it) {
+  const cats = [...new Set(S.items.map((i) => i.category).filter(Boolean))];
+  const opt = (v, cur, label) => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(label)}</option>`;
+  const f = it || { name_bn: '', name_en: '', name_mix: '', category: cats[0] || '', unit: 'kg', sell_price: '', cost_price: '', is_active: true };
+  openSheet(`<h2>${esc(it ? t('edit_item') : t('add_item'))}${it ? ' · ' + esc(it.code) : ''}</h2><div class="stack">
+    <div><label>${esc(t('name_bn'))}</label><input id="f_bn" value="${esc(f.name_bn)}"></div>
+    <div><label>${esc(t('name_en'))}</label><input id="f_en" value="${esc(f.name_en)}"></div>
+    <div><label>${esc(t('name_mix'))}</label><input id="f_mix" value="${esc(f.name_mix)}"></div>
+    <div class="row"><div style="flex:1"><label>${esc(t('category'))}</label><select id="f_cat">${cats.map((c) => opt(c, f.category, catName(S.items.find((i) => i.category === c)))).join('')}</select></div>
+      <div style="flex:1"><label>${esc(t('unit'))}</label><select id="f_unit">${Object.keys(UNIT).map((u) => opt(u, f.unit, unitName(u))).join('')}</select></div></div>
+    <div class="row"><div style="flex:1"><label>${esc(t('sell_price'))}</label><input id="f_sell" inputmode="decimal" value="${esc(f.sell_price)}"></div>
+      ${canCostView() ? `<div style="flex:1"><label>${esc(t('cost_price'))}</label><input id="f_cost" inputmode="decimal" value="${esc(f.cost_price)}" ${canCostEnter() ? '' : 'readonly'}></div>` : ''}</div>
+    <div class="row between"><span>${esc(t('active'))}</span>${tog(f.is_active, 'sheettog', 'id="f_act"')}</div>
+    ${S.ctx.is_owner ? '' : `<div class="notice warn">${esc(t('needs_approval'))}</div>`}
+    <div><label>${esc(t('reason_note'))}</label><input id="f_note"></div>
+    <div class="row"><button class="full" data-act="closesheet">${esc(t('cancel'))}</button>
+      <button class="primary full" data-act="itemsave" data-v="${it ? it.id : ''}">${esc(t('save'))}</button></div></div>`);
+}
+async function saveItem(id) {
+  const num = (v) => (v === '' ? null : Number(v));
+  const cur = id ? S.items.find((i) => i.id === id) : null;
+  const next = { name_bn: val('#f_bn'), name_en: val('#f_en') || null, name_mix: val('#f_mix') || null,
+    category: val('#f_cat') || null, unit: val('#f_unit') || null, sell_price: num(val('#f_sell')),
+    is_active: $('#f_act').classList.contains('on') };
+  if ($('#f_cost') && canCostEnter()) next.cost_price = num(val('#f_cost'));
+  if (!next.name_bn) return toast(t('err_item_name'));
+  for (const k of ['sell_price', 'cost_price']) if (k in next && next[k] !== null && (!Number.isFinite(next[k]) || next[k] < 0)) return toast(t('err_price'));
+  const cat = S.items.find((i) => i.category === next.category);
+  if (cat) next.category_bn = cat.category_bn;
+  const same = (a, b) => (a ?? null) === (b ?? null) || (typeof a === 'number' || typeof b === 'number') && Number(a) === Number(b);
+  const patch = {};
+  for (const k of Object.keys(next)) if (!cur || !same(cur[k], next[k])) patch[k] = next[k];
+  if (cur && !Object.keys(patch).length) return closeSheet();
+  const { data, error } = await sb.rpc('submit_item_change', { p_item: id || null, p_patch: patch, p_note: val('#f_note') || null });
+  if (error) return fail(error);
+  closeSheet();
+  toast(data && data.status === 'applied' ? t('saved') : t('sent_for_approval'));
+  await loadItems(); drawItems();
+}
+
+// ---------- item change requests ----------
+async function viewItemReq() {
+  shell(t('item_req'), `<div id="ir_body"><p class="muted">${esc(t('loading'))}</p></div>`, true);
+  const [ch] = await Promise.all([sb.from('item_changes').select('*').order('id', { ascending: false }).limit(60), loadItems()]);
+  if (ch.error) return fail(ch.error);
+  const canDecide = S.ctx.is_owner || (S.ctx.perms.ITEMS && S.ctx.perms.ITEMS.approve);
+  const label = { name_bn: t('name_bn'), name_en: t('name_en'), name_mix: t('name_mix'), category: t('category'), unit: t('unit'),
+    sell_price: t('sell_price'), cost_price: t('cost_price'), is_active: t('active'), category_bn: null, ...(window.BOS_ITEM_LABELS ? window.BOS_ITEM_LABELS() : {}) };
+  const showVal = (k, v) => (v === null || v === undefined ? '—' : typeof v === 'boolean' ? (v ? t('yes') : t('no')) : k === 'images' ? (Array.isArray(v) ? v.length : v) : Array.isArray(v) ? (v.join(', ') || '—') : v);
+  const body = ch.data.map((c) => {
+    const it = c.item_id ? S.items.find((i) => i.id === c.item_id) : null;
+    const rows = Object.entries(c.patch).filter(([k]) => label[k]).map(([k, v]) => {
+      const was = it ? (k === 'cost_price' && it.cost_price === undefined ? '' : showVal(k, it[k])) : null;
+      return `<div class="row between"><span class="muted">${esc(label[k])}</span><span>${was === null || was === '' ? '' : esc(was) + ' → '}<b>${esc(showVal(k, v))}</b></span></div>`; }).join('');
+    const cls = c.status === 'approved' ? 'ok' : c.status === 'rejected' ? 'bad' : 'warn';
+    return `<div class="card stack"><div class="row between"><b>${esc(it ? nm(it) + ' · ' + it.code : t('add_item') + ' · ' + (c.patch.name_bn || ''))}</b><span class="chip ${cls}">${esc(t('req_' + c.status))}</span></div>
+      ${rows}<div class="muted" style="font-size:.82rem">${esc(c.requested_staff || '')} · ${esc(new Date(c.requested_at).toLocaleString('en-GB', { timeZone: 'Asia/Dhaka' }))}${c.note ? ' · ' + esc(c.note) : ''}</div>
+      ${c.status !== 'pending' ? `<div class="muted" style="font-size:.82rem">${esc(c.decided_staff || '')}${c.decision_note ? ' · ' + esc(c.decision_note) : ''}</div>` : ''}
+      ${c.status === 'pending' && canDecide ? `<input id="dn_${c.id}" placeholder="${esc(t('reason_note'))}"><div class="row"><button class="danger full" data-act="itemdecide" data-v="${c.id}" data-ok="0">${esc(t('reject'))}</button><button class="primary full" data-act="itemdecide" data-v="${c.id}" data-ok="1">${esc(t('approve'))}</button></div>` : ''}</div>`;
+  }).join('');
+  $('#ir_body').innerHTML = body || `<p class="muted center">${esc(t('no_requests'))}</p>`;
+}
+
+// ---------- staff (owner) ----------
+async function viewStaff() {
+  shell(t('staff'), `<div id="s_list"><p class="muted">${esc(t('loading'))}</p></div>`, true);
+  await drawStaff();
+}
+async function staffData() {
+  const [p, ur, ul, r, l, lf] = await Promise.all([
+    sb.from('profiles').select('*').order('created_at'), sb.from('user_roles').select('*'), sb.from('user_locations').select('*'),
+    sb.from('roles').select('*').order('sort'), sb.from('locations').select('*').order('sort'), sb.from('login_failures').select('*')]);
+  for (const x of [p, ur, ul, r, l, lf]) if (x.error) throw x.error;
+  return { profiles: p.data, ur: ur.data, ul: ul.data, roles: r.data, locs: l.data, locked: new Set(lf.data.filter((x) => x.locked).map((x) => x.staff_id)) };
+}
+async function drawStaff() {
+  let d; try { d = await staffData(); } catch (e) { return fail(e); }
+  S.staff = d;
+  const order = { pending: 0, active: 1, disabled: 2 };
+  const list = [...d.profiles].sort((a, b) => order[a.status] - order[b.status]);
+  $('#s_list').innerHTML = list.map((p) => {
+    const rs = d.ur.filter((x) => x.user_id === p.id).map((x) => nm(d.roles.find((r) => r.code === x.role_code)));
+    const cls = p.status === 'active' ? 'ok' : p.status === 'pending' ? 'warn' : 'bad';
+    return `<div class="card item" data-act="staffopen" data-v="${p.id}"><div><div class="nm">${esc(p.full_name || p.staff_id)}</div>
+      <div class="muted" style="font-size:.85rem">${esc(p.staff_id)}${rs.length ? ' · ' + esc(rs.join(', ')) : ''}</div></div>
+      <div><span class="chip ${cls}">${esc(t('status_' + p.status))}</span>${d.locked.has(p.staff_id) ? ' <span class="chip bad">🔒</span>' : ''}</div></div>`;
+  }).join('');
+  if ($('#sheet') && S.staffOpen) staffSheet(S.staffOpen);
+}
+function staffSheet(id) {
+  S.staffOpen = id;
+  const d = S.staff, p = d.profiles.find((x) => x.id === id); if (!p) return closeSheet();
+  const myRoles = new Set(d.ur.filter((x) => x.user_id === id).map((x) => x.role_code));
+  const myLocs = new Set(d.ul.filter((x) => x.user_id === id).map((x) => x.location_id));
+  openSheet(`<h2>${esc(p.full_name || p.staff_id)} <span class="muted">· ${esc(p.staff_id)}</span></h2>
+    <div class="row wrap">${p.status !== 'active' ? `<button class="primary" data-act="setstatus" data-v="${id}" data-s="active">${esc(p.status === 'pending' ? t('approve') : t('enable'))}</button>` : ''}
+      ${p.status === 'active' ? `<button class="danger" data-act="setstatus" data-v="${id}" data-s="disabled">${esc(t('disable'))}</button>` : ''}
+      ${d.locked.has(p.staff_id) ? `<button data-act="unlock" data-v="${esc(p.staff_id)}">🔒 ${esc(t('unlock'))}</button>` : ''}</div>
+    <h2>${esc(t('roles'))}</h2>${d.roles.map((r) => `<div class="row between perm"><span>${esc(nm(r))}</span>${tog(myRoles.has(r.code), 'userrole', `data-u="${id}" data-r="${r.code}"`)}</div>`).join('')}
+    <h2>${esc(t('locations'))}</h2>${d.locs.map((l) => `<div class="row between perm"><span>${esc(nm(l))}</span>${tog(myLocs.has(l.id), 'userloc', `data-u="${id}" data-l="${l.id}"`)}</div>`).join('')}
+    <button class="full" style="margin-top:14px" data-act="closesheet">${esc(t('done'))}</button>`);
+}
+
+// ---------- role x form matrix (owner) ----------
+async function viewMatrix() {
+  shell(t('matrix'), `<div id="m_body"><p class="muted">${esc(t('loading'))}</p></div>`, true);
+  const [r, f, p] = await Promise.all([sb.from('roles').select('*').order('sort'), sb.from('forms').select('*').order('sort'), sb.from('role_form_perms').select('*')]);
+  for (const x of [r, f, p]) if (x.error) return fail(x.error);
+  S.m = { roles: r.data.filter((x) => x.code !== 'owner'), forms: f.data, perms: p.data };
+  if (!S.matrixRole || !S.m.roles.find((x) => x.code === S.matrixRole)) S.matrixRole = S.m.roles[0].code;
+  drawMatrix();
+}
+function drawMatrix() {
+  const { roles, forms, perms } = S.m, role = roles.find((x) => x.code === S.matrixRole);
+  const get = (fc) => perms.find((x) => x.role_code === role.code && x.form_code === fc) || { can_view: false, can_enter: false, can_approve: false };
+  $('#m_body').innerHTML = `<div class="notice warn">${esc(t('hint_defaults'))}</div><div class="notice ok">${esc(t('owner_note'))}</div>
+    <div class="row wrap">${roles.map((x) => `<button class="tog ${x.code === role.code ? 'on' : ''}" data-act="mrole" data-v="${x.code}">${esc(nm(x))}</button>`).join('')}</div>
+    <div class="card"><div class="row between"><div><b>${esc(t('self_approve'))}</b><div class="muted" style="font-size:.8rem">${esc(t('self_approve_hint'))}</div></div>
+      ${tog(role.allow_self_approve, 'selfapprove', `data-v="${role.code}"`)}</div></div>
+    <p class="muted">${esc(t('hint_matrix'))}</p>
+    ${AREAS.map((a) => [a, forms.filter((f) => f.area === a)]).filter(([, l]) => l.length).map(([a, l]) => `<div class="card"><b>${esc(t('area_' + a))}</b>${l.map((f) => {
+      const g = get(f.code);
+      return `<div class="perm"><div class="nm">${esc(f.code === 'ITEMS' ? '' : f.code + ' · ')}${esc(nm(f))}</div><div class="row wrap">
+        ${tog(g.can_view, 'perm', `data-f="${f.code}" data-k="view"`, t('can_view'))}${tog(g.can_enter, 'perm', `data-f="${f.code}" data-k="enter"`, t('can_enter'))}${tog(g.can_approve, 'perm', `data-f="${f.code}" data-k="approve"`, t('can_approve'))}</div></div>`; }).join('')}</div>`).join('')}`;
+}
+async function togglePerm(fc, k) {
+  const role = S.matrixRole, cur = S.m.perms.find((x) => x.role_code === role && x.form_code === fc) || { can_view: false, can_enter: false, can_approve: false };
+  const n = { view: cur.can_view, enter: cur.can_enter, approve: cur.can_approve }; n[k] = !n[k];
+  if (k === 'view' && !n.view) { n.enter = false; n.approve = false; }   // no viewing -> no entering or approving
+  else if (n.enter || n.approve) n.view = true;                         // entering or approving needs viewing
+  const row = { role_code: role, form_code: fc, can_view: n.view, can_enter: n.enter, can_approve: n.approve };
+  const { error } = await sb.from('role_form_perms').upsert(row, { onConflict: 'role_code,form_code' });
+  if (error) return fail(error);
+  const i = S.m.perms.findIndex((x) => x.role_code === role && x.form_code === fc);
+  if (i >= 0) S.m.perms[i] = row; else S.m.perms.push(row);
+  drawMatrix();
+}
+
+// ---------- form rules (owner) ----------
+async function viewRules() {
+  shell(t('rules'), `<div id="r_body"><p class="muted">${esc(t('loading'))}</p></div>`, true);
+  const { data, error } = await sb.from('forms').select('*').order('sort'); if (error) return fail(error);
+  S.rules = data.filter((f) => f.code !== 'ITEMS'); drawRules();
+}
+function drawRules() {
+  $('#r_body').innerHTML = AREAS.map((a) => [a, S.rules.filter((f) => f.area === a)]).filter(([, l]) => l.length).map(([a, l]) => `<div class="card"><b>${esc(t('area_' + a))}</b>${l.map((f) =>
+    `<div class="perm"><div class="nm">${esc(f.code)} · ${esc(nm(f))}</div><div class="row wrap">
+      ${tog(f.count_first, 'rule', `data-f="${f.code}" data-k="count_first"`, t('rule_count_first'))}${tog(f.red_block, 'rule', `data-f="${f.code}" data-k="red_block"`, t('rule_red_block'))}${tog(f.enabled, 'rule', `data-f="${f.code}" data-k="enabled"`, t('rule_enabled'))}</div></div>`).join('')}</div>`).join('');
+}
+async function toggleRule(fc, k) {
+  const f = S.rules.find((x) => x.code === fc), v = !f[k];
+  const { error } = await sb.from('forms').update({ [k]: v }).eq('code', fc); if (error) return fail(error);
+  f[k] = v; drawRules();
+}
+
+// ---------- settings (owner) ----------
+async function viewSettings() {
+  shell(t('settings'), `<div id="st_body"><p class="muted">${esc(t('loading'))}</p></div>`, true);
+  const { data, error } = await sb.from('settings').select('*').order('key'); if (error) return fail(error);
+  const label = (s) => (S.lang === 'en' ? s.label_en : S.lang === 'mix' ? s.label_mix : s.label_bn) || s.label_bn || s.key;
+  $('#st_body').innerHTML = layoutRow() + data.map((s) => `<div class="card stack"><div class="row between"><b>${esc(label(s))}</b>${s.value === null ? `<span class="chip warn">${esc(t('need_data'))}</span>` : ''}</div>
+    <div class="row"><input id="sv_${esc(s.key)}" value="${esc(s.value === null ? '' : (typeof s.value === 'string' ? s.value : JSON.stringify(s.value)))}">
+    <button class="primary" data-act="setsave" data-v="${esc(s.key)}">${esc(t('save'))}</button></div></div>`).join('');
+}
+// screen layout choice (docs/DESKTOP_LAYOUT.md 4.2): stored on this device only (localStorage bos_layout = 'phone' | 'desktop'; absent = automatic by width). Never in the database.
+function layoutChoice() { try { const v = localStorage.getItem('bos_layout'); return v === 'phone' || v === 'desktop' ? v : 'auto'; } catch (e) { return 'auto'; } }
+function layoutRow() {
+  const cur = layoutChoice();
+  return `<div class="card stack" id="lay_row"><div class="row between"><b data-info="feature:layout_choice">${esc(t('layout_title'))}</b></div>
+    <div class="row wrap" role="group" aria-label="${esc(t('layout_title'))}" style="gap:8px">${['auto', 'phone', 'desktop'].map((v) => `<button type="button" class="tog ${cur === v ? 'on' : ''}" aria-pressed="${cur === v}" data-act="layout_set" data-v="${v}">${esc(t('layout_' + v))}</button>`).join('')}</div>
+    <div class="muted" style="font-size:.9rem">${esc(t('layout_hint'))}</div></div>`;
+}
+function setLayoutChoice(v) {
+  const on = v === 'phone' || v === 'desktop';
+  try { if (on) localStorage.setItem('bos_layout', v); else localStorage.removeItem('bos_layout'); } catch (e) { /* storage blocked: the choice applies to this visit only */ }
+  if (on) document.documentElement.setAttribute('data-layout', v); else document.documentElement.removeAttribute('data-layout');   // nav.js and desktop.css follow at once, no reload
+  document.querySelectorAll('#lay_row [data-act="layout_set"]').forEach((b) => { const sel = b.dataset.v === (on ? v : 'auto'); b.classList.toggle('on', sel); b.setAttribute('aria-pressed', String(sel)); });
+  toast(t('layout_saved'));
+}
+async function saveSetting(key) {
+  let raw = val('#sv_' + key), v;
+  if (key === 'books_closed_until' && raw !== '') { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw), d = m && new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])); if (!m || d.getUTCFullYear() !== +m[1] || d.getUTCMonth() !== +m[2] - 1 || d.getUTCDate() !== +m[3]) return toast('তারিখ YYYY-MM-DD ফরম্যাটে লিখুন, যেমন 2026-09-30 / Write the date as YYYY-MM-DD, e.g. 2026-09-30'); }
+  if (raw === '') v = null; else if (/^-?\d+(\.\d+)?$/.test(raw)) v = Number(raw); else if (raw === 'true' || raw === 'false') v = raw === 'true'; else v = raw;
+  const { error } = await sb.from('settings').update({ value: v, updated_at: new Date().toISOString(), updated_by: S.ctx.profile.id }).eq('key', key);
+  if (error) return fail(error); toast(t('saved'));
+}
+
+// ---------- change log (owner) ----------
+async function viewLogs() {
+  shell(t('logs'), `<div class="row"><select id="l_t"><option value="">${esc(t('all_tables'))}</option>${['items', 'profiles', 'user_roles', 'user_locations', 'role_form_perms', 'roles', 'forms', 'locations', 'settings'].map((x) => `<option ${S.logTable === x ? 'selected' : ''}>${x}</option>`).join('')}</select></div>
+    <div id="l_body"><p class="muted">${esc(t('loading'))}</p></div>`, true);
+  let q = sb.from('audit_log').select('*').order('id', { ascending: false }).limit(100);
+  if (S.logTable) q = q.eq('table_name', S.logTable);
+  const { data, error } = await q; if (error) return fail(error);
+  const when = (x) => new Date(x).toLocaleString('en-GB', { timeZone: 'Asia/Dhaka', hour12: true });
+  const short = (o) => { const s = JSON.stringify(o); return s.length > 260 ? s.slice(0, 260) + '…' : s; };
+  $('#l_body').innerHTML = data.map((r) => {
+    const d = r.detail || {};
+    const body = r.action === 'update' ? `${short(d.old)}\n→ ${short(d.new)}` : short(d.new || d.old);
+    return `<div class="card log"><div class="row between"><b>${esc(r.table_name)} · ${esc(r.action)}</b><span class="k">${esc(when(r.at))}</span></div>
+      <div class="k">${esc(r.staff_id || 'system')} · ${esc(r.record_id || '')}</div><pre class="diff">${esc(body)}</pre></div>`;
+  }).join('') || `<p class="muted center">${esc(t('logs_empty'))}</p>`;
+}
+
+// ---------- backup (owner) ----------
+// Every business-data table the owner can read through RLS (sale lines live inside sales.lines; sales_fact_t is a rebuildable report cache; serials/login_throttle have no read policy).
+// Never add a table that holds a PIN or secret (PINs are only inside Supabase Auth, never in these tables).
+const BACKUP_TABLES = ['profiles', 'roles', 'user_roles', 'locations', 'user_locations', 'forms', 'role_form_perms', 'items', 'item_costs', 'item_changes', 'item_price_history',
+  'settings', 'audit_log', 'corrections', 'location_settings', 'entries', 'exceptions', 'release_requests', 'emergency_requests', 'rules', 'rule_grants', 'grant_defs', 'user_grants',
+  'option_lists', 'customers', 'suppliers', 'sales', 'sale_payments', 'stock_ledger', 'stock_balance', 'stock_batches', 'stock_transfers', 'stock_wastage', 'purchase_bills', 'purchase_lines',
+  'supplier_payments', 'unit_conversions', 'shelf_life_rules', 'invoice_templates', 'print_profiles', 'report_brand_map', 'role_favourites', 'login_failures', 'login_attempts', 'wastage_requests', 'supplier_refunds', 'sale_returns',
+  'location_setup_steps', 'settings_sheets', 'settings_values', 'list_defs', 'option_requests', 'list_other_entries', 'list_managers', 'item_types', 'item_class_map', 'item_import_batches', 'item_mapping_review', 'item_master_links', 'item_bulk_batches', 'item_map_actions', 'assets', 'asset_costs', 'form_rollout', 'entry_change_requests', 'entry_revisions', 'entry_counts', 'entry_count_peeks', 'entry_signatures', 'blind_count_cfg', 'pin_sig_cfg', 'recipes', 'recipe_lines', 'product_packaging', 'production_runs', 'forms_ledger_cfg', 'entry_ledger_posts'];
+// Backup state lives here, not in the DOM, so a redraw (progress, error, retry) never loses it.
+// busy: one run at a time (a tap during a run does nothing); file: the last JSON, kept in memory for "save again" (a new tap = a new user gesture);
+// err: the run failed (Bengali message + retry); partial: tables that could not be read (file saved without them, retry offered).
+const BK = { busy: false, done: 0, total: 0, file: null, err: '', partial: [] };
+function viewBackup() {
+  shell(t('backup'), `<div class="card stack"><p>${esc(t('backup_text'))}</p><div id="bk_box" class="stack" role="status" aria-live="polite"></div></div>`, true);
+  drawBackup();
+}
+function drawBackup() {
+  const box = document.getElementById('bk_box'); if (!box) return;   // the person left the screen: the run still finishes, the next visit draws the result
+  const busy = BK.busy, dis = busy ? ' disabled' : '';
+  const prog = busy ? `<p class="muted">${esc(t('backup_busy'))} · <b>${BK.done} / ${BK.total}</b></p>` : '';
+  const err = (!busy && BK.err) ? `<div class="notice bad"><p><b>${esc(t('backup_fail'))}</b></p><p class="muted">${esc(BK.err.slice(0, 120))}</p><button class="primary full" data-act="bk_all">${esc(t('backup_retry'))}</button></div>` : '';
+  const warn = (!busy && !BK.err && BK.partial.length) ? `<div class="notice warn"><p>${esc(t('backup_partial'))} <b>${esc(BK.partial.join(', '))}</b></p><button class="full" data-act="bk_all">${esc(t('backup_retry'))}</button></div>` : '';
+  const ok = (!busy && !BK.err && BK.file && !BK.partial.length) ? `<p class="muted">${esc(t('backup_ok'))}</p>` : '';
+  box.innerHTML = `${prog}${err}${warn}${ok}
+    <button class="primary full" data-act="bk_all"${dis}>${esc(t('backup_all'))}</button>
+    <button class="full" data-act="bk_items"${dis}>${esc(t('backup_items'))}</button>
+    ${BK.file && !busy ? `<button class="full" data-act="bk_again">${esc(t('backup_again'))}</button>` : ''}`;
+}
+async function fetchAll(table) {
+  // the two stock tables hold cost columns that are not granted: the owner reads them through definer RPCs (phase12)
+  if (table === 'stock_balance') { const r = await sb.rpc('backup_stock_balance'); if (r.error) throw r.error; return r.data || []; }
+  if (table === 'stock_ledger') { const out = []; let last = 0; for (;;) { const r = await sb.rpc('backup_stock_ledger', { p_from: last, p_limit: 1000 }); if (r.error) throw r.error; const d = r.data || []; out.push(...d); if (d.length < 1000) break; last = d[d.length - 1].id; } return out; }
+  const out = []; for (let from = 0; ; from += 1000) {
+    const { data, error } = await sb.from(table).select('*').range(from, from + 999); if (error) throw error;
+    out.push(...data); if (data.length < 1000) break; }
+  return out;
+}
+// one table failing (missing, no read right) never stops the backup: it is recorded in o.errors and the rest continues.
+// Four tables are read at a time (one by one, a phone on mobile data waited for every table in turn); the file keeps the table order.
+async function backupTables(o, tables, onProgress) {
+  o.errors = o.errors || {}; o.row_counts = o.row_counts || {};
+  const got = {}; let next = 0, n = 0;
+  const worker = async () => { while (next < tables.length) { const tb = tables[next++];
+    try { got[tb] = await fetchAll(tb); } catch (e) { o.errors[tb] = String((e && e.message) || e); }
+    n++; if (onProgress) onProgress(n); } };
+  await Promise.all(Array.from({ length: Math.min(4, tables.length) }, worker));
+  for (const tb of tables) { if (tb in got) { o.tables[tb] = got[tb]; o.row_counts[tb] = got[tb].length; } else o.row_counts[tb] = null; }
+  return o;
+}
+// the object URL is kept for a minute: a browser that starts the save late still finds the file
+function download(name, text, type) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+}
+const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
+async function backupAll() {
+  if (BK.busy) return;   // a second tap during a run does nothing: no second run, no duplicate file
+  Object.assign(BK, { busy: true, done: 0, total: BACKUP_TABLES.length, file: null, err: '', partial: [] }); drawBackup();
+  try { const o = { exported_at: new Date().toISOString(), note: 'row_counts = rows saved per table; errors = tables that could not be read (not included)', tables: {} };
+    await backupTables(o, BACKUP_TABLES, (k) => { BK.done = k; drawBackup(); });
+    const bad = Object.keys(o.errors || {});
+    if (bad.length === BACKUP_TABLES.length) throw new Error('every table failed: ' + bad.slice(0, 2).map((k) => k + ' ' + o.errors[k]).join('; '));
+    const name = `bos-backup-${today()}.json`, text = JSON.stringify(o, null, 1);
+    BK.file = { name, text }; BK.partial = bad;
+    download(name, text, 'application/json'); toast(t('done'));
+  } catch (e) { console.error(e); BK.file = null; BK.err = String((e && e.message) || e) || 'error'; }
+  finally { BK.busy = false; drawBackup(); }
+}
+// "save again" is its own tap, so the browser sees a user gesture; the file is the one already made (no new read of the data)
+function backupAgain() { if (BK.file) download(BK.file.name, BK.file.text, 'application/json'); }
+async function backupItems() {
+  try { const rows = await fetchAll('items'); const cols = ['code', 'name_bn', 'name_en', 'name_mix', 'category', 'unit', 'sell_price', 'cost_price', 'is_active'];
+    const q = (v) => { let s = String(v ?? ''); if (/^[=+\-@\t\r]/.test(s) && !/^-?\d+(\.\d+)?$/.test(s)) s = "'" + s; /* spreadsheet formula guard */ return '"' + s.replace(/"/g, '""') + '"'; };
+    download(`bos-items-${today()}.csv`, '﻿' + [cols.join(','), ...rows.map((r) => cols.map((c) => q(r[c])).join(','))].join('\n'), 'text/csv'); toast(t('done'));
+  } catch (e) { fail(e); }
+}
+
+// ---------- events ----------
+async function setLang(l) {
+  S.lang = l; store.set('bos_lang', l);
+  if (S.ctx) sb.rpc('set_my_lang', { p_lang: l });
+  closeSheet(); route();
+}
+const H = {
+  lang: (a) => setLang(a.dataset.v),
+  go: (a) => go(a.dataset.v),
+  authmode: (a) => viewAuth(a.dataset.v),
+  dologin: doLogin, doregister: doRegister, logout,
+  recheck: async () => { await loadCtx(); route(); },
+  closesheet: closeSheet,
+  goback: (a) => { const n = Math.max(1, Number(a && a.dataset && a.dataset.n) || 1); if (window.BOS_NAVSTACK) window.BOS_NAVSTACK.back(n); else if ((window.__navCount || 1) > 1) { window.__navCount -= 2; history.back(); } else go('home'); },
+  navmain: () => { if (window.BOS_NAVSTACK) window.BOS_NAVSTACK.main(); else go('home'); },
+  sheettog: (a) => a.classList.toggle('on'),
+  itemcat: (a) => { S.itemCat = a.dataset.v; drawItems(); },
+  itemnew: () => itemSheet(null),
+  itemedit: (a) => itemSheet(S.items.find((i) => i.id === a.dataset.v)),
+  itemsave: (a) => saveItem(a.dataset.v),
+  itemdecide: async (a) => { const id = Number(a.dataset.v), ok = a.dataset.ok === '1';
+    const { error } = await sb.rpc('decide_item_change', { p_id: id, p_approve: ok, p_note: val('#dn_' + id) || null });
+    if (error) return /own request/.test(error.message) ? toast(t('err_own_request')) : fail(error); toast(t('saved')); viewItemReq(); },
+  staffopen: (a) => staffSheet(a.dataset.v),
+  setstatus: async (a) => { const { error } = await sb.from('profiles').update({ status: a.dataset.s }).eq('id', a.dataset.v); if (error) return fail(error); toast(t('saved')); await drawStaff(); },
+  unlock: async (a) => { const { error } = await sb.rpc('unlock_staff', { p_staff: a.dataset.v }); if (error) return fail(error); toast(t('saved')); await drawStaff(); },
+  userrole: async (a) => { const on = a.classList.contains('on'), u = a.dataset.u, r = a.dataset.r;
+    const { error } = on ? await sb.from('user_roles').delete().eq('user_id', u).eq('role_code', r) : await sb.from('user_roles').insert({ user_id: u, role_code: r });
+    if (error) return fail(error); await drawStaff(); },
+  userloc: async (a) => { const on = a.classList.contains('on'), u = a.dataset.u, l = Number(a.dataset.l);
+    const { error } = on ? await sb.from('user_locations').delete().eq('user_id', u).eq('location_id', l) : await sb.from('user_locations').insert({ user_id: u, location_id: l });
+    if (error) return fail(error); await drawStaff(); },
+  mrole: (a) => { S.matrixRole = a.dataset.v; drawMatrix(); },
+  selfapprove: async (a) => { const role = S.m.roles.find((x) => x.code === a.dataset.v), v = !role.allow_self_approve;
+    const { error } = await sb.from('roles').update({ allow_self_approve: v }).eq('code', role.code); if (error) return fail(error); role.allow_self_approve = v; drawMatrix(); },
+  perm: (a) => togglePerm(a.dataset.f, a.dataset.k),
+  rule: (a) => toggleRule(a.dataset.f, a.dataset.k),
+  setsave: (a) => saveSetting(a.dataset.v),
+  layout_set: (a) => setLayoutChoice(a.dataset.v),
+  bk_all: backupAll, bk_again: backupAgain, bk_items: backupItems,
+};
+window.BOS_APP.H = H;
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-act]'); if (!a || !H[a.dataset.act]) return;
+  Promise.resolve(H[a.dataset.act](a)).catch(fail);
+});
+document.addEventListener('input', (e) => { if (e.target.id === 'i_q') { S.itemQ = e.target.value; drawItems(); } });
+document.addEventListener('change', (e) => { if (e.target.id === 'l_t') { S.logTable = e.target.value; viewLogs(); } });
+
+// start after every script (forms.js, entry.js) has loaded
+const boot = () => start().catch(fail);
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();

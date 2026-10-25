@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-/zibRcU0a+WHo6OiCt9LWFd4lFoHX6yNEmM7aWjqFrk=' 'wasm-unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://tessdata.projectnaptha.com; worker-src 'self' blob:; frame-src 'self' blob: about:; media-src 'self' blob: data:; manifest-src 'self'; base-uri 'self'; object-src 'none'"><!-- bos111 (M5): see docs/briefs_p2p3/step_Sec2_REPORT.md; the sha256 is the theme script below - change that script and this hash together (tests/web/sec2_csp_test.js checks it) -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<link rel="preload" as="script" href="core.js?v=daf65b5bf0">
 <meta name="theme-color" content="#a1111e">
 <meta name="google" content="notranslate">
 <title>ইসলামিয়া মিষ্টি ঘর · ISLAMIYA MISTY GHAR</title>
@@ -13,7 +12,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wdth,wght@75..125,400..800&family=Hind+Siliguri:wght@400;500;600;700&family=Cormorant+Garamond:wght@600;700&display=swap" media="print" data-fontswap>
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wdth,wght@75..125,400..800&family=Hind+Siliguri:wght@400;500;600;700&family=Cormorant+Garamond:wght@600;700&display=swap"></noscript><!-- bos114: font CSS no longer blocks the first paint; lazy.js turns it on -->
-<link rel="stylesheet" href="app.css?v=9cc8680683">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="theme.css">
 <script>/* theme first (no flash): bos_theme = dark | light | classic; first run follows prefers-color-scheme (light -> Premium Light, otherwise Premium Dark) */
 (function(){var K='bos_theme',V={dark:1,light:1,classic:1,'glass-light':1,'glass-dark':1}/* bos109 */,h=document.documentElement;
 function rd(){try{var v=localStorage.getItem(K);return V[v]?v:null}catch(e){return null}}
@@ -23,14 +23,205 @@ var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('cont
 ap(rd()||first());
 window.BOS_THEME={KEY:K,list:['dark','light','classic','glass-light','glass-dark'],get:function(){return h.getAttribute('data-theme')||'dark'},set:function(v){if(!V[v])return;try{localStorage.setItem(K,v)}catch(e){}ap(v)}};
 })();</script>
-<script src="theme_glass.js?v=1b19dfae7a"></script><!-- bos109 Liquid Glass -->
-<!-- bos-build 1b19dfae7a -->
+<link rel="stylesheet" href="controls.css">
+<link rel="stylesheet" href="theme_glass.css"><link rel="stylesheet" href="desktop.css"><script src="theme_glass.js"></script><!-- bos109 Liquid Glass -->
 </head>
 <body>
 <div id="app"><p class="muted center pad">…</p></div>
 <div id="toast" role="status"></div>
 <script src="vendor/supabase.js"></script>
-<script src="config.js?v=3c7541bce7"></script>
-<script src="core.js?v=daf65b5bf0"></script>
+<script src="pager.js"></script>
+<script src="config.js"></script>
+<script src="scan_core.js"></script>
+<script src="photo.js"></script>
+<script src="i18n.js"></script>
+<script src="navstack.js"></script>
+<script src="app.js"></script>
+<script src="lazy.js"></script>
+<script src="entry.js"></script>
+<script src="bizctx.js"></script>
+<script src="errlog.js"></script>
+<script src="kbdfix.js"></script>
+<script src="a11yfix.js"></script>
+<script src="forms.js"></script>
+<script src="forms_stock.js"></script>
+<script src="forms_cash.js"></script>
+<script src="forms_sales.js"></script>
+<script src="forms_factory.js"></script>
+<script src="forms_staff.js"></script>
+<script src="pay.js"></script>
+<script src="pos.js"></script>
+<script src="coldstart.js"></script>
+<script src="dues.js"></script>
+<script src="dash.js"></script>
+<script src="biz.js"></script>
+<script src="lists.js"></script>
+<script src="listctl.js"></script>
+<script src="controls.js"></script>
+<script src="rules.js"></script>
+<script src="settings2.js"></script>
+<script src="invoice.js"></script>
+<script src="barcode.js"></script>
+<script src="scan_native.js"></script>
+<script src="scan_items.js"></script>
+<script src="items2.js"></script>
+<script src="itemmaster.js"></script>
+<script src="bulkitems.js"></script>
+<script src="locations.js"></script>
+<script src="icons3d.js"></script>
+<script src="ia.js"></script>
+<script src="control.js"></script>
+<script src="rollout.js"></script>
+<script src="pinsign.js"></script>
+<script src="nav.js"></script>
+<script src="filters.js"></script>
+<script src="reports.js"></script>
+<script src="reports2.js"></script>
+<script src="reporthub_parse.js"></script>
+<script src="reporthub.js"></script>
+<script src="reporthub_ask.js"></script>
+<script src="reporthub_time.js"></script>
+<script src="reportsmap.js"></script>
+<script src="stock2.js"></script>
+<script src="purchase.js"></script>
+<script src="salereturn.js"></script>
+<script src="daybook.js"></script>
+<script src="rptkit.js"></script>
+<script src="campaigns.js"></script>
+<script src="couponuse.js"></script>
+<script src="auditreports.js"></script>
+<script src="forecast.js"></script>
+<script src="cashmoves.js"></script>
+<script src="shortages.js"></script>
+<script src="wallets.js"></script>
+<script src="locgroups.js"></script>
+<script src="org122.js"></script>
+<script src="places135.js"></script>
+<script src="profile134.js"></script>
+<script src="impexp124.js"></script>
+<script src="variants125.js"></script>
+<script src="cheques127.js"></script>
+<script src="schemes128.js"></script>
+<script src="tinting129.js"></script>
+<script src="switchboard.js"></script>
+<script src="paths.js"></script>
+<script src="restoredrill.js"></script>
+<script src="stockrep.js"></script>
+<script src="batchrep.js"></script>
+<script src="stockx.js"></script>
+<script src="parallel.js"></script>
+<script src="monthclose.js"></script>
+<script src="flow.js"></script>
+<script src="delegation.js"></script>
+<script src="swreg.js"></script>
+<script src="printbooks.js"></script>
+<script src="salary.js"></script>
+<script src="recipes.js"></script>
+<script src="recipebook.js"></script>
+<script src="costing.js"></script>
+<script src="costsources.js"></script>
+<script src="costattrib.js"></script>
+<script src="s1setup.js"></script>
+<script src="ownerboard.js"></script>
+<script src="accounts.js"></script>
+<script src="balancecheck.js"></script>
+<script src="moneysrc.js"></script>
+<script src="moneyaccounts.js"></script>
+<script src="openparties.js"></script>
+<script src="periodlock.js"></script>
+<script src="moneycontrols.js"></script>
+<script src="returnrules.js"></script>
+<script src="profitcheck.js"></script>
+<script src="reportnotes.js"></script>
+<script src="expenseregister.js"></script>
+<script src="statements.js"></script>
+<script src="otherincome.js"></script>
+<script src="freshness.js"></script>
+<script src="infohint.js"></script>
+<script src="finance2.js"></script>
+<script src="employees.js"></script>
+<script src="attendance.js"></script>
+<script src="attend2.js"></script>
+<script src="payroll.js"></script>
+<script src="payrequests.js"></script>
+<script src="customers.js"></script>
+<script src="crm_360.js"></script>
+<script src="crm_profile.js"></script>
+<script src="crm_consent.js"></script>
+<script src="crm_dupes.js"></script>
+<script src="crm_segments.js"></script>
+<script src="crm_rfm.js"></script>
+<script src="crm_loyalty.js"></script>
+<script src="crm_coupons.js"></script>
+<script src="crm_tasks.js"></script>
+<script src="crm_leads.js"></script>
+<script src="crm_feedback.js"></script>
+<script src="salesx.js"></script>
+<script src="c2rpt.js"></script>
+<script src="orderreports.js"></script>
+<script src="custinsight.js"></script>
+<script src="staffreports.js"></script>
+<script src="inbox.js"></script>
+<script src="partners.js"></script>
+<script src="notifications.js"></script>
+<script src="announce.js"></script>
+<script src="todo.js"></script>
+<script src="shifts.js"></script>
+<script src="assistant_tools.js"></script>
+<script src="assistant.js"></script>
+<script src="integrations.js"></script>
+<script src="connect.js"></script>
+<script src="setupadvisor.js"></script>
+<script src="twofa.js"></script>
+<script src="rb4common.js"></script>
+<script src="prodplan.js"></script>
+<script src="prodreports.js"></script>
+<script src="targets.js"></script>
+<script src="capacity.js"></script>
+<script src="trace.js"></script>
+<script src="stockout.js"></script>
+<script src="purchrep.js"></script>
+<script src="website.js"></script>
+<script src="market.js"></script>
+<script src="xc_unsold.js"></script>
+<script src="xc_summary.js"></script>
+<script src="xb_paysms.js"></script>
+<script src="xb_paycapture.js"></script>
+<script src="xb_cakejobs.js"></script>
+<script src="xb_riders.js"></script>
+<script src="posfail.js"></script>
+<script src="stepw_common.js"></script>
+<script src="formscreens.js"></script>
+<script src="chanedit.js"></script>
+<script src="costboard.js"></script>
+<script src="packflags.js"></script>
+<script src="guards.js"></script>
+<script src="scan.js"></script>
+<script src="optviews.js"></script>
+<script src="tpl_registry.js"></script>
+<script src="tpl_docs.js"></script>
+<script src="tpl_labels.js"></script>
+<script src="tpl_msgs.js"></script>
+<script src="tpl_samples.js"></script>
+<script src="tplpicker.js"></script>
+<script src="invoiceview.js"></script>
+<script src="books85.js"></script>
+<script src="cashdrawer.js"></script>
+<script src="books96.js"></script>
+<script src="landed.js"></script>
+<script src="optionsx.js"></script>
+<script src="catpick.js"></script>
+<script src="landed_q4.js"></script>
+<script src="badges107.js"></script>
+<script src="setupundo.js"></script>
+<script src="purchaseprint.js"></script>
+<script src="itemimg.js"></script>
+<script src="whatsnew.js"></script>
+<script src="charts.js"></script>
+<script src="dashx_metrics.js"></script>
+<script src="dashx.js"></script>
+<script src="cost116.js"></script>
+<script src="recon118.js"></script>
+<script src="reports131.js"></script>
 </body>
 </html>

@@ -1,1 +1,236 @@
-(()=>{"use strict";const t=window.BOS_APP,e=window.BOS,{sb:a,S:n,esc:s,toast:o,shell:r,openSheet:l,closeSheet:i,H:d}=t,c=e.L,p=e.lab,f=(t,e=document)=>e.querySelector(t),u={title:c("শিফট রোস্টার","Shift schedule","Shift roster"),my:c("আমার শিফট","My shifts","আমার shift"),roster:c("রোস্টার সাজান","Roster","Roster সাজান"),report:c("রোস্টার বনাম হাজিরা","Roster vs attendance","Roster বনাম হাজিরা"),off:c('শিফট রোস্টার এখন বন্ধ আছে। মালিক সেটিংসে "শিফট রোস্টার চালু" করলে এটি কাজ করবে।',"Off: the shift schedule is switched off. Turn on in Settings (shift_on). Nothing is lost; rosters start when it is ON.",'Shift roster বন্ধ। মালিক Settings-এ "shift_on" চালু করলে কাজ করবে।'),nofn:c("এই সুবিধা এখনো সার্ভারে বসানো হয়নি (phase132)।","The server does not have this yet (phase132).","এটি এখনো server-এ বসানো হয়নি (phase132)।"),notLinked:c("আপনার লগইন কোনো কর্মচারীর নথির সাথে যুক্ত নয়, তাই ব্যক্তিগত শিফট দেখানো যাচ্ছে না।","Your login is not linked to an employee record, so there is no personal schedule to show.","আপনার login কোনো employee record-এর সাথে যুক্ত নয়, তাই শিফট দেখানো যাচ্ছে না।"),none:c("আগামী ১৪ দিনের জন্য কোনো শিফট ঠিক করা হয়নি।","No shifts are planned for the next 14 days.","আগামী ১৪ দিনের জন্য কোনো shift ঠিক করা হয়নি।"),offDay:c("ছুটির দিন (অফ)","Off","Off"),leave:c("অনুমোদিত ছুটি","Approved leave","অনুমোদিত leave"),holiday:c("সরকারি / উৎসব ছুটি","Holiday","Holiday"),today:c("আজ","Today","আজ"),alsoOn:c("একই জায়গায় আর যারা আছে","Also on at my place","একই জায়গায় আর যারা আছে"),onlyMe:c("আর কেউ নেই","Nobody else","আর কেউ নেই"),place:c("জায়গা","Place","জায়গা"),prev:c("আগের সপ্তাহ","Previous week","আগের সপ্তাহ"),next:c("পরের সপ্তাহ","Next week","পরের সপ্তাহ"),copy:c("আগের সপ্তাহ কপি করুন","Copy last week","আগের সপ্তাহ copy"),tpls:c("শিফট টেমপ্লেট","Shift templates","Shift template"),legend:c("সংকেত","Key","Key"),noEmp:c("এই জায়গায় কোনো কর্মী নেই।","No staff at this place.","এই জায়গায় কোনো কর্মী নেই।"),pickShift:c("শিফট","Shift","Shift"),clearOpt:c("— কিছু ঠিক নেই (সাপ্তাহিক নিয়ম চলবে) —","— nothing set (weekly pattern applies) —","— কিছু নেই (weekly pattern চলবে) —"),offOpt:c("অফ-ডে","Off-day","Off-day"),note:c("ছুটি / বদলের নোট (ঐচ্ছিক)","Leave / swap note (optional)","Leave / swap note (optional)"),save:c("সেভ","Save","Save"),cancel:c("বাতিল","Cancel","Cancel"),close:c("বন্ধ করুন","Close","Close"),saved:c("সেভ হয়েছে","Saved","Saved"),copied:c("কপি হয়েছে","Copied","Copied"),skipped:c("বাদ","skipped","skipped"),addTpl:c("নতুন টেমপ্লেট","New template","নতুন template"),edit:c("বদলান","Edit","Edit"),retire:c("বন্ধ করুন","Retire","Retire"),nameBn:c("নাম (বাংলা)","Name (Bangla)","নাম (বাংলা)"),nameEn:c("নাম (ইংরেজি)","Name (English)","Name (English)"),start:c("শুরু","Start","Start"),end:c("শেষ","End","End"),allPlaces:c("সব জায়গা (শুধু মালিক)","Every place (owner only)","সব জায়গা (owner)"),from:c("থেকে","From","From"),to:c("পর্যন্ত","To","To"),show:c("দেখান","Show","Show"),noAtt:c("হাজিরার তথ্য এই সার্ভারে নেই, তাই তুলনা করা গেল না।","There is no attendance data on this server, so nothing to compare.","হাজিরার data নেই, তুলনা করা গেল না।"),nothingRep:c("এই সময়ে তুলনা করার মতো কিছু নেই।","Nothing to compare in this period.","এই সময়ে তুলনার কিছু নেই।"),planned:c("রোস্টারে","Rostered","Rostered"),r_ok:c("ঠিক সময়ে","Present","Present"),r_late:c("দেরি","Late","Late"),r_half_day:c("আধা দিন","Half day","Half day"),r_leave:c("ছুটি","Leave","Leave"),r_absent:c("অনুপস্থিত","Absent","Absent"),r_no_record:c("হাজিরার রেকর্ড নেই","No attendance record","হাজিরা record নেই"),r_worked_off:c("অফ-ডে তে কাজ করেছে","Worked on an off-day","Off-day তে কাজ"),r_off:c("অফ-ডে","Off","Off"),r_other:c("অন্যান্য","Other","Other"),showAll:c("ঠিক থাকাগুলোও দেখান","Show the matching ones too","ঠিকগুলোও দেখান")},m=t=>p(u[t]),_={not_allowed:c("এটির অনুমতি নেই।","You are not allowed to do this.","এটির permission নেই।"),shift_off:c("শিফট রোস্টার বন্ধ আছে।","The shift schedule is switched off.","Shift roster বন্ধ আছে।"),bad_date:c("ডেট ঠিক নয় (খুব আগের বা খুব পরের)।","The date is not valid (too far back or ahead).","Date ঠিক নয়।"),bad_shift:c("একটি শিফট অথবা অফ-ডে বাছুন।","Choose a shift or an off-day.","Shift অথবা off-day বাছুন।"),not_found:c("পাওয়া যায়নি।","Not found.","পাওয়া যায়নি।"),text_too_long:c("নোট বেশি লম্বা (২০০ অক্ষর পর্যন্ত)।","The note is too long (200 characters).","Note বেশি লম্বা (২০০)।"),name_required:c("নাম লিখুন।","Write a name.","নাম লিখুন।"),bad_time:c("সময় ঠিক নয়।","The time is not valid.","সময় ঠিক নয়।"),bad_location:c("জায়গা ঠিক নয়।","The place is not valid.","জায়গা ঠিক নয়।")},y=t=>{const e=String(t&&t.message||"");for(const t of Object.keys(_))if(e.indexOf(t.replace("not_allowed","not allowed"))>=0)return p(_[t]);return e||"error"};async function b(t,e){const n=await a.rpc(t,e||{});if(n.error)throw n.error;return n.data}const v=[c("রবি","Sun","রবি"),c("সোম","Mon","সোম"),c("মঙ্গল","Tue","মঙ্গল"),c("বুধ","Wed","বুধ"),c("বৃহ","Thu","বৃহ"),c("শুক্র","Fri","শুক্র"),c("শনি","Sat","শনি")],h=()=>(new Date).toLocaleDateString("en-CA",{timeZone:"Asia/Dhaka"}),$=(t,e)=>{const a=new Date(t+"T00:00:00Z");return a.setUTCDate(a.getUTCDate()+e),a.toISOString().slice(0,10)},w=t=>new Date(t+"T00:00:00Z").getUTCDay(),g=t=>new Date(t+"T00:00:00Z").toLocaleDateString("en-GB",{timeZone:"UTC",day:"2-digit",month:"short"}),x={sun:0,mon:1,tue:2,wed:3,thu:4,fri:5,sat:6};function k(t){let a=6;try{const t=e.rule&&e.rule("week_start",null);"string"==typeof t&&void 0!==x[t]&&(a=x[t])}catch(t){a=6}return $(t,-(w(t)-a+7)%7)}const S=t=>p(c(t.name_bn,t.name_en||t.name_bn,t.name_en||t.name_bn));const O={st:null,tab:"my",my:null,loc:null,from:null,ros:null,rep:null,rfrom:null,rto:null,repAll:!1,cell:null,tplId:null},T=t=>t?`${S(t)} ${t.start}–${t.end}`:"";const N=t=>String.fromCharCode(65+t%26);function A(t){const a=(e.ENV&&e.ENV.locs||[]).find(e=>e.id===t);return a?p(c(a.name_bn,a.name_en||a.name_bn,a.name_mix||a.name_bn)):"#"+t}function E(){const t=O.st.locations||[];return`<div class="stack"><div><label for="r2s_loc">${s(m("place"))}</label><select id="r2s_loc" data-r2s="loc">${t.map(t=>`<option value="${t}" ${t===O.loc?"selected":""}>${s(A(t))}</option>`).join("")}</select></div>\n    <div class="r2s-nav"><button type="button" data-act="r2s_wk" data-v="-7" aria-label="${s(m("prev"))}">‹</button><b>${s(g(O.from))} – ${s(g($(O.from,6)))}</b><button type="button" data-act="r2s_wk" data-v="7" aria-label="${s(m("next"))}">›</button></div></div>\n    <div class="r2s-btns"><button type="button" data-act="r2s_copy">${s(m("copy"))}</button><button type="button" data-act="r2s_tpls">${s(m("tpls"))}</button></div>\n    <div id="r2s_grid">${function(){const t=O.ros;if(!t)return e.ui.state("loading");const a=t.templates,n=new Map(a.map((t,e)=>[t.id,N(e)])),o=[];for(let e=0;e<t.days;e++)o.push($(t.from,e));const r=a.map((t,e)=>`<span class="chip" title="${s(T({...t}))}"><b>${N(e)}</b>&nbsp;${s(S(t))} ${s(t.start)}–${s(t.end)}</span>`).join("")+`<span class="chip warn"><b>×</b>&nbsp;${s(m("offDay"))}</span>`,l=t.employees.length?t.employees.map(t=>{const e=new Map(t.days.map(t=>[t.day,t])),a=o.map(a=>{const o=e.get(a),r=o?o.off?"×":n.get(o.shift_id)||"?":"·";return`<button type="button" class="r2s-cell ${o?o.off?"off":"":"none"} ${o&&"pattern"===o.source?"pat":""} ${o&&o.note?"note":""} ${o&&o.leave?"lv":""} ${o&&(o.holiday_bn||o.holiday_en)?"hol":""}" data-act="r2s_cell" data-emp="${s(t.id)}" data-day="${s(a)}" aria-label="${s((t.name_en||t.name_bn)+" "+a)}"><span>${s(p(v[w(a)]))} ${s(String(Number(a.slice(8))))}</span><span class="c">${s(r)}</span></button>`}).join("");return`<div class="card r2s-emp" data-emp="${s(t.id)}"><b>${s(p(c(t.name_bn,t.name_en||t.name_bn,t.name_en||t.name_bn)))}</b><div class="r2s-week">${a}</div></div>`}).join(""):e.ui.state("empty",m("noEmp"));return`<div class="r2s-leg" aria-label="${s(m("legend"))}">${r}</div>${l}`}()}</div>`}async function C(){const t=f("#r2s_body");if(!t)return;let e;try{e=await b("r2_shift_state")}catch(e){return void(t.innerHTML=`<div class="notice warn">${s((t=>t&&("PGRST202"===t.code||/does not exist|could not find/i.test(t.message||"")))(e)?m("nofn"):y(e))}</div>`)}O.st=e,e.on?(O.rfrom||(O.rto=h(),O.rfrom=$(O.rto,-6)),O.from||(O.from=k(h())),await j(),L()):t.innerHTML=`<div class="notice warn" data-state="off">${s(m("off"))}</div>`}async function j(){try{"my"===O.tab?O.my=await b("r2_shift_my",{p_from:h(),p_days:14}):"roster"===O.tab&&await async function(){null===O.loc&&(O.loc=(O.st.locations||[])[0]||null),null!==O.loc?(O.from||(O.from=k(h())),O.ros=await b("r2_shift_roster",{p_loc:O.loc,p_from:O.from,p_days:7})):O.ros={templates:[],employees:[],days:7,from:O.from}}()}catch(t){o(y(t)),"my"===O.tab&&(O.my={linked:!1,days:[]})}}function L(){const t=f("#r2s_body");if(!t||!O.st)return;const a=O.st.can_manage&&(O.st.locations||[]).length?`<div class="seg" role="group"><button type="button" data-act="r2s_tab" data-v="my" aria-pressed="${"my"===O.tab}">${s(m("my"))}</button><button type="button" data-act="r2s_tab" data-v="roster" aria-pressed="${"roster"===O.tab}">${s(m("roster"))}</button><button type="button" data-act="r2s_tab" data-v="report" aria-pressed="${"report"===O.tab}">${s(m("report"))}</button></div>`:"";t.innerHTML=a+("my"===O.tab?O.my?function(){const t=O.my;if(!t.linked)return`<div class="notice" data-state="notlinked">${s(m("notLinked"))}</div>`;if(!t.days.length)return e.ui.state("empty",m("none"));const a=h();return t.days.map(t=>{const e=t.off,n=t.leave?"leave":e?"off":"",o=t.shift?`<span class="chip ok">${s(T(t.shift))}</span>`:e?`<span class="chip warn">${s(m("offDay"))}</span>`:"",r=t.mates||[];return`<div class="card r2s-day ${t.day===a?"today":""} ${n}" data-day="${s(t.day)}"><div class="row between" style="align-items:flex-start;gap:8px"><b>${s(p(v[t.dow]))} ${s(g(t.day))}${t.day===a?" · "+s(m("today")):""}</b>${o}</div>\n      <div class="r2s-chips">${t.leave?`<span class="chip ok">${s(m("leave"))}</span>`:""}${t.holiday_bn||t.holiday_en?`<span class="chip">${s(m("holiday"))}: ${s(p(c(t.holiday_bn,t.holiday_en||t.holiday_bn,t.holiday_en||t.holiday_bn)))}</span>`:""}</div>\n      ${t.note?`<div style="font-size:.92rem;overflow-wrap:anywhere">${s(t.note)}</div>`:""}\n      ${O.my.mates_on&&t.shift?`<details><summary>${s(m("alsoOn"))} (${r.length})</summary>${r.length?`<ul>${r.map(t=>`<li>${s(p(c(t.name_bn,t.name_en||t.name_bn,t.name_en||t.name_bn)))} <span class="muted">· ${s(t.start)}–${s(t.end)}</span></li>`).join("")}</ul>`:`<div class="muted">${s(m("onlyMe"))}</div>`}</details>`:""}</div>`}).join("")}():e.ui.state("loading"):"roster"===O.tab?E():function(){const t=O.rep,a=O.st.locations||[],n=t?t.rows.filter(t=>O.repAll||"ok"!==t.result&&"off"!==t.result):[],o=t&&t.totals?Object.keys(t.totals).map(e=>`<span class="chip ${"ok"===e||"off"===e?"ok":"late"===e||"half_day"===e||"leave"===e?"warn":"bad"}">${s(m("r_"+e)||e)}: ${s(t.totals[e])}</span>`).join(""):"";return`<div class="stack"><div><label for="r2s_loc">${s(m("place"))}</label><select id="r2s_loc" data-r2s="loc">${a.map(t=>`<option value="${t}" ${t===O.loc?"selected":""}>${s(A(t))}</option>`).join("")}</select></div>\n    <div class="row wrap"><div style="flex:1 1 140px"><label for="r2s_rf">${s(m("from"))}</label><input id="r2s_rf" type="date" value="${s(O.rfrom)}"></div><div style="flex:1 1 140px"><label for="r2s_rt">${s(m("to"))}</label><input id="r2s_rt" type="date" value="${s(O.rto)}"></div></div>\n    <button type="button" class="primary full" data-act="r2s_rep">${s(m("show"))}</button></div>\n    ${t?!1===t.attendance?`<div class="notice warn" data-state="noatt">${s(m("noAtt"))}</div>`:`<div class="r2s-chips" id="r2s_tot">${o}</div>\n      <label class="row" style="align-items:center"><input type="checkbox" id="r2s_all" data-act="r2s_all" ${O.repAll?"checked":""}> ${s(m("showAll"))}</label>\n      <div id="r2s_rows">${n.length?n.map(t=>`<div class="card r2s-row" data-result="${s(t.result)}"><div class="row between" style="gap:8px"><b>${s(p(c(t.name_bn,t.name_en||t.name_bn,t.name_en||t.name_bn)))}</b><span class="chip ${"ok"===t.result||"off"===t.result?"ok":"late"===t.result||"half_day"===t.result||"leave"===t.result?"warn":"bad"}">${s(m("r_"+t.result))}</span></div>\n        <div class="muted" style="font-size:.88rem">${s(g(t.day))}${t.planned?" · "+s(m("planned"))+" "+s(t.shift_bn||"")+" "+s(t.start||"")+"–"+s(t.end||""):" · "+s(m("r_off"))}${t.late_minutes?" · +"+s(t.late_minutes)+" min":""}</div></div>`).join(""):e.ui.state("empty",m("nothingRep"))}</div>`:""}`}())}function D(t){O.tplId=t?t.id:null;const e=!(!n.ctx||!n.ctx.is_owner);l(`<h3>${s(m(t?"edit":"addTpl"))}</h3><div class="stack">\n    <div><label for="r2s_nb">${s(m("nameBn"))}</label><input id="r2s_nb" maxlength="60" autocomplete="off" value="${s(t?t.name_bn:"")}"></div>\n    <div><label for="r2s_ne">${s(m("nameEn"))}</label><input id="r2s_ne" maxlength="60" autocomplete="off" value="${s(t&&t.name_en||"")}"></div>\n    <div class="row wrap"><div style="flex:1 1 130px"><label for="r2s_st">${s(m("start"))}</label><input id="r2s_st" type="time" value="${s(t?t.start:"09:00")}"></div><div style="flex:1 1 130px"><label for="r2s_en">${s(m("end"))}</label><input id="r2s_en" type="time" value="${s(t?t.end:"17:00")}"></div></div>\n    ${e?`<label class="row" style="align-items:center"><input type="checkbox" id="r2s_all0" ${t&&!t.location_id?"checked":""}> ${s(m("allPlaces"))}</label>`:""}\n    <div class="r2s-btns"><button type="button" class="primary" data-act="r2s_tplsave">${s(m("save"))}</button><button type="button" data-act="closesheet">${s(m("cancel"))}</button></div></div>`)}Object.assign(d,{r2s_tab:async t=>{O.tab=t.dataset.v,O.my="my"===O.tab?null:O.my,L(),await j(),L()},r2s_wk:async t=>{O.from=$(O.from,Number(t.dataset.v)),O.ros=null,L(),await j(),L()},r2s_all:t=>{O.repAll=!!t.checked,L()},r2s_cell:t=>function(t,e){const a=O.ros,n=a.employees.find(e=>e.id===t),o=n&&n.days.find(t=>t.day===e),r=o?o.off?"off":"day"===o.source?String(o.shift_id):"":"";O.cell={emp:t,day:e},l(`<h3>${s(n?p(c(n.name_bn,n.name_en||n.name_bn,n.name_en||n.name_bn)):"")} · ${s(p(v[w(e)]))} ${s(g(e))}</h3><div class="stack">\n    <div><label for="r2s_sel">${s(m("pickShift"))}</label><select id="r2s_sel"><option value="">${s(m("clearOpt"))}</option>${a.templates.map((t,e)=>`<option value="${t.id}" ${r===String(t.id)?"selected":""}>${N(e)} · ${s(S(t))} ${s(t.start)}–${s(t.end)}</option>`).join("")}<option value="off" ${"off"===r?"selected":""}>× ${s(m("offOpt"))}</option></select></div>\n    <div><label for="r2s_note">${s(m("note"))}</label><input id="r2s_note" maxlength="200" autocomplete="off" value="${s(o&&"day"===o.source&&o.note||"")}"></div>\n    <div class="r2s-btns"><button type="button" class="primary" data-act="r2s_cellsave">${s(m("save"))}</button><button type="button" data-act="closesheet">${s(m("cancel"))}</button></div></div>`)}(t.dataset.emp,t.dataset.day),r2s_cellsave:async()=>{const t=O.cell;if(!t)return;const e=(f("#r2s_sel")||{}).value||"",a=((f("#r2s_note")||{}).value||"").trim();try{""===e?await b("r2_roster_clear",{p_emp:t.emp,p_day:t.day}):await b("r2_roster_set",{p_emp:t.emp,p_day:t.day,p_shift:"off"===e?null:Number(e),p_off:"off"===e,p_note:a||null,p_loc:null}),i(),o(m("saved")),await j(),L()}catch(t){o(y(t))}},r2s_copy:async()=>{try{const t=await b("r2_roster_copy_week",{p_loc:O.loc,p_from:$(O.from,-7),p_to:O.from});o(m("copied")+": "+t.copied+(t.skipped?" · "+m("skipped")+" "+t.skipped:"")),await j(),L()}catch(t){o(y(t))}},r2s_tpls:()=>function(){const t=O.ros;l(`<h3>${s(m("tpls"))}</h3><div id="r2s_tpllist">${t.templates.map((t,e)=>`<div class="card"><div class="row between" style="gap:8px"><span><b>${N(e)}</b> · ${s(S(t))} <span class="muted">${s(t.start)}–${s(t.end)}${t.location_id?"":" · "+s(m("allPlaces"))}</span></span></div>\n    <div class="r2s-btns"><button type="button" data-act="r2s_tpledit" data-v="${s(t.id)}">${s(m("edit"))}</button><button type="button" data-act="r2s_tplretire" data-v="${s(t.id)}">${s(m("retire"))}</button></div></div>`).join("")}</div>\n    <div class="r2s-btns"><button type="button" class="primary" data-act="r2s_tplnew">${s(m("addTpl"))}</button><button type="button" data-act="closesheet">${s(m("close"))}</button></div>`)}(),r2s_tplnew:()=>D(null),r2s_tpledit:t=>D(O.ros.templates.find(e=>String(e.id)===t.dataset.v)),r2s_tplretire:async t=>{try{await b("r2_shift_template_save",{p_id:Number(t.dataset.v),p_data:{active:!1}}),i(),o(m("saved")),await j(),L()}catch(t){o(y(t))}},r2s_tplsave:async()=>{const t=!!(f("#r2s_all0")||{}).checked,e={name_bn:((f("#r2s_nb")||{}).value||"").trim(),name_en:((f("#r2s_ne")||{}).value||"").trim()||null,start_time:(f("#r2s_st")||{}).value,end_time:(f("#r2s_en")||{}).value};if(O.tplId?t&&(e.location_id=null):e.location_id=t?null:O.loc,!e.name_bn)return o(p(_.name_required));try{await b("r2_shift_template_save",{p_id:O.tplId,p_data:e}),i(),o(m("saved")),await j(),L()}catch(t){o(y(t))}},r2s_rep:async()=>{O.rfrom=(f("#r2s_rf")||{}).value||O.rfrom,O.rto=(f("#r2s_rt")||{}).value||O.rto,null===O.loc&&(O.loc=(O.st.locations||[])[0]||null);try{O.rep=await b("r2_shift_report",{p_loc:O.loc,p_from:O.rfrom,p_to:O.rto}),L()}catch(t){o(y(t))}}}),document.addEventListener("change",async t=>{const e=t.target;e&&e.getAttribute&&"loc"===e.getAttribute("data-r2s")&&(O.loc=Number(e.value),O.ros=null,O.rep=null,"roster"===O.tab&&(L(),await j()),L())}),e.shifts={load:C},window.BOS_PAGES=Object.assign(window.BOS_PAGES||{},{shifts:async function(){if(e.loadStatic)try{await e.loadStatic()}catch(t){}!function(){if(document.getElementById("r2s_css"))return;const t=document.createElement("style");t.id="r2s_css",t.textContent="\n.r2s-day.today { border-color: var(--ruby); border-left: 6px solid var(--ruby); } .r2s-day.off, .r2s-day.leave { opacity: .92; }\n.r2s-day summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; } .r2s-day ul { margin: 4px 0; padding-inline-start: 20px; }\n.r2s-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; margin-top: 6px; }\n.r2s-cell { min-width: 0; min-height: 48px; padding: 2px 0; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.15; font: 600 .72rem var(--text-font); box-shadow: none; }\n.r2s-cell .c { font: 800 1rem var(--text-font); } .r2s-cell.off { background: var(--warn-bg); color: var(--warn); } .r2s-cell.pat { border-style: dashed; } .r2s-cell.none .c { opacity: .4; }\n.r2s-cell.note { box-shadow: inset 0 -3px 0 var(--ruby); } .r2s-cell.lv { box-shadow: inset 0 3px 0 var(--ok); } .r2s-cell.hol { background: var(--ok-bg); }\n.r2s-btns { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; } .r2s-btns > * { flex: 1 1 130px; min-height: 44px; }\n.r2s-leg { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; } .r2s-nav { display: flex; gap: 8px; align-items: center; margin: 8px 0; } .r2s-nav b { flex: 1; text-align: center; } .r2s-nav button { min-width: 44px; min-height: 44px; }\n.r2s-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }\n#r2s_all, #r2s_all0 { width: 24px; min-height: 24px; flex: none; }\n",document.head.appendChild(t)}(),O.tab="my",r(m("title"),'<div id="r2s_body"><p class="muted">…</p></div>',!0),await C()}})})();
+/* Islamia BOS · Shift schedule (#/shifts). Package R2-C.
+   Staff: "My shifts" = the next 14 days (shift and time, off-days, approved leave, holidays, notes) and, when the owner allows it, who else is on at my place.
+   Schedulers (the owner, or a person holding the grant shift_manage for the place): the weekly roster of one place as people x days, tap a day to give a shift
+   template, an off-day or a leave / swap note; copy last week; shift templates (name, start, end, place); and a report that compares the roster with what attendance
+   recorded (read only; shown only when the server has attendance data).
+   Reuses the existing tables: templates = shifts, the weekly pattern = employee_shift_assignments, holidays, approved leave, attendance_days. This file writes only through r2_* functions.
+   Switches: shift_on (OFF by default: entry stays visible to the owner and the grant holder, no request, the page says it is off), shift_mates_on (ON; only matters when shift_on is ON).
+   Server: supabase/phase132.sql. The server is the authority on who may schedule. UNVERIFIED on a real phone and a real Supabase project. */
+(() => {
+'use strict';
+const A = window.BOS_APP, B = window.BOS;
+const { sb, S, esc, toast, shell, openSheet, closeSheet, H } = A;
+const L = B.L, lab = B.lab;
+const $ = (s, el = document) => el.querySelector(s);
+const X = {
+  title: L('শিফট রোস্টার', 'Shift schedule', 'Shift roster'), my: L('আমার শিফট', 'My shifts', 'আমার shift'), roster: L('রোস্টার সাজান', 'Roster', 'Roster সাজান'), report: L('রোস্টার বনাম হাজিরা', 'Roster vs attendance', 'Roster বনাম হাজিরা'),
+  off: L('শিফট রোস্টার এখন বন্ধ আছে। মালিক সেটিংসে "শিফট রোস্টার চালু" করলে এটি কাজ করবে।', 'Off: the shift schedule is switched off. Turn on in Settings (shift_on). Nothing is lost; rosters start when it is ON.', 'Shift roster বন্ধ। মালিক Settings-এ "shift_on" চালু করলে কাজ করবে।'),
+  nofn: L('এই সুবিধা এখনো সার্ভারে বসানো হয়নি (phase132)।', 'The server does not have this yet (phase132).', 'এটি এখনো server-এ বসানো হয়নি (phase132)।'),
+  notLinked: L('আপনার লগইন কোনো কর্মচারীর নথির সাথে যুক্ত নয়, তাই ব্যক্তিগত শিফট দেখানো যাচ্ছে না।', 'Your login is not linked to an employee record, so there is no personal schedule to show.', 'আপনার login কোনো employee record-এর সাথে যুক্ত নয়, তাই শিফট দেখানো যাচ্ছে না।'),
+  none: L('আগামী ১৪ দিনের জন্য কোনো শিফট ঠিক করা হয়নি।', 'No shifts are planned for the next 14 days.', 'আগামী ১৪ দিনের জন্য কোনো shift ঠিক করা হয়নি।'),
+  offDay: L('ছুটির দিন (অফ)', 'Off', 'Off'), leave: L('অনুমোদিত ছুটি', 'Approved leave', 'অনুমোদিত leave'), holiday: L('সরকারি / উৎসব ছুটি', 'Holiday', 'Holiday'), today: L('আজ', 'Today', 'আজ'),
+  alsoOn: L('একই জায়গায় আর যারা আছে', 'Also on at my place', 'একই জায়গায় আর যারা আছে'), onlyMe: L('আর কেউ নেই', 'Nobody else', 'আর কেউ নেই'),
+  place: L('জায়গা', 'Place', 'জায়গা'), prev: L('আগের সপ্তাহ', 'Previous week', 'আগের সপ্তাহ'), next: L('পরের সপ্তাহ', 'Next week', 'পরের সপ্তাহ'), copy: L('আগের সপ্তাহ কপি করুন', 'Copy last week', 'আগের সপ্তাহ copy'),
+  tpls: L('শিফট টেমপ্লেট', 'Shift templates', 'Shift template'), legend: L('সংকেত', 'Key', 'Key'), noEmp: L('এই জায়গায় কোনো কর্মী নেই।', 'No staff at this place.', 'এই জায়গায় কোনো কর্মী নেই।'),
+  pickShift: L('শিফট', 'Shift', 'Shift'), clearOpt: L('— কিছু ঠিক নেই (সাপ্তাহিক নিয়ম চলবে) —', '— nothing set (weekly pattern applies) —', '— কিছু নেই (weekly pattern চলবে) —'), offOpt: L('অফ-ডে', 'Off-day', 'Off-day'),
+  note: L('ছুটি / বদলের নোট (ঐচ্ছিক)', 'Leave / swap note (optional)', 'Leave / swap note (optional)'), save: L('সেভ', 'Save', 'Save'), cancel: L('বাতিল', 'Cancel', 'Cancel'), close: L('বন্ধ করুন', 'Close', 'Close'),
+  saved: L('সেভ হয়েছে', 'Saved', 'Saved'), copied: L('কপি হয়েছে', 'Copied', 'Copied'), skipped: L('বাদ', 'skipped', 'skipped'),
+  addTpl: L('নতুন টেমপ্লেট', 'New template', 'নতুন template'), edit: L('বদলান', 'Edit', 'Edit'), retire: L('বন্ধ করুন', 'Retire', 'Retire'),
+  nameBn: L('নাম (বাংলা)', 'Name (Bangla)', 'নাম (বাংলা)'), nameEn: L('নাম (ইংরেজি)', 'Name (English)', 'Name (English)'), start: L('শুরু', 'Start', 'Start'), end: L('শেষ', 'End', 'End'), allPlaces: L('সব জায়গা (শুধু মালিক)', 'Every place (owner only)', 'সব জায়গা (owner)'),
+  from: L('থেকে', 'From', 'From'), to: L('পর্যন্ত', 'To', 'To'), show: L('দেখান', 'Show', 'Show'), noAtt: L('হাজিরার তথ্য এই সার্ভারে নেই, তাই তুলনা করা গেল না।', 'There is no attendance data on this server, so nothing to compare.', 'হাজিরার data নেই, তুলনা করা গেল না।'),
+  nothingRep: L('এই সময়ে তুলনা করার মতো কিছু নেই।', 'Nothing to compare in this period.', 'এই সময়ে তুলনার কিছু নেই।'), planned: L('রোস্টারে', 'Rostered', 'Rostered'),
+  r_ok: L('ঠিক সময়ে', 'Present', 'Present'), r_late: L('দেরি', 'Late', 'Late'), r_half_day: L('আধা দিন', 'Half day', 'Half day'), r_leave: L('ছুটি', 'Leave', 'Leave'), r_absent: L('অনুপস্থিত', 'Absent', 'Absent'),
+  r_no_record: L('হাজিরার রেকর্ড নেই', 'No attendance record', 'হাজিরা record নেই'), r_worked_off: L('অফ-ডে তে কাজ করেছে', 'Worked on an off-day', 'Off-day তে কাজ'), r_off: L('অফ-ডে', 'Off', 'Off'), r_other: L('অন্যান্য', 'Other', 'Other'),
+  showAll: L('ঠিক থাকাগুলোও দেখান', 'Show the matching ones too', 'ঠিকগুলোও দেখান'),
+};
+const T = (k) => lab(X[k]);
+const E = {
+  not_allowed: L('এটির অনুমতি নেই।', 'You are not allowed to do this.', 'এটির permission নেই।'), shift_off: L('শিফট রোস্টার বন্ধ আছে।', 'The shift schedule is switched off.', 'Shift roster বন্ধ আছে।'),
+  bad_date: L('ডেট ঠিক নয় (খুব আগের বা খুব পরের)।', 'The date is not valid (too far back or ahead).', 'Date ঠিক নয়।'), bad_shift: L('একটি শিফট অথবা অফ-ডে বাছুন।', 'Choose a shift or an off-day.', 'Shift অথবা off-day বাছুন।'),
+  not_found: L('পাওয়া যায়নি।', 'Not found.', 'পাওয়া যায়নি।'), text_too_long: L('নোট বেশি লম্বা (২০০ অক্ষর পর্যন্ত)।', 'The note is too long (200 characters).', 'Note বেশি লম্বা (২০০)।'),
+  name_required: L('নাম লিখুন।', 'Write a name.', 'নাম লিখুন।'), bad_time: L('সময় ঠিক নয়।', 'The time is not valid.', 'সময় ঠিক নয়।'), bad_location: L('জায়গা ঠিক নয়।', 'The place is not valid.', 'জায়গা ঠিক নয়।'),
+};
+const eText = (e) => { const m = String((e && e.message) || ''); for (const k of Object.keys(E)) if (m.indexOf(k.replace('not_allowed', 'not allowed')) >= 0) return lab(E[k]); return m || 'error'; };
+const isMissing = (e) => e && (e.code === 'PGRST202' || /does not exist|could not find/i.test(e.message || ''));
+async function rpc(fn, args) { const r = await sb.rpc(fn, args || {}); if (r.error) throw r.error; return r.data; }
+
+const WD = [L('রবি', 'Sun', 'রবি'), L('সোম', 'Mon', 'সোম'), L('মঙ্গল', 'Tue', 'মঙ্গল'), L('বুধ', 'Wed', 'বুধ'), L('বৃহ', 'Thu', 'বৃহ'), L('শুক্র', 'Fri', 'শুক্র'), L('শনি', 'Sat', 'শনি')];
+const todayISO = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
+const addDays = (iso, n) => { const d = new Date(iso + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const dowOf = (iso) => new Date(iso + 'T00:00:00Z').getUTCDay();
+const dm = (iso) => new Date(iso + 'T00:00:00Z').toLocaleDateString('en-GB', { timeZone: 'UTC', day: '2-digit', month: 'short' });
+const WSMAP = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
+function weekStart(iso) {
+  let ws = 6; try { const r = B.rule && B.rule('week_start', null); if (typeof r === 'string' && WSMAP[r] !== undefined) ws = WSMAP[r]; } catch (e) { ws = 6; }
+  return addDays(iso, -((dowOf(iso) - ws + 7) % 7));
+}
+const nm = (o) => lab(L(o.name_bn, o.name_en || o.name_bn, o.name_en || o.name_bn));
+
+function css() {
+  if (document.getElementById('r2s_css')) return;
+  const st = document.createElement('style'); st.id = 'r2s_css';
+  st.textContent = `
+.r2s-day.today { border-color: var(--ruby); border-left: 6px solid var(--ruby); } .r2s-day.off, .r2s-day.leave { opacity: .92; }
+.r2s-day summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; } .r2s-day ul { margin: 4px 0; padding-inline-start: 20px; }
+.r2s-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; margin-top: 6px; }
+.r2s-cell { min-width: 0; min-height: 48px; padding: 2px 0; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.15; font: 600 .72rem var(--text-font); box-shadow: none; }
+.r2s-cell .c { font: 800 1rem var(--text-font); } .r2s-cell.off { background: var(--warn-bg); color: var(--warn); } .r2s-cell.pat { border-style: dashed; } .r2s-cell.none .c { opacity: .4; }
+.r2s-cell.note { box-shadow: inset 0 -3px 0 var(--ruby); } .r2s-cell.lv { box-shadow: inset 0 3px 0 var(--ok); } .r2s-cell.hol { background: var(--ok-bg); }
+.r2s-btns { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; } .r2s-btns > * { flex: 1 1 130px; min-height: 44px; }
+.r2s-leg { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; } .r2s-nav { display: flex; gap: 8px; align-items: center; margin: 8px 0; } .r2s-nav b { flex: 1; text-align: center; } .r2s-nav button { min-width: 44px; min-height: 44px; }
+.r2s-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+#r2s_all, #r2s_all0 { width: 24px; min-height: 24px; flex: none; }
+`;
+  document.head.appendChild(st);
+}
+
+const D = { st: null, tab: 'my', my: null, loc: null, from: null, ros: null, rep: null, rfrom: null, rto: null, repAll: false, cell: null, tplId: null };
+const shiftTxt = (s) => (s ? `${nm(s)} ${s.start}–${s.end}` : '');
+
+/* ---------- my shifts ---------- */
+function myHTML() {
+  const m = D.my;
+  if (!m.linked) return `<div class="notice" data-state="notlinked">${esc(T('notLinked'))}</div>`;
+  if (!m.days.length) return B.ui.state('empty', T('none'));
+  const td = todayISO();
+  return m.days.map((d) => {
+    const isOff = d.off, kind = d.leave ? 'leave' : isOff ? 'off' : '';
+    const chip = d.shift ? `<span class="chip ok">${esc(shiftTxt(d.shift))}</span>` : isOff ? `<span class="chip warn">${esc(T('offDay'))}</span>` : '';
+    const mates = (d.mates || []);
+    return `<div class="card r2s-day ${d.day === td ? 'today' : ''} ${kind}" data-day="${esc(d.day)}"><div class="row between" style="align-items:flex-start;gap:8px"><b>${esc(lab(WD[d.dow]))} ${esc(dm(d.day))}${d.day === td ? ' · ' + esc(T('today')) : ''}</b>${chip}</div>
+      <div class="r2s-chips">${d.leave ? `<span class="chip ok">${esc(T('leave'))}</span>` : ''}${d.holiday_bn || d.holiday_en ? `<span class="chip">${esc(T('holiday'))}: ${esc(lab(L(d.holiday_bn, d.holiday_en || d.holiday_bn, d.holiday_en || d.holiday_bn)))}</span>` : ''}</div>
+      ${d.note ? `<div style="font-size:.92rem;overflow-wrap:anywhere">${esc(d.note)}</div>` : ''}
+      ${D.my.mates_on && d.shift ? `<details><summary>${esc(T('alsoOn'))} (${mates.length})</summary>${mates.length ? `<ul>${mates.map((p) => `<li>${esc(lab(L(p.name_bn, p.name_en || p.name_bn, p.name_en || p.name_bn)))} <span class="muted">· ${esc(p.start)}–${esc(p.end)}</span></li>`).join('')}</ul>` : `<div class="muted">${esc(T('onlyMe'))}</div>`}</details>` : ''}</div>`;
+  }).join('');
+}
+
+/* ---------- roster ---------- */
+const letter = (i) => String.fromCharCode(65 + (i % 26));
+function rosterHTML() {
+  const r = D.ros; if (!r) return B.ui.state('loading');
+  const tpls = r.templates, code = new Map(tpls.map((t, i) => [t.id, letter(i)]));
+  const days = []; for (let i = 0; i < r.days; i++) days.push(addDays(r.from, i));
+  const legend = tpls.map((t, i) => `<span class="chip" title="${esc(shiftTxt({ ...t }))}"><b>${letter(i)}</b>&nbsp;${esc(nm(t))} ${esc(t.start)}–${esc(t.end)}</span>`).join('') + `<span class="chip warn"><b>×</b>&nbsp;${esc(T('offDay'))}</span>`;
+  const emps = r.employees.length ? r.employees.map((e) => {
+    const byDay = new Map(e.days.map((x) => [x.day, x]));
+    const cells = days.map((d) => { const x = byDay.get(d); const c = x ? (x.off ? '×' : (code.get(x.shift_id) || '?')) : '·';
+      return `<button type="button" class="r2s-cell ${x ? (x.off ? 'off' : '') : 'none'} ${x && x.source === 'pattern' ? 'pat' : ''} ${x && x.note ? 'note' : ''} ${x && x.leave ? 'lv' : ''} ${x && (x.holiday_bn || x.holiday_en) ? 'hol' : ''}" data-act="r2s_cell" data-emp="${esc(e.id)}" data-day="${esc(d)}" aria-label="${esc((e.name_en || e.name_bn) + ' ' + d)}"><span>${esc(lab(WD[dowOf(d)]))} ${esc(String(Number(d.slice(8))))}</span><span class="c">${esc(c)}</span></button>`; }).join('');
+    return `<div class="card r2s-emp" data-emp="${esc(e.id)}"><b>${esc(lab(L(e.name_bn, e.name_en || e.name_bn, e.name_en || e.name_bn)))}</b><div class="r2s-week">${cells}</div></div>`; }).join('') : B.ui.state('empty', T('noEmp'));
+  return `<div class="r2s-leg" aria-label="${esc(T('legend'))}">${legend}</div>${emps}`;
+}
+function locName(id) { const l = ((B.ENV && B.ENV.locs) || []).find((x) => x.id === id); return l ? lab(L(l.name_bn, l.name_en || l.name_bn, l.name_mix || l.name_bn)) : '#' + id; }
+async function loadRoster() {
+  if (D.loc === null) D.loc = (D.st.locations || [])[0] || null;
+  if (D.loc === null) { D.ros = { templates: [], employees: [], days: 7, from: D.from }; return; }
+  if (!D.from) D.from = weekStart(todayISO());
+  D.ros = await rpc('r2_shift_roster', { p_loc: D.loc, p_from: D.from, p_days: 7 });
+}
+function rosterTab() {
+  const st = D.st; const locs = st.locations || [];
+  return `<div class="stack"><div><label for="r2s_loc">${esc(T('place'))}</label><select id="r2s_loc" data-r2s="loc">${locs.map((l) => `<option value="${l}" ${l === D.loc ? 'selected' : ''}>${esc(locName(l))}</option>`).join('')}</select></div>
+    <div class="r2s-nav"><button type="button" data-act="r2s_wk" data-v="-7" aria-label="${esc(T('prev'))}">‹</button><b>${esc(dm(D.from))} – ${esc(dm(addDays(D.from, 6)))}</b><button type="button" data-act="r2s_wk" data-v="7" aria-label="${esc(T('next'))}">›</button></div></div>
+    <div class="r2s-btns"><button type="button" data-act="r2s_copy">${esc(T('copy'))}</button><button type="button" data-act="r2s_tpls">${esc(T('tpls'))}</button></div>
+    <div id="r2s_grid">${rosterHTML()}</div>`;
+}
+
+/* ---------- report ---------- */
+function reportTab() {
+  const r = D.rep; const locs = D.st.locations || [];
+  const filt = r ? r.rows.filter((x) => D.repAll || (x.result !== 'ok' && x.result !== 'off')) : [];
+  const tot = r && r.totals ? Object.keys(r.totals).map((k) => `<span class="chip ${k === 'ok' || k === 'off' ? 'ok' : k === 'late' || k === 'half_day' || k === 'leave' ? 'warn' : 'bad'}">${esc(T('r_' + k) || k)}: ${esc(r.totals[k])}</span>`).join('') : '';
+  return `<div class="stack"><div><label for="r2s_loc">${esc(T('place'))}</label><select id="r2s_loc" data-r2s="loc">${locs.map((l) => `<option value="${l}" ${l === D.loc ? 'selected' : ''}>${esc(locName(l))}</option>`).join('')}</select></div>
+    <div class="row wrap"><div style="flex:1 1 140px"><label for="r2s_rf">${esc(T('from'))}</label><input id="r2s_rf" type="date" value="${esc(D.rfrom)}"></div><div style="flex:1 1 140px"><label for="r2s_rt">${esc(T('to'))}</label><input id="r2s_rt" type="date" value="${esc(D.rto)}"></div></div>
+    <button type="button" class="primary full" data-act="r2s_rep">${esc(T('show'))}</button></div>
+    ${!r ? '' : r.attendance === false ? `<div class="notice warn" data-state="noatt">${esc(T('noAtt'))}</div>` : `<div class="r2s-chips" id="r2s_tot">${tot}</div>
+      <label class="row" style="align-items:center"><input type="checkbox" id="r2s_all" data-act="r2s_all" ${D.repAll ? 'checked' : ''}> ${esc(T('showAll'))}</label>
+      <div id="r2s_rows">${filt.length ? filt.map((x) => `<div class="card r2s-row" data-result="${esc(x.result)}"><div class="row between" style="gap:8px"><b>${esc(lab(L(x.name_bn, x.name_en || x.name_bn, x.name_en || x.name_bn)))}</b><span class="chip ${x.result === 'ok' || x.result === 'off' ? 'ok' : x.result === 'late' || x.result === 'half_day' || x.result === 'leave' ? 'warn' : 'bad'}">${esc(T('r_' + x.result))}</span></div>
+        <div class="muted" style="font-size:.88rem">${esc(dm(x.day))}${x.planned ? ' · ' + esc(T('planned')) + ' ' + esc(x.shift_bn || '') + ' ' + esc(x.start || '') + '–' + esc(x.end || '') : ' · ' + esc(T('r_off'))}${x.late_minutes ? ' · +' + esc(x.late_minutes) + ' min' : ''}</div></div>`).join('') : B.ui.state('empty', T('nothingRep'))}</div>`}`;
+}
+
+/* ---------- page ---------- */
+async function view() {
+  if (B.loadStatic) { try { await B.loadStatic(); } catch (e) { /* still opens */ } }
+  css(); D.tab = 'my';
+  shell(T('title'), `<div id="r2s_body"><p class="muted">…</p></div>`, true);
+  await load();
+}
+async function load() {
+  const box = $('#r2s_body'); if (!box) return;
+  let st;
+  try { st = await rpc('r2_shift_state'); } catch (e) { box.innerHTML = `<div class="notice warn">${esc(isMissing(e) ? T('nofn') : eText(e))}</div>`; return; }
+  D.st = st;
+  if (!st.on) { box.innerHTML = `<div class="notice warn" data-state="off">${esc(T('off'))}</div>`; return; }
+  if (!D.rfrom) { D.rto = todayISO(); D.rfrom = addDays(D.rto, -6); }
+  if (!D.from) D.from = weekStart(todayISO());
+  await loadTab(); draw();
+}
+async function loadTab() {
+  try {
+    if (D.tab === 'my') D.my = await rpc('r2_shift_my', { p_from: todayISO(), p_days: 14 });
+    else if (D.tab === 'roster') await loadRoster();
+  } catch (e) { toast(eText(e)); if (D.tab === 'my') D.my = { linked: false, days: [] }; }
+}
+function draw() {
+  const box = $('#r2s_body'); if (!box || !D.st) return;
+  const can = D.st.can_manage && (D.st.locations || []).length;
+  const tabs = can ? `<div class="seg" role="group"><button type="button" data-act="r2s_tab" data-v="my" aria-pressed="${D.tab === 'my'}">${esc(T('my'))}</button><button type="button" data-act="r2s_tab" data-v="roster" aria-pressed="${D.tab === 'roster'}">${esc(T('roster'))}</button><button type="button" data-act="r2s_tab" data-v="report" aria-pressed="${D.tab === 'report'}">${esc(T('report'))}</button></div>` : '';
+  box.innerHTML = tabs + (D.tab === 'my' ? (D.my ? myHTML() : B.ui.state('loading')) : D.tab === 'roster' ? rosterTab() : reportTab());
+}
+
+/* ---------- sheets ---------- */
+function cellSheet(emp, day) {
+  const r = D.ros; const e = r.employees.find((x) => x.id === emp); const x = e && e.days.find((d) => d.day === day);
+  const cur = x ? (x.off ? 'off' : (x.source === 'day' ? String(x.shift_id) : '')) : '';
+  D.cell = { emp, day };
+  openSheet(`<h3>${esc(e ? lab(L(e.name_bn, e.name_en || e.name_bn, e.name_en || e.name_bn)) : '')} · ${esc(lab(WD[dowOf(day)]))} ${esc(dm(day))}</h3><div class="stack">
+    <div><label for="r2s_sel">${esc(T('pickShift'))}</label><select id="r2s_sel"><option value="">${esc(T('clearOpt'))}</option>${r.templates.map((t, i) => `<option value="${t.id}" ${cur === String(t.id) ? 'selected' : ''}>${letter(i)} · ${esc(nm(t))} ${esc(t.start)}–${esc(t.end)}</option>`).join('')}<option value="off" ${cur === 'off' ? 'selected' : ''}>× ${esc(T('offOpt'))}</option></select></div>
+    <div><label for="r2s_note">${esc(T('note'))}</label><input id="r2s_note" maxlength="200" autocomplete="off" value="${esc((x && x.source === 'day' && x.note) || '')}"></div>
+    <div class="r2s-btns"><button type="button" class="primary" data-act="r2s_cellsave">${esc(T('save'))}</button><button type="button" data-act="closesheet">${esc(T('cancel'))}</button></div></div>`);
+}
+function tplListSheet() {
+  const r = D.ros;
+  openSheet(`<h3>${esc(T('tpls'))}</h3><div id="r2s_tpllist">${r.templates.map((t, i) => `<div class="card"><div class="row between" style="gap:8px"><span><b>${letter(i)}</b> · ${esc(nm(t))} <span class="muted">${esc(t.start)}–${esc(t.end)}${t.location_id ? '' : ' · ' + esc(T('allPlaces'))}</span></span></div>
+    <div class="r2s-btns"><button type="button" data-act="r2s_tpledit" data-v="${esc(t.id)}">${esc(T('edit'))}</button><button type="button" data-act="r2s_tplretire" data-v="${esc(t.id)}">${esc(T('retire'))}</button></div></div>`).join('')}</div>
+    <div class="r2s-btns"><button type="button" class="primary" data-act="r2s_tplnew">${esc(T('addTpl'))}</button><button type="button" data-act="closesheet">${esc(T('close'))}</button></div>`);
+}
+function tplForm(t) {
+  D.tplId = t ? t.id : null; const isOwner = !!(S.ctx && S.ctx.is_owner);
+  openSheet(`<h3>${esc(t ? T('edit') : T('addTpl'))}</h3><div class="stack">
+    <div><label for="r2s_nb">${esc(T('nameBn'))}</label><input id="r2s_nb" maxlength="60" autocomplete="off" value="${esc(t ? t.name_bn : '')}"></div>
+    <div><label for="r2s_ne">${esc(T('nameEn'))}</label><input id="r2s_ne" maxlength="60" autocomplete="off" value="${esc((t && t.name_en) || '')}"></div>
+    <div class="row wrap"><div style="flex:1 1 130px"><label for="r2s_st">${esc(T('start'))}</label><input id="r2s_st" type="time" value="${esc(t ? t.start : '09:00')}"></div><div style="flex:1 1 130px"><label for="r2s_en">${esc(T('end'))}</label><input id="r2s_en" type="time" value="${esc(t ? t.end : '17:00')}"></div></div>
+    ${isOwner ? `<label class="row" style="align-items:center"><input type="checkbox" id="r2s_all0" ${t && !t.location_id ? 'checked' : ''}> ${esc(T('allPlaces'))}</label>` : ''}
+    <div class="r2s-btns"><button type="button" class="primary" data-act="r2s_tplsave">${esc(T('save'))}</button><button type="button" data-act="closesheet">${esc(T('cancel'))}</button></div></div>`);
+}
+
+Object.assign(H, {
+  r2s_tab: async (a) => { D.tab = a.dataset.v; D.my = D.tab === 'my' ? null : D.my; draw(); await loadTab(); draw(); },
+  r2s_wk: async (a) => { D.from = addDays(D.from, Number(a.dataset.v)); D.ros = null; draw(); await loadTab(); draw(); },
+  r2s_all: (a) => { D.repAll = !!a.checked; draw(); },
+  r2s_cell: (a) => cellSheet(a.dataset.emp, a.dataset.day),
+  r2s_cellsave: async () => {
+    const c = D.cell; if (!c) return; const v = ($('#r2s_sel') || {}).value || '', note = (($('#r2s_note') || {}).value || '').trim();
+    try {
+      if (v === '') await rpc('r2_roster_clear', { p_emp: c.emp, p_day: c.day });
+      else await rpc('r2_roster_set', { p_emp: c.emp, p_day: c.day, p_shift: v === 'off' ? null : Number(v), p_off: v === 'off', p_note: note || null, p_loc: null });
+      closeSheet(); toast(T('saved')); await loadTab(); draw();
+    } catch (e) { toast(eText(e)); }
+  },
+  r2s_copy: async () => {
+    try { const r = await rpc('r2_roster_copy_week', { p_loc: D.loc, p_from: addDays(D.from, -7), p_to: D.from }); toast(T('copied') + ': ' + r.copied + (r.skipped ? ' · ' + T('skipped') + ' ' + r.skipped : '')); await loadTab(); draw(); } catch (e) { toast(eText(e)); }
+  },
+  r2s_tpls: () => tplListSheet(),
+  r2s_tplnew: () => tplForm(null),
+  r2s_tpledit: (a) => tplForm(D.ros.templates.find((t) => String(t.id) === a.dataset.v)),
+  r2s_tplretire: async (a) => { try { await rpc('r2_shift_template_save', { p_id: Number(a.dataset.v), p_data: { active: false } }); closeSheet(); toast(T('saved')); await loadTab(); draw(); } catch (e) { toast(eText(e)); } },
+  r2s_tplsave: async () => {
+    const all0 = !!($('#r2s_all0') || {}).checked;
+    const data = { name_bn: (($('#r2s_nb') || {}).value || '').trim(), name_en: (($('#r2s_ne') || {}).value || '').trim() || null, start_time: ($('#r2s_st') || {}).value, end_time: ($('#r2s_en') || {}).value };
+    if (!D.tplId) data.location_id = all0 ? null : D.loc; else if (all0) data.location_id = null;
+    if (!data.name_bn) return toast(lab(E.name_required));
+    try { await rpc('r2_shift_template_save', { p_id: D.tplId, p_data: data }); closeSheet(); toast(T('saved')); await loadTab(); draw(); } catch (e) { toast(eText(e)); }
+  },
+  r2s_rep: async () => {
+    D.rfrom = ($('#r2s_rf') || {}).value || D.rfrom; D.rto = ($('#r2s_rt') || {}).value || D.rto;
+    if (D.loc === null) D.loc = (D.st.locations || [])[0] || null;
+    try { D.rep = await rpc('r2_shift_report', { p_loc: D.loc, p_from: D.rfrom, p_to: D.rto }); draw(); } catch (e) { toast(eText(e)); }
+  },
+});
+document.addEventListener('change', async (e) => {
+  const el = e.target; if (!el || !el.getAttribute || el.getAttribute('data-r2s') !== 'loc') return;
+  D.loc = Number(el.value); D.ros = null; D.rep = null; if (D.tab === 'roster') { draw(); await loadTab(); } draw();
+});
+
+B.shifts = { load };
+window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { shifts: view });
+})();

@@ -1,1 +1,334 @@
-(()=>{"use strict";const t=window.BOS_APP,e=window.BOS,{sb:n,S:o,esc:a,toast:s,shell:i,openSheet:c,closeSheet:d,H:r}=t,l=e.L,u=e.lab,p=(t,e)=>(e||document).querySelector(t),_=t=>{const e=(t=>String(t??"").replace(/[০-৯]/g,t=>"০১২৩৪৫৬৭৮৯".indexOf(t)).replace(/,/g,"").trim())(t);if(""===e)return NaN;const n=Number(e);return Number.isFinite(n)?n:NaN},m=t=>{const e=Number(t);return Number.isFinite(e)?(e<0?"-":"")+Math.abs(e).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2}):"-"},v=t=>"৳ "+m(t),w={title:l("শুরুর স্টক ও কস্টের অপেক্ষা","Opening stock and cost waiting","Opening stock ও cost-এর অপেক্ষা"),t_ob:l("শুরুর স্টক","Opening stock","Opening stock"),t_cw:l("কস্টের অপেক্ষা","Cost waiting","Cost-এর অপেক্ষা"),loading:l("লোড হচ্ছে…","Loading…","Loading…"),retry:l("আবার চেষ্টা করুন","Try again","আবার Try করুন"),saved:l("সেভ হয়েছে","Saved","Saved"),place:l("জায়গা","Place","Place"),allPlaces:l("সব জায়গা","All places","সব place"),show:l("দেখান","Show","Show"),none:l("কিছু নেই","Nothing here","কিছু নেই"),rec:l("প্রস্তাবিত","Recommended","Recommended"),recNote:l("প্রস্তাব মানা জরুরি নয়; সিস্টেম নিজে থেকে কিছু করে না, আপনি যা চান সেটাই বেছে নিন।","A recommendation never blocks you and nothing is applied by itself; choose what you want.","Recommendation মানা জরুরি নয়; system নিজে কিছু করে না, আপনার পছন্দই চলবে।"),ownerOnly:l("এটি করতে মালিক লাগবে।","Only the owner can do this.","এটা করতে owner লাগবে।"),cancel:l("বাদ দিন","Cancel","Cancel"),close:l("বন্ধ করুন","Close","Close"),reason:l("কারণ","Reason","Reason"),dryNote:l("এটি শুধু দেখা (dry run): কিছু লেখা হয়নি।","This is a dry run: nothing was written.","এটা শুধু dry run: কিছু লেখা হয়নি।"),obIntro:l("শুরুর স্টক খাতায় তোলার আগে দেখে নিন, শুরুর জের (opening journal) এ stock আগেই আছে কি না। থাকলে আবার তুললে দুইবার গোনা হবে।","Before opening stock goes to the books, see whether the stock is already inside the opening journal. If it is, posting it again counts it twice.","Opening stock খাতায় তোলার আগে দেখুন opening journal এ stock আগেই আছে কি না। থাকলে আবার তুললে দুইবার গোনা হবে।"),openVal:l("শুরুর স্টকের মূল্য","Opening stock value","Opening stock-এর value"),inJournal:l("শুরুর জের এ আগেই আছে","Already in the opening journal","Opening journal-এ আগেই আছে"),glInv:l("খাতায় স্টক","Stock in the books (GL)","Books-এ stock (GL)"),valuation:l("স্টক এর মূল্য","Stock valuation","Stock valuation"),diff:l("পার্থক্য","Difference","Difference"),rows:l("সারি","rows","row"),uncosted:l("কস্ট ছাড়া সারি","rows without cost","cost ছাড়া row"),byswitch:l("সুইচ দিয়ে আগেই তোলা","Already posted by the switch","Switch দিয়ে আগেই তোলা"),decided:l("সিদ্ধান্ত নেওয়া হয়েছে","Decision taken","Decision নেওয়া হয়েছে"),switchL:l("শুরুর স্টক পোস্টিং সুইচ","Opening stock posting switch","Opening stock posting switch"),on:l("চালু","On","On"),off:l("বন্ধ","Off","Off"),risk:l("দুইবার গোনার ঝুঁকি আছে","Double count risk","Double count-এর ঝুঁকি আছে"),noRisk:l("দুইবার গোনার ঝুঁকি দেখা যায়নি ✓","No double count risk found ✓","Double count-এর ঝুঁকি পাওয়া যায়নি ✓"),recL:l("সিস্টেমের প্রস্তাব","System recommendation","System-এর recommendation"),why:l("কেন","Why","কেন"),o_owner_capital:l("মালিকের মূলধনের বিপরীতে","Against owner capital","Owner capital-এর against-এ"),o_existing_account:l("আগের একটি শুরুর জের খাতের বিপরীতে","Against an existing opening balance account","আগের একটা opening balance account-এর against-এ"),o_skip:l("বাদ: খাতায় আগেই আছে","Skip: already in the books","Skip: books-এ আগেই আছে"),o_difference:l("শুধু পার্থক্যটুকু","Only the difference","শুধু difference-টুকু"),o_none:l("কিছু করার নেই","Nothing to do","কিছু করার নেই"),o_wait_for_cost:l("আগে কস্ট দিন","Supply the cost first","আগে cost দিন"),d_owner_capital:l("Dr stock / Cr মালিকের মূলধন: পুরো শুরুর স্টক।","Dr stock / Cr owner capital for the whole opening stock.","Dr stock / Cr owner capital: পুরো opening stock।"),d_existing_account:l("Dr stock / Cr আপনার দেওয়া একটি equity বা liability খাত।","Dr stock / Cr an equity or liability account you name.","Dr stock / Cr আপনার দেওয়া একটা equity বা liability account।"),d_skip:l("কিছু তোলা হয় না; শুধু সিদ্ধান্ত লেখা থাকে। সুইচ চালু থাকলেও এই স্টক আবার তোলা হবে না।","Nothing is posted; only the decision is kept. Even with the switch on, this stock is not posted again.","কিছু post হয় না; শুধু decision লেখা থাকে। Switch on থাকলেও এই stock আবার post হবে না।"),d_difference:l("শুরুর জের এ যতটা নেই শুধু ততটা তোলা হয়।","Posts only what the opening journal does not carry yet.","Opening journal-এ যতটা নেই শুধু ততটা post হয়।"),acct:l('খাতের কোড (শুধু "আগের খাত" ও "পার্থক্য" এর জন্য)','Account code (only for "existing account" and "difference")','Account code (শুধু "existing account" ও "difference"-এর জন্য)'),acctHint:l("যেমন শুরুর জের এর equity খাত। ফাঁকা থাকলে মালিকের মূলধন।","An equity or liability account. Blank = owner capital.","একটা equity বা liability account। ফাঁকা = owner capital।"),preview:l("আগে দেখুন (dry run)","Preview (dry run)","আগে দেখুন (dry run)"),apply:l("অ্যাপ্লাই করুন","Apply","Apply করুন"),applyGo:l("বুঝেছি, অ্যাপ্লাই করুন","I understand, apply","বুঝেছি, apply করুন"),applyWarn:l("এটি খাতায় একটি এন্ট্রি লেখে (বা সিদ্ধান্ত রাখে), নিজে নিজে ফেরানো যায় না। এক জায়গায় একবারই হয়।","This writes a journal entry (or keeps a decision) and cannot be undone here. It happens once per place.","এটা খাতায় একটা entry লেখে (বা decision রাখে), এখানে থেকে ফেরানো যায় না। এক place-এ একবারই হয়।"),amount:l("অংক","Amount","Amount"),lines:l("লাইন","Lines","Lines"),debit:l("ডেবিট","Debit","Debit"),credit:l("ক্রেডিট","Credit","Credit"),w_opening_journal_has_inventory:l("শুরুর জের এ স্টক আগেই ধরা আছে।","The opening journal already carries stock.","Opening journal-এ stock আগেই ধরা আছে।"),w_switch_would_double_count:l("এই অবস্থায় শুরুর স্টক পোস্টিং সুইচ চালালে একই স্টক দুইবার গোনা হবে।","Turning the opening stock posting switch on now would count the same stock twice.","এখন opening stock posting switch চালালে একই stock দুইবার গোনা হবে।"),w_switch_on_double_count:l("শুরুর স্টক পোস্টিং সুইচ চালু, আর শুরুর জের এ স্টক আছে: দুইবার গোনার ঝুঁকি!","The opening stock posting switch is ON and the opening journal carries stock: double count risk!","Opening stock posting switch ON, আর opening journal-এ stock আছে: double count-এর ঝুঁকি!"),w_opening_journal_not_split_by_place:l('শুরুর জের জায়গা অনুযায়ী ভাগ করা নেই; তাই "পার্থক্য" পুরো কোম্পানির হিসাবে করুন।','The opening journal is not split by place; use "difference" for the whole company.','Opening journal place অনুযায়ী ভাগ করা নেই; তাই "difference" পুরো company-তে করুন।'),w_uncosted_openings:l("কিছু শুরুর স্টকের কস্ট জানা নেই; সেগুলো ধরা হয়নি, কস্ট দিলে আলাদা করে উঠবে।","Some opening stock has no cost; it is left out and can be posted once its cost is supplied.","কিছু opening stock-এর cost জানা নেই; সেগুলো ধরা হয়নি, cost দিলে আলাদা করে উঠবে।"),w_skip_but_not_in_opening_journal:l("বাদ দিলেন, কিন্তু শুরুর জের এ এই স্টক পুরোটা নেই; খাতায় স্টক কম থাকতে পারে।","You skip it, but the opening journal does not carry all of this stock; the books may show less stock.","Skip করছেন, কিন্তু opening journal-এ এই stock পুরোটা নেই; books-এ stock কম থাকতে পারে।"),w_switch_on:l("শুরুর স্টক পোস্টিং সুইচ চালু আছে; এই সিদ্ধান্তের পর ঢাকা স্টক সুইচ আর তুলবে না।","The opening stock posting switch is on; after this decision the switch no longer posts the covered stock.","Opening stock posting switch on আছে; এই decision-এর পর covered stock switch আর post করবে না।"),cwIntro:l("যে stock movement এর খরচ জানা নেই সেগুলো এখানে অপেক্ষায় থাকে। খরচ দিলে কাগজটি একবারই খাতায় উঠবে। কিছু ধরে নেওয়া হয় না।","Stock movements with no known cost wait here. Once a cost is supplied the document posts once. Nothing is assumed.","যে stock movement-এর cost জানা নেই সেগুলো এখানে অপেক্ষায় থাকে। Cost দিলে document একবারই খাতায় উঠবে। কিছু ধরে নেওয়া হয় না।"),waitN:l("টি কাগজ কস্টের অপেক্ষায়","documents wait for a cost","টি document cost-এর অপেক্ষায়"),oldest:l("সবচেয়ে পুরোনো","Oldest","Oldest"),daysU:l("দিন","days","দিন"),alertDays:l("সতর্কতার দিন (আপনি সংখ্যা লিখবেন, ফাঁকা = সতর্কতা নেই)","Alert after days (you type the number, blank = no alert)","Alert-এর দিন (আপনি সংখ্যা লিখবেন, ফাঁকা = alert নেই)"),save:l("রাখুন","Save","Save"),clear:l("মুছুন","Clear","Clear"),alertOn:l("টি কাগজ সতর্কতার দিনের চেয়ে বেশি অপেক্ষায়","documents wait longer than the alert days","টি document alert-এর দিনের চেয়ে বেশি অপেক্ষায়"),alertOk:l("সতর্কতার দিন পার হওয়া কাগজ নেই ✓","No document is past the alert days ✓","Alert-এর দিন পার হওয়া document নেই ✓"),alertOffL:l("সতর্কতা বন্ধ (সংখ্যা দেওয়া নেই)","Alert is off (no number typed)","Alert বন্ধ (সংখ্যা দেওয়া নেই)"),badDays:l("সংখ্যা ঠিক নয় (০ থেকে ৩৬৫০)","The number is not valid (0 to 3650)","সংখ্যা ঠিক নয় (০ থেকে ৩৬৫০)"),k_wastage:l("নষ্ট / বাদ (wastage)","Wastage","Wastage"),k_production:l("উৎপাদন (ingredient)","Production ingredients","Production (ingredient)"),k_transfer:l("স্টক ট্রান্সফার","Stock transfer","Stock transfer"),k_purchase_return:l("কেনা ফেরত","Purchase return","Purchase return"),k_ledger:l("স্টক movement","Stock movement","Stock movement"),m_count_adjust:l("গণনার পার্থক্য","Count difference","Count difference"),m_opening:l("শুরুর স্টক","Opening stock","Opening stock"),m_issue_out:l("নিজের কাজে issue","Own-use issue","Own-use issue"),willPost:l("খরচ দিলে খাতায় উঠবে","Posts when costed","Cost দিলে post হবে"),noPost:l("এখন খাতায় উঠবে না (সুইচ বন্ধ)","Will not post now (switch off)","এখন post হবে না (switch off)"),ageL:l("দিন আগের","days old","দিন আগের"),supply:l("কস্ট দিন","Supply cost","Cost দিন"),supplyGo:l("এই কস্ট দিন","Supply this cost","এই cost দিন"),method:l("কোন উপায়ে","Method","Method"),m_item_average:l("গড় কস্ট (average)","Item average cost","Item average cost"),m_last_purchase:l("শেষ কেনা কস্ট","Last purchase cost","Last purchase cost"),m_recipe_standard:l("রেসিপির standard কস্ট","Recipe standard cost","Recipe standard cost"),m_manual:l("নিজে লিখব (কারণসহ)","Type it myself (with a reason)","নিজে লিখব (reason সহ)"),unitCost:l("প্রতি একক কস্ট","Cost per unit","Per unit cost"),qty:l("Qty","Qty","Qty"),total:l("টোটাল","Total","Total"),notKnown:l("জানা নেই","not known","জানা নেই"),manualWhy:l("নিজে লিখলে কারণ লিখতে হবে","A manual cost needs a reason","Manual cost-এ reason লিখতে হবে"),derived:l("তৈরি পণ্যের প্রতি একক খরচও রেকর্ড হবে","The finished good gets a cost record too","তৈরি পণ্যের per unit cost-ও record হবে"),derivedNote:l("(স্টক এর গড় কস্ট বদলায় না)","(the stock average cost is not changed)","(stock-এর average cost বদলায় না)"),posted:l("খাতায় উঠেছে","Posted to the books","Books-এ উঠেছে"),notPosted:l("কস্ট রাখা হয়েছে; খাতায় তোলা হবে পরের posting-এ (বা যিনি posting করেন তাঁর হাতে)।","The cost is kept; the document posts at the next posting run (by someone who posts).","Cost রাখা হয়েছে; document পরের posting run-এ উঠবে (যিনি post করেন তাঁর হাতে)।"),dup:l("এটি আগেই রাখা হয়েছে (দ্বিতীয়বার নয়)।","This was already recorded (not twice).","এটা আগেই রাখা হয়েছে (দ্বিতীয়বার নয়)।"),needRight:l("কস্ট দেখা ও দেওয়ার অনুমতি (মালিক বা cost right) লাগবে।","Seeing and supplying costs needs the owner or the cost right.","Cost দেখা ও দেওয়ার জন্য owner বা cost right লাগবে।")},b=t=>u(w[t]),h={not_allowed:l("অনুমতি নেই","Not allowed","অনুমতি নেই"),"not allowed":l("অনুমতি নেই","Not allowed","অনুমতি নেই"),client_id_needed:l("অনুরোধের পরিচয় নেই; আবার চেষ্টা করুন","The request has no id; try again","Request-এর id নেই; আবার try করুন"),bad_option:l("এই উপায়টি ঠিক নয়","That option is not valid","এই option ঠিক নয়"),place_needed:l("একটি জায়গা বেছে নিন","Choose a place","একটা place বেছে নিন"),account_needed:l("খাতের কোড দিন","Give the account code","Account code দিন"),bad_account:l("এই খাতটি চলবে না (equity বা liability লাগবে, স্টক খাত নয়)","That account cannot be used (it must be an equity or liability account, not a stock account)","এই account চলবে না (equity বা liability লাগবে, stock account নয়)"),bad_location:l("জায়গা ঠিক নয়","The place is not valid","Place ঠিক নয়"),already_applied:l("এই জায়গার জন্য আগেই সিদ্ধান্ত নেওয়া হয়েছে","A decision was already taken for this place","এই place-এর জন্য আগেই decision নেওয়া হয়েছে"),nothing_to_post:l("তোলার মতো শুরুর স্টক নেই","There is no opening stock to post","Post করার মতো opening stock নেই"),untagged_opening_inventory:l('শুরুর জের জায়গা অনুযায়ী ভাগ করা নেই; "সব জায়গা" বেছে করুন','The opening journal is not split by place; choose "All places"','Opening journal place অনুযায়ী ভাগ করা নেই; "সব place" বেছে করুন'),before_start:l("হিসাব শুরুর আগের ডেট হয় না","The date is before the accounting start","Accounting start-এর আগের date হয় না"),bad_date:l("ডেট ঠিক নয়","The date is not valid","Date ঠিক নয়"),period_closed:l("এই মাস বন্ধ; মালিকের অনুমতি লাগবে","This period is closed","এই মাস বন্ধ"),data_needed:l("হিসাব শুরুর ডেট দেওয়া হয়নি; আগে Accounts পাতায় ডেট দিন","The accounting start date is not set; set it on the Accounts page first","Accounting start date দেওয়া হয়নি; আগে Accounts পাতায় date দিন"),mapping_missing:l("হিসাবের খাত ঠিক করা নেই (mapping)","An account mapping is missing","Account mapping ঠিক করা নেই"),reason_needed:l("কারণ লিখুন","Write the reason","Reason লিখুন"),bad_method:l("এই উপায়টি ঠিক নয়","That method is not valid","এই method ঠিক নয়"),bad_kind:l("কাগজের ধরন ঠিক নয়","The document type is not valid","Document type ঠিক নয়"),nothing_waiting:l("এখন আর কস্টের অপেক্ষায় কিছু নেই","Nothing waits for a cost any more","এখন আর cost-এর অপেক্ষায় কিছু নেই"),cost_unavailable:l("এই উপায়ে কস্ট জানা নেই; অন্য উপায় বা নিজে লিখুন","No cost is known by this method; use another one or type it","এই method-এ cost জানা নেই; অন্য method বা নিজে লিখুন"),bad_manual:l("লেখা কস্ট ঠিক নয় (০ এর বেশি লাগবে)","The typed cost is not valid (it must be above 0)","লেখা cost ঠিক নয় (০-র বেশি লাগবে)"),already_posted:l("কাগজটি আগেই খাতায় উঠে গেছে","The document is already in the books","Document আগেই books-এ উঠে গেছে"),bad_value:l("সংখ্যা ঠিক নয়","The value is not valid","Value ঠিক নয়"),"does not exist":l("সার্ভারে এই সুবিধা এখনো বসানো হয়নি (phase96 লাগবে)","The server does not have this yet (phase96 is needed)","Server-এ এটা এখনো নেই (phase96 লাগবে)"),"Could not find the function":l("সার্ভারে এই সুবিধা এখনো বসানো হয়নি (phase96 লাগবে)","The server does not have this yet (phase96 is needed)","Server-এ এটা এখনো নেই (phase96 লাগবে)"),"Failed to fetch":l("ইন্টারনেট নেই বা সার্ভার পাওয়া যায়নি; আবার চেষ্টা করুন","No internet or the server did not answer; try again","Internet নেই বা server পাওয়া যায়নি; আবার try করুন"),NetworkError:l("ইন্টারনেট নেই বা সার্ভার পাওয়া যায়নি; আবার চেষ্টা করুন","No internet or the server did not answer; try again","Internet নেই বা server পাওয়া যায়নি; আবার try করুন")},y=t=>{const e=String(t&&t.message||t||""),n=Object.keys(h).find(t=>e.includes(t));return n?u(h[n]):e||"error"},g=["owner_capital","existing_account","skip","difference"],$=["item_average","last_purchase","recipe_standard","manual"],k={tab:"ob",st:null,rules:{},loc:"",ob:null,obRec:null,obPrev:null,obPrevOpt:null,cw:null,doc:null,docRec:null,docPrev:null,method:null,ready:!1,err:null,ids:{},msg:null},f=()=>e.liveLocs?e.liveLocs(e.ENV&&e.ENV.locs||[]):e.ENV&&e.ENV.locs||[],S=t=>{const e=f().find(e=>String(e.id)===String(t));return e&&("en"===o.lang?e.name_en||e.name_bn:e.name_bn||e.name_en)||String(t)},O=()=>!!(k.st&&k.st.owner||o.ctx&&o.ctx.is_owner),x=async(t,e)=>{const o=await n.rpc(t,e||{});if(o.error)throw o.error;return o.data},P=()=>""===k.loc||null==k.loc?null:Number(k.loc),N=t=>(k.ids[t]||(k.ids[t]=window.crypto&&crypto.randomUUID?crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,t=>{const e=16*Math.random()|0;return("x"===t?e:3&e|8).toString(16)})),k.ids[t]);function j(){return`<div class="row wrap" role="tablist">${[["ob","t_ob"],["cw","t_cw"]].map(([t,e])=>`<button type="button" role="tab" class="mini ${k.tab===t?"primary":""}" aria-selected="${k.tab===t}" data-act="d23_tab" data-v="${t}">${a(b(e))}</button>`).join("")}</div>`}const T=t=>w["w_"+t]?`<div class="notice warn" data-d23="warn" data-code="${a(t)}">${a(b("w_"+t))}</div>`:"";function R(){const t=k.obRec;if(!t||t.data_needed)return"";const e=t.numbers||{};return`<div class="card stack" data-d23="orec"><div class="row between"><b>${a(b("recL"))}</b><span class="chip">${a(b("rec"))}: ${a(w["o_"+t.recommended]?b("o_"+t.recommended):t.recommended)}</span></div>\n    <div class="muted">${a(b("why"))}: ${a(u(t.reason||{}))}</div>\n    <div class="muted">${a(b("openVal"))} ${a(v(e.opening_value))} · ${a(b("inJournal"))} ${a(v(e.already_in_opening_journal))}</div><div class="muted">${a(b("recNote"))}</div></div>`}function A(){const t=k.obRec&&k.obRec.recommended,e=k.obRec&&k.obRec.alternatives||[],n=O();let o=`<label for="d23_acct">${a(b("acct"))}</label><input id="d23_acct" autocomplete="off" inputmode="numeric" placeholder="${a(b("acctHint"))}">`;return o+=g.map(o=>{const s=e.find(t=>t.option===o);return`<div class="card stack" data-d23="opt" data-opt="${o}"><div class="row between"><b>${a(b("o_"+o))}</b>${t===o?`<span class="chip" data-d23="optrec">${a(b("rec"))}</span>`:""}</div>\n      <div class="muted">${a(b("d_"+o))}</div>${s&&s.possible?`<div class="muted">${a(b("amount"))}: ${a(v(s.amount))}</div>`:""}\n      <div class="row"><button type="button" class="mini" data-act="d23_oprev" data-v="${o}">${a(b("preview"))}</button>${n?`<button type="button" class="mini primary" data-act="d23_oapply" data-v="${o}">${a(b("apply"))}</button>`:""}</div></div>`}).join(""),n||(o+=`<div class="muted">${a(b("ownerOnly"))}</div>`),o}function C(){const t=k.obPrev;if(!t)return'<div id="d23_pv"></div>';if(t.error)return`<div id="d23_pv" class="notice bad" data-d23="pv">${a(y(t.error))}</div>`;const e=(t.lines||[]).map(t=>`<div class="row between" data-d23="pvline"><span>${a(t.code)} ${a("en"===o.lang?t.name_en||t.name_bn:t.name_bn||t.name_en)}</span><span>${Number(t.debit)?a(b("debit"))+" "+a(m(t.debit)):a(b("credit"))+" "+a(m(t.credit))}</span></div>`).join("");return`<div id="d23_pv" class="card stack" data-d23="pv"><b>${a(b("o_"+t.option))}</b><div class="muted">${a(b("dryNote"))}</div><div>${a(b("amount"))}: <b>${a(v(t.amount))}</b></div>${e}${(t.warnings||[]).map(T).join("")}</div>`}function D(){const t=k.ob;let e=`<p class="muted">${a(b("obIntro"))}</p><label for="d23_loc">${a(b("place"))}</label><div class="row"><select id="d23_loc"><option value=""${""===k.loc?" selected":""}>${a(b("allPlaces"))}</option>${f().map(t=>`<option value="${a(t.id)}"${String(t.id)===String(k.loc)?" selected":""}>${a("en"===o.lang?t.name_en||t.name_bn:t.name_bn||t.name_en)}</option>`).join("")}</select><button type="button" class="mini" data-act="d23_show">${a(b("show"))}</button></div>`;return t&&t.data_needed?e+`<div class="notice warn">${a(u(h.data_needed))}</div>`:(t&&(e+=`<div class="notice ${t.risk?"warn":"ok"}" data-d23="risk">${a(t.risk?b("risk"):b("noRisk"))} · ${a(b("switchL"))}: ${a(t.switch_on?b("on"):b("off"))}</div>`,e+=(t.warnings||[]).map(T).join(""),e+=function(){const t=(k.ob&&k.ob.rows||[]).filter(t=>t.opening_rows>0||t.decision||0!==Number(t.gl_inventory)||0!==Number(t.valuation));return t.length?t.map(t=>`<div class="card stack" data-d23="obrow" data-loc="${a(t.location_id)}"><b>${a(S(t.location_id))}</b>\n    <div class="row between"><span class="muted">${a(b("openVal"))}</span><b>${a(v(t.opening_value))}</b></div>\n    <div class="muted">${a(t.opening_rows)} ${a(b("rows"))}${t.uncosted_rows?" · "+a(t.uncosted_rows)+" "+a(b("uncosted")):""}${Number(t.posted_by_switch)?" · "+a(b("byswitch"))+" "+a(v(t.posted_by_switch)):""}</div>\n    <div class="row between"><span class="muted">${a(b("inJournal"))}</span><span>${a(v(t.opening_journal_inventory))}</span></div>\n    <div class="row between"><span class="muted">${a(b("glInv"))}</span><span>${a(v(t.gl_inventory))}</span></div>\n    <div class="row between"><span class="muted">${a(b("valuation"))}</span><span>${a(v(t.valuation))}</span></div>\n    <div class="row between"><span class="muted">${a(b("diff"))}</span><b class="${0===Number(t.diff)?"":"warn"}">${a(v(t.diff))}</b></div>\n    ${t.decision?`<span class="chip" data-d23="decided">${a(b("decided"))}: ${a(w["o_"+t.decision]?b("o_"+t.decision):t.decision)}</span>`:""}</div>`).join(""):`<p class="muted">${a(b("none"))}</p>`}()),e+=R()+`<h3>${a(b("lines"))}</h3>`+A()+C(),e)}function L(){const t=k.cw;let e=`<p class="muted">${a(b("cwIntro"))}</p>`;if(k.cwErr)return e+`<div class="notice bad" data-state="error">${a(k.cwErr)}</div>`;if(!t)return e;e+=`<div class="card stack" data-d23="alertbox"><div class="muted">${a(b("alertDays"))}</div>`,O()?e+=`<div class="row"><input id="d23_days" inputmode="numeric" autocomplete="off" value="${a(null==t.alert_days?"":t.alert_days)}"><button type="button" class="mini" data-act="d23_daysset">${a(b("save"))}</button><button type="button" class="mini" data-act="d23_daysclr">${a(b("clear"))}</button></div>`:e+=`<b>${a(null==t.alert_days?"-":t.alert_days)}</b>`,e+="</div>";const n=t.old_count;return e+=t.alert_enabled?n>0?`<div class="notice warn" data-d23="alert">${a(n)} ${a(b("alertOn"))}</div>`:`<div class="notice ok" data-d23="alert">${a(b("alertOk"))}</div>`:`<div class="notice" data-d23="alert">${a(b("alertOffL"))}</div>`,e+=`<div class="muted" data-d23="count">${a(t.total)} ${a(b("waitN"))} · ${a(b("oldest"))}: ${a(t.oldest_days)} ${a(b("daysU"))}</div>`,e+=(t.items||[]).length?t.items.map(t=>`<div class="card stack" data-d23="doc" data-kind="${a(t.kind)}">\n    <div class="row between"><b>${a(b("k_"+t.kind))}${t.move&&w["m_"+t.move]?" · "+a(b("m_"+t.move)):""}</b>${function(t){return`<span class="chip ${t.over_alert?"warn":""}">${a(t.age_days)} ${a(b("ageL"))}</span>`}(t)}</div>\n    <div class="muted">${a(S(t.location_id))} · ${a(String(t.date))}</div><div>${function(t){return(t.items||[]).map(t=>`${a(t.code)} × ${a(t.qty)}${t.unit?" "+a(t.unit):""}`).join(", ")}(t)}</div>\n    <span class="chip ${t.gl_post?"":"warn"}">${a(t.gl_post?b("willPost"):b("noPost"))}</span>\n    <button type="button" class="mini primary" data-act="d23_cwopen" data-k="${a(t.kind)}" data-r="${a(t.ref)}">${a(b("supply"))}</button></div>`).join(""):`<p class="muted">${a(b("none"))}</p>`,e}function q(){return k.err?`${j()}<div class="notice bad" data-state="error">${a(k.err)}</div><button type="button" class="full" data-act="d23_retry">${a(b("retry"))}</button>`:k.ready?j()+("ob"===k.tab?D():L()):`${j()}<p class="muted center pad" data-state="loading">${a(b("loading"))}</p>`}function E(){const t=p("#d23_body");t&&(t.innerHTML=q())}function I(){const t=k.docRec;if(!t)return"";if(!t.ok)return`<div class="notice bad">${a(y(t.error||"error"))}</div>`;const e=k.method,n=t.items||[];let o=`<div class="stack"><h3>${a(b("supply"))}: ${a(b("k_"+k.doc.kind))}</h3><div class="muted">${a(b("recNote"))}</div>`;o+=n.map((t,n)=>`<div class="card stack" data-d23="sitem"><b>${a(t.code)}</b> <span class="muted">${a(b("qty"))} ${a(t.qty)}${t.unit?" "+a(t.unit):""}</span>\n    <span class="chip" data-d23="irec">${a(b("rec"))}: ${a(b("m_"+t.recommended))}</span><div class="muted">${a(b("why"))}: ${a(u(t.reason||{}))}</div>\n    ${$.filter(t=>"manual"!==t).map(e=>{const n=function(t,e){return t.candidates?"manual"===e?null:t.candidates[e]:null}(t,e);return`<div class="row between" data-d23="mrow" data-m="${e}"><span>${a(b("m_"+e))}</span><span>${null==n?a(b("notKnown")):a(m(n))+" → "+a(m(n*t.qty))}</span></div>`}).join("")}\n    ${"manual"===e?`<label for="d23_mc${n}">${a(b("unitCost"))}</label><input id="d23_mc${n}" data-item="${a(t.item_id)}" inputmode="decimal" autocomplete="off">`:""}</div>`).join(""),o+=`<label>${a(b("method"))}</label><div class="row wrap">${$.map(t=>`<button type="button" class="mini ${e===t?"primary":""}" data-act="d23_pick" data-m="${t}">${a(b("m_"+t))}</button>`).join("")}</div>`,"manual"===e&&(o+=`<label for="d23_reason">${a(b("reason"))}</label><input id="d23_reason" autocomplete="off"><div class="muted">${a(b("manualWhy"))}</div>`);const s=k.docPrev;return s&&(o+=s.error||!1===s.ok?`<div class="notice warn" data-d23="spv">${a(y(s.error||"error"))}${s.detail?": "+a(s.detail):""}</div>`:`<div class="notice ok" data-d23="spv">${a(b("dryNote"))} ${a(b("total"))}: <b>${a(v(s.total))}</b> · ${a(s.gl_post?b("willPost"):b("noPost"))}${(s.derived||[]).length?"<br>"+a(b("derived"))+" "+a(b("derivedNote")):""}</div>`),o+=`<div id="d23_sout" class="muted" aria-live="polite">${k.msg?a(k.msg):""}</div><div class="row"><button type="button" class="full" data-act="d23_sclose">${a(b("close"))}</button><button type="button" class="full primary" data-act="d23_supply">${a(b("supplyGo"))}</button></div></div>`,o}function B(){const t=[];return(k.docRec&&k.docRec.items||[]).forEach((e,n)=>{const o=p("#d23_mc"+n),a=_(o&&o.value);t.push({item_id:e.item_id,cost:Number.isFinite(a)?a:0})}),t}async function G(){k.docPrev=null;try{k.docPrev=await x("cost_wait_preview96",{p_kind:k.doc.kind,p_ref:k.doc.ref,p_method:k.method,p_manual:"manual"===k.method?B():null})}catch(t){k.docPrev={error:t&&t.message||String(t)}}}function W(){c(I())}async function V(){k.err=null;try{k.st=await x("acct_status")}catch(t){}"ob"===k.tab?await async function(){k.obPrev=null,k.ob=await x("opening_stock_check96",{p_loc:P()});try{k.obRec=await x("opening_stock_recommend96",{p_loc:P()})}catch(t){k.obRec=null}}():await async function(){k.cwErr=null;try{k.cw=await x("cost_wait_list96",{p_loc:P(),p_limit:100})}catch(t){k.cw=null,k.cwErr=/not allowed/.test(String(t&&t.message||t))?b("needRight"):y(t)}}(),k.ready=!0}async function F(){try{await V()}catch(t){k.err=/not allowed/.test(String(t&&t.message||t))?b("needRight"):y(t)}E()}Object.assign(r,{d23_tab:async t=>{k.tab=t.dataset.v,k.ready=!1,E(),await F()},d23_retry:async()=>{k.ready=!1,k.err=null,E(),await F()},d23_show:async()=>{k.loc=(p("#d23_loc")||{}).value||"",k.ready=!1,E(),await F()},d23_oprev:async t=>{const e=t.dataset.v,n=((p("#d23_acct")||{}).value||"").trim();try{k.obPrev=await x("opening_stock_preview96",{p_option:e,p_loc:P(),p_account:n||null,p_date:null}),k.obPrev&&!1===k.obPrev.ok&&(k.obPrev={error:k.obPrev.error})}catch(t){k.obPrev={error:t&&t.message||String(t)}}E()},d23_oapply:t=>{const e=t.dataset.v;c(`<div class="stack"><h3>${a(b("o_"+e))}</h3><div class="notice warn" data-d23="awarn">${a(b("applyWarn"))}</div><div class="muted">${a(b("d_"+e))}</div>\n      <label for="d23_areason">${a(b("reason"))}</label><input id="d23_areason" autocomplete="off"><div id="d23_aout" class="muted" aria-live="polite"></div>\n      <div class="row"><button type="button" class="full" data-act="d23_sclose">${a(b("cancel"))}</button><button type="button" class="full primary" data-act="d23_ago" data-v="${e}">${a(b("applyGo"))}</button></div></div>`)},d23_ago:async t=>{const e=t.dataset.v,n=p("#d23_aout"),o=((p("#d23_acct")||{}).value||"").trim(),a="ob:"+e+":"+(""===k.loc?"all":k.loc);try{const t=await x("opening_stock_apply96",{p_option:e,p_loc:P(),p_account:o||null,p_date:null,p_reason:((p("#d23_areason")||{}).value||"").trim()||null,p_client:N(a)});delete k.ids[a],d(),s(t&&t.dup?b("dup"):b("saved")),k.ready=!1,E(),await F()}catch(t){n&&(n.textContent=y(t))}},d23_sclose:()=>{k.docRec=null,k.docPrev=null,k.msg=null,d()},d23_daysset:async()=>{const t=_((p("#d23_days")||{}).value);if(!(Number.isFinite(t)&&t>=0&&t<=3650))return s(b("badDays"));try{await x("set_rule",{p_key:"acct_cost_wait_alert_days",p_value:t}),s(b("saved")),await F()}catch(t){s(y(t))}},d23_daysclr:async()=>{try{await x("set_rule",{p_key:"acct_cost_wait_alert_days",p_value:null}),s(b("saved")),await F()}catch(t){s(y(t))}},d23_cwopen:async t=>{k.doc={kind:t.dataset.k,ref:t.dataset.r},k.docRec=null,k.docPrev=null,k.msg=null,k.method=null;try{k.docRec=await x("cost_wait_recommend96",{p_kind:k.doc.kind,p_ref:k.doc.ref});const t=k.docRec&&k.docRec.items||[];k.method=t.length?t[0].recommended:"manual",k.docRec&&!1!==k.docRec.ok&&"manual"!==k.method&&await G()}catch(t){k.docRec={ok:!1,error:t&&t.message||String(t)}}W()},d23_pick:async t=>{k.method=t.dataset.m,k.msg=null,"manual"!==k.method?await G():k.docPrev=null,W()},d23_supply:async()=>{if(!k.doc||!k.method)return;const t=((p("#d23_reason")||{}).value||"").trim();if("manual"===k.method&&!t)return k.msg=u(h.reason_needed),W();const e="cw:"+k.doc.kind+":"+k.doc.ref+":"+k.method;try{const n=await x("cost_wait_supply96",{p_kind:k.doc.kind,p_ref:k.doc.ref,p_method:k.method,p_manual:"manual"===k.method?B():null,p_reason:t||null,p_client:N(e),p_post:!0});delete k.ids[e],k.docRec=null,k.docPrev=null,k.msg=null,d(),s(n&&n.dup?b("dup"):n&&n.posted?b("posted"):b("notPosted")),k.ready=!1,E(),await F()}catch(t){k.msg=y(t),W()}}}),window.BOS_PAGES=Object.assign(window.BOS_PAGES||{},{books96:async function(){k.ready=!1,k.err=null,k.ids={},i(b("title"),'<div id="d23_body"></div>',!0),E(),await async function(){try{const t=await n.from("rules").select("key,value,default_value").in("key",["acct_cost_wait_alert_days","acct_stock_opening"]);k.rules={},(t&&t.data||[]).forEach(t=>{k.rules[t.key]=t})}catch(t){k.rules={}}}(),await F()}}),e.books96={X:w,ERR:h,OPTS:g,METHODS:$,eText:y,D:k,body:q,tabs:j,obTab:D,cwTab:L,sheetBody:I,recCard:R,optCards:A,previewBox:C}})();
+/* Islamia BOS · Books 96 (#/books96): screens for the phase96 backend (step D23).
+   Tab 1 "Opening stock": the opening-stock helper. Per place: opening stock value, what the opening journal already carries, GL inventory, stock valuation and the
+     difference; the double-count warning; a RECOMMENDED way (card) and four ways (owner capital / existing opening account / skip / only the difference), each with a dry-run
+     preview (no writes). Apply is owner only. Nothing is ever applied by itself.
+   Tab 2 "Cost waiting": the list of documents that wait for a cost (wastage, production ingredients, count differences, openings, transfers, purchase returns), oldest first,
+     the aging alert (the owner types the number, blank = none) and a sheet to supply the cost: item average / last purchase / recipe standard / manual with a reason,
+     with the RECOMMENDED choice and a dry-run before the write. The document then posts once.
+   Gates are the server's: owner or cost right (and place) for the cost side, owner for the apply. Language rule: English mode all English, Bangla mode keeps common words English.
+   Server: supabase/phase96.sql. data-act names start with d23_. */
+(() => {
+'use strict';
+const A = window.BOS_APP, B = window.BOS;
+const { sb, S, esc, toast, shell, openSheet, closeSheet, H } = A;
+const L = B.L, lab = B.lab;
+const $ = (s, el) => (el || document).querySelector(s);
+const rid = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3) | 8).toString(16); }));
+const norm = (v) => String(v == null ? '' : v).replace(/[০-৯]/g, (d) => '০১২৩৪৫৬৭৮৯'.indexOf(d)).replace(/,/g, '').trim();
+const nnum = (v) => { const s = norm(v); if (s === '') return NaN; const n = Number(s); return Number.isFinite(n) ? n : NaN; };
+const fm = (n) => { const v = Number(n); if (!Number.isFinite(v)) return '-'; return (v < 0 ? '-' : '') + Math.abs(v).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+const money = (n) => '৳ ' + fm(n);
+
+const X = {
+  title: L('শুরুর স্টক ও কস্টের অপেক্ষা', 'Opening stock and cost waiting', 'Opening stock ও cost-এর অপেক্ষা'),
+  t_ob: L('শুরুর স্টক', 'Opening stock', 'Opening stock'), t_cw: L('কস্টের অপেক্ষা', 'Cost waiting', 'Cost-এর অপেক্ষা'),
+  loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), retry: L('আবার চেষ্টা করুন', 'Try again', 'আবার Try করুন'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'),
+  place: L('জায়গা', 'Place', 'Place'), allPlaces: L('সব জায়গা', 'All places', 'সব place'), show: L('দেখান', 'Show', 'Show'), none: L('কিছু নেই', 'Nothing here', 'কিছু নেই'),
+  rec: L('প্রস্তাবিত', 'Recommended', 'Recommended'), recNote: L('প্রস্তাব মানা জরুরি নয়; সিস্টেম নিজে থেকে কিছু করে না, আপনি যা চান সেটাই বেছে নিন।', 'A recommendation never blocks you and nothing is applied by itself; choose what you want.', 'Recommendation মানা জরুরি নয়; system নিজে কিছু করে না, আপনার পছন্দই চলবে।'),
+  ownerOnly: L('এটি করতে মালিক লাগবে।', 'Only the owner can do this.', 'এটা করতে owner লাগবে।'), cancel: L('বাদ দিন', 'Cancel', 'Cancel'), close: L('বন্ধ করুন', 'Close', 'Close'),
+  reason: L('কারণ', 'Reason', 'Reason'), dryNote: L('এটি শুধু দেখা (dry run): কিছু লেখা হয়নি।', 'This is a dry run: nothing was written.', 'এটা শুধু dry run: কিছু লেখা হয়নি।'),
+  // opening stock
+  obIntro: L('শুরুর স্টক খাতায় তোলার আগে দেখে নিন, শুরুর জের (opening journal) এ stock আগেই আছে কি না। থাকলে আবার তুললে দুইবার গোনা হবে।',
+    'Before opening stock goes to the books, see whether the stock is already inside the opening journal. If it is, posting it again counts it twice.',
+    'Opening stock খাতায় তোলার আগে দেখুন opening journal এ stock আগেই আছে কি না। থাকলে আবার তুললে দুইবার গোনা হবে।'),
+  openVal: L('শুরুর স্টকের মূল্য', 'Opening stock value', 'Opening stock-এর value'), inJournal: L('শুরুর জের এ আগেই আছে', 'Already in the opening journal', 'Opening journal-এ আগেই আছে'),
+  glInv: L('খাতায় স্টক', 'Stock in the books (GL)', 'Books-এ stock (GL)'), valuation: L('স্টক এর মূল্য', 'Stock valuation', 'Stock valuation'), diff: L('পার্থক্য', 'Difference', 'Difference'),
+  rows: L('সারি', 'rows', 'row'), uncosted: L('কস্ট ছাড়া সারি', 'rows without cost', 'cost ছাড়া row'), byswitch: L('সুইচ দিয়ে আগেই তোলা', 'Already posted by the switch', 'Switch দিয়ে আগেই তোলা'),
+  decided: L('সিদ্ধান্ত নেওয়া হয়েছে', 'Decision taken', 'Decision নেওয়া হয়েছে'), switchL: L('শুরুর স্টক পোস্টিং সুইচ', 'Opening stock posting switch', 'Opening stock posting switch'), on: L('চালু', 'On', 'On'), off: L('বন্ধ', 'Off', 'Off'),
+  risk: L('দুইবার গোনার ঝুঁকি আছে', 'Double count risk', 'Double count-এর ঝুঁকি আছে'), noRisk: L('দুইবার গোনার ঝুঁকি দেখা যায়নি ✓', 'No double count risk found ✓', 'Double count-এর ঝুঁকি পাওয়া যায়নি ✓'),
+  recL: L('সিস্টেমের প্রস্তাব', 'System recommendation', 'System-এর recommendation'), why: L('কেন', 'Why', 'কেন'),
+  o_owner_capital: L('মালিকের মূলধনের বিপরীতে', 'Against owner capital', 'Owner capital-এর against-এ'), o_existing_account: L('আগের একটি শুরুর জের খাতের বিপরীতে', 'Against an existing opening balance account', 'আগের একটা opening balance account-এর against-এ'),
+  o_skip: L('বাদ: খাতায় আগেই আছে', 'Skip: already in the books', 'Skip: books-এ আগেই আছে'), o_difference: L('শুধু পার্থক্যটুকু', 'Only the difference', 'শুধু difference-টুকু'),
+  o_none: L('কিছু করার নেই', 'Nothing to do', 'কিছু করার নেই'), o_wait_for_cost: L('আগে কস্ট দিন', 'Supply the cost first', 'আগে cost দিন'),
+  d_owner_capital: L('Dr stock / Cr মালিকের মূলধন: পুরো শুরুর স্টক।', 'Dr stock / Cr owner capital for the whole opening stock.', 'Dr stock / Cr owner capital: পুরো opening stock।'),
+  d_existing_account: L('Dr stock / Cr আপনার দেওয়া একটি equity বা liability খাত।', 'Dr stock / Cr an equity or liability account you name.', 'Dr stock / Cr আপনার দেওয়া একটা equity বা liability account।'),
+  d_skip: L('কিছু তোলা হয় না; শুধু সিদ্ধান্ত লেখা থাকে। সুইচ চালু থাকলেও এই স্টক আবার তোলা হবে না।', 'Nothing is posted; only the decision is kept. Even with the switch on, this stock is not posted again.', 'কিছু post হয় না; শুধু decision লেখা থাকে। Switch on থাকলেও এই stock আবার post হবে না।'),
+  d_difference: L('শুরুর জের এ যতটা নেই শুধু ততটা তোলা হয়।', 'Posts only what the opening journal does not carry yet.', 'Opening journal-এ যতটা নেই শুধু ততটা post হয়।'),
+  acct: L('খাতের কোড (শুধু "আগের খাত" ও "পার্থক্য" এর জন্য)', 'Account code (only for "existing account" and "difference")', 'Account code (শুধু "existing account" ও "difference"-এর জন্য)'),
+  acctHint: L('যেমন শুরুর জের এর equity খাত। ফাঁকা থাকলে মালিকের মূলধন।', 'An equity or liability account. Blank = owner capital.', 'একটা equity বা liability account। ফাঁকা = owner capital।'),
+  preview: L('আগে দেখুন (dry run)', 'Preview (dry run)', 'আগে দেখুন (dry run)'), apply: L('অ্যাপ্লাই করুন', 'Apply', 'Apply করুন'), applyGo: L('বুঝেছি, অ্যাপ্লাই করুন', 'I understand, apply', 'বুঝেছি, apply করুন'),
+  applyWarn: L('এটি খাতায় একটি এন্ট্রি লেখে (বা সিদ্ধান্ত রাখে), নিজে নিজে ফেরানো যায় না। এক জায়গায় একবারই হয়।', 'This writes a journal entry (or keeps a decision) and cannot be undone here. It happens once per place.', 'এটা খাতায় একটা entry লেখে (বা decision রাখে), এখানে থেকে ফেরানো যায় না। এক place-এ একবারই হয়।'),
+  amount: L('অংক', 'Amount', 'Amount'), lines: L('লাইন', 'Lines', 'Lines'), debit: L('ডেবিট', 'Debit', 'Debit'), credit: L('ক্রেডিট', 'Credit', 'Credit'),
+  w_opening_journal_has_inventory: L('শুরুর জের এ স্টক আগেই ধরা আছে।', 'The opening journal already carries stock.', 'Opening journal-এ stock আগেই ধরা আছে।'),
+  w_switch_would_double_count: L('এই অবস্থায় শুরুর স্টক পোস্টিং সুইচ চালালে একই স্টক দুইবার গোনা হবে।', 'Turning the opening stock posting switch on now would count the same stock twice.', 'এখন opening stock posting switch চালালে একই stock দুইবার গোনা হবে।'),
+  w_switch_on_double_count: L('শুরুর স্টক পোস্টিং সুইচ চালু, আর শুরুর জের এ স্টক আছে: দুইবার গোনার ঝুঁকি!', 'The opening stock posting switch is ON and the opening journal carries stock: double count risk!', 'Opening stock posting switch ON, আর opening journal-এ stock আছে: double count-এর ঝুঁকি!'),
+  w_opening_journal_not_split_by_place: L('শুরুর জের জায়গা অনুযায়ী ভাগ করা নেই; তাই "পার্থক্য" পুরো কোম্পানির হিসাবে করুন।', 'The opening journal is not split by place; use "difference" for the whole company.', 'Opening journal place অনুযায়ী ভাগ করা নেই; তাই "difference" পুরো company-তে করুন।'),
+  w_uncosted_openings: L('কিছু শুরুর স্টকের কস্ট জানা নেই; সেগুলো ধরা হয়নি, কস্ট দিলে আলাদা করে উঠবে।', 'Some opening stock has no cost; it is left out and can be posted once its cost is supplied.', 'কিছু opening stock-এর cost জানা নেই; সেগুলো ধরা হয়নি, cost দিলে আলাদা করে উঠবে।'),
+  w_skip_but_not_in_opening_journal: L('বাদ দিলেন, কিন্তু শুরুর জের এ এই স্টক পুরোটা নেই; খাতায় স্টক কম থাকতে পারে।', 'You skip it, but the opening journal does not carry all of this stock; the books may show less stock.', 'Skip করছেন, কিন্তু opening journal-এ এই stock পুরোটা নেই; books-এ stock কম থাকতে পারে।'),
+  w_switch_on: L('শুরুর স্টক পোস্টিং সুইচ চালু আছে; এই সিদ্ধান্তের পর ঢাকা স্টক সুইচ আর তুলবে না।', 'The opening stock posting switch is on; after this decision the switch no longer posts the covered stock.', 'Opening stock posting switch on আছে; এই decision-এর পর covered stock switch আর post করবে না।'),
+  // cost waiting
+  cwIntro: L('যে stock movement এর খরচ জানা নেই সেগুলো এখানে অপেক্ষায় থাকে। খরচ দিলে কাগজটি একবারই খাতায় উঠবে। কিছু ধরে নেওয়া হয় না।',
+    'Stock movements with no known cost wait here. Once a cost is supplied the document posts once. Nothing is assumed.',
+    'যে stock movement-এর cost জানা নেই সেগুলো এখানে অপেক্ষায় থাকে। Cost দিলে document একবারই খাতায় উঠবে। কিছু ধরে নেওয়া হয় না।'),
+  waitN: L('টি কাগজ কস্টের অপেক্ষায়', 'documents wait for a cost', 'টি document cost-এর অপেক্ষায়'), oldest: L('সবচেয়ে পুরোনো', 'Oldest', 'Oldest'), daysU: L('দিন', 'days', 'দিন'),
+  alertDays: L('সতর্কতার দিন (আপনি সংখ্যা লিখবেন, ফাঁকা = সতর্কতা নেই)', 'Alert after days (you type the number, blank = no alert)', 'Alert-এর দিন (আপনি সংখ্যা লিখবেন, ফাঁকা = alert নেই)'),
+  save: L('রাখুন', 'Save', 'Save'), clear: L('মুছুন', 'Clear', 'Clear'), alertOn: L('টি কাগজ সতর্কতার দিনের চেয়ে বেশি অপেক্ষায়', 'documents wait longer than the alert days', 'টি document alert-এর দিনের চেয়ে বেশি অপেক্ষায়'),
+  alertOk: L('সতর্কতার দিন পার হওয়া কাগজ নেই ✓', 'No document is past the alert days ✓', 'Alert-এর দিন পার হওয়া document নেই ✓'), alertOffL: L('সতর্কতা বন্ধ (সংখ্যা দেওয়া নেই)', 'Alert is off (no number typed)', 'Alert বন্ধ (সংখ্যা দেওয়া নেই)'),
+  badDays: L('সংখ্যা ঠিক নয় (০ থেকে ৩৬৫০)', 'The number is not valid (0 to 3650)', 'সংখ্যা ঠিক নয় (০ থেকে ৩৬৫০)'),
+  k_wastage: L('নষ্ট / বাদ (wastage)', 'Wastage', 'Wastage'), k_production: L('উৎপাদন (ingredient)', 'Production ingredients', 'Production (ingredient)'), k_transfer: L('স্টক ট্রান্সফার', 'Stock transfer', 'Stock transfer'),
+  k_purchase_return: L('কেনা ফেরত', 'Purchase return', 'Purchase return'), k_ledger: L('স্টক movement', 'Stock movement', 'Stock movement'),
+  m_count_adjust: L('গণনার পার্থক্য', 'Count difference', 'Count difference'), m_opening: L('শুরুর স্টক', 'Opening stock', 'Opening stock'), m_issue_out: L('নিজের কাজে issue', 'Own-use issue', 'Own-use issue'),
+  willPost: L('খরচ দিলে খাতায় উঠবে', 'Posts when costed', 'Cost দিলে post হবে'), noPost: L('এখন খাতায় উঠবে না (সুইচ বন্ধ)', 'Will not post now (switch off)', 'এখন post হবে না (switch off)'),
+  ageL: L('দিন আগের', 'days old', 'দিন আগের'), supply: L('কস্ট দিন', 'Supply cost', 'Cost দিন'), supplyGo: L('এই কস্ট দিন', 'Supply this cost', 'এই cost দিন'),
+  method: L('কোন উপায়ে', 'Method', 'Method'), m_item_average: L('গড় কস্ট (average)', 'Item average cost', 'Item average cost'), m_last_purchase: L('শেষ কেনা কস্ট', 'Last purchase cost', 'Last purchase cost'),
+  m_recipe_standard: L('রেসিপির standard কস্ট', 'Recipe standard cost', 'Recipe standard cost'), m_manual: L('নিজে লিখব (কারণসহ)', 'Type it myself (with a reason)', 'নিজে লিখব (reason সহ)'),
+  unitCost: L('প্রতি একক কস্ট', 'Cost per unit', 'Per unit cost'), qty: L('Qty', 'Qty', 'Qty'), total: L('টোটাল', 'Total', 'Total'), notKnown: L('জানা নেই', 'not known', 'জানা নেই'),
+  manualWhy: L('নিজে লিখলে কারণ লিখতে হবে', 'A manual cost needs a reason', 'Manual cost-এ reason লিখতে হবে'), derived: L('তৈরি পণ্যের প্রতি একক খরচও রেকর্ড হবে', 'The finished good gets a cost record too', 'তৈরি পণ্যের per unit cost-ও record হবে'),
+  derivedNote: L('(স্টক এর গড় কস্ট বদলায় না)', '(the stock average cost is not changed)', '(stock-এর average cost বদলায় না)'),
+  posted: L('খাতায় উঠেছে', 'Posted to the books', 'Books-এ উঠেছে'), notPosted: L('কস্ট রাখা হয়েছে; খাতায় তোলা হবে পরের posting-এ (বা যিনি posting করেন তাঁর হাতে)।', 'The cost is kept; the document posts at the next posting run (by someone who posts).', 'Cost রাখা হয়েছে; document পরের posting run-এ উঠবে (যিনি post করেন তাঁর হাতে)।'),
+  dup: L('এটি আগেই রাখা হয়েছে (দ্বিতীয়বার নয়)।', 'This was already recorded (not twice).', 'এটা আগেই রাখা হয়েছে (দ্বিতীয়বার নয়)।'),
+  needRight: L('কস্ট দেখা ও দেওয়ার অনুমতি (মালিক বা cost right) লাগবে।', 'Seeing and supplying costs needs the owner or the cost right.', 'Cost দেখা ও দেওয়ার জন্য owner বা cost right লাগবে।'),
+};
+const T = (k) => lab(X[k]);
+
+/* server error codes (and Postgres / network messages) -> readable 3-language text. English has no Bangla. */
+const ERR = {
+  not_allowed: L('অনুমতি নেই', 'Not allowed', 'অনুমতি নেই'),
+  'not allowed': L('অনুমতি নেই', 'Not allowed', 'অনুমতি নেই'),
+  client_id_needed: L('অনুরোধের পরিচয় নেই; আবার চেষ্টা করুন', 'The request has no id; try again', 'Request-এর id নেই; আবার try করুন'),
+  bad_option: L('এই উপায়টি ঠিক নয়', 'That option is not valid', 'এই option ঠিক নয়'),
+  place_needed: L('একটি জায়গা বেছে নিন', 'Choose a place', 'একটা place বেছে নিন'),
+  account_needed: L('খাতের কোড দিন', 'Give the account code', 'Account code দিন'),
+  bad_account: L('এই খাতটি চলবে না (equity বা liability লাগবে, স্টক খাত নয়)', 'That account cannot be used (it must be an equity or liability account, not a stock account)', 'এই account চলবে না (equity বা liability লাগবে, stock account নয়)'),
+  bad_location: L('জায়গা ঠিক নয়', 'The place is not valid', 'Place ঠিক নয়'),
+  already_applied: L('এই জায়গার জন্য আগেই সিদ্ধান্ত নেওয়া হয়েছে', 'A decision was already taken for this place', 'এই place-এর জন্য আগেই decision নেওয়া হয়েছে'),
+  nothing_to_post: L('তোলার মতো শুরুর স্টক নেই', 'There is no opening stock to post', 'Post করার মতো opening stock নেই'),
+  untagged_opening_inventory: L('শুরুর জের জায়গা অনুযায়ী ভাগ করা নেই; "সব জায়গা" বেছে করুন', 'The opening journal is not split by place; choose "All places"', 'Opening journal place অনুযায়ী ভাগ করা নেই; "সব place" বেছে করুন'),
+  before_start: L('হিসাব শুরুর আগের ডেট হয় না', 'The date is before the accounting start', 'Accounting start-এর আগের date হয় না'),
+  bad_date: L('ডেট ঠিক নয়', 'The date is not valid', 'Date ঠিক নয়'),
+  period_closed: L('এই মাস বন্ধ; মালিকের অনুমতি লাগবে', 'This period is closed', 'এই মাস বন্ধ'),
+  data_needed: L('হিসাব শুরুর ডেট দেওয়া হয়নি; আগে Accounts পাতায় ডেট দিন', 'The accounting start date is not set; set it on the Accounts page first', 'Accounting start date দেওয়া হয়নি; আগে Accounts পাতায় date দিন'),
+  mapping_missing: L('হিসাবের খাত ঠিক করা নেই (mapping)', 'An account mapping is missing', 'Account mapping ঠিক করা নেই'),
+  reason_needed: L('কারণ লিখুন', 'Write the reason', 'Reason লিখুন'),
+  bad_method: L('এই উপায়টি ঠিক নয়', 'That method is not valid', 'এই method ঠিক নয়'),
+  bad_kind: L('কাগজের ধরন ঠিক নয়', 'The document type is not valid', 'Document type ঠিক নয়'),
+  nothing_waiting: L('এখন আর কস্টের অপেক্ষায় কিছু নেই', 'Nothing waits for a cost any more', 'এখন আর cost-এর অপেক্ষায় কিছু নেই'),
+  cost_unavailable: L('এই উপায়ে কস্ট জানা নেই; অন্য উপায় বা নিজে লিখুন', 'No cost is known by this method; use another one or type it', 'এই method-এ cost জানা নেই; অন্য method বা নিজে লিখুন'),
+  bad_manual: L('লেখা কস্ট ঠিক নয় (০ এর বেশি লাগবে)', 'The typed cost is not valid (it must be above 0)', 'লেখা cost ঠিক নয় (০-র বেশি লাগবে)'),
+  already_posted: L('কাগজটি আগেই খাতায় উঠে গেছে', 'The document is already in the books', 'Document আগেই books-এ উঠে গেছে'),
+  bad_value: L('সংখ্যা ঠিক নয়', 'The value is not valid', 'Value ঠিক নয়'),
+  'does not exist': L('সার্ভারে এই সুবিধা এখনো বসানো হয়নি (phase96 লাগবে)', 'The server does not have this yet (phase96 is needed)', 'Server-এ এটা এখনো নেই (phase96 লাগবে)'),
+  'Could not find the function': L('সার্ভারে এই সুবিধা এখনো বসানো হয়নি (phase96 লাগবে)', 'The server does not have this yet (phase96 is needed)', 'Server-এ এটা এখনো নেই (phase96 লাগবে)'),
+  'Failed to fetch': L('ইন্টারনেট নেই বা সার্ভার পাওয়া যায়নি; আবার চেষ্টা করুন', 'No internet or the server did not answer; try again', 'Internet নেই বা server পাওয়া যায়নি; আবার try করুন'),
+  NetworkError: L('ইন্টারনেট নেই বা সার্ভার পাওয়া যায়নি; আবার চেষ্টা করুন', 'No internet or the server did not answer; try again', 'Internet নেই বা server পাওয়া যায়নি; আবার try করুন'),
+};
+const eText = (e) => {
+  const m = String((e && e.message) || e || '');
+  const k = Object.keys(ERR).find((x) => m.includes(x));
+  return k ? lab(ERR[k]) : (m || 'error');
+};
+
+const OPTS = ['owner_capital', 'existing_account', 'skip', 'difference'];
+const METHODS = ['item_average', 'last_purchase', 'recipe_standard', 'manual'];
+
+/* state */
+const D = { tab: 'ob', st: null, rules: {}, loc: '', ob: null, obRec: null, obPrev: null, obPrevOpt: null, cw: null, doc: null, docRec: null, docPrev: null, method: null, ready: false, err: null, ids: {}, msg: null };
+const locs = () => (B.liveLocs ? B.liveLocs((B.ENV && B.ENV.locs) || []) : ((B.ENV && B.ENV.locs) || []));
+const locName = (id) => { const l = locs().find((x) => String(x.id) === String(id)); return l ? ((S.lang === 'en' ? (l.name_en || l.name_bn) : (l.name_bn || l.name_en)) || String(id)) : String(id); };
+const isOwner = () => !!((D.st && D.st.owner) || (S.ctx && S.ctx.is_owner));
+const rpc = async (fn, args) => { const r = await sb.rpc(fn, args || {}); if (r.error) throw r.error; return r.data; };
+const locArg = () => (D.loc === '' || D.loc == null ? null : Number(D.loc));
+const cid = (key) => { if (!D.ids[key]) D.ids[key] = rid(); return D.ids[key]; };   // kept until the call succeeds, so a repeated tap or a retry never records twice
+
+/* ---------- render pieces ---------- */
+function tabs() {
+  return `<div class="row wrap" role="tablist">${[['ob', 't_ob'], ['cw', 't_cw']].map(([k, l]) => `<button type="button" role="tab" class="mini ${D.tab === k ? 'primary' : ''}" aria-selected="${D.tab === k}" data-act="d23_tab" data-v="${k}">${esc(T(l))}</button>`).join('')}</div>`;
+}
+function picker() {
+  return `<label for="d23_loc">${esc(T('place'))}</label><div class="row"><select id="d23_loc"><option value=""${D.loc === '' ? ' selected' : ''}>${esc(T('allPlaces'))}</option>${locs().map((l) => `<option value="${esc(l.id)}"${String(l.id) === String(D.loc) ? ' selected' : ''}>${esc(S.lang === 'en' ? (l.name_en || l.name_bn) : (l.name_bn || l.name_en))}</option>`).join('')}</select><button type="button" class="mini" data-act="d23_show">${esc(T('show'))}</button></div>`;
+}
+const warnLine = (c) => (X['w_' + c] ? `<div class="notice warn" data-d23="warn" data-code="${esc(c)}">${esc(T('w_' + c))}</div>` : '');
+function obRows() {
+  const rows = ((D.ob && D.ob.rows) || []).filter((r) => r.opening_rows > 0 || r.decision || Number(r.gl_inventory) !== 0 || Number(r.valuation) !== 0);
+  return rows.length ? rows.map((r) => `<div class="card stack" data-d23="obrow" data-loc="${esc(r.location_id)}"><b>${esc(locName(r.location_id))}</b>
+    <div class="row between"><span class="muted">${esc(T('openVal'))}</span><b>${esc(money(r.opening_value))}</b></div>
+    <div class="muted">${esc(r.opening_rows)} ${esc(T('rows'))}${r.uncosted_rows ? ' · ' + esc(r.uncosted_rows) + ' ' + esc(T('uncosted')) : ''}${Number(r.posted_by_switch) ? ' · ' + esc(T('byswitch')) + ' ' + esc(money(r.posted_by_switch)) : ''}</div>
+    <div class="row between"><span class="muted">${esc(T('inJournal'))}</span><span>${esc(money(r.opening_journal_inventory))}</span></div>
+    <div class="row between"><span class="muted">${esc(T('glInv'))}</span><span>${esc(money(r.gl_inventory))}</span></div>
+    <div class="row between"><span class="muted">${esc(T('valuation'))}</span><span>${esc(money(r.valuation))}</span></div>
+    <div class="row between"><span class="muted">${esc(T('diff'))}</span><b class="${Number(r.diff) === 0 ? '' : 'warn'}">${esc(money(r.diff))}</b></div>
+    ${r.decision ? `<span class="chip" data-d23="decided">${esc(T('decided'))}: ${esc(X['o_' + r.decision] ? T('o_' + r.decision) : r.decision)}</span>` : ''}</div>`).join('') : `<p class="muted">${esc(T('none'))}</p>`;
+}
+function recCard() {
+  const r = D.obRec; if (!r || r.data_needed) return '';
+  const nm = r.numbers || {};
+  return `<div class="card stack" data-d23="orec"><div class="row between"><b>${esc(T('recL'))}</b><span class="chip">${esc(T('rec'))}: ${esc(X['o_' + r.recommended] ? T('o_' + r.recommended) : r.recommended)}</span></div>
+    <div class="muted">${esc(T('why'))}: ${esc(lab(r.reason || {}))}</div>
+    <div class="muted">${esc(T('openVal'))} ${esc(money(nm.opening_value))} · ${esc(T('inJournal'))} ${esc(money(nm.already_in_opening_journal))}</div><div class="muted">${esc(T('recNote'))}</div></div>`;
+}
+function optCards() {
+  const rec = D.obRec && D.obRec.recommended; const alts = (D.obRec && D.obRec.alternatives) || [];
+  const own = isOwner();
+  let h = `<label for="d23_acct">${esc(T('acct'))}</label><input id="d23_acct" autocomplete="off" inputmode="numeric" placeholder="${esc(T('acctHint'))}">`;
+  h += OPTS.map((o) => {
+    const alt = alts.find((x) => x.option === o);
+    return `<div class="card stack" data-d23="opt" data-opt="${o}"><div class="row between"><b>${esc(T('o_' + o))}</b>${rec === o ? `<span class="chip" data-d23="optrec">${esc(T('rec'))}</span>` : ''}</div>
+      <div class="muted">${esc(T('d_' + o))}</div>${alt && alt.possible ? `<div class="muted">${esc(T('amount'))}: ${esc(money(alt.amount))}</div>` : ''}
+      <div class="row"><button type="button" class="mini" data-act="d23_oprev" data-v="${o}">${esc(T('preview'))}</button>${own ? `<button type="button" class="mini primary" data-act="d23_oapply" data-v="${o}">${esc(T('apply'))}</button>` : ''}</div></div>`;
+  }).join('');
+  if (!own) h += `<div class="muted">${esc(T('ownerOnly'))}</div>`;
+  return h;
+}
+function previewBox() {
+  const p = D.obPrev; if (!p) return '<div id="d23_pv"></div>';
+  if (p.error) return `<div id="d23_pv" class="notice bad" data-d23="pv">${esc(eText(p.error))}</div>`;
+  const ls = (p.lines || []).map((x) => `<div class="row between" data-d23="pvline"><span>${esc(x.code)} ${esc(S.lang === 'en' ? (x.name_en || x.name_bn) : (x.name_bn || x.name_en))}</span><span>${Number(x.debit) ? esc(T('debit')) + ' ' + esc(fm(x.debit)) : esc(T('credit')) + ' ' + esc(fm(x.credit))}</span></div>`).join('');
+  return `<div id="d23_pv" class="card stack" data-d23="pv"><b>${esc(T('o_' + p.option))}</b><div class="muted">${esc(T('dryNote'))}</div><div>${esc(T('amount'))}: <b>${esc(money(p.amount))}</b></div>${ls}${(p.warnings || []).map(warnLine).join('')}</div>`;
+}
+function obTab() {
+  const o = D.ob;
+  let h = `<p class="muted">${esc(T('obIntro'))}</p>${picker()}`;
+  if (o && o.data_needed) return h + `<div class="notice warn">${esc(lab(ERR.data_needed))}</div>`;
+  if (o) {
+    h += `<div class="notice ${o.risk ? 'warn' : 'ok'}" data-d23="risk">${esc(o.risk ? T('risk') : T('noRisk'))} · ${esc(T('switchL'))}: ${esc(o.switch_on ? T('on') : T('off'))}</div>`;
+    h += (o.warnings || []).map(warnLine).join('');
+    h += obRows();
+  }
+  h += recCard() + `<h3>${esc(T('lines'))}</h3>` + optCards() + previewBox();
+  return h;
+}
+function ageChip(it) { return `<span class="chip ${it.over_alert ? 'warn' : ''}">${esc(it.age_days)} ${esc(T('ageL'))}</span>`; }
+function itemsLine(it) { return (it.items || []).map((x) => `${esc(x.code)} × ${esc(x.qty)}${x.unit ? ' ' + esc(x.unit) : ''}`).join(', '); }
+function cwTab() {
+  const c = D.cw;
+  let h = `<p class="muted">${esc(T('cwIntro'))}</p>`;
+  if (D.cwErr) return h + `<div class="notice bad" data-state="error">${esc(D.cwErr)}</div>`;
+  if (!c) return h;
+  h += `<div class="card stack" data-d23="alertbox"><div class="muted">${esc(T('alertDays'))}</div>`;
+  if (isOwner()) h += `<div class="row"><input id="d23_days" inputmode="numeric" autocomplete="off" value="${esc(c.alert_days == null ? '' : c.alert_days)}"><button type="button" class="mini" data-act="d23_daysset">${esc(T('save'))}</button><button type="button" class="mini" data-act="d23_daysclr">${esc(T('clear'))}</button></div>`;
+  else h += `<b>${esc(c.alert_days == null ? '-' : c.alert_days)}</b>`;
+  h += `</div>`;
+  const old = c.old_count;
+  h += c.alert_enabled ? (old > 0 ? `<div class="notice warn" data-d23="alert">${esc(old)} ${esc(T('alertOn'))}</div>` : `<div class="notice ok" data-d23="alert">${esc(T('alertOk'))}</div>`) : `<div class="notice" data-d23="alert">${esc(T('alertOffL'))}</div>`;
+  h += `<div class="muted" data-d23="count">${esc(c.total)} ${esc(T('waitN'))} · ${esc(T('oldest'))}: ${esc(c.oldest_days)} ${esc(T('daysU'))}</div>`;
+  h += (c.items || []).length ? c.items.map((it) => `<div class="card stack" data-d23="doc" data-kind="${esc(it.kind)}">
+    <div class="row between"><b>${esc(T('k_' + it.kind))}${it.move && X['m_' + it.move] ? ' · ' + esc(T('m_' + it.move)) : ''}</b>${ageChip(it)}</div>
+    <div class="muted">${esc(locName(it.location_id))} · ${esc(String(it.date))}</div><div>${itemsLine(it)}</div>
+    <span class="chip ${it.gl_post ? '' : 'warn'}">${esc(it.gl_post ? T('willPost') : T('noPost'))}</span>
+    <button type="button" class="mini primary" data-act="d23_cwopen" data-k="${esc(it.kind)}" data-r="${esc(it.ref)}">${esc(T('supply'))}</button></div>`).join('') : `<p class="muted">${esc(T('none'))}</p>`;
+  return h;
+}
+function body() {
+  if (D.err) return `${tabs()}<div class="notice bad" data-state="error">${esc(D.err)}</div><button type="button" class="full" data-act="d23_retry">${esc(T('retry'))}</button>`;
+  if (!D.ready) return `${tabs()}<p class="muted center pad" data-state="loading">${esc(T('loading'))}</p>`;
+  return tabs() + (D.tab === 'ob' ? obTab() : cwTab());
+}
+function draw() { const el = $('#d23_body'); if (el) el.innerHTML = body(); }
+
+/* ---------- the supply-cost sheet ---------- */
+function methodCost(it, m) { return it.candidates ? (m === 'manual' ? null : it.candidates[m]) : null; }
+function sheetBody() {
+  const r = D.docRec; if (!r) return '';
+  if (!r.ok) return `<div class="notice bad">${esc(eText(r.error || 'error'))}</div>`;
+  const m = D.method;
+  const its = r.items || [];
+  let h = `<div class="stack"><h3>${esc(T('supply'))}: ${esc(T('k_' + D.doc.kind))}</h3><div class="muted">${esc(T('recNote'))}</div>`;
+  h += its.map((it, i) => `<div class="card stack" data-d23="sitem"><b>${esc(it.code)}</b> <span class="muted">${esc(T('qty'))} ${esc(it.qty)}${it.unit ? ' ' + esc(it.unit) : ''}</span>
+    <span class="chip" data-d23="irec">${esc(T('rec'))}: ${esc(T('m_' + it.recommended))}</span><div class="muted">${esc(T('why'))}: ${esc(lab(it.reason || {}))}</div>
+    ${METHODS.filter((x) => x !== 'manual').map((x) => { const c = methodCost(it, x); return `<div class="row between" data-d23="mrow" data-m="${x}"><span>${esc(T('m_' + x))}</span><span>${c == null ? esc(T('notKnown')) : esc(fm(c)) + ' → ' + esc(fm(c * it.qty))}</span></div>`; }).join('')}
+    ${m === 'manual' ? `<label for="d23_mc${i}">${esc(T('unitCost'))}</label><input id="d23_mc${i}" data-item="${esc(it.item_id)}" inputmode="decimal" autocomplete="off">` : ''}</div>`).join('');
+  h += `<label>${esc(T('method'))}</label><div class="row wrap">${METHODS.map((x) => `<button type="button" class="mini ${m === x ? 'primary' : ''}" data-act="d23_pick" data-m="${x}">${esc(T('m_' + x))}</button>`).join('')}</div>`;
+  if (m === 'manual') h += `<label for="d23_reason">${esc(T('reason'))}</label><input id="d23_reason" autocomplete="off"><div class="muted">${esc(T('manualWhy'))}</div>`;
+  const p = D.docPrev;
+  if (p) h += p.error || p.ok === false ? `<div class="notice warn" data-d23="spv">${esc(eText(p.error || 'error'))}${p.detail ? ': ' + esc(p.detail) : ''}</div>`
+    : `<div class="notice ok" data-d23="spv">${esc(T('dryNote'))} ${esc(T('total'))}: <b>${esc(money(p.total))}</b> · ${esc(p.gl_post ? T('willPost') : T('noPost'))}${(p.derived || []).length ? '<br>' + esc(T('derived')) + ' ' + esc(T('derivedNote')) : ''}</div>`;
+  h += `<div id="d23_sout" class="muted" aria-live="polite">${D.msg ? esc(D.msg) : ''}</div><div class="row"><button type="button" class="full" data-act="d23_sclose">${esc(T('close'))}</button><button type="button" class="full primary" data-act="d23_supply">${esc(T('supplyGo'))}</button></div></div>`;
+  return h;
+}
+function manualArg() {
+  const out = [];
+  const items = (D.docRec && D.docRec.items) || [];
+  items.forEach((it, i) => { const el = $('#d23_mc' + i); const v = nnum(el && el.value); out.push({ item_id: it.item_id, cost: Number.isFinite(v) ? v : 0 }); });
+  return out;
+}
+async function previewNow() {
+  D.docPrev = null;
+  try { D.docPrev = await rpc('cost_wait_preview96', { p_kind: D.doc.kind, p_ref: D.doc.ref, p_method: D.method, p_manual: D.method === 'manual' ? manualArg() : null }); } catch (e) { D.docPrev = { error: (e && e.message) || String(e) }; }
+}
+function drawSheet() { openSheet(sheetBody()); }
+
+/* ---------- loading ---------- */
+async function loadRules() {
+  try { const r = await sb.from('rules').select('key,value,default_value').in('key', ['acct_cost_wait_alert_days', 'acct_stock_opening']); D.rules = {}; ((r && r.data) || []).forEach((x) => { D.rules[x.key] = x; }); } catch (e) { D.rules = {}; }
+}
+async function loadOb() {
+  D.obPrev = null;
+  D.ob = await rpc('opening_stock_check96', { p_loc: locArg() });
+  try { D.obRec = await rpc('opening_stock_recommend96', { p_loc: locArg() }); } catch (e) { D.obRec = null; }   // advice: a failure must not hide the numbers
+}
+async function loadCw() {
+  D.cwErr = null;
+  try { D.cw = await rpc('cost_wait_list96', { p_loc: locArg(), p_limit: 100 }); } catch (e) { D.cw = null; D.cwErr = /not allowed/.test(String((e && e.message) || e)) ? T('needRight') : eText(e); }
+}
+async function loadAll() {
+  D.err = null;
+  try { D.st = await rpc('acct_status'); } catch (e) { /* owner is also read from the session */ }
+  if (D.tab === 'ob') await loadOb(); else await loadCw();
+  D.ready = true;
+}
+async function refresh() { try { await loadAll(); } catch (e) { D.err = /not allowed/.test(String((e && e.message) || e)) ? T('needRight') : eText(e); } draw(); }
+
+/* ---------- actions ---------- */
+Object.assign(H, {
+  d23_tab: async (a) => { D.tab = a.dataset.v; D.ready = false; draw(); await refresh(); },
+  d23_retry: async () => { D.ready = false; D.err = null; draw(); await refresh(); },
+  d23_show: async () => { D.loc = ($('#d23_loc') || {}).value || ''; D.ready = false; draw(); await refresh(); },
+  d23_oprev: async (a) => {
+    const o = a.dataset.v; const acct = (($('#d23_acct') || {}).value || '').trim();
+    try { D.obPrev = await rpc('opening_stock_preview96', { p_option: o, p_loc: locArg(), p_account: acct || null, p_date: null }); if (D.obPrev && D.obPrev.ok === false) D.obPrev = { error: D.obPrev.error }; } catch (e) { D.obPrev = { error: (e && e.message) || String(e) }; }
+    draw();
+  },
+  d23_oapply: (a) => {
+    const o = a.dataset.v;
+    openSheet(`<div class="stack"><h3>${esc(T('o_' + o))}</h3><div class="notice warn" data-d23="awarn">${esc(T('applyWarn'))}</div><div class="muted">${esc(T('d_' + o))}</div>
+      <label for="d23_areason">${esc(T('reason'))}</label><input id="d23_areason" autocomplete="off"><div id="d23_aout" class="muted" aria-live="polite"></div>
+      <div class="row"><button type="button" class="full" data-act="d23_sclose">${esc(T('cancel'))}</button><button type="button" class="full primary" data-act="d23_ago" data-v="${o}">${esc(T('applyGo'))}</button></div></div>`);
+  },
+  d23_ago: async (a) => {
+    const o = a.dataset.v; const out = $('#d23_aout'); const acct = (($('#d23_acct') || {}).value || '').trim();
+    const key = 'ob:' + o + ':' + (D.loc === '' ? 'all' : D.loc);
+    try {
+      const r = await rpc('opening_stock_apply96', { p_option: o, p_loc: locArg(), p_account: acct || null, p_date: null, p_reason: (($('#d23_areason') || {}).value || '').trim() || null, p_client: cid(key) });
+      delete D.ids[key]; closeSheet(); toast(r && r.dup ? T('dup') : T('saved')); D.ready = false; draw(); await refresh();
+    } catch (e) { if (out) out.textContent = eText(e); }
+  },
+  d23_sclose: () => { D.docRec = null; D.docPrev = null; D.msg = null; closeSheet(); },
+  d23_daysset: async () => {
+    const v = nnum(($('#d23_days') || {}).value);
+    if (!(Number.isFinite(v) && v >= 0 && v <= 3650)) return toast(T('badDays'));
+    try { await rpc('set_rule', { p_key: 'acct_cost_wait_alert_days', p_value: v }); toast(T('saved')); await refresh(); } catch (e) { toast(eText(e)); }
+  },
+  d23_daysclr: async () => { try { await rpc('set_rule', { p_key: 'acct_cost_wait_alert_days', p_value: null }); toast(T('saved')); await refresh(); } catch (e) { toast(eText(e)); } },
+  d23_cwopen: async (a) => {
+    D.doc = { kind: a.dataset.k, ref: a.dataset.r }; D.docRec = null; D.docPrev = null; D.msg = null; D.method = null;
+    try {
+      D.docRec = await rpc('cost_wait_recommend96', { p_kind: D.doc.kind, p_ref: D.doc.ref });
+      const its = (D.docRec && D.docRec.items) || [];
+      D.method = its.length ? its[0].recommended : 'manual';
+      if (D.docRec && D.docRec.ok !== false && D.method !== 'manual') await previewNow();
+    } catch (e) { D.docRec = { ok: false, error: (e && e.message) || String(e) }; }
+    drawSheet();
+  },
+  d23_pick: async (a) => { D.method = a.dataset.m; D.msg = null; if (D.method !== 'manual') await previewNow(); else D.docPrev = null; drawSheet(); },
+  d23_supply: async () => {
+    if (!D.doc || !D.method) return;
+    const reason = (($('#d23_reason') || {}).value || '').trim();
+    if (D.method === 'manual' && !reason) { D.msg = lab(ERR.reason_needed); return drawSheet(); }
+    const key = 'cw:' + D.doc.kind + ':' + D.doc.ref + ':' + D.method;
+    try {
+      const r = await rpc('cost_wait_supply96', { p_kind: D.doc.kind, p_ref: D.doc.ref, p_method: D.method, p_manual: D.method === 'manual' ? manualArg() : null, p_reason: reason || null, p_client: cid(key), p_post: true });
+      delete D.ids[key]; D.docRec = null; D.docPrev = null; D.msg = null; closeSheet();
+      toast(r && r.dup ? T('dup') : (r && r.posted ? T('posted') : T('notPosted')));
+      D.ready = false; draw(); await refresh();
+    } catch (e) { D.msg = eText(e); drawSheet(); }
+  },
+});
+
+async function viewBooks96() {
+  D.ready = false; D.err = null; D.ids = {};
+  shell(T('title'), '<div id="d23_body"></div>', true);
+  draw(); await loadRules(); await refresh();
+}
+window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { books96: viewBooks96 });
+B.books96 = { X, ERR, OPTS, METHODS, eText, D, body, tabs, obTab, cwTab, sheetBody, recCard, optCards, previewBox };
+})();

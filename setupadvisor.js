@@ -1,1 +1,130 @@
-(()=>{"use strict";const a=window.BOS_APP,e=window.BOS,{sb:n,esc:t,toast:r,shell:s,H:o}=a,i=e.L,d=e.lab,l={title:i("চালু করার গাইড","Setup advisor","চালু করার guide"),intro:i("এটা শুধু পরামর্শ — কোনো কাজ আটকায় না। আপনি যা ঠিক করেছেন তা আপনার কথামতোই থাকে।","Advice only - nothing is blocked. A value you chose yourself stays as you set it.","এটা শুধু পরামর্শ — কোনো কাজ আটকায় না। আপনি যা ঠিক করেছেন তা আপনার কথামতোই থাকে।"),t_rec:i("প্রস্তাবিত","Recommended","প্রস্তাবিত"),t_ready:i("চালুর আগে","Before switching on","চালুর আগে"),t_flow:i("সব ঠিকমতো চলছে?","Is it all flowing?","সব ঠিকমতো চলছে?"),t_hist:i("ইতিহাস","History","History"),s_ok:i("ঠিক আছে","As recommended","ঠিক আছে"),s_recommended:i("প্রস্তাব আছে","Suggested","প্রস্তাব আছে"),s_owner_chosen:i("আপনার বেছে নেওয়া","Your own choice","আপনার বেছে নেওয়া"),s_info:i("আপনি ঠিক করবেন","Your decision","আপনি ঠিক করবেন"),s_not_installed:i("এখনো যোগ হয়নি","Not installed yet","এখনো যোগ হয়নি"),now:i("এখন","Now","এখন"),rec:i("প্রস্তাব","Recommended","প্রস্তাব"),dflt:i("ডিফল্ট","Default","Default"),range:i("সীমা","Range","Range"),on:i("চালু","ON","ON"),off:i("বন্ধ","OFF","OFF"),apply:i("প্রস্তাবিতগুলো অ্যাপ্লাই করুন","Apply recommended","Recommended apply করুন"),applyAll:i("সব প্রস্তাবিত অ্যাপ্লাই করুন","Apply all recommended","সব recommended apply করুন"),applyAny:i("তবুও অ্যাপ্লাই করুন","Apply anyway","তবুও apply করুন"),replace:i("আমার মান বদলে প্রস্তাবিতটা বসান","Replace my value","আমার value বদলে recommended বসান"),confirmAll:i("যেগুলো তৈরি আছে সেগুলো অ্যাপ্লাই হবে। আপনার নিজের বেছে নেওয়া কিছু বদলাবে না। চালাবেন?","Every row that is ready will be applied. Nothing you chose yourself is changed. Go on?","যেগুলো ready আছে সেগুলো apply হবে। আপনার নিজের বেছে নেওয়া কিছু বদলাবে না। চালাবেন?"),confirmAny:i("এখনো সব তৈরি নয়। তবুও অ্যাপ্লাই করবেন?","Not everything is ready yet. Apply anyway?","এখনো সব ready নয়। তবুও apply করবেন?"),confirmOwn:i("আপনার আগের মান বদলে যাবে (ইতিহাসে থাকবে)। করবেন?","Your earlier value will be replaced (kept in the history). Do it?","আপনার আগের value বদলে যাবে (history-তে থাকবে)। করবেন?"),changeIn:i("মান লিখতে সুইচবোর্ড খুলুন","Open the Switchboard to type a value","Value লিখতে Switchboard খুলুন"),notReady:i("এখনো তৈরি নয়","Not ready yet","এখনো ready নয়"),ready:i("তৈরি","Ready","Ready"),applied:i("অ্যাপ্লাই হয়েছে","Applied","Apply হয়েছে"),skipped:i("বাদ","Skipped","Skipped"),r_not_ready:i("এখনো তৈরি নয়","not ready","ready নয়"),r_owner_chosen:i("আপনার নিজের মান","your own value","আপনার নিজের value"),r_already:i("আগেই ঠিক","already right","আগেই ঠিক"),r_no_recommendation:i("প্রস্তাব নেই","no recommendation","প্রস্তাব নেই"),r_not_installed:i("যোগ হয়নি","not installed","যোগ হয়নি"),r_rejected:i("নেওয়া গেল না","rejected","নেওয়া গেল না"),readyTopic:i("সব তৈরি ✓","All ready ✓","সব ready ✓"),problems:i("টি সমস্যা","to fix","টি সমস্যা"),fixIt:i("কী করবেন","What to do","কী করবেন"),open:i("খুলুন","Open","খুলুন"),na:i("বন্ধ আছে — দেখার কিছু নেই","Off - nothing to check","বন্ধ আছে — দেখার কিছু নেই"),flowOk:i("ঠিকমতো চলছে ✓","Flowing ✓","ঠিকমতো চলছে ✓"),warnN:i("টি সতর্কতা","warnings","টি সতর্কতা"),histNone:i("এখনো কিছু অ্যাপ্লাই করা হয়নি","Nothing has been applied yet","এখনো কিছু apply করা হয়নি"),loading:i("লোড হচ্ছে…","Loading…","Loading…"),none:i("কিছু নেই ✓","Nothing ✓","কিছু নেই ✓"),e_not_allowed:i("এই অংশ দেখার অনুমতি আপনার নেই","You do not have access to this part","এই অংশের access নেই")},c=a=>d(l[a]),p={tab:"rec",rec:null,ready:null,flow:null,hist:null,err:{}},y={"not allowed":"e_not_allowed"},u=a=>{const e=String(a&&a.message||a||""),n=Object.keys(y).find(a=>e.indexOf(a)>=0);return n?c(y[n]):e},w=(a,e)=>d(i(a[e+"_bn"]||"",a[e+"_en"]||"",a[e+"_mix"]||a[e+"_bn"]||"")),m=a=>!0===a?c("on"):!1===a?c("off"):null==a||""===a?"-":String(a),f=a=>({ok:"ok",recommended:"warn",owner_chosen:"",info:"",not_installed:""}[a]||""),v=a=>l["r_"+a]?c("r_"+a):String(a||""),$=a=>a?`<a class="mini" href="#/${t(a)}">${t(c("open"))}</a>`:"",_=a=>p.err[a]?`<p class="muted" role="alert">${t(p.err[a])}</p>`:"";function h(){const a=p.rec;if(!a)return p.err.rec?_("rec"):`<p class="muted">${t(c("loading"))}</p>`;const e=a.summary||{};return`<div class="card stack"><div class="row wrap"><span class="chip ok">${t(c("s_ok"))}: ${t(String(e.ok||0))}</span><span class="chip warn">${t(c("s_recommended"))}: ${t(String(e.recommended||0))}</span>\n    <span class="chip">${t(c("s_owner_chosen"))}: ${t(String(e.owner_chosen||0))}</span><span class="chip">${t(c("s_info"))}: ${t(String(e.info||0))}</span></div>\n    ${a.can_apply&&(e.recommended||0)>0?`<button type="button" class="btn primary" data-act="sadv_apply_all">${t(c("applyAll"))}</button>`:""}${_("rec")}</div>\n    ${(a.items||[]).filter(a=>"not_installed"!==a.status).map(e=>function(a,e){const n="info"===a.status&&"number"===a.kind,r=n?`<div class="muted">${t(c("dflt"))}: ${t(m(a.default))}${null!==a.min&&null!==a.max&&void 0!==a.min?" · "+t(c("range"))+": "+t(String(a.min))+"–"+t(String(a.max))+(a.unit?" "+t(a.unit):""):""}</div>`:"",s="info"===a.status||"not_installed"===a.status?"":`<div class="row wrap"><span class="chip">${t(c("now"))}: ${t(m(a.current))}</span><span class="chip">${t(c("rec"))}: ${t(m(a.recommended))}</span></div>`,o=(a.ready_issues||[]).map(a=>`<div class="muted">• ${t(w(a,"label"))} (${t(String(a.n))})</div>`).join("");let i="";return e&&"recommended"===a.status&&(i=`<button type="button" class="btn primary" data-act="sadv_apply" data-code="${t(a.code)}" data-ready="${a.ready?1:0}">${t(a.ready?c("apply"):c("applyAny"))}</button>`),e&&"owner_chosen"===a.status&&(i=`<button type="button" class="mini" data-act="sadv_replace" data-code="${t(a.code)}">${t(c("replace"))}</button>`),(n||"info"===a.status&&"number"!==a.kind&&!a.recommended)&&(i=`<a class="mini" href="#/switchboard">${t(c("changeIn"))}</a>`),`<div class="card stack"><div class="row between wrap"><b>${t(w(a,"rule_label"))}</b><span class="chip ${f(a.status)}">${t(c("s_"+a.status))}</span></div>\n    ${s}${r}<p>${t(w(a,"reason"))}</p>${"recommended"!==a.status||a.ready?"":`<div class="chip warn">${t(c("notReady"))}</div>${o}`}${i}</div>`}(e,a.can_apply)).join("")}`}function b(){const a=((a,e=document)=>e.querySelector(a))("#sadv_body");if(!a)return;a.innerHTML=`<p class="muted">${t(c("intro"))}</p><div class="row wrap" role="tablist">${["rec","ready","flow","hist"].map(a=>`<button type="button" class="btn ${p.tab===a?"primary":""}" role="tab" aria-selected="${p.tab===a}" data-act="sadv_tab" data-t="${a}">${t(c("t_"+a))}</button>`).join("")}</div>\n    ${"rec"===p.tab?h():"ready"===p.tab?function(){const a=p.ready;return a?(a.topics||[]).map(a=>`<div class="card stack"><div class="row between wrap"><b>${t(w(a,"label"))}</b>\n    <span class="chip ${a.ready?"ok":"warn"}">${a.ready?t(c("readyTopic")):t(String(a.problem_checks)+" "+c("problems"))}</span></div>\n    ${(a.checks||[]).filter(a=>a.applies).map(a=>`<div class="stack"><div class="row between wrap"><span>${t(w(a,"label"))}${a.ok?"":" ("+t(String(a.problems))+")"}</span><span class="chip ${a.ok?"ok":"info"===a.level?"":"warn"}">${t(a.ok?c("ready"):c("notReady"))}</span></div>\n      ${a.ok?"":`<div class="muted">${t(c("fixIt"))}: ${t(w(a,"fix"))} ${$(a.nav)}</div>`}</div>`).join("")}</div>`).join("")+_("ready"):p.err.ready?_("ready"):`<p class="muted">${t(c("loading"))}</p>`}():"flow"===p.tab?function(){const a=p.flow;return a?`<div class="card stack"><span class="chip ${a.warnings?"warn":"ok"}">${a.warnings?t(String(a.warnings)+" "+c("warnN")):t(c("flowOk"))}</span></div>`+(a.checks||[]).map(a=>`<div class="card stack"><div class="row between wrap"><span>${t(w(a,"label"))}${"warn"===a.level||"info"===a.level?" ("+t(String(a.problems))+")":""}</span>\n      <span class="chip ${"ok"===a.level?"ok":"warn"===a.level?"warn":""}">${t("na"===a.level?c("na"):"ok"===a.level?c("flowOk"):c("notReady"))}</span></div>\n      ${"warn"===a.level||"info"===a.level?`<div class="muted">${t(c("fixIt"))}: ${t(w(a,"fix"))} ${$(a.nav)}</div>`:""}</div>`).join("")+_("flow"):p.err.flow?_("flow"):`<p class="muted">${t(c("loading"))}</p>`}():function(){const a=p.hist;return a?a.length?a.map(a=>`<div class="card stack"><div class="muted">${t(String(a.applied_at||"").slice(0,16).replace("T"," "))}</div>\n    ${(a.lines||[]).map(a=>`<div class="row between wrap"><span>${t(a.rule_key)}</span><span class="muted">${t(m(a.old))} → ${t(m(a.new))}${a.overwrote?" *":""}</span></div>`).join("")}${e.setupundo?e.setupundo.btn(a):""}</div>`).join(""):`<div class="card"><p class="muted">${t(c("histNone"))}</p></div>`:p.err.hist?_("hist"):`<p class="muted">${t(c("loading"))}</p>`}()}`}async function g(a){p.err[a]="";try{if("rec"===a){const a=await n.rpc("setup_recommendations");if(a.error)throw a.error;p.rec=a.data}if("ready"===a){const a=await n.rpc("setup_readiness",{p_topic:null});if(a.error)throw a.error;p.ready=a.data}if("flow"===a){const a=await n.rpc("setup_flow_check");if(a.error)throw a.error;p.flow=a.data}if("hist"===a){const a=await n.rpc("setup_apply_history",{p_limit:30});if(a.error)throw a.error;p.hist=a.data}}catch(e){p.err[a]=u(e),p[a]=null}b()}async function k(a,e,t){const s=await n.rpc("setup_recommend_apply",{p_client:window.crypto&&crypto.randomUUID?crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,a=>{const e=16*Math.random()|0;return("x"===a?e:3&e|8).toString(16)}),p_codes:a,p_overwrite:!!e,p_ignore_ready:!!t});if(s.error)return r(u(s.error));const o=s.data&&s.data.count||0,i=(s.data&&s.data.skipped||[]).filter(a=>"no_recommendation"!==a.reason&&"already"!==a.reason);r(`${c("applied")}: ${o}`+(i.length?` · ${c("skipped")}: ${i.map(a=>v(a.reason)).filter((a,e,n)=>n.indexOf(a)===e).join(", ")}`:"")),p.hist=null,await g("rec")}Object.assign(o,{sadv_tab:async a=>{p.tab=a.dataset.t,b(),await g(p.tab)},sadv_apply:async a=>{("0"!==a.dataset.ready||window.confirm(c("confirmAny")))&&await k([a.dataset.code],!1,"0"===a.dataset.ready)},sadv_apply_all:async()=>{window.confirm(c("confirmAll"))&&await k(null,!1,!1)},sadv_replace:async a=>{window.confirm(c("confirmOwn"))&&await k([a.dataset.code],!0,!0)}}),e.setupadvisor={pick:w,fmt:m,tone:f,canApplyRow:a=>a&&"recommended"===a.status,skipTxt:v,msg:u,_hist:()=>p.hist,_reload:()=>(p.hist=null,p.rec=null,g(p.tab))},window.BOS_PAGES=Object.assign(window.BOS_PAGES||{},{setupadvisor:async function(){e.loadStatic&&await e.loadStatic(),p.rec=p.ready=p.flow=p.hist=null,p.err={},s(c("title"),'<div id="sadv_body" class="stack"></div>',!0),b(),await g(p.tab)}})})();
+/* Islamia BOS · Setup advisor (#/setupadvisor) - step S2: recommended choices, "before you switch it on" checks, "is everything flowing?" checks.
+   Server side: supabase/phase81.sql. ADVISORY ONLY: nothing on this page blocks a sale, purchase, production or order. The one write is the owner's own tap
+   on "Apply recommended" (setup_recommend_apply): it never replaces a value the owner already chose unless he taps "Replace" on that row.
+     setup_recommendations · setup_recommend_apply · setup_readiness · setup_flow_check · setup_apply_history
+   Phone width: single column of cards. All texts via B.L(bn, en, mix); texts that come from the server carry bn / mix / en and are picked by the same language setting. */
+(() => {
+'use strict';
+const A = window.BOS_APP, B = window.BOS;
+const { sb, esc, toast, shell, H } = A;
+const L = B.L, lab = B.lab;
+const $ = (s, el = document) => el.querySelector(s);
+const X = {
+  title: L('চালু করার গাইড', 'Setup advisor', 'চালু করার guide'),
+  intro: L('এটা শুধু পরামর্শ — কোনো কাজ আটকায় না। আপনি যা ঠিক করেছেন তা আপনার কথামতোই থাকে।', 'Advice only - nothing is blocked. A value you chose yourself stays as you set it.', 'এটা শুধু পরামর্শ — কোনো কাজ আটকায় না। আপনি যা ঠিক করেছেন তা আপনার কথামতোই থাকে।'),
+  t_rec: L('প্রস্তাবিত', 'Recommended', 'প্রস্তাবিত'), t_ready: L('চালুর আগে', 'Before switching on', 'চালুর আগে'), t_flow: L('সব ঠিকমতো চলছে?', 'Is it all flowing?', 'সব ঠিকমতো চলছে?'), t_hist: L('ইতিহাস', 'History', 'History'),
+  s_ok: L('ঠিক আছে', 'As recommended', 'ঠিক আছে'), s_recommended: L('প্রস্তাব আছে', 'Suggested', 'প্রস্তাব আছে'), s_owner_chosen: L('আপনার বেছে নেওয়া', 'Your own choice', 'আপনার বেছে নেওয়া'),
+  s_info: L('আপনি ঠিক করবেন', 'Your decision', 'আপনি ঠিক করবেন'), s_not_installed: L('এখনো যোগ হয়নি', 'Not installed yet', 'এখনো যোগ হয়নি'),
+  now: L('এখন', 'Now', 'এখন'), rec: L('প্রস্তাব', 'Recommended', 'প্রস্তাব'), dflt: L('ডিফল্ট', 'Default', 'Default'), range: L('সীমা', 'Range', 'Range'),
+  on: L('চালু', 'ON', 'ON'), off: L('বন্ধ', 'OFF', 'OFF'),
+  apply: L('প্রস্তাবিতগুলো অ্যাপ্লাই করুন', 'Apply recommended', 'Recommended apply করুন'), applyAll: L('সব প্রস্তাবিত অ্যাপ্লাই করুন', 'Apply all recommended', 'সব recommended apply করুন'),
+  applyAny: L('তবুও অ্যাপ্লাই করুন', 'Apply anyway', 'তবুও apply করুন'), replace: L('আমার মান বদলে প্রস্তাবিতটা বসান', 'Replace my value', 'আমার value বদলে recommended বসান'),
+  confirmAll: L('যেগুলো তৈরি আছে সেগুলো অ্যাপ্লাই হবে। আপনার নিজের বেছে নেওয়া কিছু বদলাবে না। চালাবেন?', 'Every row that is ready will be applied. Nothing you chose yourself is changed. Go on?', 'যেগুলো ready আছে সেগুলো apply হবে। আপনার নিজের বেছে নেওয়া কিছু বদলাবে না। চালাবেন?'),
+  confirmAny: L('এখনো সব তৈরি নয়। তবুও অ্যাপ্লাই করবেন?', 'Not everything is ready yet. Apply anyway?', 'এখনো সব ready নয়। তবুও apply করবেন?'),
+  confirmOwn: L('আপনার আগের মান বদলে যাবে (ইতিহাসে থাকবে)। করবেন?', 'Your earlier value will be replaced (kept in the history). Do it?', 'আপনার আগের value বদলে যাবে (history-তে থাকবে)। করবেন?'),
+  changeIn: L('মান লিখতে সুইচবোর্ড খুলুন', 'Open the Switchboard to type a value', 'Value লিখতে Switchboard খুলুন'),
+  notReady: L('এখনো তৈরি নয়', 'Not ready yet', 'এখনো ready নয়'), ready: L('তৈরি', 'Ready', 'Ready'),
+  applied: L('অ্যাপ্লাই হয়েছে', 'Applied', 'Apply হয়েছে'), skipped: L('বাদ', 'Skipped', 'Skipped'),
+  r_not_ready: L('এখনো তৈরি নয়', 'not ready', 'ready নয়'), r_owner_chosen: L('আপনার নিজের মান', 'your own value', 'আপনার নিজের value'), r_already: L('আগেই ঠিক', 'already right', 'আগেই ঠিক'),
+  r_no_recommendation: L('প্রস্তাব নেই', 'no recommendation', 'প্রস্তাব নেই'), r_not_installed: L('যোগ হয়নি', 'not installed', 'যোগ হয়নি'), r_rejected: L('নেওয়া গেল না', 'rejected', 'নেওয়া গেল না'),
+  readyTopic: L('সব তৈরি ✓', 'All ready ✓', 'সব ready ✓'), problems: L('টি সমস্যা', 'to fix', 'টি সমস্যা'), fixIt: L('কী করবেন', 'What to do', 'কী করবেন'), open: L('খুলুন', 'Open', 'খুলুন'),
+  na: L('বন্ধ আছে — দেখার কিছু নেই', 'Off - nothing to check', 'বন্ধ আছে — দেখার কিছু নেই'), flowOk: L('ঠিকমতো চলছে ✓', 'Flowing ✓', 'ঠিকমতো চলছে ✓'), warnN: L('টি সতর্কতা', 'warnings', 'টি সতর্কতা'),
+  histNone: L('এখনো কিছু অ্যাপ্লাই করা হয়নি', 'Nothing has been applied yet', 'এখনো কিছু apply করা হয়নি'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), none: L('কিছু নেই ✓', 'Nothing ✓', 'কিছু নেই ✓'),
+  e_not_allowed: L('এই অংশ দেখার অনুমতি আপনার নেই', 'You do not have access to this part', 'এই অংশের access নেই'),
+};
+const T = (k) => lab(X[k]);
+const D = { tab: 'rec', rec: null, ready: null, flow: null, hist: null, err: {} };
+const FRIENDLY = { 'not allowed': 'e_not_allowed' };
+const rid = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3) | 8).toString(16); }));
+const msg = (e) => { const m = String((e && e.message) || e || ''); const k = Object.keys(FRIENDLY).find((x) => m.indexOf(x) >= 0); return k ? T(FRIENDLY[k]) : m; };
+
+/* ---------- pure helpers (tested) ---------- */
+const pick = (o, base) => lab(L(o[base + '_bn'] || '', o[base + '_en'] || '', o[base + '_mix'] || o[base + '_bn'] || ''));
+const fmt = (v) => (v === true ? T('on') : v === false ? T('off') : v === null || v === undefined || v === '' ? '-' : String(v));
+const tone = (s) => ({ ok: 'ok', recommended: 'warn', owner_chosen: '', info: '', not_installed: '' }[s] || '');
+const canApplyRow = (it) => it && it.status === 'recommended';
+const skipTxt = (r) => (X['r_' + r] ? T('r_' + r) : String(r || ''));
+const goto = (nav) => (nav ? `<a class="mini" href="#/${esc(nav)}">${esc(T('open'))}</a>` : '');
+
+/* ---------- drawing ---------- */
+const errBox = (k) => (D.err[k] ? `<p class="muted" role="alert">${esc(D.err[k])}</p>` : '');
+function drawRow(it, canApply) {
+  const isNum = it.status === 'info' && it.kind === 'number';
+  const nums = isNum ? `<div class="muted">${esc(T('dflt'))}: ${esc(fmt(it.default))}${it.min !== null && it.max !== null && it.min !== undefined ? ' · ' + esc(T('range')) + ': ' + esc(String(it.min)) + '–' + esc(String(it.max)) + (it.unit ? ' ' + esc(it.unit) : '') : ''}</div>` : '';
+  const vals = it.status === 'info' || it.status === 'not_installed' ? '' : `<div class="row wrap"><span class="chip">${esc(T('now'))}: ${esc(fmt(it.current))}</span><span class="chip">${esc(T('rec'))}: ${esc(fmt(it.recommended))}</span></div>`;
+  const issues = (it.ready_issues || []).map((i) => `<div class="muted">• ${esc(pick(i, 'label'))} (${esc(String(i.n))})</div>`).join('');
+  let btn = '';
+  if (canApply && it.status === 'recommended') btn = `<button type="button" class="btn primary" data-act="sadv_apply" data-code="${esc(it.code)}" data-ready="${it.ready ? 1 : 0}">${esc(it.ready ? T('apply') : T('applyAny'))}</button>`;
+  if (canApply && it.status === 'owner_chosen') btn = `<button type="button" class="mini" data-act="sadv_replace" data-code="${esc(it.code)}">${esc(T('replace'))}</button>`;
+  if (isNum || (it.status === 'info' && it.kind !== 'number' && !it.recommended)) btn = `<a class="mini" href="#/switchboard">${esc(T('changeIn'))}</a>`;
+  return `<div class="card stack"><div class="row between wrap"><b>${esc(pick(it, 'rule_label'))}</b><span class="chip ${tone(it.status)}">${esc(T('s_' + it.status))}</span></div>
+    ${vals}${nums}<p>${esc(pick(it, 'reason'))}</p>${it.status === 'recommended' && !it.ready ? `<div class="chip warn">${esc(T('notReady'))}</div>${issues}` : ''}${btn}</div>`;
+}
+function drawRec() {
+  const d = D.rec; if (!d) return D.err.rec ? errBox('rec') : `<p class="muted">${esc(T('loading'))}</p>`;
+  const s = d.summary || {};
+  return `<div class="card stack"><div class="row wrap"><span class="chip ok">${esc(T('s_ok'))}: ${esc(String(s.ok || 0))}</span><span class="chip warn">${esc(T('s_recommended'))}: ${esc(String(s.recommended || 0))}</span>
+    <span class="chip">${esc(T('s_owner_chosen'))}: ${esc(String(s.owner_chosen || 0))}</span><span class="chip">${esc(T('s_info'))}: ${esc(String(s.info || 0))}</span></div>
+    ${d.can_apply && (s.recommended || 0) > 0 ? `<button type="button" class="btn primary" data-act="sadv_apply_all">${esc(T('applyAll'))}</button>` : ''}${errBox('rec')}</div>
+    ${(d.items || []).filter((it) => it.status !== 'not_installed').map((it) => drawRow(it, d.can_apply)).join('')}`;
+}
+function drawReady() {
+  const d = D.ready; if (!d) return D.err.ready ? errBox('ready') : `<p class="muted">${esc(T('loading'))}</p>`;
+  return (d.topics || []).map((t) => `<div class="card stack"><div class="row between wrap"><b>${esc(pick(t, 'label'))}</b>
+    <span class="chip ${t.ready ? 'ok' : 'warn'}">${t.ready ? esc(T('readyTopic')) : esc(String(t.problem_checks) + ' ' + T('problems'))}</span></div>
+    ${(t.checks || []).filter((c) => c.applies).map((c) => `<div class="stack"><div class="row between wrap"><span>${esc(pick(c, 'label'))}${c.ok ? '' : ' (' + esc(String(c.problems)) + ')'}</span><span class="chip ${c.ok ? 'ok' : c.level === 'info' ? '' : 'warn'}">${esc(c.ok ? T('ready') : T('notReady'))}</span></div>
+      ${c.ok ? '' : `<div class="muted">${esc(T('fixIt'))}: ${esc(pick(c, 'fix'))} ${goto(c.nav)}</div>`}</div>`).join('')}</div>`).join('') + errBox('ready');
+}
+function drawFlow() {
+  const d = D.flow; if (!d) return D.err.flow ? errBox('flow') : `<p class="muted">${esc(T('loading'))}</p>`;
+  return `<div class="card stack"><span class="chip ${d.warnings ? 'warn' : 'ok'}">${d.warnings ? esc(String(d.warnings) + ' ' + T('warnN')) : esc(T('flowOk'))}</span></div>` +
+    (d.checks || []).map((c) => `<div class="card stack"><div class="row between wrap"><span>${esc(pick(c, 'label'))}${c.level === 'warn' || c.level === 'info' ? ' (' + esc(String(c.problems)) + ')' : ''}</span>
+      <span class="chip ${c.level === 'ok' ? 'ok' : c.level === 'warn' ? 'warn' : ''}">${esc(c.level === 'na' ? T('na') : c.level === 'ok' ? T('flowOk') : T('notReady'))}</span></div>
+      ${c.level === 'warn' || c.level === 'info' ? `<div class="muted">${esc(T('fixIt'))}: ${esc(pick(c, 'fix'))} ${goto(c.nav)}</div>` : ''}</div>`).join('') + errBox('flow');
+}
+function drawHist() {
+  const d = D.hist; if (!d) return D.err.hist ? errBox('hist') : `<p class="muted">${esc(T('loading'))}</p>`;
+  if (!d.length) return `<div class="card"><p class="muted">${esc(T('histNone'))}</p></div>`;
+  return d.map((b) => `<div class="card stack"><div class="muted">${esc(String(b.applied_at || '').slice(0, 16).replace('T', ' '))}</div>
+    ${(b.lines || []).map((l) => `<div class="row between wrap"><span>${esc(l.rule_key)}</span><span class="muted">${esc(fmt(l.old))} → ${esc(fmt(l.new))}${l.overwrote ? ' *' : ''}</span></div>`).join('')}${B.setupundo ? B.setupundo.btn(b) : ''}</div>`).join('');   // bos107 q4: Undo button comes from setupundo.js
+}
+function draw() {
+  const el = $('#sadv_body'); if (!el) return;
+  const tabs = ['rec', 'ready', 'flow', 'hist'];
+  el.innerHTML = `<p class="muted">${esc(T('intro'))}</p><div class="row wrap" role="tablist">${tabs.map((t) => `<button type="button" class="btn ${D.tab === t ? 'primary' : ''}" role="tab" aria-selected="${D.tab === t}" data-act="sadv_tab" data-t="${t}">${esc(T('t_' + t))}</button>`).join('')}</div>
+    ${D.tab === 'rec' ? drawRec() : D.tab === 'ready' ? drawReady() : D.tab === 'flow' ? drawFlow() : drawHist()}`;
+}
+
+/* ---------- loading + actions ---------- */
+async function load(tab) {
+  D.err[tab] = '';
+  try {
+    if (tab === 'rec') { const r = await sb.rpc('setup_recommendations'); if (r.error) throw r.error; D.rec = r.data; }
+    if (tab === 'ready') { const r = await sb.rpc('setup_readiness', { p_topic: null }); if (r.error) throw r.error; D.ready = r.data; }
+    if (tab === 'flow') { const r = await sb.rpc('setup_flow_check'); if (r.error) throw r.error; D.flow = r.data; }
+    if (tab === 'hist') { const r = await sb.rpc('setup_apply_history', { p_limit: 30 }); if (r.error) throw r.error; D.hist = r.data; }
+  } catch (e) { D.err[tab] = msg(e); D[tab] = null; }
+  draw();
+}
+async function doApply(codes, overwrite, ignoreReady) {
+  const r = await sb.rpc('setup_recommend_apply', { p_client: rid(), p_codes: codes, p_overwrite: !!overwrite, p_ignore_ready: !!ignoreReady });
+  if (r.error) return toast(msg(r.error));
+  const n = (r.data && r.data.count) || 0, sk = ((r.data && r.data.skipped) || []).filter((x) => x.reason !== 'no_recommendation' && x.reason !== 'already');
+  toast(`${T('applied')}: ${n}` + (sk.length ? ` · ${T('skipped')}: ${sk.map((x) => skipTxt(x.reason)).filter((v, i, a) => a.indexOf(v) === i).join(', ')}` : ''));
+  D.hist = null; await load('rec');
+}
+Object.assign(H, {
+  sadv_tab: async (a) => { D.tab = a.dataset.t; draw(); await load(D.tab); },
+  sadv_apply: async (a) => { if (a.dataset.ready === '0' && !window.confirm(T('confirmAny'))) return; await doApply([a.dataset.code], false, a.dataset.ready === '0'); },
+  sadv_apply_all: async () => { if (!window.confirm(T('confirmAll'))) return; await doApply(null, false, false); },
+  sadv_replace: async (a) => { if (!window.confirm(T('confirmOwn'))) return; await doApply([a.dataset.code], true, true); },
+});
+async function view() {
+  if (B.loadStatic) await B.loadStatic();
+  D.rec = D.ready = D.flow = D.hist = null; D.err = {};
+  shell(T('title'), '<div id="sadv_body" class="stack"></div>', true);
+  draw(); await load(D.tab);
+}
+B.setupadvisor = { pick, fmt, tone, canApplyRow, skipTxt, msg, _hist: () => D.hist, _reload: () => { D.hist = null; D.rec = null; return load(D.tab); } };   // bos107 q4: _hist/_reload for setupundo.js
+window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { setupadvisor: view });
+})();

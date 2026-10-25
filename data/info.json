@@ -85,7 +85,7 @@
   },
   "feature:attendance_sources": {
    "title": "Attendance summary reads both sources",
-   "does": "The staff attendance summary shows the attendance marked in the app and the paper register 02-1 in separate rows, with a column saying which is which.",
+   "does": "The staff attendance summary shows the attendance marked in the app and the paper register 19-1 in separate rows, with a column saying which is which.",
    "why": "The report used to show only the paper register and was empty while the app held the attendance.",
    "default": "Shown automatically.",
    "change": "Nothing is added together by name; the two sources stay apart.",
@@ -249,7 +249,7 @@
   "feature:campaigns_master": {
    "title": "Campaign list",
    "does": "The master list of marketing campaigns with start, end, budget and channel.",
-   "why": "18-1 lines, bills and online orders point to a campaign here; without it no report can work per campaign.",
+   "why": "17-1 lines, bills and online orders point to a campaign here; without it no report can work per campaign.",
    "default": "Empty. The owner enters every campaign.",
    "change": "Nothing is posted or changed by the list itself.",
    "who": "The owner or the people who manage the list.",
@@ -277,12 +277,12 @@
    "src": "RPT-C1 (docs/integration/RPT-C1_info.json)"
   },
   "feature:cashier_14_1": {
-   "title": "Cashier on the daily showroom sheet 14-1",
+   "title": "Cashier on the daily showroom sheet 06-1",
    "does": "The person who handled the till for that sheet (the shift box already exists).",
    "why": "Cash short and over could only be tied to the person who wrote the sheet.",
-   "default": "Optional box on form 14-1.",
+   "default": "Optional box on form 06-1.",
    "change": "Cashier-wise variance fills in from new sheets. Older sheets show as 'cashier not written'.",
-   "who": "Anyone who fills form 14-1.",
+   "who": "Anyone who fills form 06-1.",
    "verified": true,
    "src": "RPT-C2 (docs/integration/RPT-C2_info.json)"
   },
@@ -576,7 +576,7 @@
   },
   "feature:expense_register": {
    "title": "Expense register",
-   "does": "One list of every expense line (vouchers 10-2 in every status, quick expenses, bank charges, wallet fees, and the marketing register 18-1 marked 'not in the books'), with the expense report, P&L, day book and journal totals side by side, a reconciliation that says why they differ, a basis selector and a CSV.",
+   "does": "One list of every expense line (vouchers 11-1 in every status, quick expenses, bank charges, wallet fees, and the marketing register 17-1 marked 'not in the books'), with the expense report, P&L, day book and journal totals side by side, a reconciliation that says why they differ, a basis selector and a CSV.",
    "why": "The same period gave three different expense totals and no screen listed the vouchers behind them.",
    "default": "Open to the owner and to people with the expense report right or accounts rights. Nothing to switch on.",
    "change": "Read only. Nothing is posted.",
@@ -785,9 +785,9 @@
    "src": "RPT-C3 (docs/integration/RPT-C3_info.json)"
   },
   "feature:mkt_post": {
-   "title": "Post 18-1 to the books",
-   "does": "Shows each approved 18-1 line and what would happen to it before anything is posted.",
-   "why": "Prevents counting the same spend twice with form 10-2.",
+   "title": "Post 17-1 to the books",
+   "does": "Shows each approved 17-1 line and what would happen to it before anything is posted.",
+   "why": "Prevents counting the same spend twice with form 11-1.",
    "default": "Preview always available; posting only when the setting is ON.",
    "change": "See the setting marketing_post_on.",
    "who": "The accounts manager runs it; the owner winds it down.",
@@ -816,7 +816,7 @@
   },
   "feature:mkt_spend": {
    "title": "Spend by campaign (#164)",
-   "does": "Paid 18-1 amounts by campaign and month, with budget used.",
+   "does": "Paid 17-1 amounts by campaign and month, with budget used.",
    "why": "Shows what each campaign cost.",
    "default": "Open to the owner, report_marketing and view_reports.",
    "change": "Nothing.",
@@ -1160,7 +1160,7 @@
   },
   "feature:r140": {
    "title": "Returns and complaints per customer (#140)",
-   "does": "Sale returns and 20-3 complaint sheets matched by phone; sheets that cannot be matched are counted apart.",
+   "does": "Sale returns and 32-1 complaint sheets matched by phone; sheets that cannot be matched are counted apart.",
    "why": "Complaints had no customer view.",
    "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
    "change": "Reading changes nothing. A missing figure shows as 'not captured', never as 0.",
@@ -1220,7 +1220,7 @@
   },
   "feature:r150": {
    "title": "Cashier cash variance (#150)",
-   "does": "Cash short and over by cashier and shift from form 14-1, with the decision on each shortage case.",
+   "does": "Cash short and over by cashier and shift from form 06-1, with the decision on each shortage case.",
    "why": "Variance could only be tied to the sheet writer.",
    "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
    "change": "Reading changes nothing. A missing figure shows as 'not captured', never as 0.",
@@ -1230,7 +1230,7 @@
   },
   "feature:r153": {
    "title": "Order register (#153)",
-   "does": "Every order in one list: app orders, paper 20-1 sheets and paper 20-6 ledger lines, each with its source. Never merged.",
+   "does": "Every order in one list: app orders, paper 05-1 sheets and paper 23-1 ledger lines, each with its source. Never merged.",
    "why": "Before this the paper report showed nothing for app orders and the app list ignored paper.",
    "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
    "change": "Reading changes nothing. A missing figure shows as 'not captured', never as 0.",
@@ -1394,7 +1394,7 @@
   },
   "feature:report_k2_count_variance": {
    "title": "Stock count variance",
-   "does": "Counts from the paper sheet 04-3 and counts typed in the app. The app writes a line only when the count differs, so for those rows the number of counts and the off % are not captured. Missing data is shown as \"data not captured: number of counts (app), avg_cost\".",
+   "does": "Counts from the paper sheet 36-1 and counts typed in the app. The app writes a line only when the count differs, so for those rows the number of counts and the off % are not captured. Missing data is shown as \"data not captured: number of counts (app), avg_cost\".",
    "verified": false,
    "src": "RPT-B2 (docs/integration/RPT-B2_info.json)"
   },
@@ -1410,7 +1410,7 @@
   },
   "feature:report_p4_supplier_score": {
    "title": "Supplier scorecard",
-   "does": "Per supplier: posted purchase bills, purchase returns (amount and % of bills), quality checks held or rejected, plus the paper-form legs (goods received 04-1, bill check 06-4, purchase orders 06-3). A leg that was never captured in the period is empty and its form code is named; it is not 0. Missing data is shown as \"data not captured: 04-1, 06-4, 06-3, qc_records\".",
+   "does": "Per supplier: posted purchase bills, purchase returns (amount and % of bills), quality checks held or rejected, plus the paper-form legs (goods received 13-1, bill check 02-1, purchase orders 27-1). A leg that was never captured in the period is empty and its form code is named; it is not 0. Missing data is shown as \"data not captured: 13-1, 02-1, 27-1, qc_records\".",
    "verified": false,
    "src": "RPT-B2 (docs/integration/RPT-B2_info.json)"
   },
@@ -1592,7 +1592,7 @@
   },
   "feature:salary": {
    "title": "Salary basis notice",
-   "does": "Which salary figure the staff-cost and profit reports use, beside the 02-2 sheets and the payroll runs. Changes nothing.",
+   "does": "Which salary figure the staff-cost and profit reports use, beside the 21-1 sheets and the payroll runs. Changes nothing.",
    "why": "The two sources differ and nothing said which one a report used.",
    "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
    "change": "Reading changes nothing. A missing figure shows as 'not captured', never as 0.",
@@ -2520,7 +2520,7 @@
    "title": "Complaint categories that always count as food safety",
    "does": "A comma list of category codes. A complaint in one of these categories is marked food safety even if the staff member forgot to tick the box.",
    "why": "A cashier under pressure may forget the tick box.",
-   "default": "sick (the same fell-ill cause that form 20-3 already flags).",
+   "default": "sick (the same fell-ill cause that form 32-1 already flags).",
    "change": "Add more codes, for example sick,smell, to treat more categories as food safety. Set it to blank to let only the tick box decide.",
    "who": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log.",
    "verified": true,
@@ -2589,7 +2589,7 @@
   "rule:crm_complaints_on": {
    "title": "Record customer complaints and track them to a result",
    "does": "Lets staff log a complaint with the outlet, item, severity and owner, and move it through open, in progress, resolved and closed. Every step is kept in a history that cannot be edited.",
-   "why": "Today a complaint is only a line on the paper register (form 20-3).",
+   "why": "Today a complaint is only a line on the paper register (form 32-1).",
    "default": "OFF. Nothing changes and nobody can log a complaint here.",
    "change": "ON: the Feedback and complaints screen accepts complaints. A complaint never posts any money; a refund is still made on the sale return screen and then linked.",
    "who": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log.",
@@ -3598,7 +3598,7 @@
   },
   "rule:marketing_post_from": {
    "title": "Marketing spend is posted from this date",
-   "does": "The first date an 18-1 line may be posted.",
+   "does": "The first date an 17-1 line may be posted.",
    "why": "Stops old months from being posted into closed books.",
    "default": "Blank. The switch above cannot be turned on.",
    "change": "Lines dated before it are never posted.",
@@ -3607,9 +3607,9 @@
    "src": "RPT-C3 (docs/integration/RPT-C3_info.json)"
   },
   "rule:marketing_post_on": {
-   "title": "Post the marketing spend of form 18-1 to the books",
-   "does": "When ON, approved 18-1 lines paid from bank, mobile or card are written to the journal (Dr marketing expense, Cr bank or mobile), except lines that look like the same spend already in a 10-2 voucher or quick expense, which wait for a person's decision.",
-   "why": "Today marketing spend in 18-1 never reaches the journal profit.",
+   "title": "Post the marketing spend of form 17-1 to the books",
+   "does": "When ON, approved 17-1 lines paid from bank, mobile or card are written to the journal (Dr marketing expense, Cr bank or mobile), except lines that look like the same spend already in a 11-1 voucher or quick expense, which wait for a person's decision.",
+   "why": "Today marketing spend in 17-1 never reaches the journal profit.",
    "default": "OFF. Nothing is posted (today).",
    "change": "Switch it ON only after setting the start date below. Use the 'Post to the books' tab: Dry run first, then Post now.",
    "who": "Only the owner (Settings). Posting is run by the accounts manager.",
@@ -4572,7 +4572,7 @@
    "title": "Cash short/over report follows the shortage case",
    "does": "The cash short and over report leaves out sheets whose shortage case was rejected or voided, and shows how many cases are open, approved, rejected and void.",
    "why": "The owner's decision on a shortage case should be visible in the report.",
-   "default": "OFF. The report counts the flag of every daily sheet (14-1) as today.",
+   "default": "OFF. The report counts the flag of every daily sheet (06-1) as today.",
    "change": "Rejected and voided cases no longer add to the figures.",
    "who": "The owner (Settings).",
    "verified": true,
@@ -4673,7 +4673,7 @@
   },
   "rule:report_salary_source": {
    "title": "Salary in the profit comes from",
-   "does": "legacy: the 02-2 salary sheet. app_first: app payroll runs are the main source and the sheet is used only where no counted run exists.",
+   "does": "legacy: the 21-1 salary sheet. app_first: app payroll runs are the main source and the sheet is used only where no counted run exists.",
    "why": "A salary should be counted once.",
    "default": "legacy. As today.",
    "change": "app_first reads payroll runs first. Journal entries already posted do not change.",
@@ -6067,7 +6067,7 @@
    "why": "It lets you match each wallet with what the phone really shows.",
    "default": "The wallet register works alone. Nothing moves to its own wallet account until the wallet split switch is ON.",
    "change": "The phone total is typed first, and the book figure comes back after it is saved. A difference needs a reason once.",
-   "who": "The owner, people with the 10-3 form right and people with Accounts view.",
+   "who": "The owner, people with the 07-1 form right and people with Accounts view.",
    "related": [
     "rule:d_wallet_split_on",
     "rule:d_wallet_fee_treatment",
@@ -6112,9 +6112,9 @@
   },
   "switch:path:expense": {
    "title": "Path switch: expense",
-   "does": "Chooses which way counts for this job: the day-book quick expense or the 10-2 expense voucher. The other way becomes a locked shadow copy.",
+   "does": "Chooses which way counts for this job: the day-book quick expense or the 11-1 expense voucher. The other way becomes a locked shadow copy.",
    "why": "One job must be counted once.",
-   "default": "Quick entries get a 10-2 shadow copy at day end, confirmed with one click.",
+   "default": "Quick entries get a 11-1 shadow copy at day end, confirmed with one click.",
    "change": "The other path becomes a shadow copy, and its screen may be refused with path_locked; whichever-is-first is also allowed. Nothing is deleted.",
    "who": "Only the owner, on the path switches page.",
    "related": [
@@ -6138,9 +6138,9 @@
   },
   "switch:path:payroll": {
    "title": "Path switch: payroll",
-   "does": "Chooses which way counts for this job: app payroll runs or the 02-2 monthly salary sheet. The other way becomes a locked shadow copy.",
+   "does": "Chooses which way counts for this job: app payroll runs or the 21-1 monthly salary sheet. The other way becomes a locked shadow copy.",
    "why": "One job must be counted once.",
-   "default": "Both are open. Once app payroll starts for a month, 02-2 is locked and kept as a shadow copy.",
+   "default": "Both are open. Once app payroll starts for a month, 21-1 is locked and kept as a shadow copy.",
    "change": "The other path becomes a shadow copy, and its screen may be refused with path_locked; whichever-is-first is also allowed. Nothing is deleted.",
    "who": "Only the owner, on the path switches page.",
    "related": [
@@ -6151,7 +6151,7 @@
   },
   "switch:path:production": {
    "title": "Path switch: production",
-   "does": "Chooses which way counts for this job: the recipe production run or the 05-1 factory daily sheet. The other way becomes a locked shadow copy.",
+   "does": "Chooses which way counts for this job: the recipe production run or the 12-1 factory daily sheet. The other way becomes a locked shadow copy.",
    "why": "One job must be counted once.",
    "default": "The run is the main record. The form is a reference.",
    "change": "The other path becomes a shadow copy and its screen may be refused with path_locked. Nothing is deleted.",
@@ -6165,7 +6165,7 @@
   },
   "switch:path:stock_count": {
    "title": "Path switch: stock count",
-   "does": "Chooses which way counts for this job: the stock screen count or the 04-3 count sheet. The other way becomes a locked shadow copy.",
+   "does": "Chooses which way counts for this job: the stock screen count or the 36-1 count sheet. The other way becomes a locked shadow copy.",
    "why": "One job must be counted once.",
    "default": "The screen is the main record. The form is a reference.",
    "change": "The other path becomes a shadow copy and its screen may be refused with path_locked. Nothing is deleted.",
@@ -6179,7 +6179,7 @@
   },
   "switch:path:stock_issue": {
    "title": "Path switch: stock issue",
-   "does": "Chooses which way counts for this job: the stock screen issue or the 04-2 issue slip. The other way becomes a locked shadow copy.",
+   "does": "Chooses which way counts for this job: the stock screen issue or the 18-1 issue slip. The other way becomes a locked shadow copy.",
    "why": "One job must be counted once.",
    "default": "The screen is the main record. The form is a reference.",
    "change": "The other path becomes a shadow copy and its screen may be refused with path_locked. Nothing is deleted.",
@@ -6193,7 +6193,7 @@
   },
   "switch:path:stock_transfer": {
    "title": "Path switch: stock transfer",
-   "does": "Chooses which way counts for this job: the stock screen transfer or the 03-1 transfer challan. The other way becomes a locked shadow copy.",
+   "does": "Chooses which way counts for this job: the stock screen transfer or the 39-1 transfer challan. The other way becomes a locked shadow copy.",
    "why": "One job must be counted once.",
    "default": "The screen is the main record. The form is a reference.",
    "change": "The other path becomes a shadow copy and its screen may be refused with path_locked. Nothing is deleted.",
@@ -6204,6 +6204,26 @@
    ],
    "verified": true,
    "src": "phase48.sql (path_domains); paths.js; W1-G.md"
+  },
+  "rule:transfer_client_reuse_block": {
+   "title": "Refuse a transfer id already used by another user",
+   "does": "When ON, a factory-to-branch send whose id was already used by a different user is refused. Without it, the second send is answered as done with the first transfer's id and its goods are not moved.",
+   "why": "A send that is reported as done but never moved goods hides stock that is still in the factory.",
+   "default": "Off. The second send is answered as done with the first transfer's id (as before).",
+   "change": "On: the second send is refused with \"client_id_reused\"; nothing moves. The same user retrying the same send still gets the first result.",
+   "who": "Owner, in Settings (stock rules).",
+   "verified": false,
+   "src": "phase544 (SW-7, docs/PLAN_NEXT.md item 20); reproduced on a local database, not yet checked in the app"
+  },
+  "rule:price_check_include_freight": {
+   "title": "Include freight in the purchase price check",
+   "does": "When ON, after a landed cost (freight, duty, clearing and other charges) is posted, each item it touches is compared with its last purchase, using the invoice price plus the freight allocated to that item. A jump above the threshold (Purchase cost jump %) gives a yellow flag in the exceptions list.",
+   "why": "A freight rise is a real rise in what the goods cost. The price check that runs at bill posting sees only the invoice price, so it misses it.",
+   "default": "Off. The price check uses the invoice price only, as before.",
+   "change": "On: the flag appears when the landed cost is posted, because the freight is not known before that. The check at bill posting does not change.",
+   "who": "Owner, in Settings (purchase rules).",
+   "verified": false,
+   "src": "phase545 (docs/PLAN_NEXT.md item 45); tested on a local database (phase545_test.sql; the scenario with the switch off gives the same state as the chain without phase 545); not yet checked in the app"
   },
   "rule:transfer_overdraw_block": {
    "title": "Refuse a send bigger than the stock on hand (transfers)",
@@ -6577,7 +6597,7 @@
   },
   "rule:recipe_approval_required": {
    "title": "Cost and production before a recipe is approved: off, yellow warning, or refuse",
-   "does": "off = today's behaviour (no approval needed). warn = yellow line for the owner. on = recipe_cost and production_post refuse an unapproved recipe (form 05-3: no costing before approval).",
+   "does": "off = today's behaviour (no approval needed). warn = yellow line for the owner. on = recipe_cost and production_post refuse an unapproved recipe (form 31-1: no costing before approval).",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "off (the value that applies until the owner sets another).",
    "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
@@ -7007,7 +7027,7 @@
   },
   "rule:daybook_align_mode": {
    "title": "Day book follows the journal: off or on",
-   "does": "off = as before. on = a 10-2 voucher paid by bank or mobile shows with that mode in the day book (today every voucher is cash) and the card fee of a settlement leaves the bank side. daybook_vs_journal then shows no difference for these kinds.",
+   "does": "off = as before. on = a 11-1 voucher paid by bank or mobile shows with that mode in the day book (today every voucher is cash) and the card fee of a settlement leaves the bank side. daybook_vs_journal then shows no difference for these kinds.",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "off (the value that applies until the owner sets another).",
    "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
@@ -7047,7 +7067,7 @@
   },
   "rule:drawer_short_post": {
    "title": "Post the drawer count difference to the books: off or on",
-   "does": "off = as before (the difference is only the yellow / red flag and the books keep more cash than the till holds). on = a submitted or approved drawer count (form 14-1) with a difference posts Cash short / over (5800) and the day book shows the same row. A form that stops being final is reversed.",
+   "does": "off = as before (the difference is only the yellow / red flag and the books keep more cash than the till holds). on = a submitted or approved drawer count (form 06-1) with a difference posts Cash short / over (5800) and the day book shows the same row. A form that stops being final is reversed.",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "off (the value that applies until the owner sets another).",
    "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
@@ -7086,8 +7106,8 @@
    "src": "phase117.sql (advanced line); entry written from the rule text in the database seed, not yet checked in the app"
   },
   "rule:form_051_mode": {
-   "title": "Factory daily sheet (05-1): how it reaches stock",
-   "does": "reference = exactly as before (default). post = when the sheet posts to stock, the recipe ingredients also go out at the average cost and the finished goods get a cost. refuse = 05-1 never posts to stock.",
+   "title": "Factory daily sheet (12-1): how it reaches stock",
+   "does": "reference = exactly as before (default). post = when the sheet posts to stock, the recipe ingredients also go out at the average cost and the finished goods get a cost. refuse = 12-1 never posts to stock.",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "reference (the value that applies until the owner sets another).",
    "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",

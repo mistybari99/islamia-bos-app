@@ -1,1 +1,575 @@
-(()=>{"use strict";const t=window.BOS_APP,e=window.BOS,{sb:a,S:n,t:o,esc:i,toast:s,fail:c,shell:r,openSheet:l,closeSheet:d,nm:u,fmt:p,store:m}=t,_=(t,e=document)=>e.querySelector(t),b=e.L,v=e.lab,f=t=>Math.round(100*t)/100,$=t=>"৳ "+p(f(t)),y=()=>(new Date).toLocaleDateString("en-CA",{timeZone:"Asia/Dhaka"}),h=t=>new Date(t).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Dhaka"}),g=t=>String(t??"").replace(/[০-৯]/g,t=>"০১২৩৪৫৬৭৮৯".indexOf(t)),w=t=>{const e=Number(g(t).trim());return Number.isFinite(e)?e:0},k=t=>{let e=g(t).replace(/[^0-9+]/g,"");return e.startsWith("+880")?e="0"+e.slice(4):e.startsWith("880")&&13===e.length&&(e="0"+e.slice(3)),/^01[3-9][0-9]{8}$/.test(e)?e:null},x={sweet_kg:b("মিষ্টি (কেজি)","Sweets (KG)","মিষ্টি (KG)"),sweet_pc:b("মিষ্টি (পিস)","Sweets (Piece)","মিষ্টি (Piece)"),doi:b("দই","Doi (Curd)","Doi (দই)"),cake_lb:b("কেক (পাউন্ড)","Cake (Pound)","Cake (Pound)"),cake_pc:b("কেক (পিস)","Cake (Piece)","Cake (Piece)")},q={kg:b("কেজি","KG","KG"),pc:b("পিস","Piece","Piece"),lb:b("পাউন্ড","Pound","Pound"),g:b("গ্রাম","Gram","Gram"),dozen:b("ডজন","Dozen","Dozen"),box:b("বক্স","Box","Box")},S={title:b("সেল (POS)","Sales (POS)","Sale (POS)"),sell:b("বিক্রি","Sell","Sell"),today:b("আজকের সেল","Today's sales","Today সেল"),quick:b("কুইক সেল","Quick sale","Quick Sale"),cart:b("কার্ট","Cart","Cart"),pay:b("পেমেন্ট","Pay","Pay"),total:b("মোট","Total","Total"),discount:b("ডিসকাউন্ট (৳)","Discount (৳)","Discount (৳)"),discL:b("ডিসকাউন্ট","Discount","Discount"),discTakes:b("কাটা হবে","Takes off","কাটা হবে"),print:b("রসিদ প্রিন্ট","Print receipt","Receipt Print"),note:b("নোট (ঐচ্ছিক)","Note (optional)","Note (ঐচ্ছিক)"),confirm:b("সেল সম্পন্ন","Complete sale","Complete Sale"),empty:b("কার্ট খালি — আইটেম ট্যাপ করুন","Cart is empty — tap an item","Cart খালি — Item ট্যাপ করুন"),amount:b("টাকার পরিমাণ","Amount","Amount"),what:b("কী বিক্রি (ঐচ্ছিক)","What was sold (optional)","কী বিক্রি (ঐচ্ছিক)"),all:b("সব","All","All"),freq:b("বেশি বিক্রি","Frequent","Frequent"),scan:b("বারকোড স্ক্যান","Scan barcode","Barcode স্ক্যান"),search:b("আইটেম খুঁজুন","Search item","Item খুঁজুন"),qty:b("পরিমাণ","Quantity","Quantity"),add:b("কার্টে দিন","Add to cart","Add to Cart"),receipt:b("রসিদ","Receipt","Receipt"),done:b("সেল হয়েছে","Sale done","Sale হয়েছে"),queued:b("নেট নেই — সেল জমা আছে, নেট এলে পাঠানো হবে","No network — sale saved, will be sent when online","Net নেই — Sale জমা আছে, Online হলে যাবে"),held:b("মালিকের জন্য ধরা আছে — এখনও রসিদ নেই","Held for the owner — no receipt yet","মালিকের জন্য Held — এখনও receipt নেই"),pending:b("পাঠানো বাকি","waiting to send","পাঠানো বাকি"),void:b("বাতিল","Void","Void"),voided:b("বাতিল হয়েছে","Voided","Voided"),voidwhy:b("বাতিলের কারণ (লিখতেই হবে)","Reason for voiding (required)","Void এর কারণ (লিখতেই হবে)"),day:b("আজকের মোট","Today's total","Today মোট"),count:b("টি সেল","sales","sales"),nodata:b("এখনও কোনো সেল নেই","No sales yet","এখনও কোনো sale নেই"),back:b("ফিরুন","Back","Back"),close:b("বন্ধ","Close","Close"),lines:b("আইটেম","Items","Items"),by:b("বিক্রেতা","Sold by","Sold by"),needNote:b("কারণ লিখুন","Write a reason","কারণ লিখুন"),noloc:b("কোনো লোকেশন দেওয়া নেই — মালিককে জানান","No location assigned — tell the owner","কোনো Location দেওয়া নেই — Owner কে জানান"),priceov:b("দাম বদলান (ব্যতিক্রম তালিকায় যাবে)","Change price (goes to exceptions)","Price বদলান (Exception এ যাবে)"),retail:b("খুচরা","Retail","Retail"),wholesale:b("পাইকারি","Wholesale","Wholesale (পাইকারি)"),cust:b("গ্রাহক","Customer","Customer"),custAdd:b("গ্রাহক যোগ করুন","Add customer","Customer যোগ করুন"),mobile:b("মোবাইল নম্বর","Mobile number","Mobile number"),cname:b("গ্রাহকের নাম","Customer name","Customer এর নাম"),custReq:b("বাকি বা পাইকারি সেলে গ্রাহকের মোবাইল নম্বর আর নাম লাগবেই","A customer mobile number and name are required for a due or wholesale sale","Due বা Wholesale sale এ Customer এর mobile number আর নাম লাগবেই"),known:b("পুরনো গ্রাহক","Existing customer","পুরনো Customer"),newc:b("নতুন গ্রাহক — নাম লিখুন","New customer — enter the name","নতুন Customer — নাম লিখুন"),owes:b("এখন বাকি","Owes now","এখন Due"),limit:b("বাকির সীমা","Credit limit","Credit limit"),unit:b("একক","Unit","Unit"),convHow:b("অন্য এককেও বিক্রি করতে চান? (যেমন ১ পিস = ০.২ কেজি)","Sell in another unit too? (e.g. 1 pc = 0.2 kg)","অন্য unit-এও বিক্রি? (যেমন ১ pc = ০.২ kg)"),save:b("সেভ","Save","Save"),convSaved:b("ইউনিট কনভার্সন সেভ হয়েছে","Unit conversion saved","Unit conversion save হয়েছে"),other:b("অন্য আইটেম (তালিকায় নেই)","Other item (not in the list)","অন্য Item (list এ নেই)"),oname:b("আইটেমের নাম","Item name","Item এর নাম"),ounit:b("একক (কেজি, পিস…)","Unit (kg, piece…)","Unit (kg, piece…)"),oprice:b("একক দাম (৳)","Unit price (৳)","Unit price (৳)"),ohint:b('এটা মালিকের কাছে "তালিকায় নেই" হিসেবে যাবে, যাতে তালিকায় যোগ হয়।',"The owner is told it is not in the list so it can be added.",'Owner কে "list এ নেই" হিসেবে জানানো হবে, যাতে list এ যোগ হয়।'),newitem:b("＋ নতুন আইটেম","＋ New item","＋ নতুন Item"),full:b("নগদে সম্পন্ন","Done — cash","Cash এ Done"),more:b("মোবাইল / বাকি / ভাগ…","Mobile / due / split…","Mobile / Due / ভাগ…"),paidword:b("পরিশোধ","Paid","Paid"),dueword:b("বাকি","Due","Due"),share:b("রসিদ শেয়ার","Share receipt","Receipt Share"),collect:b("বাকি আদায়","Collect due","Due আদায়"),failed:b("পাঠানো যায়নি (নিয়মে আটকেছে)","Could not be recorded (refused)","পাঠানো যায়নি (আটকেছে)"),discard:b("বাদ দিন","Discard","Discard"),failedmsg:b("কিছু সেল নিয়মে আটকেছে — আজকের সেল পাতায় দেখুন","Some sales were refused — see Today","কিছু Sale আটকেছে — Today পাতায় দেখুন"),needupd:b("ডেটাবেস আপডেট বাকি (নতুন SQL চালাতে হবে) — এখন শুধু পুরো নগদ সেল চলবে","Database update pending (new SQL) — only full-cash sales work for now","Database update বাকি (নতুন SQL) — এখন শুধু full-cash sale চলবে")},C=t=>v(S[t]),N={customer_required:S.custReq,customer_name_required:b("নতুন গ্রাহকের নাম লিখুন","Enter the new customer’s name","নতুন Customer এর নাম লিখুন"),bad_mobile:b("মোবাইল নম্বর সঠিক নয় (01XXXXXXXXX)","The mobile number is not valid (01XXXXXXXXX)","Mobile number ঠিক নয় (01XXXXXXXXX)"),overpaid:b("পরিশোধ মোটের বেশি হতে পারে না","Paid cannot be more than the total","Paid মোটের বেশি হতে পারে না"),over_credit_limit:b("এই গ্রাহকের বাকির সীমা পার হচ্ছে — ম্যানেজার লাগবে","This customer’s credit limit would be exceeded — a manager is needed","এই Customer এর Credit limit পার হচ্ছে — Manager লাগবে"),override_needs_approval:b("দাম বদলাতে ম্যানেজার লাগবে","Only a manager can change a price","Price বদলাতে Manager লাগবে"),discount_needs_approval:b("ডিসকাউন্ট সীমার উপরে — ম্যানেজার লাগবে","The discount is above the limit — a manager is needed","Discount limit এর উপরে — Manager লাগবে"),customer_inactive:b("এই গ্রাহক বন্ধ করা আছে","This customer is switched off","এই Customer বন্ধ করা আছে"),bad_discount:b("ডিসকাউন্ট মোটের বেশি হতে পারে না (শতাংশ ১০০ এর বেশি নয়)","Discount cannot exceed the total (percent at most 100)","Discount মোটের বেশি হতে পারে না (percent 100 এর বেশি নয়)"),discount_mode_off:b("এই ধরনের ডিসকাউন্ট বন্ধ আছে (নিয়ম)","This kind of discount is switched off (rule)","এই ধরনের Discount বন্ধ (নিয়ম)"),unlisted_blocked:b("তালিকায় নেই এমন আইটেম বিক্রি বন্ধ আছে (নিয়ম)","Selling an item that is not in the list is switched off (rule)","List এ নেই এমন item বিক্রি বন্ধ (নিয়ম)"),paper_no_required:b("কাগজের ছাপা নম্বর লাগবে","The printed paper number is required","কাগজের ছাপা number লাগবে"),period_closed:b("এই ডেটের হিসাব বন্ধ — শুধু মালিক বদলাতে পারবেন","This date is closed — only the owner can change it","এই date এর হিসাব বন্ধ — শুধু Owner বদলাতে পারবেন"),expired_stock_blocked:b("মেয়াদ শেষ স্টক বিক্রি বন্ধ আছে (মালিকের সেটিং) — সেল হয়নি","Selling expired stock is blocked (owner setting) — the sale was not made","মেয়াদ শেষ stock বিক্রি বন্ধ (owner setting) — sale হয়নি"),insufficient_stock:b("মজুতে এত নেই — বিক্রি করা গেল না","Not enough stock on hand — the sale was not made","Stock-এ এত নেই — বিক্রি হয়নি"),item_not_sellable:b("এই আইটেম সেলের জন্য নয় বা প্রাইস দেওয়া নেই (তথ্য লাগবে)","This item is not for sale or has no selling price (Data needed)","এই item sale-এর জন্য নয় বা price নেই (Data লাগবে)"),wallet_needed:b("মোবাইল পেমেন্টে বিকাশ/নগদ ইত্যাদি বাছুন","Choose bKash / Nagad etc. for a mobile payment","Mobile payment এ bKash/Nagad বাছুন"),name_required:b("আইটেমের নাম লিখুন","Enter the item name","Item এর নাম লিখুন")},T=t=>{const e=t&&t.message||String(t||"");for(const t of Object.keys(N))if(e.includes(t))return v(N[t]);return null},L={loc:null,cat:"",q:"",items:[],locs:[],cart:[],type:"retail",tab:"sell",day:[],busy:!1,dk:"amount",st:null,cust:{mobile:"",name:"",found:null,show:!1}},M=()=>n.ctx&&n.ctx.profile?n.ctx.profile.id:"anon",D=()=>"bos_pos_queue_"+M(),X=()=>"bos_pos_failed_"+M(),A="bos_pos_freq",O=(t,e)=>{try{return JSON.parse(m.get(t))||e}catch(t){return e}},P=()=>O(D(),[]),E=t=>m.set(D(),JSON.stringify(t)),z=()=>O(X(),[]),I=t=>m.set(X(),JSON.stringify(t)),j=/^(no_lines|bad_mode|bad_qty|bad_price|bad_amount|bad_discount|bad_discount_kind|discount_mode_off|no_price|item_not_found|due_needs_customer|not allowed|customer_required|customer_name_required|bad_mobile|overpaid|over_credit_limit|override_needs_approval|discount_needs_approval|customer_inactive|bad_sale_type|bad_payments|name_required|period_closed|unlisted_blocked|paper_no_required|insufficient_stock|expired_stock_blocked|item_not_sellable|unit_unknown|production_negative_reason_needed|client_id_taken)/,H=()=>O(A,{}),B=t=>{const e=H();e[t]=(e[t]||0)+1,m.set(A,JSON.stringify(e))},R=()=>n.ctx.perms.POS||{},G=t=>"pc"===t?1:.5,U=t=>v(q[t])||t||"",W=t=>L.items.find(e=>e.id===t),J=t=>{const e=new Map;e.set(t.unit,1);const a=(L.conv||[]).filter(e=>!1!==e.active&&(e.item_id===t.id||null===e.item_id||void 0===e.item_id));return a.sort((t,e)=>(t.item_id?0:1)-(e.item_id?0:1)),a.forEach(a=>{const n=Number(a.factor);n>0&&(a.to_unit!==t.unit||e.has(a.from_unit)?a.from_unit!==t.unit||e.has(a.to_unit)||e.set(a.to_unit,1/n):e.set(a.from_unit,n))}),e},Q=(t,e)=>J(t).get(e)||null,V=t=>"quick"===t.kind?f(t.amount):f(t.qty*t.price),K=()=>f(L.cart.reduce((t,e)=>t+V(e),0)),F=t=>!navigator.onLine||/fetch|network|load failed|timeout/i.test(t&&t.message||""),Y=()=>({a:!1!==e.rule("discount_mode_amount_on",!0),p:!1!==e.rule("discount_mode_percent_on",!0)}),Z=()=>Math.max(0,w((_("#cart_disc")||{}).value||0)),tt=()=>{const t=Z();return"percent"===L.dk?f(K()*Math.min(t,100)/100):t},et=()=>Math.max(0,f(K()-tt())),at=t=>null!==t.sell_price&&!1!==t.sellable&&!t.hidden&&"asset"!==t.item_type&&"raw_material"!==t.item_type;const nt=t=>t.length+"|"+t.map(t=>[t.id,t.sell_price,t.name_bn,t.name_en,t.name_mix,t.category,t.sub_category,t.unit,t.barcode].join("~")).join("|");function ot(){const t=e.liveLocs?e.liveLocs(e.ENV.locs):e.ENV.locs;L.locs=n.ctx.is_owner||n.ctx.roles.includes("management")?t:t.filter(t=>n.ctx.locations.includes(t.id)),L.loc&&L.locs.find(t=>t.id===L.loc)||(L.loc=m.get("bos_pos_loc")?Number(m.get("bos_pos_loc")):(L.locs[0]||{}).id),L.locs.find(t=>t.id===L.loc)||(L.loc=(L.locs[0]||{}).id)}async function it(){const t=(async()=>{let t=await window.BOS_ALL(a.from("items").select("id,code,name_bn,name_en,name_mix,category,category_bn,sub_category,unit,sell_price,is_active,barcode,sellable,hidden,item_type").eq("is_active",!0).order("code"));if(t.error&&(t=await window.BOS_ALL(a.from("items").select("id,code,name_bn,name_en,name_mix,category,category_bn,sub_category,unit,sell_price,is_active,barcode").eq("is_active",!0).order("code"))),t.error&&e.cs&&F(t.error)){const a=e.cs.itemsLoad();a&&(t={data:a,error:null})}if(t.error)throw t.error;return e.cs&&!t.error&&t.data&&t.data.length&&e.cs.itemsSave(t.data),t.data.filter(at)})(),o=async function(){try{const t=await a.from("unit_conversions").select("item_id,from_unit,to_unit,factor,active").eq("active",!0);L.conv=t.error?JSON.parse(m.get("bos_pos_conv")||"[]"):t.data||[],t.error||m.set("bos_pos_conv",JSON.stringify(L.conv))}catch(t){L.conv=L.conv||JSON.parse(m.get("bos_pos_conv")||"[]")}}(),i=e.loadStatic();let s=null;if(!1===navigator.onLine||n.offline||(s=L.items.length?L.items:(e.cs&&e.cs.itemsLoad&&e.cs.itemsLoad()||[]).filter(at),s.length||(s=null)),t.catch(()=>{}),o.catch(()=>{}),await i,s)return L.items=s,L.conv||(L.conv=JSON.parse(m.get("bos_pos_conv")||"[]")),ot(),e.pay.loadWallets(),void Promise.all([t,o]).then(([t])=>{nt(t)!==nt(L.items)&&(L.items=t,"sell"===L.tab&&_("#pos_items")&&!_("#sheet")&&ct(R().enter||n.ctx.is_owner))}).catch(()=>{});L.items=await t,await o,ot(),e.pay.loadWallets()}function st(){const t=R().enter||n.ctx.is_owner,e=P().filter(t=>t.p_loc===L.loc).length;r(C("title"),`\n    <div class="row" style="margin-bottom:8px">${L.locs.length>1?`<select id="pos_loc" style="flex:1">${L.locs.map(t=>`<option value="${t.id}" ${t.id===L.loc?"selected":""}>${i(u(t))}</option>`).join("")}</select>`:`<b style="flex:1">${i(u(L.locs[0]))}</b>`}\n      ${e?`<span class="chip warn" id="pos_qchip">${e} ${i(C("pending"))}</span>`:""}</div>\n    <div class="row" style="margin-bottom:10px"><button class="tog ${"sell"===L.tab?"on":""}" data-act="pos_tab" data-v="sell" style="flex:1">${i(C("sell"))}</button>\n      <button class="tog ${"today"===L.tab?"on":""}" data-act="pos_tab" data-v="today" style="flex:1">${i(C("today"))}</button></div>\n    <div id="pos_body"></div>`,!0),"sell"===L.tab?ct(t):Ut()}function ct(t){const a=[...new Set(L.items.map(t=>t.category).filter(Boolean))],o=t=>e.catpick&&e.catpick.nameIfKnown(t)||v(x[t])||(L.items.find(e=>e.category===t)||{}).category_bn||t,s=n.ctx.is_owner||n.ctx.perms.ITEMS&&n.ctx.perms.ITEMS.enter;_("#pos_body").innerHTML=`\n    <div class="row"><input id="pos_q" placeholder="${i(C("search"))}" value="${i(L.q)}" style="flex:1"><button data-act="pos_scan" aria-label="${i(C("scan"))}" ${t?"":"disabled"}>▮▮</button><button class="primary" data-act="pos_quick" ${t?"":"disabled"}>⚡ ${i(C("quick"))}</button></div>\n    <div class="row wrap" style="margin:10px 0" id="pos_cats" data-ctl="select" data-title="${i(v(b("ক্যাটাগরি","Category","Category")))}">${[["",C("all")],["_f",C("freq")],...a.map(t=>[t,o(t)])].map(([t,e])=>`<button class="tog ${L.cat===t?"on":""}" data-act="pos_cat" data-v="${i(t)}">${i(e)}</button>`).join("")}</div>\n    ${e.catpick?e.catpick.subChips(L.items,L.cat,L.sub,"pos_sub"):""}\x3c!-- bos100: Sub-category chips --\x3e\n    <div class="row wrap" style="margin-bottom:10px"><button class="tog" data-act="pos_other" ${t?"":"disabled"}>${i(C("other"))}</button>${s?`<button class="tog" data-act="pos_newitem">${i(C("newitem"))}</button>`:""}</div>\n    <div class="pos-grid" id="pos_items"></div><div style="height:96px"></div>\n    <div class="pos-bar" id="pos_bar"></div>`,mt(t),_t(t)}function rt(){const t=L.q.trim().toLowerCase(),e=H();let a=L.items.filter(e=>(!L.cat||"_f"===L.cat||e.category===L.cat)&&(!L.sub||"_f"===L.cat||e.sub_category===L.sub)&&(!t||[e.name_bn,e.name_en,e.name_mix,e.code].some(e=>(e||"").toLowerCase().includes(t))));return"_f"===L.cat&&(a=a.filter(t=>e[t.id]).sort((t,a)=>e[a.id]-e[t.id]).slice(0,24)),a}const lt=72,dt=72,ut=(t,e,a)=>`<button class="pos-item ${e.has(t.id)?"in":""}" data-cat="${i(t.category||"")}" data-act="pos_add" data-v="${t.id}" ${a?"":"disabled"}>\n      <span class="pn">${i(u(t))}</span><span class="pp"><span class="cur">৳</span>${p(t.sell_price)}<small> / ${i(U(t.unit))}</small></span>${e.has(t.id)?`<span class="pq">${p(e.get(t.id))}</span>`:""}</button>`,pt=()=>new Map(L.cart.filter(t=>"item"===t.kind).map(t=>[t.item_id,t.qty]));function mt(t){const e=_("#pos_items");if(!e)return;const a=rt(),n=L.dtok=(L.dtok||0)+1;L.shown=a,L.io&&(L.io.disconnect(),L.io=null);const o=_("#pos_more");if(o&&o.remove(),!a.length)return void(e.innerHTML='<p class="muted center">—</p>');e.innerHTML=a.slice(0,lt).map(e=>ut(e,pt(),t)).join("");let i=lt;if(a.length<=i)return;const s=document.createElement("div");s.id="pos_more",s.setAttribute("aria-hidden","true"),s.style.cssText="height:1px",e.after(s);const c=()=>{if(n===L.dtok&&e.isConnected){if(e.insertAdjacentHTML("beforeend",a.slice(i,i+dt).map(e=>ut(e,pt(),t)).join("")),i+=dt,i>=a.length)return L.io&&(L.io.disconnect(),L.io=null),void s.remove();L.io?(L.io.unobserve(s),L.io.observe(s)):setTimeout(c,0)}};window.IntersectionObserver?(L.io=new IntersectionObserver(t=>{t.some(t=>t.isIntersecting)&&c()},{rootMargin:"900px 0px"}),L.io.observe(s)):setTimeout(c,0)}function _t(t){const e=L.cart.length,a=K(),n=_("#pos_bar");n&&(n.innerHTML=`<div><div class="muted" style="font-size:.8rem">${e?e+" · "+i(C("lines")):i(C("cart"))}</div><b style="font-size:1.25rem">${$(a)}</b></div>\n    <button class="primary" data-act="pos_cart" ${e&&t?"":"disabled"}>${i(C("pay"))} →</button>`)}function bt(){if("sell"!==L.tab||!_("#pos_items"))return;const t=rt(),e=L.shown;if(e&&e.length===t.length&&t.every((t,a)=>t===e[a])){const t=pt();_("#pos_items").querySelectorAll(".pos-item").forEach(e=>{const a=t.get(e.getAttribute("data-v")),n=t.has(e.getAttribute("data-v")),o=e.querySelector(".pq");if(e.classList.toggle("in",n),n)if(o)o.textContent=p(a);else{const t=document.createElement("span");t.className="pq",t.textContent=p(a),e.appendChild(t)}else o&&o.remove()})}else mt(!0);_t(!0)}function vt(t){const a=e.barcode&&e.barcode.find(t,L.items);if(!a)return s(t+" · "+v(b("এই বারকোডের কোনো পণ্য নেই","No product has this barcode","এই barcode-এর কোনো product নেই")));B(a.id),"pc"!==a.unit||(t=>J(t).size>1)(a)?ht(a.id):ft(a.id,1)}function ft(t,e,a){const n=W(t);if(!n)return;const o=L.cart.find(e=>"item"===e.kind&&e.item_id===t);o?(o.qty=Math.round(1e3*(o.qty+e))/1e3,o.alt=o.alt&&a&&o.alt.unit===a.unit?{unit:a.unit,n:Math.round(1e3*(o.alt.n+a.n))/1e3}:null):L.cart.push({kind:"item",item_id:t,qty:e,price:Number(n.sell_price),ov:!1,alt:a||null}),bt()}const $t=t=>"pc"===t?[1,2,3,5,10]:"dozen"===t?[.5,1,2,3]:"g"===t?[100,250,500,1e3]:[.25,.5,1,2,5];let yt=null;function ht(t,e){const a=W(t);if(!a)return;const s=J(a);yt=e&&s.has(e)?e:a.unit;const c=s.get(yt)||1,r=[...s.keys()],d=r.length>1?`<div class="row wrap" style="margin-bottom:10px" role="group" aria-label="${i(C("unit"))}">${r.map(e=>`<button class="tog ${e===yt?"on":""}" data-act="pos_q_unit" data-v="${t}" data-u="${i(e)}" style="min-width:76px;font-size:1.1rem" aria-pressed="${e===yt}">${i(U(e))}</button>`).join("")}</div>`:"",p=!(!n.ctx||!n.ctx.is_owner)&&1===r.length?`<details data-ctl="off" style="margin-top:10px"><summary class="muted">${i(C("convHow"))}</summary><div class="row" style="align-items:flex-end;margin-top:6px"><span>1</span>\n      <select id="cv_from" aria-label="${i(C("unit"))}">${["pc","kg","dozen","lb","g","box"].filter(t=>t!==a.unit).map(t=>`<option value="${t}">${i(U(t))}</option>`).join("")}</select><span>=</span>\n      <input id="cv_f" inputmode="decimal" placeholder="0.2" style="width:90px"><span>${i(U(a.unit))}</span><button class="mini" data-act="pos_conv_save" data-v="${t}">${i(C("save"))}</button></div></details>`:"",m=$t(yt);l(`<h2 style="font-size:1.35rem">${i(u(a))}</h2><p class="muted" style="font-size:1rem">${$(Number(a.sell_price)*c)} / ${i(U(yt))}${yt!==a.unit?` <small>(${$(a.sell_price)} / ${i(U(a.unit))})</small>`:""}</p>${d}\n    <div class="row wrap" style="margin-bottom:10px">${m.map(e=>`<button class="tog" data-act="pos_q_set" data-v="${t}" data-n="${e}" style="min-width:64px;font-size:1.15rem">${e}</button>`).join("")}</div>\n    <label>${i(C("qty"))} (${i(U(yt))})</label><input id="pos_qty" inputmode="decimal" value="1" style="font-size:1.4rem">\n    <div class="muted" id="pos_qconv" style="min-height:1.3em"></div>${p}\n    <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${i(o("cancel"))}</button><button class="primary full" data-act="pos_q_ok" data-v="${t}">${i(C("add"))}</button></div>`),setTimeout(()=>{const e=_("#pos_qty");e&&(e.focus(),e.select()),gt(t)},60)}function gt(t){const e=W(t),a=_("#pos_qconv");if(!e||!a)return;const n=Q(e,yt)||1;if(yt===e.unit)return void(a.textContent="");const o=w((_("#pos_qty")||{}).value);a.textContent=o>0?`= ${p(Math.round(o*n*1e3)/1e3)} ${U(e.unit)} · ${$(f(o*n*Number(e.sell_price)))}`:""}function wt(){const t=Y();L.dk=t.a?"amount":t.p?"percent":null,L.st=e.pay.create(et,St),e.pay.receipt&&e.pay.receipt(L.st,"pos_split_payment"),l(`<h2>${i(C("cart"))}</h2><div id="cart_lines" class="stack"></div>\n    <div class="row wrap" style="margin:8px 0"><button class="tog ${"retail"===L.type?"on":""}" data-act="pos_type" data-v="retail">${i(C("retail"))}</button><button class="tog ${"wholesale"===L.type?"on":""}" data-act="pos_type" data-v="wholesale">${i(C("wholesale"))}</button></div>\n    ${t.a||t.p?`<div class="row" style="align-items:flex-end"><div style="flex:1"><label id="cart_disc_l"></label><input id="cart_disc" inputmode="decimal"></div>${t.a&&t.p?`<div class="row" id="cart_dk" role="group" style="gap:6px"><button class="tog" data-act="pos_dk" data-v="amount" aria-label="${i(C("discL"))} ৳">৳</button><button class="tog" data-act="pos_dk" data-v="percent" aria-label="${i(C("discL"))} %">%</button></div>`:""}</div>\n    <div class="muted" id="cart_disc_calc" style="font-size:.9rem;min-height:1.4em"></div>`:""}\n    ${e.mkt&&e.mkt.posBox?e.mkt.posBox():""}\n    ${e.crmf&&e.crmf.posBox?e.crmf.posBox():""}\n    <div class="row between" style="margin:10px 0"><span>${i(C("total"))}</span><b style="font-size:1.4rem" id="cart_total"></b></div>\n    <div id="cart_pay"></div><div id="cart_cust"></div>\n    <div style="margin-top:8px"><label>${i(C("note"))}</label><input id="cart_note"></div>\n    <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${i(C("back"))}</button><button class="primary full" id="cart_ok" data-act="pos_confirm">${i(C("confirm"))}</button></div>`),Mt(),qt(),Nt(),kt()}function kt(){const t=_("#cart_disc_l");if(!t)return;const e="percent"===L.dk;t.textContent=C("discL")+(e?" (%)":" (৳)"),document.querySelectorAll("#cart_dk .tog").forEach(t=>t.classList.toggle("on",t.dataset.v===L.dk));const a=_("#cart_disc_calc");a&&(a.textContent=e&&Z()>0?`${C("discTakes")}: ${$(tt())}`:"")}function xt(){e.pay.syncAuto(L.st);const t=_("#cart_pay");if(t){const a=document.activeElement;t.innerHTML=e.pay.html(L.st),a&&"cart_disc"===a.id&&a.focus()}St()}function qt(){const t=_("#cart_pay");t&&(t.innerHTML=e.pay.html(L.st))}function St(){const t=_("#cart_total");t&&(t.textContent=$(et())),Nt(),kt()}function Ct(){return"wholesale"===L.type&&!0===e.rule("pos_customer_on_wholesale",!0)||L.st&&e.pay.due(L.st)>0&&!0===e.rule("pos_customer_on_due",!0)||tt()>0&&!0===e.rule("pos_customer_on_discount",!1)}function Nt(){const t=_("#cart_cust");if(!t)return;const a=Ct(),o=L.cust,s=document.activeElement&&document.activeElement.id;if(!a&&!o.show)return void(t.innerHTML=`<button type="button" class="tog" data-act="pos_cust_show">${i(C("custAdd"))}</button>`);const c=k(o.mobile),r=o.found;if(t.innerHTML=`<div class="card" style="margin:8px 0"><b>${i(C("cust"))}${a?" *":""}</b>${a?`<div class="muted" style="font-size:.85rem">${i(C("custReq"))}</div>`:""}\n    <label>${i(C("mobile"))}</label><input id="cu_mobile" inputmode="tel" value="${i(o.mobile)}" placeholder="01XXXXXXXXX">\n    ${c&&r&&r.found?`<div class="notice ok"><b>${i(r.name)}</b> · ${i(C("known"))}${Number(r.balance)>0?` · ${i(C("owes"))}: ${$(r.balance)}`:""}${null!==r.credit_limit&&void 0!==r.credit_limit?` · ${i(C("limit"))}: ${$(r.credit_limit)}`:""}</div>${function(){const t=L.cust.info;if(!t||!t.found||!t.tier)return"";const e=t.tier,a="en"===n.lang?e.name_en||e.name_bn:e.name_bn||e.name_en,o=Number(e.discount_percent);return`<div class="stack" id="cart_tier" style="margin-top:6px"><div class="row wrap" style="gap:6px;align-items:center"><span class="chip" style="border-color:${i(e.color)};color:${i(e.color)}">${e.badge?i(e.badge)+" ":""}${i(a)}</span>\n      ${Number(t.gifts_due)>0?`<span class="chip warn" id="cart_gift">🎁 ${Number(t.gifts_due)} ${i(v(Tt.gift))}</span>`:""}${null!==t.points&&void 0!==t.points?`<span class="chip">${Number(t.points)} ${i(v(Tt.pts))}</span>`:""}</div>\n      ${e.perks?`<div class="muted" style="font-size:.85rem">${i(e.perks)}</div>`:""}\n      ${t.tier_discount_on?`<button type="button" class="tog" id="cart_tier_btn" data-act="pos_tier_disc" style="min-height:40px">${i(v(Tt.apply))}: ${i(a)} ${o}%${null!==e.discount_cap_amount&&void 0!==e.discount_cap_amount?` (${i(v(Tt.capNote))} ${$(e.discount_cap_amount)})`:""}</button>`:""}</div>`}()}`:c?`<label>${i(C("cname"))} — ${i(C("newc"))}</label><input id="cu_name" value="${i(o.name)}">`:""}${e.crmConsent?e.crmConsent.posStrip(o.mobile):""}</div>`,"cu_mobile"===s){const t=_("#cu_mobile");t&&(t.focus(),t.setSelectionRange(t.value.length,t.value.length))}}const Tt={apply:b("স্তরের ছাড় দিন","Apply tier discount","Tier discount দিন"),gift:b("উপহার পাওনা","gift(s) due","gift পাওনা"),pts:b("পয়েন্ট","points","points"),capNote:b("সর্বোচ্চ","up to","সর্বোচ্চ")};let Lt=null;function Mt(){const t=_("#cart_lines");if(!t)return;t.innerHTML=L.cart.map((t,e)=>{const a="item"===t.kind?W(t.item_id):null,n="item"===t.kind?u(a):t.name,o="item"===t.kind?U(a.unit):t.unit||"";return`<div class="cart-line"><div style="flex:1;min-width:0"><div class="nm">${i(n)}${"quick"===t.kind?" ⚡":""}${"custom"===t.kind?" ◇":""}</div>\n      ${"quick"===t.kind?"":`<div class="muted" style="font-size:.85rem" ${"item"===t.kind?`data-act="pos_price" data-k="${e}"`:""}>${$(t.price)} / ${i(o)}${"item"===t.kind?" ✎":""}${t.ov?" ✎":""}${t.alt?` · <b>${p(t.alt.n)} ${i(U(t.alt.unit))}</b>`:""}</div>`}</div>\n      ${"quick"===t.kind?`<button class="mini" data-act="pos_rm" data-k="${e}" aria-label="x">✕</button>`:`<div class="stepper"><button data-act="pos_step" data-k="${e}" data-d="-1">−</button><button data-act="pos_qedit" data-k="${e}" class="qv">${p(t.qty)}</button><button data-act="pos_step" data-k="${e}" data-d="1">＋</button></div>`}\n      <b style="min-width:72px;text-align:right">${$(V(t))}</b></div>`}).join("")||`<p class="muted">${i(C("empty"))}</p>`;const e=_("#cart_total");e&&(e.textContent=$(et()))}function Dt(){if(!L.cart.length)return d(),void bt();Mt(),e.pay.syncAuto(L.st),qt(),Nt(),_t(!0)}function Xt(){const t=w(_("#qs_amt").value);return t>0?{kind:"quick",amount:t,name:(_("#qs_what").value||"").trim()||"Quick sale"}:(s(C("amount")),null)}function At(){return L.cart.map(t=>"item"===t.kind?{item_id:t.item_id,qty:t.qty,price:t.price,override:t.ov,name:u(W(t.item_id))}:"custom"===t.kind?{item_id:null,name:t.name,unit:t.unit,qty:t.qty,price:t.price}:{item_id:null,name:t.name,amount:t.amount})}function Ot(t){return{p_client:crypto.randomUUID?crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,t=>{const e=16*Math.random()|0;return("x"===t?e:3&e|8).toString(16)}),p_loc:L.loc,p_lines:t.lines,p_discount:t.disc||0,p_payments:t.payments,p_customer_mobile:t.mobile||null,p_customer_name:t.cname||null,p_sale_type:t.type||"retail",p_note:t.note||null,p_quick:!!t.quick,p_sold_at:(new Date).toISOString(),...t.dk&&t.disc>0?{p_discount_kind:t.dk,p_discount_input:t.dinput}:{},_t:Date.now(),_total:t.total,_paid:t.paid}}const Pt=t=>{const{_t:e,_total:a,_paid:n,...o}=t;return o},Et=/record_sale2|Could not find the function|PGRST202|schema cache/i;async function zt(t,n){let o=await(n&&e.posfail?e.posfail.sendOffline(Pt(t)):a.rpc("record_sale2",Pt(t)));if(o.error&&Et.test(o.error.message||"")&&"p_discount_kind"in t){const{p_discount_kind:e,p_discount_input:n,...i}=Pt(t);o=await a.rpc("record_sale2",i)}if(o.error&&Et.test(o.error.message||"")){const e=t.p_payments||[];o=1===e.length&&Number(e[0].amount)>=Number(t._total)-.001&&"retail"===t.p_sale_type&&!t.p_customer_mobile&&t.p_lines.every(t=>t.item_id||void 0!==t.amount)?await a.rpc("record_sale",{p_client:t.p_client,p_loc:t.p_loc,p_lines:t.p_lines.filter(t=>t.item_id||t.amount),p_discount:t.p_discount,p_mode:e[0].mode,p_tendered:e[0].tendered||null,p_customer:t.p_customer_name,p_note:t.p_note,p_quick:t.p_quick,p_sold_at:t.p_sold_at}):{data:null,error:{message:"LEGACY: "+v(S.needupd)}}}return o}async function It(t,a){if(L.busy)return;L.busy=!0;const n=_("#cart_ok")||_('[data-act="pos_qs_cash"]');n&&(n.disabled=!0);try{e.drawer&&e.drawer.beforeSale(t);const{data:o,error:i}=await zt(t);if(i){if(F(i))return E([...P(),t]),d(),jt(),s(C("queued")),e.mkt&&e.mkt.queued&&e.mkt.queued(t.p_client),e.invoiceview&&e.invoiceview.afterSale({p:t,pending:!0}),e.drawer&&e.drawer.afterSale(t),Ht();n&&(n.disabled=!1);const a=T(i);if(a){const n=e.emergency&&e.emergency.grantFor(i.message);return n?e.emergency.offer({grant:n,loc:L.loc,context:"discount_over_limit"===n?{amount:t.p_discount,total:t._total}:"credit_over_limit"===n?{amount:Math.max(0,Math.round(100*(t._total-t._paid))/100),total:t._total}:{total:t._total},message:a}):s(a)}return/^LEGACY: /.test(i.message||"")?s(i.message.slice(8)):c(i)}if(o&&o.parked)return d(),jt(),s(C("held")),Ht();d(),jt(),s(`${C("done")} · ${C("receipt")} ${o.receipt} · ${$(o.total)}${a>0?" · "+v(b("ফেরত","Change","Change"))+" "+$(a):""}${o.due>0?" · "+C("dueword")+" "+$(o.due):""}`),e.invoice&&e.invoice.offer&&e.invoice.offer(o.id,t.p_loc),e.invoiceview&&e.invoiceview.afterSale({p:t,data:o,change:a}),e.drawer&&e.drawer.afterSale(t),e.crmConsent&&e.crmConsent.afterSale&&e.crmConsent.afterSale(t.p_customer_mobile),e.crmf&&e.crmf.afterSale&&e.crmf.afterSale(o.id),e.mkt&&e.mkt.afterSale&&e.mkt.afterSale(o.id),Ht()}finally{L.busy=!1}}function jt(){L.cart=[],L.type="retail",L.cust={mobile:"",name:"",found:null,info:null,show:!1},L.st=null}function Ht(){location.hash.startsWith("#/pos")&&st()}let Bt=!1;async function Rt(){if(Bt||!n.ctx||!navigator.onLine)return;const t=P();if(!t.length)return;Bt=!0;const a=new Set,o=[],i=new Map;try{for(const e of t){const{error:t}=await zt(e,!0);if(!t){a.add(e.p_client);continue}const n=t&&t.message||"";if(j.test(n))a.add(e.p_client),o.push({...e,_err:T(t)||n});else{if(F(t)||/jwt|token|401|403|permission denied|not authenticated|unauthor/i.test(n))break;e._tries=(e._tries||0)+1,e._tries>=3?(a.add(e.p_client),o.push({...e,_err:n})):i.set(e.p_client,e)}}}finally{E(P().filter(t=>!a.has(t.p_client)).map(t=>i.get(t.p_client)||t)),o.length&&(I([...z(),...o]),s(C("failedmsg")),e.posfail&&e.posfail.report(o)),Bt=!1}o.length&&location.hash.startsWith("#/pos")&&st()}window.addEventListener("online",Rt),setInterval(Rt,3e4);const Gt={cash:b("নগদ","Cash","Cash"),mobile:b("মোবাইল","Mobile","Mobile"),card:b("কার্ড","Card","Card"),due:b("বাকি","Due","Due"),split:b("ভাগ করা","Split","Split")};async function Ut(){_("#pos_body").innerHTML=`<p class="muted">${i(o("loading"))}</p>`;const[t,n]=await Promise.all([a.from("sales").select("*").eq("location_id",L.loc).eq("sale_date",y()).order("receipt",{ascending:!1}),a.from("sale_payments").select("mode,kind,amount").eq("location_id",L.loc).eq("voided",!1).gte("paid_at",y()+"T00:00:00+06:00")]);if(t.error)return c(t.error);L.day=t.data;const s=L.day.filter(t=>"done"===t.status),r=s.reduce((t,e)=>t+Number(e.total),0),l=s.reduce((t,e)=>t+Number(e.due_amount||0),0),d=(n.data||[]).filter(t=>"collection"===t.kind).reduce((t,e)=>t+Number(e.amount),0),u=P().filter(t=>t.p_loc===L.loc);_("#pos_body").innerHTML=`<div class="card"><div class="row between"><span>${i(C("day"))}</span><b style="font-size:1.5rem">${$(r)}</b></div>\n    <div class="muted">${s.length} ${i(C("count"))}</div>\n    <div class="row wrap" style="margin-top:6px">${["cash","mobile","card"].map(t=>`<span class="chip">${i(v(Gt[t]))} ${$((t=>n.error?s.filter(e=>e.pay_mode===t).reduce((t,e)=>t+Number(e.total),0):(n.data||[]).filter(e=>e.mode===t).reduce((t,e)=>t+Number(e.amount),0))(t))}</span>`).join("")}<span class="chip warn">${i(C("dueword"))} ${$(l)}</span>${d?`<span class="chip ok">${i(C("collect"))} ${$(d)}</span>`:""}</div></div>\n    ${z().filter(t=>t.p_loc===L.loc).map(t=>`<div class="notice bad"><b>${i(C("failed"))}</b> · ${$(t._total||0)} · ${i(t._err||"")}<div class="row" style="margin-top:6px"><button class="full" data-act="pos_discard" data-v="${i(t.p_client)}">${i(C("discard"))}</button>${e.posfail?e.posfail.buttons(t):""}</div></div>`).join("")}\n    ${e.drawer?e.drawer.noSaleButton(L.loc):""}\n    ${u.length?`<div class="notice warn">${u.length} ${i(C("pending"))}: ${$(u.reduce((t,e)=>t+(e._total||0),0))}</div>`:""}\n    ${L.day.length?L.day.map(t=>`<div class="card item" data-act="pos_open" data-v="${t.id}" style="${"void"===t.status?"opacity:.55":""}"><div><div class="nm">#${t.receipt} · ${h(t.sold_at)} ${t.quick?"⚡":""}${"wholesale"===t.sale_type?" ◆":""}</div>\n        <div class="muted" style="font-size:.85rem">${i(v(Gt[t.pay_mode]))} · ${i(t.created_staff||"")}${t.customer?" · "+i(t.customer):""}</div></div>\n        <div class="pr"><b>${$(t.total)}</b>${"void"===t.status?`<div><span class="chip bad">${i(C("voided"))}</span></div>`:Number(t.due_amount)>0?`<div><span class="chip warn">${i(C("dueword"))} ${$(t.due_amount)}</span></div>`:""}</div></div>`).join(""):`<p class="muted center">${i(C("nodata"))}</p>`}`}async function Wt(o){const s=L.day.find(t=>t.id===o);if(!s)return;const c=(R().approve||n.ctx.is_owner)&&"done"===s.status,[r,d]=await Promise.all([a.from("sale_payments").select("mode,wallet,ref,amount,voided").eq("sale_id",o),s.customer_id?a.from("customers").select("name,mobile").eq("id",s.customer_id).maybeSingle():{data:null}]),m=(r.data||[]).filter(t=>!t.voided);L.shareText=function(a,n,o){const i=e.ENV.locs.find(t=>t.id===a.location_id)||{},s=(a.lines||[]).map(t=>`${t.name}${t.item_id||t.custom?` ${p(t.qty)} × ${p(t.price)}`:""} = ${p(t.amount)}`),c=e.biz?e.biz.brandFor(a.location_id):{bn:"ইসলামিয়া মিষ্টি ঘর",en:"ISLAMIYA MISTY GHAR"},r=e.biz&&e.biz.receipt?e.biz.receipt(a.location_id):{header:"",footer:"",address:"",phone:""};return[`${t.BRAND_TEXT||c.bn}`,`${c.en}`,r.header||null,r.address||null,r.phone||null,`${u(i)}`,`${C("receipt")} ${i.code||""}-${a.receipt} · ${a.sale_date} ${h(a.sold_at)}`,"—",...s,Number(a.discount)?`${v(b("ডিসকাউন্ট","Discount","Discount"))}: -${p(a.discount)}`:null,`${C("total")}: ${p(a.total)}`,...(n||[]).map(t=>`${v(Gt[t.mode])}${t.wallet?" ("+t.wallet+")":""}: ${p(t.amount)}`),Number(a.due_amount)>0?`${C("dueword")}: ${p(a.due_amount)}`:null,o?`${C("cust")}: ${o.name} ${o.mobile}`:null,r.footer||v(b("ধন্যবাদ","Thank you","ধন্যবাদ"))].filter(Boolean).join("\n")}(s,m,d.data),l(`<h2>#${s.receipt} · ${h(s.sold_at)}</h2>\n    <div class="stack">${(s.lines||[]).map(t=>`<div class="row between"><span>${i(t.name)}${t.item_id||t.custom?` <span class="muted">${p(t.qty)} × ${p(t.price)}${t.override?" ✎":""}</span>`:""}</span><b>${$(t.amount)}</b></div>`).join("")}\n      ${Number(s.discount)?`<div class="row between"><span>${i(C("discount"))}</span><b>− ${$(s.discount)}</b></div>`:""}\n      <div class="row between"><b>${i(C("total"))}</b><b style="font-size:1.3rem">${$(s.total)}</b></div>\n      ${m.map(t=>`<div class="row between muted"><span>${i(v(Gt[t.mode]))}${t.wallet?" · "+i(t.wallet):""}${t.ref?" · "+i(t.ref):""}</span><span>${$(t.amount)}</span></div>`).join("")}\n      ${Number(s.due_amount)>0&&"done"===s.status?`<div class="notice warn">${i(C("dueword"))}: <b>${$(s.due_amount)}</b></div>`:""}\n      <div class="muted">${i(C("by"))}: ${i(s.created_staff||"")}${d.data?" · "+i(d.data.name)+" "+i(d.data.mobile):s.customer?" · "+i(s.customer):""}${s.note?" · "+i(s.note):""}</div>\n      ${"void"===s.status?`<div class="notice bad">${i(C("voided"))}: ${i(s.void_note||"")} (${i(s.void_staff||"")})</div>`:""}\n      ${e.invoiceview?`<button class="full" data-act="iv92_open" data-v="${s.id}">${i(e.invoiceview.T("openHist"))}</button>`:""}   \x3c!-- bos92 --\x3e\n      <button class="full" data-act="pos_share">${i(C("share"))}</button>\n      ${e.invoice&&e.invoice.printSaleId?`<button class="full" data-act="pos_print" data-v="${s.id}">${i(C("print"))}</button>`:""}\n      ${e.saleReturn&&"done"===s.status?`<button class="full" data-act="pos_return" data-v="${s.id}">${i(v(b("মাল ফেরত নিন","Return goods","মাল return নিন")))}</button>`:""}\n      ${c?`<label>${i(C("voidwhy"))}</label><input id="void_note"><button class="danger full" data-act="pos_void" data-v="${s.id}">${i(C("void"))}</button>`:""}\n      <button class="full" data-act="closesheet">${i(C("close"))}</button></div>`)}Object.assign(t.H,{pos_tab:t=>{L.tab=t.dataset.v,st()},pos_cat:t=>{L.cat=t.dataset.v,L.sub="",ct(!0)},pos_sub:t=>{L.sub=t.dataset.v,ct(!0)},pos_add:t=>{const e=W(t.dataset.v);B(e.id),"pc"===e.unit?ft(e.id,1):ht(e.id)},pos_q_set:t=>{_("#pos_qty").value=t.dataset.n},pos_q_unit:t=>ht(t.dataset.v,t.dataset.u),pos_q_ok:t=>{const e=W(t.dataset.v),a=w(_("#pos_qty").value);if(!(e&&a>0))return s(C("qty"));const n=Q(e,yt)||1,o=Math.round(a*n*1e3)/1e3;if(!(o>0))return s(C("qty"));d(),ft(e.id,o,yt!==e.unit?{unit:yt,n:a}:null)},pos_conv_save:async t=>{const e=W(t.dataset.v),n=w((_("#cv_f")||{}).value),o=(_("#cv_from")||{}).value;if(!(e&&o&&n>0))return s(C("qty"));const i=await a.from("unit_conversions").insert({item_id:e.id,from_unit:o,to_unit:e.unit,factor:n,active:!0});if(i.error)return c(i.error);(L.conv=L.conv||[]).push({item_id:e.id,from_unit:o,to_unit:e.unit,factor:n,active:!0});try{m.set("bos_pos_conv",JSON.stringify(L.conv))}catch(t){}s(C("convSaved")),ht(e.id,o)},pos_other:()=>(l(`<h2>${i(C("other"))}</h2><div class="notice ok">${i(C("ohint"))}</div><div class="stack">\n    <div><label>${i(C("oname"))}</label><input id="ot_name"></div>\n    <div class="row"><div style="flex:1"><label>${i(C("qty"))}</label><input id="ot_qty" inputmode="decimal" value="1"></div><div style="flex:1"><label>${i(C("ounit"))}</label><input id="ot_unit"></div></div>\n    <div><label>${i(C("oprice"))}</label><input id="ot_price" inputmode="decimal"></div>\n    <div class="row"><button class="full" data-act="closesheet">${i(o("cancel"))}</button><button class="primary full" data-act="pos_ot_ok">${i(C("add"))}</button></div></div>`),void setTimeout(()=>{const t=_("#ot_name");t&&t.focus()},60)),pos_ot_ok:()=>{const t=(_("#ot_name").value||"").trim(),e=w(_("#ot_qty").value),a=w(_("#ot_price").value);return t?e>0&&a>0?(L.cart.push({kind:"custom",name:t,unit:(_("#ot_unit").value||"").trim(),qty:e,price:a}),d(),void bt()):s(C("oprice")):s(v(N.name_required))},pos_newitem:()=>{location.hash="#/items",setTimeout(()=>{t.H.itemnew&&t.H.itemnew()},700)},pos_cart:()=>wt(),pos_type:t=>{L.type=t.dataset.v,[...document.querySelectorAll("[data-act=pos_type]")].forEach(t=>t.classList.toggle("on",t.dataset.v===L.type)),Nt()},pos_dk:t=>{if(L.dk===t.dataset.v)return;L.dk=t.dataset.v;const e=_("#cart_disc");e&&(e.value=""),xt()},pos_cust_show:()=>{L.cust.show=!0,Nt()},pos_tier_disc:()=>{const t=L.cust.info;if(!t||!t.tier||!t.tier_discount_on)return;const e=Y();if(!e.a&&!e.p)return s(v(N.discount_mode_off));const a=Number(t.tier.discount_percent),n=null===t.tier.discount_cap_amount||void 0===t.tier.discount_cap_amount?null:Number(t.tier.discount_cap_amount),o=f(K()*a/100);let i=e.p?"percent":"amount",c=a;null!==n&&o>n&&e.a?(i="amount",c=n):"amount"===i&&(c=o),L.dk=i;const r=_("#cart_disc");r&&(r.value=String(c)),xt(),kt()},pos_step:t=>{const e=Number(t.dataset.k),a=L.cart[e],n=Number(t.dataset.d);if("item"===a.kind&&a.alt){const t=W(a.item_id),o=Q(t,a.alt.unit)||1,i=G(a.alt.unit),s=Math.round(1e3*(a.alt.n+n*i))/1e3;return s<=0?L.cart.splice(e,1):(a.alt.n=s,a.qty=Math.round(s*o*1e3)/1e3),Dt()}const o=G("item"===a.kind?W(a.item_id).unit:"pc"),i=Math.round(1e3*(a.qty+n*o))/1e3;i<=0?L.cart.splice(e,1):a.qty=i,Dt()},pos_rm:t=>{L.cart.splice(Number(t.dataset.k),1),Dt()},pos_qedit:t=>{const e=L.cart[Number(t.dataset.k)],a="item"===e.kind&&e.alt,n=prompt(C("qty")+(a?" ("+U(a.unit)+")":""),a?a.n:e.qty);if(null===n)return;const o=w(n);o>0&&(a?(e.alt.n=o,e.qty=Math.round(o*(Q(W(e.item_id),a.unit)||1)*1e3)/1e3):e.qty=o,Dt())},pos_price:t=>{const e=L.cart[Number(t.dataset.k)],a=prompt(C("priceov"),e.price);if(null===a)return;const n=w(a);n>=0&&""!==a.trim()&&(e.price=n,e.ov=n!==Number(W(e.item_id).sell_price),Dt())},pos_confirm:()=>{const t=tt(),a=K(),n=L.dk;if(t>a||"percent"===n&&Z()>100)return s(v(N.bad_discount));const o=e.pay.check(L.st);if(o)return s(v(N[o]));let i=null,c=null;if(Ct()||L.cust.mobile){if(i=k(L.cust.mobile),!i)return s(L.cust.mobile?v(N.bad_mobile):v(N.customer_required));if(c=(L.cust.found&&L.cust.found.found?L.cust.found.name:(_("#cu_name")||{}).value||L.cust.name||"").trim(),!c)return s(v(N.customer_name_required))}const r=et(),l=e.pay.paid(L.st),d=1===L.st.rows.length&&"cash"===L.st.rows[0].mode,u=d?w(L.st.rows[0].given):0,p=d?f(w(L.st.rows[0].amount)):0,m=L.cart.length>0&&L.cart.every(t=>"quick"===t.kind);return It(Ot({lines:At(),disc:t,payments:e.pay.list(L.st),mobile:i,cname:c,type:L.type,note:(_("#cart_note")||{}).value||"",quick:m,total:r,paid:l,dk:n,dinput:"percent"===n?Z():t}),u>p?f(u-p):0)},pos_scan:async()=>{if(!e.barcode)return;const t=await e.barcode.scan();t&&vt(t)},pos_quick:()=>(l(`<h2>⚡ ${i(C("quick"))}</h2>\n    <label>${i(C("amount"))} (৳)</label><input id="qs_amt" inputmode="decimal" style="font-size:1.8rem;font-weight:700" autocomplete="off">\n    <label style="margin-top:8px">${i(C("what"))}</label><input id="qs_what">\n    <div class="stack" style="margin-top:12px"><button class="primary full" data-act="pos_qs_cash" style="min-height:56px">${i(C("full"))}</button>\n      <button class="full" data-act="pos_qs_more">${i(C("more"))}</button><button class="full" data-act="closesheet">${i(o("cancel"))}</button></div>`),void setTimeout(()=>{const t=_("#qs_amt");t&&t.focus()},60)),pos_qs_cash:()=>{const t=Xt();if(t)return It(Ot({lines:[{item_id:null,name:t.name,amount:t.amount}],disc:0,payments:[{mode:"cash",amount:t.amount}],type:"retail",quick:!0,total:t.amount,paid:t.amount}),0)},pos_qs_more:()=>{const t=Xt();t&&(L.cart.push(t),d(),bt(),wt())},pos_open:t=>Wt(t.dataset.v),pos_share:async()=>{const t=L.shareText||"";try{navigator.share?await navigator.share({text:t}):(await navigator.clipboard.writeText(t),s("✓"))}catch(t){}},pos_print:t=>e.invoice.printSaleId(t.dataset.v,L.loc),pos_discard:t=>{I(z().filter(e=>e.p_client!==t.dataset.v)),e.posfail&&e.posfail.discarded(t.dataset.v),Ut()},pos_return:t=>{d(),e.saleReturn.open(t.dataset.v)},pos_void:async t=>{const e=(_("#void_note").value||"").trim();if(!e)return s(C("needNote"));const{error:n}=await a.rpc("void_sale",{p_id:t.dataset.v,p_note:e});if(n)return c(n);d(),s(C("voided")),Ut()}}),document.addEventListener("input",t=>{const n=t.target.id;if("pos_q"===n&&(L.q=t.target.value,mt(!0)),"pos_qty"===n&&void 0!==yt){const t=document.querySelector("[data-act=pos_q_ok]");t&&gt(t.dataset.v)}if("cart_disc"===n&&xt(),"cu_mobile"===n){L.cust.mobile=t.target.value,L.cust.found=null,L.cust.info=null,L.cust.name="",function(){clearTimeout(Lt);const t=k(L.cust.mobile);t?Lt=setTimeout(async()=>{const n=await a.rpc("find_customer",{p_mobile:t});if(n.error)return;if(k(L.cust.mobile)!==t)return;let o=t;if(n.data&&!n.data.found&&e.crm&&e.crm.findAny){const a=await e.crm.findAny(t);a&&(n.data=a,o=a.mobile,L.cust.mobile=a.mobile)}if(L.cust.found=n.data,n.data&&n.data.found&&(L.cust.name=n.data.name),L.cust.info=null,n.data&&n.data.found)try{const t=await a.rpc("customer_pos_info",{p_mobile:o});!t.error&&t.data&&k(L.cust.mobile)===o&&(L.cust.info=t.data)}catch(t){}Nt()},250):L.cust.found=null}();_("#cart_cust");k(L.cust.mobile)&&Nt()}"cu_name"===n&&(L.cust.name=t.target.value)}),document.addEventListener("keydown",t=>{if("Enter"!==t.key||"pos_q"!==t.target.id||!L.q.trim()||!0!==e.rule("barcode_device_on",!1))return;const a=e.barcode&&e.barcode.find(L.q,L.items);a&&(t.preventDefault(),L.q="",t.target.value="",mt(!0),vt(a.barcode))}),document.addEventListener("change",t=>{"pos_loc"===t.target.id&&(L.loc=Number(t.target.value),m.set("bos_pos_loc",String(L.loc)),jt(),st())}),window.BOS_PAGES=Object.assign(window.BOS_PAGES||{},{pos:async function(){if(!R().view&&!n.ctx.is_owner)return location.hash="#/home";r(C("title"),`<p class="muted" role="status">${i(o("loading"))}</p><div class="pos-grid" aria-hidden="true">${'<div class="sk-card"></div>'.repeat(8)}</div>`,!0);try{await it()}catch(t){return c(t)}if(!L.loc)return r(C("title"),`<div class="notice bad">${i(C("noloc"))}</div>`,!0);st(),Rt()}}),e.pos={flush:Rt,normMobile:k,ctx:()=>({loc:L.loc,lines:At(),sub:K(),customerId:L.cust.info&&L.cust.info.id||null,setDiscount:t=>{L.dk="amount";const e=_("#cart_disc");e&&(e.value=String(t)),xt(),kt()}})}})();
+/* Islamia BOS · POS: running sales. Item-wise sale, items that are not in the list, quick sale for rush, retail / wholesale,
+   split and partial payment, customer (mobile) rules, today's list, void with a note, receipt share.
+   Prices and totals are fixed by the server (record_sale2). A sale that cannot be sent waits in a local queue and is re-sent. */
+(() => {
+'use strict';
+const A = window.BOS_APP, B = window.BOS;
+const { sb, S, t, esc, toast, fail, shell, openSheet, closeSheet, nm, fmt, store } = A;
+const $ = (s, el = document) => el.querySelector(s);
+const L = B.L, lab = B.lab;
+const r2 = (n) => Math.round(n * 100) / 100;
+const money = (n) => '৳ ' + fmt(r2(n));
+const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
+const hhmm = (iso) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Dhaka' });
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }));
+const norm = (v) => String(v ?? '').replace(/[০-৯]/g, (d) => '০১২৩৪৫৬৭৮৯'.indexOf(d));
+const nnum = (v) => { const n = Number(norm(v).trim()); return Number.isFinite(n) ? n : 0; };
+// Bangladesh mobile: 01XXXXXXXXX (also +880 / 880 / spaces / dashes)
+const normMobile = (v) => { let d = norm(v).replace(/[^0-9+]/g, ''); if (d.startsWith('+880')) d = '0' + d.slice(4); else if (d.startsWith('880') && d.length === 13) d = '0' + d.slice(3); return /^01[3-9][0-9]{8}$/.test(d) ? d : null; };
+
+const CATS = { sweet_kg: L('মিষ্টি (কেজি)', 'Sweets (KG)', 'মিষ্টি (KG)'), sweet_pc: L('মিষ্টি (পিস)', 'Sweets (Piece)', 'মিষ্টি (Piece)'), doi: L('দই', 'Doi (Curd)', 'Doi (দই)'),
+  cake_lb: L('কেক (পাউন্ড)', 'Cake (Pound)', 'Cake (Pound)'), cake_pc: L('কেক (পিস)', 'Cake (Piece)', 'Cake (Piece)') };
+const UNITS = { kg: L('কেজি', 'KG', 'KG'), pc: L('পিস', 'Piece', 'Piece'), lb: L('পাউন্ড', 'Pound', 'Pound'), g: L('গ্রাম', 'Gram', 'Gram'), dozen: L('ডজন', 'Dozen', 'Dozen'), box: L('বক্স', 'Box', 'Box') };
+const X = {
+  title: L('সেল (POS)', 'Sales (POS)', 'Sale (POS)'), sell: L('বিক্রি', 'Sell', 'Sell'), today: L('আজকের সেল', "Today's sales", 'Today সেল'),
+  quick: L('কুইক সেল', 'Quick sale', 'Quick Sale'), cart: L('কার্ট', 'Cart', 'Cart'), pay: L('পেমেন্ট', 'Pay', 'Pay'), total: L('মোট', 'Total', 'Total'),
+  discount: L('ডিসকাউন্ট (৳)', 'Discount (৳)', 'Discount (৳)'), discL: L('ডিসকাউন্ট', 'Discount', 'Discount'), discTakes: L('কাটা হবে', 'Takes off', 'কাটা হবে'), print: L('রসিদ প্রিন্ট', 'Print receipt', 'Receipt Print'), note: L('নোট (ঐচ্ছিক)', 'Note (optional)', 'Note (ঐচ্ছিক)'),
+  confirm: L('সেল সম্পন্ন', 'Complete sale', 'Complete Sale'), empty: L('কার্ট খালি — আইটেম ট্যাপ করুন', 'Cart is empty — tap an item', 'Cart খালি — Item ট্যাপ করুন'),
+  amount: L('টাকার পরিমাণ', 'Amount', 'Amount'), what: L('কী বিক্রি (ঐচ্ছিক)', 'What was sold (optional)', 'কী বিক্রি (ঐচ্ছিক)'), all: L('সব', 'All', 'All'), freq: L('বেশি বিক্রি', 'Frequent', 'Frequent'),
+  scan: L('বারকোড স্ক্যান', 'Scan barcode', 'Barcode স্ক্যান'), search: L('আইটেম খুঁজুন', 'Search item', 'Item খুঁজুন'), qty: L('পরিমাণ', 'Quantity', 'Quantity'), add: L('কার্টে দিন', 'Add to cart', 'Add to Cart'),
+  receipt: L('রসিদ', 'Receipt', 'Receipt'), done: L('সেল হয়েছে', 'Sale done', 'Sale হয়েছে'), queued: L('নেট নেই — সেল জমা আছে, নেট এলে পাঠানো হবে', 'No network — sale saved, will be sent when online', 'Net নেই — Sale জমা আছে, Online হলে যাবে'),
+  held: L('মালিকের জন্য ধরা আছে — এখনও রসিদ নেই', 'Held for the owner — no receipt yet', 'মালিকের জন্য Held — এখনও receipt নেই'),   // W1-B: a late offline sale parked by late_sale_policy = park
+  pending: L('পাঠানো বাকি', 'waiting to send', 'পাঠানো বাকি'), void: L('বাতিল', 'Void', 'Void'), voided: L('বাতিল হয়েছে', 'Voided', 'Voided'), voidwhy: L('বাতিলের কারণ (লিখতেই হবে)', 'Reason for voiding (required)', 'Void এর কারণ (লিখতেই হবে)'),
+  day: L('আজকের মোট', "Today's total", 'Today মোট'), count: L('টি সেল', 'sales', 'sales'), nodata: L('এখনও কোনো সেল নেই', 'No sales yet', 'এখনও কোনো sale নেই'),
+  back: L('ফিরুন', 'Back', 'Back'), close: L('বন্ধ', 'Close', 'Close'), lines: L('আইটেম', 'Items', 'Items'), by: L('বিক্রেতা', 'Sold by', 'Sold by'),
+  needNote: L('কারণ লিখুন', 'Write a reason', 'কারণ লিখুন'), noloc: L('কোনো লোকেশন দেওয়া নেই — মালিককে জানান', 'No location assigned — tell the owner', 'কোনো Location দেওয়া নেই — Owner কে জানান'),
+  priceov: L('দাম বদলান (ব্যতিক্রম তালিকায় যাবে)', 'Change price (goes to exceptions)', 'Price বদলান (Exception এ যাবে)'),
+  retail: L('খুচরা', 'Retail', 'Retail'), wholesale: L('পাইকারি', 'Wholesale', 'Wholesale (পাইকারি)'),
+  cust: L('গ্রাহক', 'Customer', 'Customer'), custAdd: L('গ্রাহক যোগ করুন', 'Add customer', 'Customer যোগ করুন'), mobile: L('মোবাইল নম্বর', 'Mobile number', 'Mobile number'), cname: L('গ্রাহকের নাম', 'Customer name', 'Customer এর নাম'),
+  custReq: L('বাকি বা পাইকারি সেলে গ্রাহকের মোবাইল নম্বর আর নাম লাগবেই', 'A customer mobile number and name are required for a due or wholesale sale', 'Due বা Wholesale sale এ Customer এর mobile number আর নাম লাগবেই'),
+  known: L('পুরনো গ্রাহক', 'Existing customer', 'পুরনো Customer'), newc: L('নতুন গ্রাহক — নাম লিখুন', 'New customer — enter the name', 'নতুন Customer — নাম লিখুন'),
+  owes: L('এখন বাকি', 'Owes now', 'এখন Due'), limit: L('বাকির সীমা', 'Credit limit', 'Credit limit'),
+  unit: L('একক', 'Unit', 'Unit'), convHow: L('অন্য এককেও বিক্রি করতে চান? (যেমন ১ পিস = ০.২ কেজি)', 'Sell in another unit too? (e.g. 1 pc = 0.2 kg)', 'অন্য unit-এও বিক্রি? (যেমন ১ pc = ০.২ kg)'), save: L('সেভ', 'Save', 'Save'), convSaved: L('ইউনিট কনভার্সন সেভ হয়েছে', 'Unit conversion saved', 'Unit conversion save হয়েছে'),
+  other: L('অন্য আইটেম (তালিকায় নেই)', 'Other item (not in the list)', 'অন্য Item (list এ নেই)'), oname: L('আইটেমের নাম', 'Item name', 'Item এর নাম'), ounit: L('একক (কেজি, পিস…)', 'Unit (kg, piece…)', 'Unit (kg, piece…)'), oprice: L('একক দাম (৳)', 'Unit price (৳)', 'Unit price (৳)'),
+  ohint: L('এটা মালিকের কাছে "তালিকায় নেই" হিসেবে যাবে, যাতে তালিকায় যোগ হয়।', 'The owner is told it is not in the list so it can be added.', 'Owner কে "list এ নেই" হিসেবে জানানো হবে, যাতে list এ যোগ হয়।'),
+  newitem: L('＋ নতুন আইটেম', '＋ New item', '＋ নতুন Item'), full: L('নগদে সম্পন্ন', 'Done — cash', 'Cash এ Done'), more: L('মোবাইল / বাকি / ভাগ…', 'Mobile / due / split…', 'Mobile / Due / ভাগ…'),
+  paidword: L('পরিশোধ', 'Paid', 'Paid'), dueword: L('বাকি', 'Due', 'Due'), share: L('রসিদ শেয়ার', 'Share receipt', 'Receipt Share'), collect: L('বাকি আদায়', 'Collect due', 'Due আদায়'),
+  failed: L('পাঠানো যায়নি (নিয়মে আটকেছে)', 'Could not be recorded (refused)', 'পাঠানো যায়নি (আটকেছে)'), discard: L('বাদ দিন', 'Discard', 'Discard'),
+  failedmsg: L('কিছু সেল নিয়মে আটকেছে — আজকের সেল পাতায় দেখুন', 'Some sales were refused — see Today', 'কিছু Sale আটকেছে — Today পাতায় দেখুন'),
+  needupd: L('ডেটাবেস আপডেট বাকি (নতুন SQL চালাতে হবে) — এখন শুধু পুরো নগদ সেল চলবে', 'Database update pending (new SQL) — only full-cash sales work for now', 'Database update বাকি (নতুন SQL) — এখন শুধু full-cash sale চলবে'),
+};
+const T = (k) => lab(X[k]);
+const ERRS = {
+  customer_required: X.custReq, customer_name_required: L('নতুন গ্রাহকের নাম লিখুন', 'Enter the new customer’s name', 'নতুন Customer এর নাম লিখুন'), bad_mobile: L('মোবাইল নম্বর সঠিক নয় (01XXXXXXXXX)', 'The mobile number is not valid (01XXXXXXXXX)', 'Mobile number ঠিক নয় (01XXXXXXXXX)'),
+  overpaid: L('পরিশোধ মোটের বেশি হতে পারে না', 'Paid cannot be more than the total', 'Paid মোটের বেশি হতে পারে না'), over_credit_limit: L('এই গ্রাহকের বাকির সীমা পার হচ্ছে — ম্যানেজার লাগবে', 'This customer’s credit limit would be exceeded — a manager is needed', 'এই Customer এর Credit limit পার হচ্ছে — Manager লাগবে'),
+  override_needs_approval: L('দাম বদলাতে ম্যানেজার লাগবে', 'Only a manager can change a price', 'Price বদলাতে Manager লাগবে'), discount_needs_approval: L('ডিসকাউন্ট সীমার উপরে — ম্যানেজার লাগবে', 'The discount is above the limit — a manager is needed', 'Discount limit এর উপরে — Manager লাগবে'),
+  customer_inactive: L('এই গ্রাহক বন্ধ করা আছে', 'This customer is switched off', 'এই Customer বন্ধ করা আছে'), bad_discount: L('ডিসকাউন্ট মোটের বেশি হতে পারে না (শতাংশ ১০০ এর বেশি নয়)', 'Discount cannot exceed the total (percent at most 100)', 'Discount মোটের বেশি হতে পারে না (percent 100 এর বেশি নয়)'),
+  discount_mode_off: L('এই ধরনের ডিসকাউন্ট বন্ধ আছে (নিয়ম)', 'This kind of discount is switched off (rule)', 'এই ধরনের Discount বন্ধ (নিয়ম)'),
+  unlisted_blocked: L('তালিকায় নেই এমন আইটেম বিক্রি বন্ধ আছে (নিয়ম)', 'Selling an item that is not in the list is switched off (rule)', 'List এ নেই এমন item বিক্রি বন্ধ (নিয়ম)'), paper_no_required: L('কাগজের ছাপা নম্বর লাগবে', 'The printed paper number is required', 'কাগজের ছাপা number লাগবে'),
+  period_closed: L('এই ডেটের হিসাব বন্ধ — শুধু মালিক বদলাতে পারবেন', 'This date is closed — only the owner can change it', 'এই date এর হিসাব বন্ধ — শুধু Owner বদলাতে পারবেন'),
+  expired_stock_blocked: L('মেয়াদ শেষ স্টক বিক্রি বন্ধ আছে (মালিকের সেটিং) — সেল হয়নি', 'Selling expired stock is blocked (owner setting) — the sale was not made', 'মেয়াদ শেষ stock বিক্রি বন্ধ (owner setting) — sale হয়নি'),
+  insufficient_stock: L('মজুতে এত নেই — বিক্রি করা গেল না', 'Not enough stock on hand — the sale was not made', 'Stock-এ এত নেই — বিক্রি হয়নি'),
+  item_not_sellable: L('এই আইটেম সেলের জন্য নয় বা প্রাইস দেওয়া নেই (তথ্য লাগবে)', 'This item is not for sale or has no selling price (Data needed)', 'এই item sale-এর জন্য নয় বা price নেই (Data লাগবে)'),
+  wallet_needed: L('মোবাইল পেমেন্টে বিকাশ/নগদ ইত্যাদি বাছুন', 'Choose bKash / Nagad etc. for a mobile payment', 'Mobile payment এ bKash/Nagad বাছুন'), name_required: L('আইটেমের নাম লিখুন', 'Enter the item name', 'Item এর নাম লিখুন'),
+};
+const T2 = (e) => { const m = (e && e.message) || String(e || ''); for (const k of Object.keys(ERRS)) if (m.includes(k)) return lab(ERRS[k]); return null; };
+
+// ---------- state ----------
+const P = { loc: null, cat: '', q: '', items: [], locs: [], cart: [], type: 'retail', tab: 'sell', day: [], busy: false, dk: 'amount', st: null, cust: { mobile: '', name: '', found: null, show: false } };
+const uidK = () => (S.ctx && S.ctx.profile ? S.ctx.profile.id : 'anon');
+const QK = () => 'bos_pos_queue_' + uidK(), XK = () => 'bos_pos_failed_' + uidK(), FKEY = 'bos_pos_freq';
+const jget = (k, d) => { try { return JSON.parse(store.get(k)) || d; } catch (e) { return d; } };
+const queue = () => jget(QK(), []);
+const setQueue = (q) => store.set(QK(), JSON.stringify(q));
+const failedQ = () => jget(XK(), []);
+const setFailed = (q) => store.set(XK(), JSON.stringify(q));
+const BUSINESS = /^(no_lines|bad_mode|bad_qty|bad_price|bad_amount|bad_discount|bad_discount_kind|discount_mode_off|no_price|item_not_found|due_needs_customer|not allowed|customer_required|customer_name_required|bad_mobile|overpaid|over_credit_limit|override_needs_approval|discount_needs_approval|customer_inactive|bad_sale_type|bad_payments|name_required|period_closed|unlisted_blocked|paper_no_required|insufficient_stock|expired_stock_blocked|item_not_sellable|unit_unknown|production_negative_reason_needed|client_id_taken)/;
+const freq = () => jget(FKEY, {});
+const bump = (id) => { const f = freq(); f[id] = (f[id] || 0) + 1; store.set(FKEY, JSON.stringify(f)); };
+const perms = () => S.ctx.perms.POS || {};
+const stepOf = (u) => (u === 'pc' ? 1 : 0.5);
+const unitL = (u) => lab(UNITS[u]) || u || '';
+const itemById = (id) => P.items.find((i) => i.id === id);
+// ---- selling in another unit (Kg / Pc ...): the cart always holds the quantity in the item's own unit (what the server prices and takes out of stock);
+// a line may also remember what was typed (alt = { unit, n }) so the screen can show "3 pc = 0.6 kg". The conversions are the owner's unit_conversions rows.
+const altList = (i) => {
+  const out = new Map(); out.set(i.unit, 1);
+  const rows = (P.conv || []).filter((c) => c.active !== false && (c.item_id === i.id || c.item_id === null || c.item_id === undefined));
+  rows.sort((a, z) => (a.item_id ? 0 : 1) - (z.item_id ? 0 : 1));       // the item's own row wins over a general one
+  rows.forEach((c) => { const f = Number(c.factor); if (!(f > 0)) return;
+    if (c.to_unit === i.unit && !out.has(c.from_unit)) out.set(c.from_unit, f);          // 1 from = f of the item unit
+    else if (c.from_unit === i.unit && !out.has(c.to_unit)) out.set(c.to_unit, 1 / f); });
+  return out;
+};
+const altFactor = (i, u) => altList(i).get(u) || null;
+const hasAlt = (i) => altList(i).size > 1;
+const lineAmt = (l) => (l.kind === 'quick' ? r2(l.amount) : r2(l.qty * l.price));
+const cartSub = () => r2(P.cart.reduce((s, l) => s + lineAmt(l), 0));
+const isNet = (e) => !navigator.onLine || /fetch|network|load failed|timeout/i.test((e && e.message) || '');
+const dmodes = () => ({ a: B.rule('discount_mode_amount_on', true) !== false, p: B.rule('discount_mode_percent_on', true) !== false });   // rules: which discount kinds may be typed
+const discIn = () => Math.max(0, nnum(($('#cart_disc') || {}).value || 0));                                                          // what was typed (৳ or %)
+const discVal = () => { const v = discIn(); return P.dk === 'percent' ? r2(cartSub() * Math.min(v, 100) / 100) : v; };               // the amount that comes off
+const netTotal = () => Math.max(0, r2(cartSub() - discVal()));
+
+const SELLABLE = (i) => i.sell_price !== null && i.sellable !== false && !i.hidden && i.item_type !== 'asset' && i.item_type !== 'raw_material';
+/* bos114 (WebLoad): the item list, the unit conversions and the static data (locations, rules ...) are read AT THE SAME TIME (they were one after the other = 3-5 round trips on mobile data).
+   Stale-while-revalidate: when this phone already has the list (opened POS before, or the saved copy of the last good load), the POS draws from it at once and the fresh list replaces it
+   as soon as it arrives (redraw only if something changed). The server prices every sale, so a card is never the authority on a price. */
+function fetchItems() {
+  return (async () => {
+    // item master (phase14): only sellable types with a selling price are offered; hidden items stay out of the picker. An older database has no such columns: the plain list is used.
+    let it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,sub_category,unit,sell_price,is_active,barcode,sellable,hidden,item_type').eq('is_active', true).order('code'));
+    if (it.error) it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,sub_category,unit,sell_price,is_active,barcode').eq('is_active', true).order('code'));
+    if (it.error && B.cs && isNet(it.error)) { const c = B.cs.itemsLoad(); if (c) it = { data: c, error: null }; }   // bos112: no internet: the item list saved by the last good load
+    if (it.error) throw it.error;
+    if (B.cs && !it.error && it.data && it.data.length) B.cs.itemsSave(it.data);   // bos112
+    return it.data.filter(SELLABLE);
+  })();
+}
+async function fetchConv() {
+  try { const cv = await sb.from('unit_conversions').select('item_id,from_unit,to_unit,factor,active').eq('active', true); P.conv = cv.error ? (JSON.parse(store.get('bos_pos_conv') || '[]')) : (cv.data || []); if (!cv.error) store.set('bos_pos_conv', JSON.stringify(P.conv)); } catch (e) { P.conv = P.conv || JSON.parse(store.get('bos_pos_conv') || '[]'); }
+}
+const itemsSig = (l) => l.length + '|' + l.map((i) => [i.id, i.sell_price, i.name_bn, i.name_en, i.name_mix, i.category, i.sub_category, i.unit, i.barcode].join('~')).join('|');
+function setLocs() {
+  const all = B.liveLocs ? B.liveLocs(B.ENV.locs) : B.ENV.locs;
+  P.locs = S.ctx.is_owner || S.ctx.roles.includes('management') ? all : all.filter((l) => S.ctx.locations.includes(l.id));
+  if (!P.loc || !P.locs.find((l) => l.id === P.loc)) P.loc = store.get('bos_pos_loc') ? Number(store.get('bos_pos_loc')) : (P.locs[0] || {}).id;
+  if (!P.locs.find((l) => l.id === P.loc)) P.loc = (P.locs[0] || {}).id;
+}
+async function load() {
+  const fresh = fetchItems(), conv = fetchConv(), stat = B.loadStatic();
+  let early = null;
+  if (navigator.onLine !== false && !S.offline) {
+    early = P.items.length ? P.items : ((B.cs && B.cs.itemsLoad && B.cs.itemsLoad()) || []).filter(SELLABLE);
+    if (!early.length) early = null;
+  }
+  fresh.catch(() => {}); conv.catch(() => {});   // handled below (awaited) or ignored on the early path
+  await stat;
+  if (early) {
+    P.items = early; if (!P.conv) P.conv = JSON.parse(store.get('bos_pos_conv') || '[]'); setLocs(); B.pay.loadWallets();
+    Promise.all([fresh, conv]).then(([l]) => {
+      if (itemsSig(l) === itemsSig(P.items)) return;
+      P.items = l; if (P.tab === 'sell' && $('#pos_items') && !$('#sheet')) { drawSell(perms().enter || S.ctx.is_owner); } }).catch(() => { /* the list on screen stays */ });
+    return;
+  }
+  P.items = await fresh; await conv; setLocs();
+  B.pay.loadWallets();
+}
+
+// ---------- page ----------
+async function viewPos() {
+  if (!perms().view && !S.ctx.is_owner) return (location.hash = '#/home');
+  shell(T('title'), `<p class="muted" role="status">${esc(t('loading'))}</p><div class="pos-grid" aria-hidden="true">${'<div class="sk-card"></div>'.repeat(8)}</div>`, true);   // bos114: skeleton cards while the list loads
+  try { await load(); } catch (e) { return fail(e); }
+  if (!P.loc) return shell(T('title'), `<div class="notice bad">${esc(T('noloc'))}</div>`, true);
+  drawPos();
+  flush();
+}
+function drawPos() {
+  const can = perms().enter || S.ctx.is_owner;
+  const q = queue().filter((x) => x.p_loc === P.loc).length;
+  shell(T('title'), `
+    <div class="row" style="margin-bottom:8px">${P.locs.length > 1 ? `<select id="pos_loc" style="flex:1">${P.locs.map((l) => `<option value="${l.id}" ${l.id === P.loc ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>` : `<b style="flex:1">${esc(nm(P.locs[0]))}</b>`}
+      ${q ? `<span class="chip warn" id="pos_qchip">${q} ${esc(T('pending'))}</span>` : ''}</div>
+    <div class="row" style="margin-bottom:10px"><button class="tog ${P.tab === 'sell' ? 'on' : ''}" data-act="pos_tab" data-v="sell" style="flex:1">${esc(T('sell'))}</button>
+      <button class="tog ${P.tab === 'today' ? 'on' : ''}" data-act="pos_tab" data-v="today" style="flex:1">${esc(T('today'))}</button></div>
+    <div id="pos_body"></div>`, true);
+  if (P.tab === 'sell') drawSell(can); else drawToday();
+}
+
+// ---------- sell ----------
+function drawSell(can) {
+  const cats = [...new Set(P.items.map((i) => i.category).filter(Boolean))];
+  const cn = (c) => (B.catpick && B.catpick.nameIfKnown(c)) /* bos100 */ || lab(CATS[c]) || (P.items.find((i) => i.category === c) || {}).category_bn || c;
+  const canNew = S.ctx.is_owner || (S.ctx.perms.ITEMS && S.ctx.perms.ITEMS.enter);
+  $('#pos_body').innerHTML = `
+    <div class="row"><input id="pos_q" placeholder="${esc(T('search'))}" value="${esc(P.q)}" style="flex:1"><button data-act="pos_scan" aria-label="${esc(T('scan'))}" ${can ? '' : 'disabled'}>▮▮</button><button class="primary" data-act="pos_quick" ${can ? '' : 'disabled'}>⚡ ${esc(T('quick'))}</button></div>
+    <div class="row wrap" style="margin:10px 0" id="pos_cats" data-ctl="select" data-title="${esc(lab(L('ক্যাটাগরি', 'Category', 'Category')))}">${[['', T('all')], ['_f', T('freq')], ...cats.map((c) => [c, cn(c)])].map(([c, l]) =>
+      `<button class="tog ${P.cat === c ? 'on' : ''}" data-act="pos_cat" data-v="${esc(c)}">${esc(l)}</button>`).join('')}</div>
+    ${B.catpick ? B.catpick.subChips(P.items, P.cat, P.sub, 'pos_sub') : ''}<!-- bos100: Sub-category chips -->
+    <div class="row wrap" style="margin-bottom:10px"><button class="tog" data-act="pos_other" ${can ? '' : 'disabled'}>${esc(T('other'))}</button>${canNew ? `<button class="tog" data-act="pos_newitem">${esc(T('newitem'))}</button>` : ''}</div>
+    <div class="pos-grid" id="pos_items"></div><div style="height:96px"></div>
+    <div class="pos-bar" id="pos_bar"></div>`;
+  drawItems(can); drawBar(can);
+}
+function visibleItems() {
+  const q = P.q.trim().toLowerCase(), f = freq();
+  let l = P.items.filter((i) => (!P.cat || P.cat === '_f' || i.category === P.cat) && (!P.sub || P.cat === '_f' || i.sub_category === P.sub) /* bos100 */ && (!q || [i.name_bn, i.name_en, i.name_mix, i.code].some((x) => (x || '').toLowerCase().includes(q))));
+  if (P.cat === '_f') l = l.filter((i) => f[i.id]).sort((a, z) => f[z.id] - f[a.id]).slice(0, 24);
+  return l;
+}
+/* bos114 (WebLoad): 1369 items drew 1369 buttons in one go (a 2.5 s freeze on a mid-range phone). The first cards are drawn at once, the rest follow in small chunks
+   (a new search / category / redraw cancels the old chunks); a tap on a card only updates that card (no full redraw, no scroll jump). Same cards, same order, same markup. */
+const CARD_FIRST = 72, CARD_STEP = 72;
+const cardHtml = (i, inCart, can) => `<button class="pos-item ${inCart.has(i.id) ? 'in' : ''}" data-cat="${esc(i.category || '')}" data-act="pos_add" data-v="${i.id}" ${can ? '' : 'disabled'}>
+      <span class="pn">${esc(nm(i))}</span><span class="pp"><span class="cur">৳</span>${fmt(i.sell_price)}<small> / ${esc(unitL(i.unit))}</small></span>${inCart.has(i.id) ? `<span class="pq">${fmt(inCart.get(i.id))}</span>` : ''}</button>`;
+const cartMap = () => new Map(P.cart.filter((l) => l.kind === 'item').map((l) => [l.item_id, l.qty]));
+function drawItems(can) {
+  const host = $('#pos_items'); if (!host) return;
+  const list = visibleItems(), tok = (P.dtok = (P.dtok || 0) + 1); P.shown = list;
+  if (P.io) { P.io.disconnect(); P.io = null; } const old = $('#pos_more'); if (old) old.remove();
+  if (!list.length) { host.innerHTML = `<p class="muted center">—</p>`; return; }
+  host.innerHTML = list.slice(0, CARD_FIRST).map((i) => cardHtml(i, cartMap(), can)).join('');
+  let k = CARD_FIRST; if (list.length <= k) return;
+  // the rest is drawn as the list is scrolled (a sentinel under the grid); without IntersectionObserver the chunks follow on a timer
+  const sent = document.createElement('div'); sent.id = 'pos_more'; sent.setAttribute('aria-hidden', 'true'); sent.style.cssText = 'height:1px'; host.after(sent);
+  const more = () => {
+    if (tok !== P.dtok || !host.isConnected) return;
+    host.insertAdjacentHTML('beforeend', list.slice(k, k + CARD_STEP).map((i) => cardHtml(i, cartMap(), can)).join('')); k += CARD_STEP;
+    if (k >= list.length) { if (P.io) { P.io.disconnect(); P.io = null; } sent.remove(); return; }
+    if (P.io) { P.io.unobserve(sent); P.io.observe(sent); } else setTimeout(more, 0);
+  };
+  if (window.IntersectionObserver) { P.io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) more(); }, { rootMargin: '900px 0px' }); P.io.observe(sent); } else setTimeout(more, 0);
+}
+function drawBar(can) {
+  const n = P.cart.length, sub = cartSub();
+  const b = $('#pos_bar'); if (!b) return;
+  b.innerHTML = `<div><div class="muted" style="font-size:.8rem">${n ? n + ' · ' + esc(T('lines')) : esc(T('cart'))}</div><b style="font-size:1.25rem">${money(sub)}</b></div>
+    <button class="primary" data-act="pos_cart" ${n && can ? '' : 'disabled'}>${esc(T('pay'))} →</button>`;
+}
+function refreshSell() {
+  if (P.tab !== 'sell' || !$('#pos_items')) return;
+  const vis = visibleItems(), cur = P.shown;
+  if (cur && cur.length === vis.length && vis.every((x, n) => x === cur[n])) {   // same cards: only the "in cart" mark and quantity change (bos114)
+    const inCart = cartMap();
+    $('#pos_items').querySelectorAll('.pos-item').forEach((b) => { const q = inCart.get(b.getAttribute('data-v')), has = inCart.has(b.getAttribute('data-v')), old = b.querySelector('.pq');
+      b.classList.toggle('in', has); if (!has) { if (old) old.remove(); } else if (old) old.textContent = fmt(q); else { const sp = document.createElement('span'); sp.className = 'pq'; sp.textContent = fmt(q); b.appendChild(sp); } });
+  } else drawItems(true);
+  drawBar(true);
+}
+// scan (camera or device) or a typed code + Enter in the search box: add the item whose items.barcode matches
+function scanAdd(code) {
+  const i = B.barcode && B.barcode.find(code, P.items);
+  if (!i) return toast(code + ' · ' + lab(L('এই বারকোডের কোনো পণ্য নেই', 'No product has this barcode', 'এই barcode-এর কোনো product নেই')));
+  bump(i.id); if (i.unit === 'pc' && !hasAlt(i)) addItem(i.id, 1); else qtySheet(i.id);
+}
+function addItem(id, qty, alt) {
+  const i = itemById(id); if (!i) return;
+  const ex = P.cart.find((l) => l.kind === 'item' && l.item_id === id);
+  if (ex) { ex.qty = Math.round((ex.qty + qty) * 1000) / 1000; ex.alt = ex.alt && alt && ex.alt.unit === alt.unit ? { unit: alt.unit, n: Math.round((ex.alt.n + alt.n) * 1000) / 1000 } : null; }
+  else P.cart.push({ kind: 'item', item_id: id, qty, price: Number(i.sell_price), ov: false, alt: alt || null });
+  refreshSell();
+}
+const presetsFor = (u) => (u === 'pc' ? [1, 2, 3, 5, 10] : u === 'dozen' ? [0.5, 1, 2, 3] : u === 'g' ? [100, 250, 500, 1000] : [0.25, 0.5, 1, 2, 5]);
+let QU = null;       // the unit chosen in the open quantity sheet
+function qtySheet(id, unit) {
+  const i = itemById(id); if (!i) return;
+  const al = altList(i); QU = unit && al.has(unit) ? unit : i.unit; const f = al.get(QU) || 1;
+  const units = [...al.keys()];
+  const chips = units.length > 1 ? `<div class="row wrap" style="margin-bottom:10px" role="group" aria-label="${esc(T('unit'))}">${units.map((u) => `<button class="tog ${u === QU ? 'on' : ''}" data-act="pos_q_unit" data-v="${id}" data-u="${esc(u)}" style="min-width:76px;font-size:1.1rem" aria-pressed="${u === QU}">${esc(unitL(u))}</button>`).join('')}</div>` : '';
+  const owner = !!(S.ctx && S.ctx.is_owner) && units.length === 1;
+  const setter = owner ? `<details data-ctl="off" style="margin-top:10px"><summary class="muted">${esc(T('convHow'))}</summary><div class="row" style="align-items:flex-end;margin-top:6px"><span>1</span>
+      <select id="cv_from" aria-label="${esc(T('unit'))}">${['pc', 'kg', 'dozen', 'lb', 'g', 'box'].filter((u) => u !== i.unit).map((u) => `<option value="${u}">${esc(unitL(u))}</option>`).join('')}</select><span>=</span>
+      <input id="cv_f" inputmode="decimal" placeholder="0.2" style="width:90px"><span>${esc(unitL(i.unit))}</span><button class="mini" data-act="pos_conv_save" data-v="${id}">${esc(T('save'))}</button></div></details>` : '';
+  const presets = presetsFor(QU);
+  openSheet(`<h2 style="font-size:1.35rem">${esc(nm(i))}</h2><p class="muted" style="font-size:1rem">${money(Number(i.sell_price) * f)} / ${esc(unitL(QU))}${QU !== i.unit ? ` <small>(${money(i.sell_price)} / ${esc(unitL(i.unit))})</small>` : ''}</p>${chips}
+    <div class="row wrap" style="margin-bottom:10px">${presets.map((p) => `<button class="tog" data-act="pos_q_set" data-v="${id}" data-n="${p}" style="min-width:64px;font-size:1.15rem">${p}</button>`).join('')}</div>
+    <label>${esc(T('qty'))} (${esc(unitL(QU))})</label><input id="pos_qty" inputmode="decimal" value="1" style="font-size:1.4rem">
+    <div class="muted" id="pos_qconv" style="min-height:1.3em"></div>${setter}
+    <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(t('cancel'))}</button><button class="primary full" data-act="pos_q_ok" data-v="${id}">${esc(T('add'))}</button></div>`);
+  setTimeout(() => { const e = $('#pos_qty'); if (e) { e.focus(); e.select(); } qConv(id); }, 60);
+}
+function qConv(id) { const i = itemById(id), el = $('#pos_qconv'); if (!i || !el) return; const f = altFactor(i, QU) || 1; if (QU === i.unit) { el.textContent = ''; return; } const n = nnum(($('#pos_qty') || {}).value); el.textContent = n > 0 ? `= ${fmt(Math.round(n * f * 1000) / 1000)} ${unitL(i.unit)} · ${money(r2(n * f * Number(i.sell_price)))}` : ''; }
+function otherSheet() {
+  openSheet(`<h2>${esc(T('other'))}</h2><div class="notice ok">${esc(T('ohint'))}</div><div class="stack">
+    <div><label>${esc(T('oname'))}</label><input id="ot_name"></div>
+    <div class="row"><div style="flex:1"><label>${esc(T('qty'))}</label><input id="ot_qty" inputmode="decimal" value="1"></div><div style="flex:1"><label>${esc(T('ounit'))}</label><input id="ot_unit"></div></div>
+    <div><label>${esc(T('oprice'))}</label><input id="ot_price" inputmode="decimal"></div>
+    <div class="row"><button class="full" data-act="closesheet">${esc(t('cancel'))}</button><button class="primary full" data-act="pos_ot_ok">${esc(T('add'))}</button></div></div>`);
+  setTimeout(() => { const e = $('#ot_name'); if (e) e.focus(); }, 60);
+}
+
+// ---------- cart / pay ----------
+function cartSheet() {
+  const dm = dmodes(); P.dk = dm.a ? 'amount' : dm.p ? 'percent' : null;
+  P.st = B.pay.create(netTotal, updDue); if (B.pay.receipt) B.pay.receipt(P.st, 'pos_split_payment');   // W1-F: bank / cheque rows only when receipt_bank_on is ON
+  openSheet(`<h2>${esc(T('cart'))}</h2><div id="cart_lines" class="stack"></div>
+    <div class="row wrap" style="margin:8px 0"><button class="tog ${P.type === 'retail' ? 'on' : ''}" data-act="pos_type" data-v="retail">${esc(T('retail'))}</button><button class="tog ${P.type === 'wholesale' ? 'on' : ''}" data-act="pos_type" data-v="wholesale">${esc(T('wholesale'))}</button></div>
+    ${dm.a || dm.p ? `<div class="row" style="align-items:flex-end"><div style="flex:1"><label id="cart_disc_l"></label><input id="cart_disc" inputmode="decimal"></div>${dm.a && dm.p ? `<div class="row" id="cart_dk" role="group" style="gap:6px"><button class="tog" data-act="pos_dk" data-v="amount" aria-label="${esc(T('discL'))} ৳">৳</button><button class="tog" data-act="pos_dk" data-v="percent" aria-label="${esc(T('discL'))} %">%</button></div>` : ''}</div>
+    <div class="muted" id="cart_disc_calc" style="font-size:.9rem;min-height:1.4em"></div>` : ''}
+    ${B.mkt && B.mkt.posBox ? B.mkt.posBox() : ''}
+    ${B.crmf && B.crmf.posBox ? B.crmf.posBox() : ''}
+    <div class="row between" style="margin:10px 0"><span>${esc(T('total'))}</span><b style="font-size:1.4rem" id="cart_total"></b></div>
+    <div id="cart_pay"></div><div id="cart_cust"></div>
+    <div style="margin-top:8px"><label>${esc(T('note'))}</label><input id="cart_note"></div>
+    <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('back'))}</button><button class="primary full" id="cart_ok" data-act="pos_confirm">${esc(T('confirm'))}</button></div>`);
+  drawCartLines(); drawPay(); drawCust(); drawDisc();
+}
+function drawDisc() {
+  const l = $('#cart_disc_l'); if (!l) return; const pct = P.dk === 'percent';
+  l.textContent = T('discL') + (pct ? ' (%)' : ' (৳)');
+  document.querySelectorAll('#cart_dk .tog').forEach((b) => b.classList.toggle('on', b.dataset.v === P.dk));
+  const c = $('#cart_disc_calc'); if (c) c.textContent = pct && discIn() > 0 ? `${T('discTakes')}: ${money(discVal())}` : '';
+}
+function discChanged() { B.pay.syncAuto(P.st); const box = $('#cart_pay'); if (box) { const f = document.activeElement; box.innerHTML = B.pay.html(P.st); if (f && f.id === 'cart_disc') f.focus(); } updDue(); }
+function drawPay() { const el = $('#cart_pay'); if (el) el.innerHTML = B.pay.html(P.st); }
+function updDue() { const tt = $('#cart_total'); if (tt) tt.textContent = money(netTotal()); drawCust(); drawDisc(); }
+function needCust() { return (P.type === 'wholesale' && B.rule('pos_customer_on_wholesale', true) === true) || (P.st && B.pay.due(P.st) > 0 && B.rule('pos_customer_on_due', true) === true) || (discVal() > 0 && B.rule('pos_customer_on_discount', false) === true); }
+function drawCust() {
+  const el = $('#cart_cust'); if (!el) return;
+  const need = needCust(), c = P.cust;
+  const keepFocus = document.activeElement && document.activeElement.id;
+  if (!need && !c.show) { el.innerHTML = `<button type="button" class="tog" data-act="pos_cust_show">${esc(T('custAdd'))}</button>`; return; }
+  const m = normMobile(c.mobile), f = c.found;
+  el.innerHTML = `<div class="card" style="margin:8px 0"><b>${esc(T('cust'))}${need ? ' *' : ''}</b>${need ? `<div class="muted" style="font-size:.85rem">${esc(T('custReq'))}</div>` : ''}
+    <label>${esc(T('mobile'))}</label><input id="cu_mobile" inputmode="tel" value="${esc(c.mobile)}" placeholder="01XXXXXXXXX">
+    ${m && f && f.found ? `<div class="notice ok"><b>${esc(f.name)}</b> · ${esc(T('known'))}${Number(f.balance) > 0 ? ` · ${esc(T('owes'))}: ${money(f.balance)}` : ''}${f.credit_limit !== null && f.credit_limit !== undefined ? ` · ${esc(T('limit'))}: ${money(f.credit_limit)}` : ''}</div>${tierBlock()}`
+      : m ? `<label>${esc(T('cname'))} — ${esc(T('newc'))}</label><input id="cu_name" value="${esc(c.name)}">` : ''}${B.crmConsent ? B.crmConsent.posStrip(c.mobile) : ''}</div>`;
+  if (keepFocus === 'cu_mobile') { const i = $('#cu_mobile'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }
+}
+// phase43: the customer's tier chip + perks, a one-tap "apply the tier discount" button and a gift reminder (all from customer_pos_info; nothing here decides a right)
+const TX = { apply: L('স্তরের ছাড় দিন', 'Apply tier discount', 'Tier discount দিন'), gift: L('উপহার পাওনা', 'gift(s) due', 'gift পাওনা'), pts: L('পয়েন্ট', 'points', 'points'), capNote: L('সর্বোচ্চ', 'up to', 'সর্বোচ্চ') };
+function tierBlock() {
+  const i = P.cust.info; if (!i || !i.found || !i.tier) return '';
+  const tr = i.tier, name = (S.lang === 'en' ? (tr.name_en || tr.name_bn) : (tr.name_bn || tr.name_en)), pct = Number(tr.discount_percent);
+  return `<div class="stack" id="cart_tier" style="margin-top:6px"><div class="row wrap" style="gap:6px;align-items:center"><span class="chip" style="border-color:${esc(tr.color)};color:${esc(tr.color)}">${tr.badge ? esc(tr.badge) + ' ' : ''}${esc(name)}</span>
+      ${Number(i.gifts_due) > 0 ? `<span class="chip warn" id="cart_gift">🎁 ${Number(i.gifts_due)} ${esc(lab(TX.gift))}</span>` : ''}${i.points !== null && i.points !== undefined ? `<span class="chip">${Number(i.points)} ${esc(lab(TX.pts))}</span>` : ''}</div>
+      ${tr.perks ? `<div class="muted" style="font-size:.85rem">${esc(tr.perks)}</div>` : ''}
+      ${i.tier_discount_on ? `<button type="button" class="tog" id="cart_tier_btn" data-act="pos_tier_disc" style="min-height:40px">${esc(lab(TX.apply))}: ${esc(name)} ${pct}%${tr.discount_cap_amount !== null && tr.discount_cap_amount !== undefined ? ` (${esc(lab(TX.capNote))} ${money(tr.discount_cap_amount)})` : ''}</button>` : ''}</div>`;
+}
+let lookTimer = null;
+function lookup() {
+  clearTimeout(lookTimer);
+  const m = normMobile(P.cust.mobile); if (!m) { P.cust.found = null; return; }
+  lookTimer = setTimeout(async () => {
+    const r = await sb.rpc('find_customer', { p_mobile: m }); if (r.error) return;
+    if (normMobile(P.cust.mobile) !== m) return;
+    let mm = m; if (r.data && !r.data.found && B.crm && B.crm.findAny) { const a = await B.crm.findAny(m); if (a) { r.data = a; mm = a.mobile; P.cust.mobile = a.mobile; } }   // CRM-A: second phone
+    P.cust.found = r.data; if (r.data && r.data.found) P.cust.name = r.data.name;
+    P.cust.info = null; if (r.data && r.data.found) { try { const ri = await sb.rpc('customer_pos_info', { p_mobile: mm }); if (!ri.error && ri.data && normMobile(P.cust.mobile) === mm) P.cust.info = ri.data; } catch (e) { /* database without tiers: no tier line */ } }   // phase43: tier chip, perks, tier discount, gifts due
+    drawCust();
+  }, 250);
+}
+function drawCartLines() {
+  const el = $('#cart_lines'); if (!el) return;
+  el.innerHTML = P.cart.map((l, k) => {
+    const i = l.kind === 'item' ? itemById(l.item_id) : null;
+    const name = l.kind === 'item' ? nm(i) : l.name, unit = l.kind === 'item' ? unitL(i.unit) : l.unit || '';
+    return `<div class="cart-line"><div style="flex:1;min-width:0"><div class="nm">${esc(name)}${l.kind === 'quick' ? ' ⚡' : ''}${l.kind === 'custom' ? ' ◇' : ''}</div>
+      ${l.kind === 'quick' ? '' : `<div class="muted" style="font-size:.85rem" ${l.kind === 'item' ? `data-act="pos_price" data-k="${k}"` : ''}>${money(l.price)} / ${esc(unit)}${l.kind === 'item' ? ' ✎' : ''}${l.ov ? ' ✎' : ''}${l.alt ? ` · <b>${fmt(l.alt.n)} ${esc(unitL(l.alt.unit))}</b>` : ''}</div>`}</div>
+      ${l.kind === 'quick' ? `<button class="mini" data-act="pos_rm" data-k="${k}" aria-label="x">✕</button>` : `<div class="stepper"><button data-act="pos_step" data-k="${k}" data-d="-1">−</button><button data-act="pos_qedit" data-k="${k}" class="qv">${fmt(l.qty)}</button><button data-act="pos_step" data-k="${k}" data-d="1">＋</button></div>`}
+      <b style="min-width:72px;text-align:right">${money(lineAmt(l))}</b></div>`; }).join('') || `<p class="muted">${esc(T('empty'))}</p>`;
+  const tt = $('#cart_total'); if (tt) tt.textContent = money(netTotal());
+}
+function afterCartChange() {
+  if (!P.cart.length) { closeSheet(); refreshSell(); return; }
+  drawCartLines(); B.pay.syncAuto(P.st); drawPay(); drawCust(); drawBar(true);
+}
+
+// ---------- quick sale ----------
+function quickSheet() {
+  openSheet(`<h2>⚡ ${esc(T('quick'))}</h2>
+    <label>${esc(T('amount'))} (৳)</label><input id="qs_amt" inputmode="decimal" style="font-size:1.8rem;font-weight:700" autocomplete="off">
+    <label style="margin-top:8px">${esc(T('what'))}</label><input id="qs_what">
+    <div class="stack" style="margin-top:12px"><button class="primary full" data-act="pos_qs_cash" style="min-height:56px">${esc(T('full'))}</button>
+      <button class="full" data-act="pos_qs_more">${esc(T('more'))}</button><button class="full" data-act="closesheet">${esc(t('cancel'))}</button></div>`);
+  setTimeout(() => { const e = $('#qs_amt'); if (e) e.focus(); }, 60);
+}
+function readQuick() { const amt = nnum($('#qs_amt').value); if (!(amt > 0)) { toast(T('amount')); return null; } return { kind: 'quick', amount: amt, name: ($('#qs_what').value || '').trim() || 'Quick sale' }; }
+
+// ---------- sending (with offline queue) ----------
+function linesOf() {
+  return P.cart.map((l) => l.kind === 'item' ? { item_id: l.item_id, qty: l.qty, price: l.price, override: l.ov, name: nm(itemById(l.item_id)) }
+    : l.kind === 'custom' ? { item_id: null, name: l.name, unit: l.unit, qty: l.qty, price: l.price } : { item_id: null, name: l.name, amount: l.amount });
+}
+function build(o) {
+  return { p_client: uid(), p_loc: P.loc, p_lines: o.lines, p_discount: o.disc || 0, p_payments: o.payments, p_customer_mobile: o.mobile || null, p_customer_name: o.cname || null,
+    p_sale_type: o.type || 'retail', p_note: o.note || null, p_quick: !!o.quick, p_sold_at: new Date().toISOString(),
+    ...(o.dk && o.disc > 0 ? { p_discount_kind: o.dk, p_discount_input: o.dinput } : {}),   // new optional pair; the legacy p_discount (the amount) is always sent, old queued sales have no pair and replay as before
+    _t: Date.now(), _total: o.total, _paid: o.paid };
+}
+const clean = (p) => { const { _t, _total, _paid, ...r } = p; return r; };
+const NOFN = /record_sale2|Could not find the function|PGRST202|schema cache/i;
+async function send(p, replay) {
+  let r = await ((replay && B.posfail) ? B.posfail.sendOffline(clean(p)) : sb.rpc('record_sale2', clean(p)));   // bos83: a queue replay goes through record_sale_offline when posfail.js is loaded
+  if (r.error && NOFN.test(r.error.message || '') && 'p_discount_kind' in p) { const { p_discount_kind, p_discount_input, ...old } = clean(p); r = await sb.rpc('record_sale2', old); }   // database without the new pair: same sale, old shape
+  if (r.error && NOFN.test(r.error.message || '')) {
+    // database not updated yet: only a full single-mode payment can still be recorded the old way
+    const pays = p.p_payments || [];
+    if (pays.length === 1 && Number(pays[0].amount) >= Number(p._total) - 0.001 && p.p_sale_type === 'retail' && !p.p_customer_mobile && p.p_lines.every((l) => l.item_id || l.amount !== undefined)) {
+      r = await sb.rpc('record_sale', { p_client: p.p_client, p_loc: p.p_loc, p_lines: p.p_lines.filter((l) => l.item_id || l.amount), p_discount: p.p_discount, p_mode: pays[0].mode, p_tendered: pays[0].tendered || null,
+        p_customer: p.p_customer_name, p_note: p.p_note, p_quick: p.p_quick, p_sold_at: p.p_sold_at });
+    } else r = { data: null, error: { message: 'LEGACY: ' + lab(X.needupd) } };
+  }
+  return r;
+}
+async function submitSale(p, change) {
+  if (P.busy) return; P.busy = true;
+  const btn = $('#cart_ok') || $('[data-act="pos_qs_cash"]'); if (btn) btn.disabled = true;
+  try {
+    if (B.drawer) B.drawer.beforeSale(p);   // bos95: cash drawer (rule cash_drawer_mode, off = nothing happens, never blocks the sale)
+    const { data, error } = await send(p);
+    if (error) {
+      if (isNet(error)) { setQueue([...queue(), p]); closeSheet(); resetCart(); toast(T('queued')); if (B.mkt && B.mkt.queued) B.mkt.queued(p.p_client); if (B.invoiceview) B.invoiceview.afterSale({ p, pending: true }); /* bos92 */ if (B.drawer) B.drawer.afterSale(p); /* bos95 */ return afterSale(); }   // RPT-C3: remember the campaign tag of a queued sale
+      if (btn) btn.disabled = false;
+      const m = T2(error);
+      if (m) { const g = B.emergency && B.emergency.grantFor(error.message); if (g) return B.emergency.offer({ grant: g, loc: P.loc, context: g === 'discount_over_limit' ? { amount: p.p_discount, total: p._total } : g === 'credit_over_limit' ? { amount: Math.max(0, Math.round((p._total - p._paid) * 100) / 100), total: p._total } : { total: p._total }, message: m }); return toast(m); }
+      if (/^LEGACY: /.test(error.message || '')) return toast(error.message.slice(8));
+      return fail(error);
+    }
+    if (data && data.parked) { closeSheet(); resetCart(); toast(T('held')); return afterSale(); }   // W1-B (phase89): answer {parked:true, held_id}: the sale is held for the owner and counts as sent (no retry, no receipt)
+    closeSheet(); resetCart();
+    toast(`${T('done')} · ${T('receipt')} ${data.receipt} · ${money(data.total)}${change > 0 ? ' · ' + lab(L('ফেরত', 'Change', 'Change')) + ' ' + money(change) : ''}${data.due > 0 ? ' · ' + T('dueword') + ' ' + money(data.due) : ''}`);
+    if (B.invoice && B.invoice.offer) B.invoice.offer(data.id, p.p_loc);
+    if (B.invoiceview) B.invoiceview.afterSale({ p, data, change });   // bos92: invoice on screen (rule pos_show_invoice_after_sale; never = nothing happens)
+    if (B.drawer) B.drawer.afterSale(p);   // bos95
+    if (B.crmConsent && B.crmConsent.afterSale) B.crmConsent.afterSale(p.p_customer_mobile);
+    if (B.crmf && B.crmf.afterSale) B.crmf.afterSale(data.id);   // bosCRMF: record a coupon typed at the till
+    if (B.mkt && B.mkt.afterSale) B.mkt.afterSale(data.id);   // RPT-C3: optional campaign / offer code tag (silent when campaigns.js is not loaded)
+    afterSale();
+  } finally { P.busy = false; }
+}
+function resetCart() { P.cart = []; P.type = 'retail'; P.cust = { mobile: '', name: '', found: null, info: null, show: false }; P.st = null; }
+function afterSale() { if (location.hash.startsWith('#/pos')) drawPos(); }
+let flushing = false;
+async function flush() {
+  if (flushing || !S.ctx || !navigator.onLine) return;
+  const q = queue(); if (!q.length) return;
+  flushing = true;
+  const done = new Set(), bad = [], tried = new Map();
+  try {
+    for (const p of q) {
+      const { error } = await send(p, true);   // bos83: replay flag
+      if (!error) { done.add(p.p_client); continue; }
+      const m = (error && error.message) || '';
+      if (BUSINESS.test(m)) { done.add(p.p_client); bad.push({ ...p, _err: T2(error) || m }); continue; }   // refused by the rules: kept visible, never lost
+      if (isNet(error) || /jwt|token|401|403|permission denied|not authenticated|unauthor/i.test(m)) break;   // network or session trouble: keep and retry later
+      p._tries = (p._tries || 0) + 1;                                                                        // an odd error on one sale must not block the others
+      if (p._tries >= 3) { done.add(p.p_client); bad.push({ ...p, _err: m }); } else tried.set(p.p_client, p);
+    }
+  } finally {
+    setQueue(queue().filter((x) => !done.has(x.p_client)).map((x) => tried.get(x.p_client) || x));
+    if (bad.length) { setFailed([...failedQ(), ...bad]); toast(T('failedmsg')); if (B.posfail) B.posfail.report(bad); /* bos83 */ }
+    flushing = false;
+  }
+  if (bad.length && location.hash.startsWith('#/pos')) drawPos();
+}
+window.addEventListener('online', flush);
+setInterval(flush, 30000);
+
+// ---------- today ----------
+const MODEL = { cash: L('নগদ', 'Cash', 'Cash'), mobile: L('মোবাইল', 'Mobile', 'Mobile'), card: L('কার্ড', 'Card', 'Card'), due: L('বাকি', 'Due', 'Due'), split: L('ভাগ করা', 'Split', 'Split') };
+async function drawToday() {
+  $('#pos_body').innerHTML = `<p class="muted">${esc(t('loading'))}</p>`;
+  const [r, pr] = await Promise.all([sb.from('sales').select('*').eq('location_id', P.loc).eq('sale_date', today()).order('receipt', { ascending: false }),
+    sb.from('sale_payments').select('mode,kind,amount').eq('location_id', P.loc).eq('voided', false).gte('paid_at', today() + 'T00:00:00+06:00')]);
+  if (r.error) return fail(r.error);
+  P.day = r.data;
+  const ok = P.day.filter((s) => s.status === 'done');
+  const tot = ok.reduce((a, s) => a + Number(s.total), 0), dueT = ok.reduce((a, s) => a + Number(s.due_amount || 0), 0);
+  const by = (m) => (pr.error ? ok.filter((x) => x.pay_mode === m).reduce((a, x) => a + Number(x.total), 0) : (pr.data || []).filter((x) => x.mode === m).reduce((a, x) => a + Number(x.amount), 0));
+  const coll = (pr.data || []).filter((x) => x.kind === 'collection').reduce((a, x) => a + Number(x.amount), 0);
+  const pend = queue().filter((x) => x.p_loc === P.loc);
+  $('#pos_body').innerHTML = `<div class="card"><div class="row between"><span>${esc(T('day'))}</span><b style="font-size:1.5rem">${money(tot)}</b></div>
+    <div class="muted">${ok.length} ${esc(T('count'))}</div>
+    <div class="row wrap" style="margin-top:6px">${['cash', 'mobile', 'card'].map((m) => `<span class="chip">${esc(lab(MODEL[m]))} ${money(by(m))}</span>`).join('')}<span class="chip warn">${esc(T('dueword'))} ${money(dueT)}</span>${coll ? `<span class="chip ok">${esc(T('collect'))} ${money(coll)}</span>` : ''}</div></div>
+    ${failedQ().filter((x) => x.p_loc === P.loc).map((x) => `<div class="notice bad"><b>${esc(T('failed'))}</b> · ${money(x._total || 0)} · ${esc(x._err || '')}<div class="row" style="margin-top:6px"><button class="full" data-act="pos_discard" data-v="${esc(x.p_client)}">${esc(T('discard'))}</button>${B.posfail ? B.posfail.buttons(x) : ''/* bos83 */}</div></div>`).join('')}
+    ${B.drawer ? B.drawer.noSaleButton(P.loc) : ''/* bos95 */}
+    ${pend.length ? `<div class="notice warn">${pend.length} ${esc(T('pending'))}: ${money(pend.reduce((a, p) => a + (p._total || 0), 0))}</div>` : ''}
+    ${P.day.length ? P.day.map((s) => `<div class="card item" data-act="pos_open" data-v="${s.id}" style="${s.status === 'void' ? 'opacity:.55' : ''}"><div><div class="nm">#${s.receipt} · ${hhmm(s.sold_at)} ${s.quick ? '⚡' : ''}${s.sale_type === 'wholesale' ? ' ◆' : ''}</div>
+        <div class="muted" style="font-size:.85rem">${esc(lab(MODEL[s.pay_mode]))} · ${esc(s.created_staff || '')}${s.customer ? ' · ' + esc(s.customer) : ''}</div></div>
+        <div class="pr"><b>${money(s.total)}</b>${s.status === 'void' ? `<div><span class="chip bad">${esc(T('voided'))}</span></div>` : Number(s.due_amount) > 0 ? `<div><span class="chip warn">${esc(T('dueword'))} ${money(s.due_amount)}</span></div>` : ''}</div></div>`).join('') : `<p class="muted center">${esc(T('nodata'))}</p>`}`;
+}
+function receiptText(s, pays, cust) {
+  const loc = B.ENV.locs.find((l) => l.id === s.location_id) || {}, lines = (s.lines || []).map((l) => `${l.name}${l.item_id || l.custom ? ` ${fmt(l.qty)} × ${fmt(l.price)}` : ''} = ${fmt(l.amount)}`);
+  const bd = B.biz ? B.biz.brandFor(s.location_id) : { bn: 'ইসলামিয়া মিষ্টি ঘর', en: 'ISLAMIYA MISTY GHAR' };   // bizctx: the business of the sale's place; legacy name when none is set
+  const rc = B.biz && B.biz.receipt ? B.biz.receipt(s.location_id) : { header: '', footer: '', address: '', phone: '' };   // phase134 profile
+  return [`${A.BRAND_TEXT || bd.bn}`, `${bd.en}`, rc.header || null, rc.address || null, rc.phone || null, `${nm(loc)}`, `${T('receipt')} ${loc.code || ''}-${s.receipt} · ${s.sale_date} ${hhmm(s.sold_at)}`, '—', ...lines,
+    Number(s.discount) ? `${lab(L('ডিসকাউন্ট', 'Discount', 'Discount'))}: -${fmt(s.discount)}` : null, `${T('total')}: ${fmt(s.total)}`,
+    ...(pays || []).map((p) => `${lab(MODEL[p.mode])}${p.wallet ? ' (' + p.wallet + ')' : ''}: ${fmt(p.amount)}`), Number(s.due_amount) > 0 ? `${T('dueword')}: ${fmt(s.due_amount)}` : null,
+    cust ? `${T('cust')}: ${cust.name} ${cust.mobile}` : null, rc.footer || lab(L('ধন্যবাদ', 'Thank you', 'ধন্যবাদ'))].filter(Boolean).join('\n');
+}
+async function saleSheet(id) {
+  const s = P.day.find((x) => x.id === id); if (!s) return;
+  const canVoid = (perms().approve || S.ctx.is_owner) && s.status === 'done';
+  const [pr, cu] = await Promise.all([sb.from('sale_payments').select('mode,wallet,ref,amount,voided').eq('sale_id', id), s.customer_id ? sb.from('customers').select('name,mobile').eq('id', s.customer_id).maybeSingle() : { data: null }]);
+  const pays = (pr.data || []).filter((p) => !p.voided);
+  P.shareText = receiptText(s, pays, cu.data);
+  openSheet(`<h2>#${s.receipt} · ${hhmm(s.sold_at)}</h2>
+    <div class="stack">${(s.lines || []).map((l) => `<div class="row between"><span>${esc(l.name)}${l.item_id || l.custom ? ` <span class="muted">${fmt(l.qty)} × ${fmt(l.price)}${l.override ? ' ✎' : ''}</span>` : ''}</span><b>${money(l.amount)}</b></div>`).join('')}
+      ${Number(s.discount) ? `<div class="row between"><span>${esc(T('discount'))}</span><b>− ${money(s.discount)}</b></div>` : ''}
+      <div class="row between"><b>${esc(T('total'))}</b><b style="font-size:1.3rem">${money(s.total)}</b></div>
+      ${pays.map((p) => `<div class="row between muted"><span>${esc(lab(MODEL[p.mode]))}${p.wallet ? ' · ' + esc(p.wallet) : ''}${p.ref ? ' · ' + esc(p.ref) : ''}</span><span>${money(p.amount)}</span></div>`).join('')}
+      ${Number(s.due_amount) > 0 && s.status === 'done' ? `<div class="notice warn">${esc(T('dueword'))}: <b>${money(s.due_amount)}</b></div>` : ''}
+      <div class="muted">${esc(T('by'))}: ${esc(s.created_staff || '')}${cu.data ? ' · ' + esc(cu.data.name) + ' ' + esc(cu.data.mobile) : s.customer ? ' · ' + esc(s.customer) : ''}${s.note ? ' · ' + esc(s.note) : ''}</div>
+      ${s.status === 'void' ? `<div class="notice bad">${esc(T('voided'))}: ${esc(s.void_note || '')} (${esc(s.void_staff || '')})</div>` : ''}
+      ${B.invoiceview ? `<button class="full" data-act="iv92_open" data-v="${s.id}">${esc(B.invoiceview.T('openHist'))}</button>` : ''}   <!-- bos92 -->
+      <button class="full" data-act="pos_share">${esc(T('share'))}</button>
+      ${B.invoice && B.invoice.printSaleId ? `<button class="full" data-act="pos_print" data-v="${s.id}">${esc(T('print'))}</button>` : ''}
+      ${B.saleReturn && s.status === 'done' ? `<button class="full" data-act="pos_return" data-v="${s.id}">${esc(lab(L('মাল ফেরত নিন', 'Return goods', 'মাল return নিন')))}</button>` : ''}
+      ${canVoid ? `<label>${esc(T('voidwhy'))}</label><input id="void_note"><button class="danger full" data-act="pos_void" data-v="${s.id}">${esc(T('void'))}</button>` : ''}
+      <button class="full" data-act="closesheet">${esc(T('close'))}</button></div>`);
+}
+
+// ---------- handlers ----------
+Object.assign(A.H, {
+  pos_tab: (a) => { P.tab = a.dataset.v; drawPos(); },
+  pos_cat: (a) => { P.cat = a.dataset.v; P.sub = ''; /* bos100 */ drawSell(true); },
+  pos_sub: (a) => { P.sub = a.dataset.v; drawSell(true); },   // bos100
+  pos_add: (a) => { const i = itemById(a.dataset.v); bump(i.id); if (i.unit === 'pc') addItem(i.id, 1); else qtySheet(i.id); },
+  pos_q_set: (a) => { $('#pos_qty').value = a.dataset.n; },
+  pos_q_unit: (a) => qtySheet(a.dataset.v, a.dataset.u),
+  pos_q_ok: (a) => { const i = itemById(a.dataset.v), q = nnum($('#pos_qty').value); if (!i || !(q > 0)) return toast(T('qty')); const f = altFactor(i, QU) || 1, base = Math.round(q * f * 1000) / 1000;
+    if (!(base > 0)) return toast(T('qty')); closeSheet(); addItem(i.id, base, QU !== i.unit ? { unit: QU, n: q } : null); },
+  pos_conv_save: async (a) => { const i = itemById(a.dataset.v), f = nnum(($('#cv_f') || {}).value), u = ($('#cv_from') || {}).value; if (!i || !u || !(f > 0)) return toast(T('qty'));
+    const r = await sb.from('unit_conversions').insert({ item_id: i.id, from_unit: u, to_unit: i.unit, factor: f, active: true }); if (r.error) return fail(r.error);
+    (P.conv = P.conv || []).push({ item_id: i.id, from_unit: u, to_unit: i.unit, factor: f, active: true }); try { store.set('bos_pos_conv', JSON.stringify(P.conv)); } catch (e) { /* ignore */ } toast(T('convSaved')); qtySheet(i.id, u); },
+  pos_other: () => otherSheet(),
+  pos_ot_ok: () => { const name = ($('#ot_name').value || '').trim(), qty = nnum($('#ot_qty').value), price = nnum($('#ot_price').value);
+    if (!name) return toast(lab(ERRS.name_required)); if (!(qty > 0) || !(price > 0)) return toast(T('oprice'));
+    P.cart.push({ kind: 'custom', name, unit: ($('#ot_unit').value || '').trim(), qty, price }); closeSheet(); refreshSell(); },
+  pos_newitem: () => { location.hash = '#/items'; setTimeout(() => { if (A.H.itemnew) A.H.itemnew(); }, 700); },
+  pos_cart: () => cartSheet(),
+  pos_type: (a) => { P.type = a.dataset.v; [...document.querySelectorAll('[data-act=pos_type]')].forEach((b) => b.classList.toggle('on', b.dataset.v === P.type)); drawCust(); },
+  pos_dk: (a) => { if (P.dk === a.dataset.v) return; P.dk = a.dataset.v; const i = $('#cart_disc'); if (i) i.value = ''; discChanged(); },
+  pos_cust_show: () => { P.cust.show = true; drawCust(); },
+  pos_tier_disc: () => {            // sets the discount field to the tier percent (or, above the tier cap, to the cap amount); the server still checks everything
+    const i = P.cust.info; if (!i || !i.tier || !i.tier_discount_on) return; const dm = dmodes(); if (!dm.a && !dm.p) return toast(lab(ERRS.discount_mode_off));
+    const pct = Number(i.tier.discount_percent), cap = i.tier.discount_cap_amount === null || i.tier.discount_cap_amount === undefined ? null : Number(i.tier.discount_cap_amount), amt = r2(cartSub() * pct / 100);
+    let kind = dm.p ? 'percent' : 'amount', v = pct;
+    if (cap !== null && amt > cap && dm.a) { kind = 'amount'; v = cap; } else if (kind === 'amount') v = amt;
+    P.dk = kind; const inp = $('#cart_disc'); if (inp) inp.value = String(v); discChanged(); drawDisc(); },
+  pos_step: (a) => { const k = Number(a.dataset.k), l = P.cart[k], d = Number(a.dataset.d);
+    if (l.kind === 'item' && l.alt) { const it = itemById(l.item_id), f = altFactor(it, l.alt.unit) || 1, st = stepOf(l.alt.unit), n = Math.round((l.alt.n + d * st) * 1000) / 1000;
+      if (n <= 0) P.cart.splice(k, 1); else { l.alt.n = n; l.qty = Math.round(n * f * 1000) / 1000; } return afterCartChange(); }
+    const st = stepOf(l.kind === 'item' ? itemById(l.item_id).unit : 'pc'), n = Math.round((l.qty + d * st) * 1000) / 1000;
+    if (n <= 0) P.cart.splice(k, 1); else l.qty = n; afterCartChange(); },
+  pos_rm: (a) => { P.cart.splice(Number(a.dataset.k), 1); afterCartChange(); },
+  pos_qedit: (a) => { const l = P.cart[Number(a.dataset.k)]; const alt = l.kind === 'item' && l.alt; const v = prompt(T('qty') + (alt ? ' (' + unitL(alt.unit) + ')' : ''), alt ? alt.n : l.qty); if (v === null) return; const n = nnum(v);
+    if (n > 0) { if (alt) { l.alt.n = n; l.qty = Math.round(n * (altFactor(itemById(l.item_id), alt.unit) || 1) * 1000) / 1000; } else l.qty = n; afterCartChange(); } },
+  pos_price: (a) => { const l = P.cart[Number(a.dataset.k)]; const v = prompt(T('priceov'), l.price); if (v === null) return; const n = nnum(v); if (n >= 0 && v.trim() !== '') { l.price = n; l.ov = n !== Number(itemById(l.item_id).sell_price); afterCartChange(); } },
+  pos_confirm: () => {
+    const disc = discVal(), sub = cartSub(), dk = P.dk;
+    if (disc > sub || (dk === 'percent' && discIn() > 100)) return toast(lab(ERRS.bad_discount));
+    const pe = B.pay.check(P.st); if (pe) return toast(lab(ERRS[pe]));
+    let mobile = null, cname = null;
+    if (needCust() || P.cust.mobile) {
+      mobile = normMobile(P.cust.mobile);
+      if (!mobile) return toast(P.cust.mobile ? lab(ERRS.bad_mobile) : lab(ERRS.customer_required));
+      cname = (P.cust.found && P.cust.found.found ? P.cust.found.name : ($('#cu_name') || {}).value || P.cust.name || '').trim();
+      if (!cname) return toast(lab(ERRS.customer_name_required));
+    }
+    const total = netTotal(), paid = B.pay.paid(P.st), single = P.st.rows.length === 1 && P.st.rows[0].mode === 'cash', given = single ? nnum(P.st.rows[0].given) : 0, cashAmt = single ? r2(nnum(P.st.rows[0].amount)) : 0;
+    const quickOnly = P.cart.length > 0 && P.cart.every((l) => l.kind === 'quick');
+    return submitSale(build({ lines: linesOf(), disc, payments: B.pay.list(P.st), mobile, cname, type: P.type, note: ($('#cart_note') || {}).value || '', quick: quickOnly, total, paid, dk, dinput: dk === 'percent' ? discIn() : disc }), given > cashAmt ? r2(given - cashAmt) : 0);
+  },
+  pos_scan: async () => { if (!B.barcode) return; const code = await B.barcode.scan(); if (code) scanAdd(code); },
+  pos_quick: () => quickSheet(),
+  pos_qs_cash: () => { const q = readQuick(); if (!q) return;      // a one-tap cash sale of just this amount; the cart is left alone
+    return submitSale(build({ lines: [{ item_id: null, name: q.name, amount: q.amount }], disc: 0, payments: [{ mode: 'cash', amount: q.amount }], type: 'retail', quick: true, total: q.amount, paid: q.amount }), 0); },
+  pos_qs_more: () => { const q = readQuick(); if (!q) return; P.cart.push(q); closeSheet(); refreshSell(); cartSheet(); },
+  pos_open: (a) => saleSheet(a.dataset.v),
+  pos_share: async () => { const txt = P.shareText || ''; try { if (navigator.share) await navigator.share({ text: txt }); else { await navigator.clipboard.writeText(txt); toast('✓'); } } catch (e) { /* cancelled */ } },
+  pos_print: (a) => B.invoice.printSaleId(a.dataset.v, P.loc),
+  pos_discard: (a) => { setFailed(failedQ().filter((x) => x.p_client !== a.dataset.v)); if (B.posfail) B.posfail.discarded(a.dataset.v); /* bos83 */ drawToday(); },
+  pos_return: (a) => { closeSheet(); B.saleReturn.open(a.dataset.v); },
+  pos_void: async (a) => { const n = ($('#void_note').value || '').trim(); if (!n) return toast(T('needNote'));
+    const { error } = await sb.rpc('void_sale', { p_id: a.dataset.v, p_note: n }); if (error) return fail(error); closeSheet(); toast(T('voided')); drawToday(); },
+});
+document.addEventListener('input', (e) => {
+  const id = e.target.id;
+  if (id === 'pos_q') { P.q = e.target.value; drawItems(true); }
+  if (id === 'pos_qty' && typeof QU !== 'undefined') { const sh = document.querySelector('[data-act=pos_q_ok]'); if (sh) qConv(sh.dataset.v); }
+  if (id === 'cart_disc') discChanged();
+  if (id === 'cu_mobile') { P.cust.mobile = e.target.value; P.cust.found = null; P.cust.info = null; P.cust.name = ''; lookup(); const el = $('#cart_cust'); const m = normMobile(P.cust.mobile); if (m) drawCust(); }
+  if (id === 'cu_name') P.cust.name = e.target.value;
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' || e.target.id !== 'pos_q' || !P.q.trim() || B.rule('barcode_device_on', false) !== true) return;   // a hardware scanner types the code and presses Enter
+  const i = B.barcode && B.barcode.find(P.q, P.items); if (!i) return; e.preventDefault(); P.q = ''; e.target.value = ''; drawItems(true); scanAdd(i.barcode);
+});
+document.addEventListener('change', (e) => { if (e.target.id === 'pos_loc') { P.loc = Number(e.target.value); store.set('bos_pos_loc', String(P.loc)); resetCart(); drawPos(); } });
+
+window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { pos: viewPos });
+B.pos = { flush, normMobile, ctx: () => ({ loc: P.loc, lines: linesOf(), sub: cartSub(), customerId: (P.cust.info && P.cust.info.id) || null, setDiscount: (v) => { P.dk = 'amount'; const i = $('#cart_disc'); if (i) i.value = String(v); discChanged(); drawDisc(); } }) };   // bosCRMF
+})();

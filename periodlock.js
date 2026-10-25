@@ -1,1 +1,224 @@
-(()=>{"use strict";const e=window.BOS_APP,t=window.BOS,{sb:a,S:o,esc:n,toast:s,fail:i,shell:d,H:l}=e,r=(e,t=document)=>t.querySelector(e),c=e=>((r("#"+e)||{}).value||"").trim(),p=(e,t)=>`<span class="chip ${t||""}">${n(e)}</span>`,u=(e,t,a)=>`<div><label for="${e}">${n(t)}</label>${a}</div>`,_=(e,t,a)=>`<input id="${e}" autocomplete="off" value="${n(t??"")}" ${a||""}>`,v=(e,t,a)=>`<select id="${e}">${t.map(([e,t])=>`<option value="${n(e)}" ${String(a)===String(e)?"selected":""}>${n(t)}</option>`).join("")}</select>`,b=[["lock","Lock"],["override","Override"],["backdate","Back-dating"],["late","Late sales"],["books","Accounting"],["log","Log"]],w=[["manual","Manual: the date I type"],["auto","Automatic month lock (the date I type still counts)"],["off","Off: nothing is locked"]],m=[["off","Silent, as before"],["log","Allowed, and every use is logged"],["reason","Only with a written reason (override window)"]],h=[["allow","Any time"],["reason_after_year_close","A reason is needed to reopen a closed year"],["reason_always","A reason is needed for any move back"]],y=[["redate","Re-date to the time it arrives (as before)"],["redate_flag","Re-date, and list it in Exceptions"],["park","Hold it for the owner to decide"]],k=[["lock","Closed period"],["backdate","Back-dating limit"],["both","Both"]],$=[["","Every document type"],["purchase","Purchase bill"],["cash_move","Cash move"],["expense","Quick expense"],["production","Production"]],f={lock_check:"the closed-period test",acct_locked:"the posting date test",record_sale2:"the sale (late offline sale)",cash_move_add:"cash moves (back-date limit)",quick_expense_add:"quick expenses (back-date limit)",save_purchase:"purchase bills (back-date limit)",production_post:"production (back-date limit)"},g={not_allowed:"You do not have permission.",reason_required:"Write a reason (at least 3 characters).",bad_date:"The date is not valid.",bad_minutes:"Minutes must be between 1 and 1440.",bad_scope:"Choose what the window is for.",bad_doc:"Unknown document type.",unknown_user:"Unknown or inactive person.",unknown_setting:"Unknown setting.",bad_value:"That value is not allowed.",auto_lock_day_missing:"Set the automatic lock day first (the automatic mode needs it).",lock_backward_needs_reason:'Moving the lock date back needs a written reason: use "Set the lock date".',start_date_locked_by_opening:"An opening balance exists: reverse it before moving the accounting start date.",accounting_on_needs_reason:"Use the Accounting tab: a reason is needed to switch accounting on.",period_closed_reason_required:"The books are closed for that date. Open an override window with a reason first.",period_closed:"That period is closed.",maker_cannot_decide:"The person who made the sale cannot decide it.",already_decided:"Already decided.",bad_action:"Unknown action.","not found":"Not found."},S=e=>{const t=String(e&&e.message||e||""),a=Object.keys(g).find(e=>t.includes(e));return a?g[a]:t||"error"},N={tab:"lock",st:null,log:null,held:null,late:null,prev:null,people:[],owner:!1,lastErr:""};async function O(e,t){const o=await a.rpc(e,t||{});if(o.error){const e=new Error(S(o.error));throw e.raw=o.error,e}return o.data}const x=e=>async t=>{try{await e(t)}catch(e){s(e.message||"error")}},P=e=>{const t=window.prompt(e);return null===t?null:t.trim()},A=(e,t)=>{const a=e.find(e=>String(e[0])===String(t));return a?a[1]:String(t??"")},j=e=>e?String(e).replace("T"," ").slice(0,16):"-";function T(){const e=N.st&&N.st.hooks||{},t=Object.keys(f).filter(t=>!0!==e[t]);return t.length?`<div class="notice bad" id="pl_hooks">These links to existing screens are not installed yet (the integrator installs them; the settings below are saved but have no effect there until then): ${t.map(e=>n(f[e])).join(", ")}.</div>`:""}function E(){const e=N.st;if(!e)return"";const t=e.effective_lock_date,a=`<div class="card stack" id="pl_state"><div class="row between"><b>Books are closed up to</b><b id="pl_eff">${n(t||"nothing is closed")}</b></div>\n    <div class="row wrap">${p("Lock: "+A(w,e.mode).split(":")[0].split(" (")[0])}${e.manual_date?p("Typed date "+e.manual_date):p("No typed date")}${"auto"===e.mode?p("Automatic: after day "+(e.auto_day??"?")):""}\n      ${p("Owner: "+A(m,e.owner_mode).split(",")[0].split(" (")[0],"off"===e.owner_mode?"warn":"ok")}</div>\n    <div class="muted">Today is ${n(e.today)}. ${"off"===e.owner_mode?'The owner can still change closed dates without a trace: choose "Only with a written reason" below once the books are really closed.':""}</div></div>`,o=(e.my_windows||[]).length?`<div class="card" id="pl_mine"><b>Your open override windows</b>${e.my_windows.map(e=>`<div class="muted">#${n(e.id)} · ${n(e.from)} to ${n(e.to)} · until ${n(j(e.expires_at))} · ${n(e.reason)}</div>`).join("")}</div>`:"";return N.owner?T()+a+o+`<div class="card stack" id="pl_setdate"><b>Set the lock date</b>\n      <p class="muted">Everything dated up to and including this day is closed. Moving it forward needs no reason. Moving it back may need one (see below). Empty = clear it.</p>\n      ${u("pl_ld","Lock date",_("pl_ld",e.manual_date||"",'type="date"'))}${u("pl_lr","Reason (needed when moving back, kept in the log)",_("pl_lr","",'maxlength="300"'))}\n      <button type="button" class="primary full" data-act="pl_setdate">Save the lock date</button></div>\n    <div class="card stack" id="pl_policy"><b>Lock rules</b>\n      ${u("pl_mode","How the books are closed",v("pl_mode",w,e.mode))}\n      ${u("pl_day","Automatic lock: lock last month after this day of the month (1 to 28, empty = not set)",_("pl_day",e.auto_day??"",'inputmode="numeric"'))}\n      ${u("pl_om","The owner in a closed period",v("pl_om",m,e.owner_mode))}\n      ${u("pl_bw","Moving the lock date back",v("pl_bw",h,e.backward_policy))}\n      ${u("pl_min","Override window: default length in minutes",_("pl_min",e.override_minutes??60,'inputmode="numeric"'))}\n      <button type="button" class="primary full" data-act="pl_savepolicy">Save the lock rules</button>\n      <p class="muted">Every change is written to the audit log with the old and the new value.</p></div>`:T()+a+o}function L(){const e=N.st,t='<option value="">Me</option>'+N.people.map(e=>`<option value="${n(e.id)}">${n(e.full_name||e.staff_id||e.id)}</option>`).join("");return`<div class="card stack" id="pl_ov"><b>Open an override window</b>\n      <p class="muted">For a short time one person may enter or change something dated in a closed period (or beyond a back-date limit). A written reason is compulsory. Every use is one audit line and one line in the Exceptions list.</p>\n      ${u("ov_reason","Reason",_("ov_reason","",'maxlength="300"'))}\n      <div class="row wrap">${u("ov_from","Dates from",_("ov_from","",'type="date"'))}${u("ov_to","to",_("ov_to","",'type="date"'))}</div>\n      ${u("ov_min","Minutes the window stays open",_("ov_min",e.override_minutes??60,'inputmode="numeric"'))}\n      ${u("ov_scope","The window is for",v("ov_scope",k,"lock"))}${u("ov_doc","Document type (back-dating)",v("ov_doc",$,""))}\n      ${u("ov_user","For",`<select id="ov_user">${t}</select>`)}\n      <button type="button" class="primary full" data-act="pl_ovstart">Open the window</button></div>\n    <h3>Open windows</h3>${(e.open_windows||[]).map(e=>`<div class="card pl-win" data-id="${n(e.id)}"><div class="row between"><b>#${n(e.id)} · ${n(e.staff||e.user_id)}</b><span>${n(A(k,e.scope))}</span></div>\n        <div class="muted">${n(e.from)} to ${n(e.to)}${e.doc?" · "+n(A($,e.doc)):""} · until ${n(j(e.expires_at))} · used ${n(e.uses)} time(s)</div><div>${n(e.reason)}</div>\n        <button type="button" class="mini" data-act="pl_ovend" data-v="${n(e.id)}">End now</button></div>`).join("")||'<p class="muted">None open.</p>'}`}function M(){const e=N.st&&N.st.backdate||{},t=N.late,a=(t,a)=>`<div class="card stack pl-bd" data-k="${t}"><b>${n(a)}</b>${u("bd_"+t,"Most days back (empty = no limit)",_("bd_"+t,e[t]??"",'inputmode="numeric"'))}<button type="button" class="mini" data-act="pl_bdsave" data-v="${t}">Save</button></div>`,o=t?Object.keys(t.by_document||{}).map(e=>{const a=t.by_document[e];return`<div class="card pl-late-row"><div class="row between"><b>${n(A($,e))}</b><span>${n(a.records)} records, latest ${n(a.max_days_late)} days late</span></div>\n      <div class="muted">same day ${n(a.same_day)} · 1-2 days ${n(a.days_1_2)} · 3-7 days ${n(a.days_3_7)} · 8-30 days ${n(a.days_8_30)} · over 30 days ${n(a.over_30)}</div></div>`}).join("")||'<p class="muted">No records in this period.</p>':"";return`<p class="muted">How far back a NEW record may be dated. Empty = no limit (as before). Over the limit the server refuses unless an override window, a one-off owner grant or a trusted role allows it. Read the lateness report first and choose a number from what really happens.</p>\n    ${a("purchase","Purchase bill date")}${a("cash_move","Cash move date")}${a("expense","Quick expense date")}${a("production","Production date")}\n    <div class="card stack"><b>Lateness report</b>${u("lr_days","Last how many days",_("lr_days",30,'inputmode="numeric"'))}<button type="button" class="btn" data-act="pl_lateshow">Show the report</button>${o}\n    <p class="muted">${n(t&&t.note||"")}</p></div>`}function q(){const e=N.st,t=(N.held||[]).map(e=>`<div class="card pl-held" data-id="${n(e.id)}"><div class="row between"><b>#${n(e.id)} · ${n(e.staff||e.user_id)}</b><span>${n(e.status)}</span></div>\n      <div class="muted">made ${n(j(e.sold_at))} · arrived ${n(j(e.received_at))} · ${n(e.hours_late)} hours late · ${n(e.n_lines)} line(s) · paid ${n(e.paid)}</div>\n      ${"held"===e.status?`<div class="row wrap"><button type="button" class="mini" data-act="pl_rel" data-v="${n(e.id)}" data-a="accept">Accept with its own time</button><button type="button" class="mini" data-act="pl_rel" data-v="${n(e.id)}" data-a="redate">Re-date to now</button>\n        <button type="button" class="mini" data-act="pl_rel" data-v="${n(e.id)}" data-a="reject">⋮ Reject</button></div>`:`<div>${n(e.decide_reason||"")}</div>`}</div>`).join("");return`<div class="card stack" id="pl_latepol"><b>A sale that arrives later than the offline limit</b>\n      <p class="muted">The limit is ${n(e.offline_hours)} hours (the setting "How many hours an offline sale keeps its own time"). What should happen to a sale that arrives after it?</p>\n      ${u("pl_lp","Policy",v("pl_lp",y,e.late_sale_policy))}<button type="button" class="primary full" data-act="pl_savelate">Save</button></div>\n    <h3>Held sales</h3>${t||'<p class="muted">None held.</p>'}`}function B(){const e=N.st,t=N.prev,a=t?!1===t.ran?`<div class="chip warn">${n(t.why||"The preview could not run")}</div>`:`<div class="card" id="pl_prev"><b>If accounting is switched on now</b>\n      <div class="row between"><span>Documents that would be posted</span><b>${n(t.would_post)}</b></div><div class="row between"><span>Reversals</span><b>${n(t.would_reverse)}</b></div>\n      <div class="row between"><span>Skipped because their date is closed</span><b>${n(t.skipped_locked)}</b></div>${t.oldest_in_sample?`<div class="muted">Oldest in the sample: ${n(t.oldest_in_sample)}</div>`:""}\n      ${t.data_needed?'<div class="chip warn">The accounting start date is not set.</div>':""}</div>`:"";return`<div class="card stack" id="pl_books"><b>Accounting is ${e.accounting_on?"ON":"OFF"}</b>\n      <div class="row wrap"><button type="button" class="btn" data-act="pl_prevgo">Preview the backlog</button>\n        <button type="button" class="${e.accounting_on?"btn":"primary"}" data-act="pl_accset" data-v="${e.accounting_on?"off":"on"}">${e.accounting_on?"Switch accounting OFF":"Switch accounting ON"}</button></div>${a}</div>\n    <div class="card stack"><b>Guards</b>\n      <label class="row"><input type="checkbox" id="pl_g1" ${e.start_date_lock_after_opening?"checked":""}> Do not move the accounting start date once the opening balance is posted</label>\n      <label class="row"><input type="checkbox" id="pl_g2" ${e.accounting_on_needs_reason?"checked":""}> Switching accounting ON again needs a written reason</label>\n      <button type="button" class="primary full" data-act="pl_saveguards">Save the guards</button><p class="muted">Both are off by default (as before).</p></div>`}function R(){const e=N.log;return e?`<h3>Windows</h3>${(e.windows||[]).map(e=>`<div class="card pl-logwin"><div class="row between"><b>#${n(e.id)} · ${n(e.staff||e.user_id)}</b><span>${n(e.ended_at?"ended":"opened")} · used ${n(e.uses)}</span></div>\n      <div class="muted">${n(A(k,e.scope))} · ${n(e.from_date)} to ${n(e.to_date)} · ${n(j(e.started_at))} until ${n(j(e.expires_at))}</div><div>${n(e.reason)}</div></div>`).join("")||'<p class="muted">None.</p>'}\n    <h3>Exceptions</h3>${(e.exceptions||[]).map(e=>`<div class="card pl-logex"><div class="row between"><b>${n(e.kind)}</b><span>${n(j(e.at))} · ${n(e.status)}</span></div><div>${n(e.reason||"")}</div></div>`).join("")||'<p class="muted">None.</p>'}\n    <h3>Audit lines</h3>${(e.audit||[]).map(e=>`<div class="muted pl-logau">${n(j(e.at))} · ${n(e.staff_id||"")} · ${n(e.action)} ${n(e.record_id||"")}</div>`).join("")||'<p class="muted">None.</p>'}`:'<p class="muted">…</p>'}function W(){const e=r("#pl_body");if(!e)return;const t={lock:E,override:L,backdate:M,late:q,books:B,log:R}[N.tab]();e.innerHTML=`<div class="row wrap" id="pl_tabs" style="gap:.3rem">${(N.owner?b:[["lock","Lock"]]).map(([e,t])=>`<button type="button" class="tog ${N.tab===e?"on":""}" data-act="pl_tab" data-v="${e}">${n(t)}</button>`).join("")}</div><div id="pl_pane">${"lock"===N.tab?"":T()}${t}</div>`}async function F(e){e&&(N.tab=e);try{await async function(){if(N.st=await O("period_lock_state",{}),N.owner=!!N.st.owner,N.owner){if("override"===N.tab&&!N.people.length){const e=await a.from("profiles").select("id,full_name,staff_id,status").eq("status","active").order("full_name");N.people=e.data||[]}"backdate"!==N.tab||N.late||(N.late=await O("period_lateness_report",{p_days:30})),"late"===N.tab&&(N.held=await O("late_sales_held_list",{p_status:null})),"log"===N.tab&&(N.log=await O("period_override_log",{p_limit:100}))}else N.tab="lock"}(),W()}catch(e){s(S(e)),W()}}const H=e=>{const t=(e=>String(e??"").replace(/[০-৯]/g,e=>"০১২৩৪৫৬৭৮৯".indexOf(e)).replace(/,/g,"").trim())(e);if(""===t)return null;const a=Number(t);return Number.isFinite(a)?a:NaN};async function D(e,t,a){await O("period_lock_policy_set",{p_key:e,p_value:void 0===t?null:t,p_note:a||null})}Object.assign(l,{pl_tab:e=>F(e.dataset.v),pl_setdate:x(async()=>{const e=c("pl_ld")||null,t=c("pl_lr");await O("period_lock_set",{p_date:e,p_reason:t||null}),s("Saved"),await F("lock")}),pl_savepolicy:x(async()=>{const e=H(c("pl_day")),t=H(c("pl_min"));if(Number.isNaN(e)||Number.isNaN(t))return s(g.bad_value);if("auto"===c("pl_mode")&&null===e)return s(g.auto_lock_day_missing);const a=N.st,o=e!==(void 0===a.auto_day||null===a.auto_day?null:Number(a.auto_day)),n=c("pl_mode")!==a.mode;"auto"===c("pl_mode")?(o&&await D("auto_lock_day",e,"Period lock screen"),n&&await D("period_lock_mode",c("pl_mode"),"Period lock screen")):(n&&await D("period_lock_mode",c("pl_mode"),"Period lock screen"),o&&await D("auto_lock_day",e,"Period lock screen")),c("pl_om")!==a.owner_mode&&await D("owner_closed_period_mode",c("pl_om"),"Period lock screen"),c("pl_bw")!==a.backward_policy&&await D("lock_backward_policy",c("pl_bw"),"Period lock screen"),null!==t&&t!==a.override_minutes&&await D("period_override_default_minutes",t,"Period lock screen"),s("Saved"),await F("lock")}),pl_ovstart:x(async()=>{const e=c("ov_reason");if(e.length<3)return s(g.reason_required);const t=c("ov_from"),a=c("ov_to");if(!t||!a)return s(g.bad_date);const o=H(c("ov_min"));if(Number.isNaN(o))return s(g.bad_minutes);await O("period_override_start",{p_reason:e,p_from:t,p_to:a,p_minutes:o,p_scope:c("ov_scope"),p_for_user:c("ov_user")||null,p_doc:c("ov_doc")||null}),s("The window is open"),await F("override")}),pl_ovend:x(async e=>{const t=P("Why is the window ended?");null!==t&&(await O("period_override_end",{p_id:Number(e.dataset.v),p_note:t||null}),s("Ended"),await F("override"))}),pl_bdsave:x(async e=>{const t=e.dataset.v,a=H(c("bd_"+t));if(Number.isNaN(a)||null!==a&&(a<0||a>3650))return s(g.bad_value);await D("backdate_max_days_"+t,a,"Period lock screen"),s("Saved"),await F("backdate")}),pl_lateshow:x(async()=>{const e=H(c("lr_days"));N.late=await O("period_lateness_report",{p_days:e||30}),W()}),pl_savelate:x(async()=>{await D("late_sale_policy",c("pl_lp"),"Period lock screen"),s("Saved"),await F("late")}),pl_rel:x(async e=>{const t=P("Write the reason for this decision");if(null!==t){if(t.length<3)return s(g.reason_required);await O("late_sale_release",{p_id:Number(e.dataset.v),p_action:e.dataset.a,p_reason:t}),s("Done"),await F("late")}}),pl_prevgo:x(async()=>{N.prev=await O("accounting_on_preview",{}),W()}),pl_accset:x(async e=>{const t="on"===e.dataset.v,a=P(t?"Why is accounting switched on? (kept in the audit log)":"Why is accounting switched off? (optional)");if(null!==a){if(t&&N.st.accounting_on_needs_reason&&a.length<3)return s(g.reason_required);await O("accounting_on_set",{p_on:t,p_reason:a||null}),s("Saved"),N.prev=null,await F("books")}}),pl_saveguards:x(async()=>{await D("start_date_lock_after_opening",!!(r("#pl_g1")||{}).checked,"Period lock screen"),await D("accounting_on_needs_reason",!!(r("#pl_g2")||{}).checked,"Period lock screen"),s("Saved"),await F("books")})}),window.BOS_PAGES=Object.assign(window.BOS_PAGES||{},{periodlock:async function(){t.loadStatic&&await t.loadStatic(),d("Period lock",'<div id="pl_body"><p class="muted">…</p></div>',!0);try{await F(N.tab)}catch(e){i(e)}}})})();
+/* Islamia BOS · Period lock (#/periodlock). One place for period integrity (U-02): the lock (manual date, automatic month lock, or off), what the owner may do in a closed period
+   (silent, logged, or only with a written reason), override windows (reason, dates, minutes), the back-date limit per document type, the policy for an offline sale that arrives
+   too late (re-date, re-date and list, or hold for the owner), the start-date and accounting-ON guards, and the log of every exception.
+   Server: supabase/phase89.sql - period_lock_state, period_lock_set, period_lock_policy_set, period_override_start / end / log, period_lateness_report, late_sales_held_list,
+   late_sale_release, accounting_on_preview, accounting_on_set. The screen only asks; the server decides (a hidden button is also a refused request).
+   Register the route only through web/ia.js and add the script tag in index.html (integrator, see docs/integration/W1-B.md).
+   English labels only for now (the owner will translate them later). UNVERIFIED on a real phone and on a real Supabase project. */
+(() => {
+'use strict';
+const A = window.BOS_APP, B = window.BOS;
+const { sb, S, esc, toast, fail, shell, H } = A;
+const $ = (s, el = document) => el.querySelector(s);
+const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
+const norm = (v) => String(v ?? '').replace(/[০-৯]/g, (d) => '০১২৩৪৫৬৭৮৯'.indexOf(d)).replace(/,/g, '').trim();
+const val = (id) => (($('#' + id) || {}).value || '').trim();
+const chip = (txt, cls) => `<span class="chip ${cls || ''}">${esc(txt)}</span>`;
+const fld = (id, label, inner) => `<div><label for="${id}">${esc(label)}</label>${inner}</div>`;
+const inp = (id, v, extra) => `<input id="${id}" autocomplete="off" value="${esc(v ?? '')}" ${extra || ''}>`;
+const sel = (id, opts, cur) => `<select id="${id}">${opts.map(([k, l]) => `<option value="${esc(k)}" ${String(cur) === String(k) ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`;
+
+const TABS_OWNER = [['lock', 'Lock'], ['override', 'Override'], ['backdate', 'Back-dating'], ['late', 'Late sales'], ['books', 'Accounting'], ['log', 'Log']];
+const MODE = [['manual', 'Manual: the date I type'], ['auto', 'Automatic month lock (the date I type still counts)'], ['off', 'Off: nothing is locked']];
+const OWNER_MODE = [['off', 'Silent, as before'], ['log', 'Allowed, and every use is logged'], ['reason', 'Only with a written reason (override window)']];
+const BACKWARD = [['allow', 'Any time'], ['reason_after_year_close', 'A reason is needed to reopen a closed year'], ['reason_always', 'A reason is needed for any move back']];
+const LATE = [['redate', 'Re-date to the time it arrives (as before)'], ['redate_flag', 'Re-date, and list it in Exceptions'], ['park', 'Hold it for the owner to decide']];
+const SCOPE = [['lock', 'Closed period'], ['backdate', 'Back-dating limit'], ['both', 'Both']];
+const DOCS = [['', 'Every document type'], ['purchase', 'Purchase bill'], ['cash_move', 'Cash move'], ['expense', 'Quick expense'], ['production', 'Production']];
+const HOOK_NAMES = { lock_check: 'the closed-period test', acct_locked: 'the posting date test', record_sale2: 'the sale (late offline sale)', cash_move_add: 'cash moves (back-date limit)',
+  quick_expense_add: 'quick expenses (back-date limit)', save_purchase: 'purchase bills (back-date limit)', production_post: 'production (back-date limit)' };
+const ERR = {
+  not_allowed: 'You do not have permission.', reason_required: 'Write a reason (at least 3 characters).', bad_date: 'The date is not valid.', bad_minutes: 'Minutes must be between 1 and 1440.',
+  bad_scope: 'Choose what the window is for.', bad_doc: 'Unknown document type.', unknown_user: 'Unknown or inactive person.', unknown_setting: 'Unknown setting.', bad_value: 'That value is not allowed.',
+  auto_lock_day_missing: 'Set the automatic lock day first (the automatic mode needs it).', lock_backward_needs_reason: 'Moving the lock date back needs a written reason: use "Set the lock date".',
+  start_date_locked_by_opening: 'An opening balance exists: reverse it before moving the accounting start date.', accounting_on_needs_reason: 'Use the Accounting tab: a reason is needed to switch accounting on.',
+  period_closed_reason_required: 'The books are closed for that date. Open an override window with a reason first.', period_closed: 'That period is closed.', maker_cannot_decide: 'The person who made the sale cannot decide it.',
+  already_decided: 'Already decided.', bad_action: 'Unknown action.', 'not found': 'Not found.',
+};
+const eText = (e) => { const m = String((e && e.message) || e || ''); const k = Object.keys(ERR).find((x) => m.includes(x)); return k ? ERR[k] : m || 'error'; };
+const D = { tab: 'lock', st: null, log: null, held: null, late: null, prev: null, people: [], owner: false, lastErr: '' };
+
+async function call(fn, args) {
+  const r = await sb.rpc(fn, args || {});
+  if (r.error) { const e = new Error(eText(r.error)); e.raw = r.error; throw e; }
+  return r.data;
+}
+const act = (fn) => async (a) => { try { await fn(a); } catch (e) { toast(e.message || 'error'); } };
+const askReason = (q) => { const r = window.prompt(q); return r === null ? null : r.trim(); };
+const optLabel = (arr, k) => { const f = arr.find((x) => String(x[0]) === String(k)); return f ? f[1] : String(k ?? ''); };
+const dt = (v) => (v ? String(v).replace('T', ' ').slice(0, 16) : '-');
+
+function hooksNotice() {
+  const h = (D.st && D.st.hooks) || {}; const miss = Object.keys(HOOK_NAMES).filter((k) => h[k] !== true);
+  if (!miss.length) return '';
+  return `<div class="notice bad" id="pl_hooks">These links to existing screens are not installed yet (the integrator installs them; the settings below are saved but have no effect there until then): ${miss.map((k) => esc(HOOK_NAMES[k])).join(', ')}.</div>`;
+}
+function tabsBar() {
+  const tabs = D.owner ? TABS_OWNER : [['lock', 'Lock']];
+  return `<div class="row wrap" id="pl_tabs" style="gap:.3rem">${tabs.map(([k, l]) => `<button type="button" class="tog ${D.tab === k ? 'on' : ''}" data-act="pl_tab" data-v="${k}">${esc(l)}</button>`).join('')}</div>`;
+}
+
+// ---------------- Lock ----------------
+function lockHTML() {
+  const s = D.st; if (!s) return '';
+  const eff = s.effective_lock_date;
+  const head = `<div class="card stack" id="pl_state"><div class="row between"><b>Books are closed up to</b><b id="pl_eff">${esc(eff || 'nothing is closed')}</b></div>
+    <div class="row wrap">${chip('Lock: ' + optLabel(MODE, s.mode).split(':')[0].split(' (')[0])}${s.manual_date ? chip('Typed date ' + s.manual_date) : chip('No typed date')}${s.mode === 'auto' ? chip('Automatic: after day ' + (s.auto_day ?? '?')) : ''}
+      ${chip('Owner: ' + optLabel(OWNER_MODE, s.owner_mode).split(',')[0].split(' (')[0], s.owner_mode === 'off' ? 'warn' : 'ok')}</div>
+    <div class="muted">Today is ${esc(s.today)}. ${s.owner_mode === 'off' ? 'The owner can still change closed dates without a trace: choose "Only with a written reason" below once the books are really closed.' : ''}</div></div>`;
+  const wins = (s.my_windows || []).length ? `<div class="card" id="pl_mine"><b>Your open override windows</b>${s.my_windows.map((w) => `<div class="muted">#${esc(w.id)} · ${esc(w.from)} to ${esc(w.to)} · until ${esc(dt(w.expires_at))} · ${esc(w.reason)}</div>`).join('')}</div>` : '';
+  if (!D.owner) return hooksNotice() + head + wins;
+  return hooksNotice() + head + wins + `<div class="card stack" id="pl_setdate"><b>Set the lock date</b>
+      <p class="muted">Everything dated up to and including this day is closed. Moving it forward needs no reason. Moving it back may need one (see below). Empty = clear it.</p>
+      ${fld('pl_ld', 'Lock date', inp('pl_ld', s.manual_date || '', 'type="date"'))}${fld('pl_lr', 'Reason (needed when moving back, kept in the log)', inp('pl_lr', '', 'maxlength="300"'))}
+      <button type="button" class="primary full" data-act="pl_setdate">Save the lock date</button></div>
+    <div class="card stack" id="pl_policy"><b>Lock rules</b>
+      ${fld('pl_mode', 'How the books are closed', sel('pl_mode', MODE, s.mode))}
+      ${fld('pl_day', 'Automatic lock: lock last month after this day of the month (1 to 28, empty = not set)', inp('pl_day', s.auto_day ?? '', 'inputmode="numeric"'))}
+      ${fld('pl_om', 'The owner in a closed period', sel('pl_om', OWNER_MODE, s.owner_mode))}
+      ${fld('pl_bw', 'Moving the lock date back', sel('pl_bw', BACKWARD, s.backward_policy))}
+      ${fld('pl_min', 'Override window: default length in minutes', inp('pl_min', s.override_minutes ?? 60, 'inputmode="numeric"'))}
+      <button type="button" class="primary full" data-act="pl_savepolicy">Save the lock rules</button>
+      <p class="muted">Every change is written to the audit log with the old and the new value.</p></div>`;
+}
+
+// ---------------- Override ----------------
+function overrideHTML() {
+  const s = D.st;
+  const people = `<option value="">Me</option>` + D.people.map((p) => `<option value="${esc(p.id)}">${esc(p.full_name || p.staff_id || p.id)}</option>`).join('');
+  return `<div class="card stack" id="pl_ov"><b>Open an override window</b>
+      <p class="muted">For a short time one person may enter or change something dated in a closed period (or beyond a back-date limit). A written reason is compulsory. Every use is one audit line and one line in the Exceptions list.</p>
+      ${fld('ov_reason', 'Reason', inp('ov_reason', '', 'maxlength="300"'))}
+      <div class="row wrap">${fld('ov_from', 'Dates from', inp('ov_from', '', 'type="date"'))}${fld('ov_to', 'to', inp('ov_to', '', 'type="date"'))}</div>
+      ${fld('ov_min', 'Minutes the window stays open', inp('ov_min', s.override_minutes ?? 60, 'inputmode="numeric"'))}
+      ${fld('ov_scope', 'The window is for', sel('ov_scope', SCOPE, 'lock'))}${fld('ov_doc', 'Document type (back-dating)', sel('ov_doc', DOCS, ''))}
+      ${fld('ov_user', 'For', `<select id="ov_user">${people}</select>`)}
+      <button type="button" class="primary full" data-act="pl_ovstart">Open the window</button></div>
+    <h3>Open windows</h3>${(s.open_windows || []).map((w) => `<div class="card pl-win" data-id="${esc(w.id)}"><div class="row between"><b>#${esc(w.id)} · ${esc(w.staff || w.user_id)}</b><span>${esc(optLabel(SCOPE, w.scope))}</span></div>
+        <div class="muted">${esc(w.from)} to ${esc(w.to)}${w.doc ? ' · ' + esc(optLabel(DOCS, w.doc)) : ''} · until ${esc(dt(w.expires_at))} · used ${esc(w.uses)} time(s)</div><div>${esc(w.reason)}</div>
+        <button type="button" class="mini" data-act="pl_ovend" data-v="${esc(w.id)}">End now</button></div>`).join('') || '<p class="muted">None open.</p>'}`;
+}
+
+// ---------------- Back-dating ----------------
+function backdateHTML() {
+  const b = (D.st && D.st.backdate) || {}; const L = D.late;
+  const row = (k, label) => `<div class="card stack pl-bd" data-k="${k}"><b>${esc(label)}</b>${fld('bd_' + k, 'Most days back (empty = no limit)', inp('bd_' + k, b[k] ?? '', 'inputmode="numeric"'))}<button type="button" class="mini" data-act="pl_bdsave" data-v="${k}">Save</button></div>`;
+  const rep = L ? Object.keys(L.by_document || {}).map((k) => { const r = L.by_document[k]; return `<div class="card pl-late-row"><div class="row between"><b>${esc(optLabel(DOCS, k))}</b><span>${esc(r.records)} records, latest ${esc(r.max_days_late)} days late</span></div>
+      <div class="muted">same day ${esc(r.same_day)} · 1-2 days ${esc(r.days_1_2)} · 3-7 days ${esc(r.days_3_7)} · 8-30 days ${esc(r.days_8_30)} · over 30 days ${esc(r.over_30)}</div></div>`; }).join('') || '<p class="muted">No records in this period.</p>' : '';
+  return `<p class="muted">How far back a NEW record may be dated. Empty = no limit (as before). Over the limit the server refuses unless an override window, a one-off owner grant or a trusted role allows it. Read the lateness report first and choose a number from what really happens.</p>
+    ${row('purchase', 'Purchase bill date')}${row('cash_move', 'Cash move date')}${row('expense', 'Quick expense date')}${row('production', 'Production date')}
+    <div class="card stack"><b>Lateness report</b>${fld('lr_days', 'Last how many days', inp('lr_days', 30, 'inputmode="numeric"'))}<button type="button" class="btn" data-act="pl_lateshow">Show the report</button>${rep}
+    <p class="muted">${esc((L && L.note) || '')}</p></div>`;
+}
+
+// ---------------- Late sales ----------------
+function lateHTML() {
+  const s = D.st; const held = D.held || [];
+  const rows = held.map((h) => `<div class="card pl-held" data-id="${esc(h.id)}"><div class="row between"><b>#${esc(h.id)} · ${esc(h.staff || h.user_id)}</b><span>${esc(h.status)}</span></div>
+      <div class="muted">made ${esc(dt(h.sold_at))} · arrived ${esc(dt(h.received_at))} · ${esc(h.hours_late)} hours late · ${esc(h.n_lines)} line(s) · paid ${esc(h.paid)}</div>
+      ${h.status === 'held' ? `<div class="row wrap"><button type="button" class="mini" data-act="pl_rel" data-v="${esc(h.id)}" data-a="accept">Accept with its own time</button><button type="button" class="mini" data-act="pl_rel" data-v="${esc(h.id)}" data-a="redate">Re-date to now</button>
+        <button type="button" class="mini" data-act="pl_rel" data-v="${esc(h.id)}" data-a="reject">⋮ Reject</button></div>` : `<div>${esc(h.decide_reason || '')}</div>`}</div>`).join('');
+  return `<div class="card stack" id="pl_latepol"><b>A sale that arrives later than the offline limit</b>
+      <p class="muted">The limit is ${esc(s.offline_hours)} hours (the setting "How many hours an offline sale keeps its own time"). What should happen to a sale that arrives after it?</p>
+      ${fld('pl_lp', 'Policy', sel('pl_lp', LATE, s.late_sale_policy))}<button type="button" class="primary full" data-act="pl_savelate">Save</button></div>
+    <h3>Held sales</h3>${rows || '<p class="muted">None held.</p>'}`;
+}
+
+// ---------------- Accounting ----------------
+function booksHTML() {
+  const s = D.st; const p = D.prev;
+  const prev = p ? (p.ran === false ? `<div class="chip warn">${esc(p.why || 'The preview could not run')}</div>` : `<div class="card" id="pl_prev"><b>If accounting is switched on now</b>
+      <div class="row between"><span>Documents that would be posted</span><b>${esc(p.would_post)}</b></div><div class="row between"><span>Reversals</span><b>${esc(p.would_reverse)}</b></div>
+      <div class="row between"><span>Skipped because their date is closed</span><b>${esc(p.skipped_locked)}</b></div>${p.oldest_in_sample ? `<div class="muted">Oldest in the sample: ${esc(p.oldest_in_sample)}</div>` : ''}
+      ${p.data_needed ? '<div class="chip warn">The accounting start date is not set.</div>' : ''}</div>`) : '';
+  return `<div class="card stack" id="pl_books"><b>Accounting is ${s.accounting_on ? 'ON' : 'OFF'}</b>
+      <div class="row wrap"><button type="button" class="btn" data-act="pl_prevgo">Preview the backlog</button>
+        <button type="button" class="${s.accounting_on ? 'btn' : 'primary'}" data-act="pl_accset" data-v="${s.accounting_on ? 'off' : 'on'}">${s.accounting_on ? 'Switch accounting OFF' : 'Switch accounting ON'}</button></div>${prev}</div>
+    <div class="card stack"><b>Guards</b>
+      <label class="row"><input type="checkbox" id="pl_g1" ${s.start_date_lock_after_opening ? 'checked' : ''}> Do not move the accounting start date once the opening balance is posted</label>
+      <label class="row"><input type="checkbox" id="pl_g2" ${s.accounting_on_needs_reason ? 'checked' : ''}> Switching accounting ON again needs a written reason</label>
+      <button type="button" class="primary full" data-act="pl_saveguards">Save the guards</button><p class="muted">Both are off by default (as before).</p></div>`;
+}
+
+// ---------------- Log ----------------
+function logHTML() {
+  const g = D.log; if (!g) return '<p class="muted">…</p>';
+  return `<h3>Windows</h3>${(g.windows || []).map((w) => `<div class="card pl-logwin"><div class="row between"><b>#${esc(w.id)} · ${esc(w.staff || w.user_id)}</b><span>${esc(w.ended_at ? 'ended' : 'opened')} · used ${esc(w.uses)}</span></div>
+      <div class="muted">${esc(optLabel(SCOPE, w.scope))} · ${esc(w.from_date)} to ${esc(w.to_date)} · ${esc(dt(w.started_at))} until ${esc(dt(w.expires_at))}</div><div>${esc(w.reason)}</div></div>`).join('') || '<p class="muted">None.</p>'}
+    <h3>Exceptions</h3>${(g.exceptions || []).map((x) => `<div class="card pl-logex"><div class="row between"><b>${esc(x.kind)}</b><span>${esc(dt(x.at))} · ${esc(x.status)}</span></div><div>${esc(x.reason || '')}</div></div>`).join('') || '<p class="muted">None.</p>'}
+    <h3>Audit lines</h3>${(g.audit || []).map((x) => `<div class="muted pl-logau">${esc(dt(x.at))} · ${esc(x.staff_id || '')} · ${esc(x.action)} ${esc(x.record_id || '')}</div>`).join('') || '<p class="muted">None.</p>'}`;
+}
+
+function draw() {
+  const el = $('#pl_body'); if (!el) return;
+  const body = ({ lock: lockHTML, override: overrideHTML, backdate: backdateHTML, late: lateHTML, books: booksHTML, log: logHTML })[D.tab]();
+  el.innerHTML = tabsBar() + `<div id="pl_pane">${D.tab === 'lock' ? '' : hooksNotice()}${body}</div>`;
+}
+async function loadTab() {
+  D.st = await call('period_lock_state', {}); D.owner = !!D.st.owner;
+  if (!D.owner) { D.tab = 'lock'; return; }
+  if (D.tab === 'override' && !D.people.length) { const p = await sb.from('profiles').select('id,full_name,staff_id,status').eq('status', 'active').order('full_name'); D.people = p.data || []; }
+  if (D.tab === 'backdate' && !D.late) D.late = await call('period_lateness_report', { p_days: 30 });
+  if (D.tab === 'late') D.held = await call('late_sales_held_list', { p_status: null });
+  if (D.tab === 'log') D.log = await call('period_override_log', { p_limit: 100 });
+}
+async function show(tab) { if (tab) D.tab = tab; try { await loadTab(); draw(); } catch (e) { toast(eText(e)); draw(); } }
+const intOrNull = (t) => { const v = norm(t); if (v === '') return null; const n = Number(v); return Number.isFinite(n) ? n : NaN; };
+async function policy(key, value, note) { await call('period_lock_policy_set', { p_key: key, p_value: value === undefined ? null : value, p_note: note || null }); }
+
+Object.assign(H, {
+  pl_tab: (a) => show(a.dataset.v),
+  pl_setdate: act(async () => {
+    const d = val('pl_ld') || null; const why = val('pl_lr');
+    await call('period_lock_set', { p_date: d, p_reason: why || null }); toast('Saved'); await show('lock');
+  }),
+  pl_savepolicy: act(async () => {
+    const day = intOrNull(val('pl_day')); const mins = intOrNull(val('pl_min'));
+    if (Number.isNaN(day) || Number.isNaN(mins)) return toast(ERR.bad_value);
+    if (val('pl_mode') === 'auto' && day === null) return toast(ERR.auto_lock_day_missing);
+    // order matters: the day first when switching to auto, the mode first when switching away from it
+    const s = D.st; const dayChanged = day !== (s.auto_day === undefined || s.auto_day === null ? null : Number(s.auto_day)); const modeChanged = val('pl_mode') !== s.mode;
+    if (val('pl_mode') === 'auto') { if (dayChanged) await policy('auto_lock_day', day, 'Period lock screen'); if (modeChanged) await policy('period_lock_mode', val('pl_mode'), 'Period lock screen'); }
+    else { if (modeChanged) await policy('period_lock_mode', val('pl_mode'), 'Period lock screen'); if (dayChanged) await policy('auto_lock_day', day, 'Period lock screen'); }
+    if (val('pl_om') !== s.owner_mode) await policy('owner_closed_period_mode', val('pl_om'), 'Period lock screen');
+    if (val('pl_bw') !== s.backward_policy) await policy('lock_backward_policy', val('pl_bw'), 'Period lock screen');
+    if (mins !== null && mins !== s.override_minutes) await policy('period_override_default_minutes', mins, 'Period lock screen');
+    toast('Saved'); await show('lock');
+  }),
+  pl_ovstart: act(async () => {
+    const why = val('ov_reason'); if (why.length < 3) return toast(ERR.reason_required);
+    const f = val('ov_from'), t = val('ov_to'); if (!f || !t) return toast(ERR.bad_date);
+    const mins = intOrNull(val('ov_min')); if (Number.isNaN(mins)) return toast(ERR.bad_minutes);
+    await call('period_override_start', { p_reason: why, p_from: f, p_to: t, p_minutes: mins, p_scope: val('ov_scope'), p_for_user: val('ov_user') || null, p_doc: val('ov_doc') || null });
+    toast('The window is open'); await show('override');
+  }),
+  pl_ovend: act(async (a) => { const n = askReason('Why is the window ended?'); if (n === null) return; await call('period_override_end', { p_id: Number(a.dataset.v), p_note: n || null }); toast('Ended'); await show('override'); }),
+  pl_bdsave: act(async (a) => {
+    const k = a.dataset.v; const n = intOrNull(val('bd_' + k)); if (Number.isNaN(n) || (n !== null && (n < 0 || n > 3650))) return toast(ERR.bad_value);
+    await policy('backdate_max_days_' + k, n, 'Period lock screen'); toast('Saved'); await show('backdate');
+  }),
+  pl_lateshow: act(async () => { const n = intOrNull(val('lr_days')); D.late = await call('period_lateness_report', { p_days: n || 30 }); draw(); }),
+  pl_savelate: act(async () => { await policy('late_sale_policy', val('pl_lp'), 'Period lock screen'); toast('Saved'); await show('late'); }),
+  pl_rel: act(async (a) => {
+    const why = askReason('Write the reason for this decision'); if (why === null) return; if (why.length < 3) return toast(ERR.reason_required);
+    await call('late_sale_release', { p_id: Number(a.dataset.v), p_action: a.dataset.a, p_reason: why }); toast('Done'); await show('late');
+  }),
+  pl_prevgo: act(async () => { D.prev = await call('accounting_on_preview', {}); draw(); }),
+  pl_accset: act(async (a) => {
+    const on = a.dataset.v === 'on'; const why = askReason(on ? 'Why is accounting switched on? (kept in the audit log)' : 'Why is accounting switched off? (optional)'); if (why === null) return;
+    if (on && D.st.accounting_on_needs_reason && why.length < 3) return toast(ERR.reason_required);
+    await call('accounting_on_set', { p_on: on, p_reason: why || null }); toast('Saved'); D.prev = null; await show('books');
+  }),
+  pl_saveguards: act(async () => {
+    await policy('start_date_lock_after_opening', !!($('#pl_g1') || {}).checked, 'Period lock screen'); await policy('accounting_on_needs_reason', !!($('#pl_g2') || {}).checked, 'Period lock screen');
+    toast('Saved'); await show('books');
+  }),
+});
+
+async function view() {
+  if (B.loadStatic) await B.loadStatic();
+  shell('Period lock', '<div id="pl_body"><p class="muted">…</p></div>', true);
+  try { await show(D.tab); } catch (e) { fail(e); }
+}
+window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { periodlock: view });
+})();

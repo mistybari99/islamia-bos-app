@@ -1,1 +1,492 @@
-(()=>{"use strict";const e=window.BOS_APP,t=window.BOS,{sb:a,S:n,esc:i,toast:s,fail:c,shell:o,openSheet:r,closeSheet:d}=e,l=e.H,p=t.L,u=t.lab,h=(e,t=document)=>t.querySelector(e),m=()=>window.crypto&&crypto.randomUUID?crypto.randomUUID():"c"+Date.now().toString(16)+Math.random().toString(16).slice(2,10),_=["purchase_bill","product_list","expense","other"],b="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js",f=["staff_meal","transport","hospitality","repair","labour","sourcing","other"],w={title:p("ছবি থেকে এন্ট্রি (স্ক্যান)","Scan a bill or list","ছবি থেকে Entry (Scan)"),intro:p("বিল বা তালিকার ছবি তুলুন। আপনি দেখে ঠিক করে কনফার্ম না করা পর্যন্ত কিছুই ঢোকে না।","Take a photo of a bill or list. Nothing is entered until you check it and press Confirm.","Bill বা list-এর ছবি তুলুন। আপনি দেখে ঠিক করে Confirm না করা পর্যন্ত কিছুই ঢোকে না।"),off:p("স্ক্যান এখন বন্ধ। মালিক Switchboard থেকে স্ক্যান সুইচ চালু করলে ব্যবহার করা যাবে।","Scan is switched off. The owner can turn on the Scan switch in the Switchboard.","Scan এখন বন্ধ। Owner Switchboard থেকে Scan switch চালু করলে ব্যবহার করা যাবে।"),newScan:p("নতুন ছবি","New photo","নতুন photo"),kind:p("কীসের ছবি","What is it","কীসের photo"),place:p("জায়গা","Place","Place"),k_purchase_bill:p("ক্রয় বিল","Purchase bill","Purchase bill"),k_product_list:p("পণ্যের তালিকা","Product list","Product list"),k_expense:p("খরচের রসিদ","Expense slip","Expense slip"),k_other:p("অন্য কাগজ / রিপোর্ট","Other paper / report","অন্য paper / report"),take:p("ক্যামেরায় ছবি তুলুন","Take a photo","Camera-য় photo তুলুন"),gallery:p("গ্যালারি থেকে নিন","Choose from gallery","Gallery থেকে নিন"),eng_manual:p("পড়ার পদ্ধতি: নিজে লিখবেন (ছবির পাশে)","Reading: you type it beside the photo","পড়ার method: নিজে লিখবেন (photo-র পাশে)"),eng_browser_ocr:p("পড়ার পদ্ধতি: ফোনে বিনামূল্যে OCR। বাংলা ও হাতের লেখায় দুর্বল, তাই প্রতিটি ঘর মিলিয়ে নিন।","Reading: free OCR on the phone. Weak on Bangla and handwriting, so check every field.","পড়ার method: phone-এ free OCR। বাংলা ও handwriting-এ দুর্বল, তাই প্রতিটি field মিলিয়ে নিন।"),eng_ai_vision:p("পড়ার পদ্ধতি: AI। ভুল করতে পারে, তাই প্রতিটি ঘর মিলিয়ে নিন।","Reading: AI. It can be wrong, so check every field.","পড়ার method: AI। ভুল করতে পারে, তাই প্রতিটি field মিলিয়ে নিন।"),ocrBn:p("বাংলাও পড়ুন (বড় ডাউনলোড)","Also read Bangla (bigger download)","বাংলাও পড়ুন (বড় download)"),working:p("ছবি তৈরি হচ্ছে…","Preparing the photo…","Photo তৈরি হচ্ছে…"),reading:p("পড়া হচ্ছে… (প্রথমবার একটু সময় লাগে)","Reading… (the first time takes a while)","পড়া হচ্ছে… (প্রথমবার একটু সময় লাগে)"),readFail:p("ছবি থেকে পড়া গেল না। নিজে লিখে নিন।","Could not read the photo. Please type it yourself.","Photo থেকে পড়া গেল না। নিজে লিখে নিন।"),queued:p("ইন্টারনেট নেই: ছবি ফোনে রাখা হয়েছে, পরে পাঠানো হবে","No internet: the photo is kept on the phone and will be sent later","Internet নেই: photo phone-এ রাখা হয়েছে, পরে পাঠানো হবে"),qwait:p("পাঠানো অপেক্ষায় ছবি","Photos waiting to be sent","পাঠানো অপেক্ষায় photo"),qsend:p("এখন পাঠান","Send now","এখন পাঠান"),qdrop:p("বাদ দিন","Discard","Discard"),qsent:p("পাঠানো হয়েছে","Sent","Sent"),list:p("আপনার ছবিগুলো","Your photos","আপনার photo"),all:p("সব","All","All"),none:p("কোনো ছবি নেই","No photos yet","কোনো photo নেই"),s_uploaded:p("নতুন","New","New"),s_extracted:p("পড়া হয়েছে","Read","Read"),s_reviewed:p("দেখা হয়েছে","Checked","Checked"),s_confirmed:p("ঢোকানো হয়েছে","Entered","Entered"),s_rejected:p("বাতিল","Rejected","Rejected"),open:p("খুলুন","Open","Open"),dupn:p("একই বিলের সন্দেহ","Possible duplicate","Possible duplicate"),photo:p("ছবি","Photo","Photo"),zoom:p("ছবি বড় করে দেখুন","View the photo larger","Photo বড় করে দেখুন"),nophoto:p("ছবি দেখানো গেল না","The photo could not be shown","Photo দেখানো গেল না"),hidden:p("এই ক্রয় বিলের কস্ট দেখার অনুমতি আপনার নেই।","You do not have the right to see the costs of this purchase bill.","এই purchase bill-এর cost দেখার right আপনার নেই।"),supplier:p("সাপ্লায়ার","Supplier","Supplier"),billNo:p("বিল নম্বর","Bill no.","Bill no."),date:p("ডেট","Date","Date"),discount:p("ছাড় ৳","Discount Tk","Discount Tk"),paper:p("কাগজের টোটাল ৳","Total on paper Tk","Paper-এর total ৳"),note:p("নোট","Note","Note"),titleF:p("শিরোনাম","Title","Title"),head:p("খাত (ইংরেজি কোড)","Head (code)","Head (code)"),paidTo:p("কাকে / কী বাবদ","Paid to / for","Paid to / for"),amount:p("টাকা ৳","Amount Tk","Amount Tk"),mode:p("মাধ্যম","Mode","Mode"),receipt:p("রসিদ আছে","Receipt kept","Receipt আছে"),lines:p("লাইন","Lines","Lines"),line:p("লাইন","Line","Line"),add:p("লাইন যোগ","Add a line","Line যোগ"),del:p("লাইন মুছুন","Remove line","Line মুছুন"),desc:p("বিবরণ","Description","Description"),qty:p("Qty","Qty","Qty"),unit:p("একক","Unit","Unit"),ucost:p("একক কস্ট ৳","Unit cost Tk","Unit cost Tk"),price:p("বিক্রয় প্রাইস ৳","Sell price Tk","Sell price Tk"),lamt:p("লাইনের টাকা","Line amount","Line amount"),decide:p("এই লাইন কী হবে","What is this line","এই line কী হবে"),choose:p("— বাছুন —","— choose —","— বাছুন —"),d_map:p("এখনকার আইটেমের সাথে মেলান","Match an existing item","Existing item-এর সাথে মেলান"),d_create:p("নতুন আইটেম বানান","Create a new item","নতুন item বানান"),d_text:p("শুধু লেখা (স্টক নয়)","Plain text (not stock)","শুধু text (stock নয়)"),d_skip:p("বাদ দিন","Skip this line","Skip করুন"),sugg:p("মিলতে পারে (ট্যাপ করে বাছুন)","Possible matches (tap to choose)","মিলতে পারে (tap করে বাছুন)"),nosugg:p("মেলে এমন কিছু নেই","No similar existing name","মেলে এমন কিছু নেই"),chosen:p("বাছা হয়েছে","Chosen","Chosen"),find:p("খুঁজুন","Find","Find"),findph:p("নাম লিখে খুঁজুন","Type a name to search","নাম লিখে খুঁজুন"),nameEn:p("নতুন আইটেমের ইংরেজি নাম","New item name (English)","নতুন item-এর English নাম"),nameBn:p("বাংলা নাম","Bangla name","বাংলা নাম"),cat:p("ক্যাটাগরি","Category","Category"),newSup:p("নতুন সাপ্লায়ার হিসেবে খুলুন","Create as a new supplier","নতুন supplier হিসেবে খুলুন"),supNew:p("নতুন সাপ্লায়ার হবে","Will be created as a new supplier","নতুন supplier হবে"),supUndo:p("বাতিল","Undo","Undo"),supHelp:p("সাপ্লায়ার বাছুন বা নতুন বলে চিহ্নিত করুন","Choose a supplier or mark it as new","Supplier বাছুন বা নতুন বলে mark করুন"),low:p("পাঠক নিশ্চিত ছিল না","The reader was not sure","Reader sure ছিল না"),lowKey:p("হলুদ ঘর = পাঠক নিশ্চিত ছিল না, আপনি বদলাননি","Yellow = the reader was not sure and you have not changed it","হলুদ field = reader sure ছিল না, আপনি বদলাননি"),save:p("ড্রাফট সেভ","Save draft","Draft save"),done:p("দেখা শেষ — কনফার্ম","Checked — Confirm","দেখা শেষ — Confirm"),doneNoRight:p("দেখা শেষ — কনফার্মের জন্য পাঠান","Checked — send for confirmation","দেখা শেষ — Confirm-এর জন্য পাঠান"),confirm:p("কনফার্ম করুন","Confirm","Confirm করুন"),reject:p("বাতিল করুন","Reject","Reject"),edit:p("আবার বদলান","Edit again","আবার edit"),cq:p("এটি এখনই ঢোকানো হবে","This will now be entered","এটি এখনই enter হবে"),ackDup:p("আমি দেখেছি, তবুও ঢোকান","I have seen it, enter it anyway","আমি দেখেছি, তবুও enter করুন"),post:p("বিলটি পোস্টও করুন (স্টকে যাবে)","Also post the bill (adds the stock)","Bill-টি post-ও করুন (stock-এ যাবে)"),postNo:p("না করলে এটি ড্রাফট ক্রয় বিল হয়ে থাকবে","If not ticked it stays a draft purchase bill","না করলে এটি draft purchase bill হয়ে থাকবে"),rwhy:p("বাতিলের কারণ (কমপক্ষে ৩ অক্ষর)","Reason for rejecting (at least 3 letters)","Reject-এর reason (কমপক্ষে ৩ অক্ষর)"),cancel:p("থাক","Cancel","Cancel"),saved:p("সেভ হয়েছে","Saved","Saved"),sent:p("কনফার্মের জন্য পাঠানো হয়েছে","Sent for confirmation","Confirm-এর জন্য পাঠানো হয়েছে"),done_ok:p("ঢোকানো হয়েছে","Entered","Entered"),rejected:p("বাতিল হয়েছে","Rejected","Rejected"),seeBill:p("ক্রয় বিল দেখুন","Open the purchase bill","Purchase bill দেখুন"),seeExp:p("দ্রুত খরচ দেখুন","Open quick expenses","Quick expense দেখুন"),seeItems:p("আইটেম দেখুন","Open items","Item দেখুন"),w_total:p("লাইনের যোগফল ৳{a}, কাগজের মোট ৳{b}। মিলিয়ে দেখুন (আটকায় না)।","Lines add up to Tk {a} but the paper says Tk {b}. Please check (does not block).","Lines-এর যোগফল ৳{a}, paper-এর total ৳{b}। মিলিয়ে দেখুন (আটকায় না)।"),w_unm:p("{n}টি লাইনের সিদ্ধান্ত বাকি","{n} line(s) still need a decision","{n}টি line-এর decision বাকি"),w_low:p("{n}টি ঘর পাঠক নিশ্চিত ছিল না","{n} field(s) the reader was unsure about","{n}টি field reader sure ছিল না"),w_dup:p("সন্দেহ: একই সাপ্লায়ার, বিল নম্বর ও টোটাল আগেই আছে","Possible duplicate: the same supplier, bill no. and total already exist","সন্দেহ: একই supplier, bill no. ও total আগেই আছে"),w_dupx:p("সন্দেহ: একই জায়গা, দিন, খাত ও টাকার খরচ আগেই আছে","Possible duplicate: an expense with the same place, day, head and amount exists","সন্দেহ: একই place, day, head ও amount-এর খরচ আগেই আছে"),e_scan_off:p("স্ক্যান বন্ধ আছে","Scan is switched off","Scan বন্ধ আছে"),e_not_reviewed:p('আগে "দেখা শেষ" করুন',"Finish the check first",'আগে "দেখা শেষ" করুন'),e_already_confirmed:p("এটি আগেই ঢোকানো হয়ে গেছে","This was already entered","এটি আগেই enter হয়ে গেছে"),e_duplicate_suspect:p("একই বিল আগে আছে বলে সন্দেহ। দেখে নিশ্চিত করুন","Looks like a duplicate. Look and acknowledge it","একই bill আগে আছে বলে সন্দেহ। দেখে নিশ্চিত করুন"),e_duplicate_bill:p("এই সাপ্লায়ারের এই বিল নম্বর আগেই আছে","This supplier already has this bill number","এই supplier-এর এই bill no. আগেই আছে"),e_supplier_not_mapped:p('সাপ্লায়ার বাছুন বা "নতুন" বলে চিহ্নিত করুন',"Choose a supplier or mark it as new",'Supplier বাছুন বা "নতুন" mark করুন'),e_similar_supplier_exists:p("একই নামের সাপ্লায়ার আছে। সেটি বাছুন","A supplier with almost the same name exists. Choose it","প্রায় একই নামের supplier আছে। সেটি বাছুন"),e_unmatched_lines:p("সব লাইনের সিদ্ধান্ত দিন","Every line needs a decision","সব line-এর decision দিন"),e_item_needs_approval:p("নতুন আইটেম বানাতে মালিকের অ্যাপ্রুভ লাগে","Creating an item needs the owner","নতুন item বানাতে owner-এর approval লাগে"),e_bad_number:p("একটি সংখ্যা ঠিক নয়","A number is not valid","একটি number ঠিক নয়"),e_bad_date:p("ডেট ঠিক নয়","The date is not valid","Date ঠিক নয়"),e_head_needed:p("খাত লিখুন (ইংরেজি কোড, যেমন transport)","Enter the head (a code such as transport)","Head লিখুন (English code, যেমন transport)"),e_bad_amount:p("টাকা লিখুন","Enter the amount","Amount লিখুন"),e_image_already_used:p("এই ছবি আগেই ব্যবহার হয়েছে","This photo was already used","এই photo আগেই use হয়েছে"),e_not_allowed:p("অনুমতি নেই","Not allowed","Permission নেই"),e_no_lines:p("কমপক্ষে একটি লাইন লাগবে","At least one line is needed","কমপক্ষে একটি line লাগবে"),e_item_not_found:p("আইটেমটি পাওয়া যায়নি","The item was not found","Item পাওয়া যায়নি"),e_bad_qty:p("Qty ঠিক নয়","The quantity is not valid","Qty ঠিক নয়"),e_bad_cost:p("কস্ট ঠিক নয়","The cost is not valid","Cost ঠিক নয়"),e_not_open:p("এটি আর বদলানো যায় না","This can no longer be changed","এটি আর বদলানো যায় না"),e_note_needed:p("কারণ লিখুন","Write the reason","Reason লিখুন"),needSup:p("সাপ্লায়ার বাছুন","Choose a supplier","Supplier বাছুন"),needDate:p("ডেট দিন","Enter the date","Date দিন"),needLine:p("কমপক্ষে একটি লাইন লিখুন","Enter at least one line","কমপক্ষে একটি line লিখুন"),back:p("তালিকায় ফিরুন","Back to the list","List-এ ফিরুন"),engine:p("পদ্ধতি","Method","Method"),by:p("করেছেন","by","by"),loading:p("লোড হচ্ছে…","Loading…","Loading…"),trail:p("ইতিহাস","History","History"),nodb:p("ডেটাবেস আপডেট (phase90.sql) বাকি","The database update (phase90.sql) is not installed yet","Database update (phase90.sql) বাকি")},g=e=>u(w[e]),$=(e,t)=>String(e).replace(/\{(\w+)\}/g,(e,a)=>void 0===t[a]?e:t[a]),v=e=>{const t=String(e&&e.message||e||""),a=(t.match(/^[a-z_ ]+/)||[""])[0].trim().replace(/ /g,"_");if(/schema cache|does not exist|Could not find the function/i.test(t))return g("nodb");const n="e_"+a;return w[n]?g(n):t},y={jobs:[],job:null,ed:null,ex:null,m:{},sm:{},lbl:{},busy:!1,pick:{kind:"purchase_bill",loc:null},cfg:null,conf:null,cc:null,dupAck:!1,post:!1,q:[],filter:""},k=(e,a)=>{try{return t.rule?t.rule(e,a):a}catch(e){return a}},x=()=>({enabled:!0===k("scan_enabled",!1),engine:["manual","browser_ocr","ai_vision"].includes(k("scan_engine","manual"))?k("scan_engine","manual"):"manual",minc:Number(k("scan_min_confidence",.6))||.6}),j=()=>{const e=t.liveLocs?t.liveLocs(t.ENV&&t.ENV.locs||[]):t.ENV&&t.ENV.locs||[];return n.ctx&&(n.ctx.is_owner||(n.ctx.roles||[]).includes("management"))?e:e.filter(e=>(n.ctx&&n.ctx.locations||[]).includes(e.id))},S=e=>{const t=String(e&&e.message||e||"");return"undefined"!=typeof navigator&&!1===navigator.onLine||/failed to fetch|networkerror|network request|load failed|fetch failed|offline/i.test(t)},q=e=>{const t=String(e??"").replace(/[০-৯]/g,e=>"০১২৩৪৫৬৭৮৯".indexOf(e)).replace(/[,৳\s]/g,"");return""===t?null:Number.isFinite(Number(t))?Number(t):NaN};function E(e,t,a){return t=t||1600,a=a||.74,new Promise((n,i)=>{const s=new Image,c=URL.createObjectURL(e);s.onload=()=>{const e=Math.min(1,t/Math.max(s.width,s.height)),o=document.createElement("canvas");o.width=Math.round(s.width*e)||1,o.height=Math.round(s.height*e)||1,o.getContext("2d").drawImage(s,0,0,o.width,o.height),URL.revokeObjectURL(c);const r=e=>o.toBlob(t=>t?t.size>7e5&&e>.45?r(e-.1):void n(t):i(new Error("image")),"image/jpeg",e);r(a)},s.onerror=()=>{URL.revokeObjectURL(c),i(new Error("image"))},s.src=c})}async function T(e){try{const t=await(e.arrayBuffer?e.arrayBuffer():new Response(e).arrayBuffer()),a=await crypto.subtle.digest("SHA-256",t);return Array.from(new Uint8Array(a)).map(e=>e.toString(16).padStart(2,"0")).join("")}catch(e){return null}}const N={mem:[]};function C(){return new Promise((e,t)=>{try{const a=indexedDB.open("bos_scan",1);a.onupgradeneeded=()=>{a.result.createObjectStore("q",{keyPath:"client"})},a.onsuccess=()=>e(a.result),a.onerror=()=>t(a.error)}catch(e){t(e)}})}async function P(){try{const e=await C();return await new Promise((t,a)=>{const n=e.transaction("q").objectStore("q").getAll();n.onsuccess=()=>t(n.result||[]),n.onerror=()=>a(n.error)})}catch(e){return N.mem.slice()}}async function L(e){try{const t=await C();await new Promise((a,n)=>{const i=t.transaction("q","readwrite");i.objectStore("q").put(e),i.oncomplete=a,i.onerror=()=>n(i.error)})}catch(t){N.mem=N.mem.filter(t=>t.client!==e.client).concat([e])}}async function O(e){try{const t=await C();await new Promise((a,n)=>{const i=t.transaction("q","readwrite");i.objectStore("q").delete(e),i.oncomplete=a,i.onerror=()=>n(i.error)})}catch(t){N.mem=N.mem.filter(t=>t.client!==e)}}async function R(e){const t="SCAN/"+e.loc+"/"+e.client+".jpg",n=await a.storage.from("photos").upload(t,e.blob,{contentType:"image/jpeg",upsert:!1});if(n.error&&!/exist|duplicate|409/i.test(String(n.error.message||n.error.statusCode||"")))throw n.error;const i=await a.rpc("scan_create",{p_client:e.client,p_kind:e.kind,p_loc:e.loc,p_image_path:t,p_image_hash:e.hash||null,p_note:null});if(i.error)throw i.error;return i.data}async function A(e,t){if(e&&!e.dup)return"browser_ocr"===e.engine?async function(e,t){try{const n=await new Promise((e,t)=>{if(window.Tesseract)return e(window.Tesseract);const a=document.createElement("script");a.src=b,a.async=!0,a.crossOrigin="anonymous";const n=setTimeout(()=>t(new Error("ocr_load")),3e4);a.onload=()=>{clearTimeout(n),window.Tesseract?e(window.Tesseract):t(new Error("ocr_load"))},a.onerror=()=>{clearTimeout(n),t(new Error("ocr_load"))},document.head.appendChild(a)}),i=(y.job&&y.job.id===e?y.job.kind:null)||y.pick.kind,s=await n.recognize(t,y.pick.bn?"eng+ben":"eng"),c=U(i,s&&s.data),o=await a.rpc("scan_set_extracted",{p_id:e,p_extracted:c.extracted,p_confidence:c.confidence,p_engine:"browser_ocr",p_error:null});if(o.error)throw o.error}catch(t){try{await a.rpc("scan_set_extracted",{p_id:e,p_extracted:null,p_confidence:null,p_engine:"browser_ocr",p_error:"ocr: "+String(t&&t.message||t).slice(0,200)})}catch(e){}s(g("readFail"))}}(e.id,t):"ai_vision"===e.engine?async function(e){try{const t=await a.auth.getSession(),n=t&&t.data&&t.data.session&&t.data.session.access_token,i=window.BOS_CONFIG||{},s=await fetch(String(i.url).replace(/\/$/,"")+"/functions/v1/scan-extract",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+n,apikey:i.key},body:JSON.stringify({job_id:e})}),c=await s.json().catch(()=>({}));if(!s.ok||!1===c.ok)throw new Error(c.error||"http "+s.status)}catch(t){try{await a.rpc("scan_set_extracted",{p_id:e,p_extracted:null,p_confidence:null,p_engine:"ai_vision",p_error:"ai: "+String(t&&t.message||t).slice(0,200)})}catch(e){}s(g("readFail"))}}(e.id):void 0}async function B(e){const t=await P();let a=0;for(const n of t)try{const e=await R(n);await O(n.client),a++;try{await A(e,n.blob)}catch(e){}}catch(t){if(S(t))break;e||s(v(t)),await O(n.client)}return y.q=await P(),a&&!e&&s(g("qsent")+" ×"+a),a}window.addEventListener&&window.addEventListener("online",()=>{B(!0).then(()=>{/^#\/scan\/?$/.test(location.hash)&&M()}).catch(()=>{})});const D="kg|gm|g|ltr|l|pcs|pc|piece|dz|dozen|box|bag|pound|lb|bottle|packet|pkt";function U(e,t){const a=(t&&t.lines&&t.lines.length?t.lines.map(e=>({t:String(e.text||"").trim(),c:Math.max(0,Math.min(1,(Number(e.confidence)||0)/100))})):String(t&&t.text||"").split(/\r?\n/).map(e=>({t:e.trim(),c:.5}))).filter(e=>e.t).map(e=>({t:e.t.replace(/[০-৯]/g,e=>"০১২৩৪৫৬৭৮৯".indexOf(e)),c:e.c})),n=e=>String(e).replace(/,/g,""),i={},s={},c="(\\d[\\d,]*(?:\\.\\d+)?)",o=/total|discount|vat|paid|due|balance|date|invoice|phone|mobile|tel\b|address|thank/i,r=e=>{let t=null;for(const n of a){const a=n.t.match(e);a&&(t={v:a[1],c:n.c})}return t},d=a.map(e=>({m:e.t.match(/(\d{4}-\d{1,2}-\d{1,2})|(\d{1,2}[/.-]\d{1,2}[/.-]\d{4})/),c:e.c})).find(e=>e.m);if(d&&(i.date=d.m[0],s.date=.9*d.c),"purchase_bill"===e){const e=r(/(?:invoice|inv|bill|memo|challan)\s*(?:no|number|#)?\s*[:.#-]*\s*([A-Za-z0-9][A-Za-z0-9\-/]{1,30})/i);e&&(i.bill_no=e.v,s.bill_no=.8*e.c);const t=r(new RegExp("discount\\s*[:\\-]?\\s*(?:tk|bdt)?\\s*"+c,"i"));t&&(i.discount=n(t.v),s.discount=.8*t.c);const d=a.find(e=>!/^[\d\s.,:/-]+$/.test(e.t)&&!o.test(e.t)&&e.t.length>2);d&&(i.supplier={name:d.t},s.supplier=.6*d.c)}const l=r(new RegExp("(?:grand\\s*total|net\\s*(?:payable|amount)|total|amount)\\s*[:\\-]?\\s*(?:tk|bdt|৳)?\\s*"+c,"i"));if("expense"===e){const e=a.flatMap(e=>(e.t.match(/\d[\d,]*(?:\.\d+)?/g)||[]).map(t=>({n:Number(n(t)),c:e.c})));if(l)i.amount=n(l.v),s.amount=.8*l.c;else if(e.length){const t=e.reduce((e,t)=>t.n>e.n?t:e);i.amount=String(t.n),s.amount=.5*t.c}const t=a.find(e=>!/^[\d\s.,:/-]+$/.test(e.t));return t&&(i.paid_to=t.t.slice(0,120),s.paid_to=.6*t.c),{extracted:i,confidence:s}}if("purchase_bill"===e&&l&&(i.total=n(l.v),s.total=.85*l.c),"other"===e)return i.title=(a[0]||{t:""}).t.slice(0,120),i.lines=a.slice(1,200).map(e=>({desc:e.t.slice(0,200)})),s.lines=a.slice(1,200).map(e=>({desc:e.c})),{extracted:i,confidence:s};const p=new RegExp("^(.{2,}?)\\s+(\\d+(?:\\.\\d+)?)\\s*("+D+")?\\s*[x@*]?\\s*"+c+"\\s+"+c+"$","i"),u=new RegExp("^(.{2,}?)\\s+"+c+"$"),h=[],m=[];for(const t of a){if(o.test(t.t))continue;let a="purchase_bill"===e?t.t.match(p):null;a?(h.push({desc:a[1].trim(),qty:a[2],unit:(a[3]||"").toLowerCase()||void 0,unit_cost:n(a[4]),amount:n(a[5])}),m.push({desc:t.c,qty:.9*t.c,unit:.8*t.c,unit_cost:.9*t.c,amount:.9*t.c})):(a=t.t.match(u),a&&!/^[\d\s.,:/-]+$/.test(a[1])&&("product_list"===e?(h.push({desc:a[1].trim(),price:n(a[2])}),m.push({desc:t.c,price:.8*t.c})):(h.push({desc:a[1].trim(),amount:n(a[2])}),m.push({desc:t.c,amount:.7*t.c}))))}return i.lines=h.slice(0,300),s.lines=m.slice(0,300),{extracted:i,confidence:s}}const z=e=>`<span class="chip ${"confirmed"===e?"ok":"rejected"===e?"":"warn"}">${i(g("s_"+("confirmed"===e?"confirmed":e)))}</span>`;function I(){const e=y.cfg,a=j();!y.pick.loc&&a[0]&&(y.pick.loc=a[0].id);return`<div class="card stack"><b>${i(g("newScan"))}</b>\n    <label for="sc_kind">${i(g("kind"))}</label><select id="sc_kind">${_.map(e=>`<option value="${e}" ${y.pick.kind===e?"selected":""}>${i(g("k_"+e))}</option>`).join("")}</select>\n    ${a.length>1?`<label for="sc_loc">${i(g("place"))}</label><select id="sc_loc">${a.map(e=>`<option value="${e.id}" ${e.id===y.pick.loc?"selected":""}>${i((e=>t.lab?u({bn:e.name_bn,en:e.name_en||e.name_bn,mix:e.name_mix||e.name_bn}):e.name_bn)(e))}</option>`).join("")}</select>`:""}\n    <p class="muted sc-eng">${i(g("eng_"+e.engine))}</p>\n    ${"browser_ocr"===e.engine?`<label class="row"><input type="checkbox" id="sc_bn" ${y.pick.bn?"checked":""}> ${i(g("ocrBn"))}</label>`:""}\n    <div class="row wrap"><label class="btn primary sc-pick">📷 ${i(g("take"))}<input type="file" accept="image/*" capture="environment" id="sc_cam" hidden></label>\n      <label class="btn sc-pick">🖼 ${i(g("gallery"))}<input type="file" accept="image/*" id="sc_gal" hidden></label></div>\n    <div id="sc_busy" class="muted"></div></div>`}async function M(){o(g("title"),`<div id="sc_body"><p class="muted">${i(g("loading"))}</p></div>`,!0),y.cfg=x(),y.q=await P();let e=[],n=null;try{t.loadStatic&&(await t.loadStatic(),y.cfg=x());const i=await a.rpc("scan_list",{p_status:y.filter||null,p_loc:null,p_limit:100});i.error?n=i.error:e=i.data||[]}catch(e){n=e}y.jobs=e;const s=h("#sc_body");if(!s)return;const c=y.q.length?`<div class="card stack"><b>${i(g("qwait"))}: ${y.q.length}</b><div class="row wrap"><button type="button" class="btn primary" data-act="scan_flush">${i(g("qsend"))}</button><button type="button" class="btn" data-act="scan_qdrop">${i(g("qdrop"))}</button></div></div>`:"";s.innerHTML=`<p class="muted">${i(g("intro"))}</p>${y.cfg.enabled?I():`<div class="card"><p>${i(g("off"))}</p></div>`}${c}\n    <div class="row between"><b>${i(g("list"))}</b><select id="sc_filter" aria-label="${i(g("list"))}"><option value="">${i(g("all"))}</option>${["uploaded","extracted","reviewed","confirmed","rejected"].map(e=>`<option value="${e}" ${y.filter===e?"selected":""}>${i(g("s_"+e))}</option>`).join("")}</select></div>\n    ${n?`<p class="sc-err">${i(v(n))}</p>`:""}\n    ${e.length?e.map(e=>`<div class="card sc-row"><div class="row between"><span><b>${i(g("k_"+e.kind))}</b> ${z(e.status)} ${e.dups?`<span class="chip warn">${i(g("dupn"))}</span>`:""}</span><button type="button" class="mini" data-act="scan_open" data-id="${i(e.id)}">${i(g("open"))}</button></div>\n      <div class="muted" style="font-size:.8rem">${i(String(e.created_at||"").slice(0,16).replace("T"," "))} · ${i(e.created_staff||"")}</div></div>`).join(""):`<p class="muted">${i(g("none"))}</p>`}`}function F(e){location.hash="#/"+e}const H=e=>"other"===e?{desc:"",amount:""}:"product_list"===e?{desc:"",unit:"",price:""}:{desc:"",qty:"",unit:"",unit_cost:""},Q=e=>JSON.parse(JSON.stringify(e||{}));function V(e){const t=Q(e.edited||e.extracted||{});Array.isArray(t.lines)||"expense"===e.kind||(t.lines=[H(e.kind)]),"purchase_bill"!==e.kind||t.supplier||(t.supplier={name:""}),y.ed=t,y.ex=Q(e.extracted||{}),y.conf=e.confidence||null,y.m={},y.sm={},y.cc=null,y.dupAck=!1,y.post=!1}const W=(e,t)=>String(e??"")===String(t??"");function G(e,t){if(!y.conf||!y.ex)return!1;const a=y.cfg.minc;if(null==t){const t=y.conf[e];return!("number"!=typeof t||t>=a)&&("supplier"===e?W((y.ed.supplier||{}).name,(y.ex.supplier||{}).name):W(y.ed[e],y.ex[e]))}const n=y.conf.lines&&y.conf.lines[t];return!(!n||"number"!=typeof n[e]||n[e]>=a)&&W(((y.ed.lines||[])[t]||{})[e],((y.ex.lines||[])[t]||{})[e])}function J(e,t,a,n){const s=(n=n||{}).low;return`<div${s?' class="sc-low"':""}${s?` title="${i(g("low"))}"`:""}><label for="${e}">${i(t)}</label><input id="${e}" ${n.attrs||""} value="${i(a??"")}"></div>`}function Y(e,a,n){y.conf&&y.conf.lines&&y.conf.lines[a];const s=e=>G(e,a),c=e.decision||"",o="purchase_bill"===n?["map","create","text","skip"]:"product_list"===n?["map","create","skip"]:[];let r=J(`sc_l${a}_desc`,g("desc"),e.desc,{low:s("desc"),attrs:`data-l="${a}" data-k="desc"`});var d;r+="purchase_bill"===n?`<div class="sc-grid">${J(`sc_l${a}_qty`,g("qty"),e.qty,{low:s("qty"),attrs:`data-l="${a}" data-k="qty" inputmode="decimal"`})}${J(`sc_l${a}_unit`,g("unit"),e.unit,{low:s("unit"),attrs:`data-l="${a}" data-k="unit"`})}${J(`sc_l${a}_uc`,g("ucost"),e.unit_cost,{low:s("unit_cost"),attrs:`data-l="${a}" data-k="unit_cost" inputmode="decimal"`})}</div>\n      <div class="muted">${i(g("lamt"))}: ৳ ${i(String(q(e.qty)>0&&q(e.unit_cost)>=0?(d=q(e.qty)*q(e.unit_cost),Math.round(100*Number(d))/100):"—"))}${e.amount?" · "+i(String(e.amount)):""}</div>`:"product_list"===n?`<div class="sc-grid">${J(`sc_l${a}_unit`,g("unit"),e.unit,{low:s("unit"),attrs:`data-l="${a}" data-k="unit"`})}${J(`sc_l${a}_price`,g("price"),e.price,{low:s("price"),attrs:`data-l="${a}" data-k="price" inputmode="decimal"`})}</div>`:J(`sc_l${a}_amount`,g("amount"),e.amount,{low:s("amount"),attrs:`data-l="${a}" data-k="amount" inputmode="decimal"`});let l="";if(o.length)if(l=`<label for="sc_l${a}_dec">${i(g("decide"))}</label><select id="sc_l${a}_dec" data-l="${a}" data-k="decision"><option value="">${i(g("choose"))}</option>${o.map(e=>`<option value="${e}" ${c===e?"selected":""}>${i(g("d_"+e))}</option>`).join("")}</select>`,"map"===c){const t=y.m[a]||[];l+=(e.item_id?`<div class="chip ok">${i(g("chosen"))}: ${i(y.lbl["i:"+e.item_id]||e.item_id)}</div>`:"")+`<div class="muted">${i(g("sugg"))}</div><div class="row wrap">${t.length?t.map(t=>`<button type="button" class="chip sc-sugg ${e.item_id===t.item_id?"on":""}" data-act="scan_itempick" data-l="${a}" data-id="${i(t.item_id)}" data-n="${i(t.code+" · "+(t.name_en||t.name_bn||""))}">${i(t.code)} · ${i(t.name_en||t.name_bn||"")} · ${Math.round(100*t.score)}%</button>`).join(""):`<span class="muted">${i(g("nosugg"))}</span>`}</div>\n        <div class="row"><input id="sc_l${a}_q" placeholder="${i(g("findph"))}" style="flex:1" value=""><button type="button" class="btn" data-act="scan_itemfind" data-l="${a}">${i(g("find"))}</button></div>`}else if("create"===c){const n=(p=e.desc,/[ঀ-৿]/.test(String(p||"")));l+=J(`sc_l${a}_nen`,g("nameEn"),void 0!==e.name_en?e.name_en:n?"":e.desc,{attrs:`data-l="${a}" data-k="name_en"`})+J(`sc_l${a}_nbn`,g("nameBn"),void 0!==e.name_bn?e.name_bn:n?e.desc:"",{attrs:`data-l="${a}" data-k="name_bn"`})+(t.catpick&&t.catpick.catOptions?`<div><label for="sc_l${a}_cat">${i(g("cat"))}</label><select id="sc_l${a}_cat" data-l="${a}" data-k="category">${t.catpick.catOptions(e.category,"—")}</select></div>`:J(`sc_l${a}_cat`,g("cat"),e.category,{attrs:`data-l="${a}" data-k="category"`}))}var p;return`<div class="card stack sc-line${"skip"===c?" sc-skip":""}"><div class="row between"><b>${i(g("line"))} ${a+1}</b><button type="button" class="mini" data-act="scan_delline" data-l="${a}">${i(g("del"))}</button></div>${r}${l}</div>`}function K(e){const t=y.ed,a=e.kind;let n="";const s=(t.date||"").slice(0,10);return"purchase_bill"===a?n+=function(){const e=y.ed.supplier||{},t=y.sm.list||[];return`<div class="card stack"><b>${i(g("supplier"))}</b>${G("supplier")?`<div class="sc-low"><span class="muted">${i(g("low"))}</span></div>`:""}\n    <div class="row"><input id="sc_sup" value="${i(e.name||"")}" placeholder="${i(g("supplier"))}" style="flex:1"><button type="button" class="btn" data-act="scan_supfind">${i(g("find"))}</button></div>\n    ${e.id?`<div class="chip ok">${i(g("chosen"))}: ${i(y.lbl["s:"+e.id]||e.name||"")}</div>`:e.create?`<div class="chip warn">${i(g("supNew"))}: ${i(e.name||"")} <button type="button" class="mini" data-act="scan_supundo">${i(g("supUndo"))}</button></div>`:`<div class="muted">${i(g("supHelp"))}</div>`}\n    <div class="row wrap">${t.map(e=>`<button type="button" class="chip sc-sugg" data-act="scan_suppick" data-id="${i(e.supplier_id)}" data-n="${i(e.name)}">${i(e.name)} · ${Math.round(100*e.score)}%</button>`).join("")}\n      ${e.name&&!e.create?`<button type="button" class="chip sc-sugg" data-act="scan_supnew">+ ${i(g("newSup"))}</button>`:""}</div></div>`}()+`<div class="card stack">${J("sc_h_bill_no",g("billNo"),t.bill_no,{low:G("bill_no"),attrs:'data-h="bill_no"'})}${J("sc_h_date",g("date"),s,{low:G("date"),attrs:'data-h="date" type="date"'})}\n    <div class="sc-grid">${J("sc_h_discount",g("discount"),t.discount,{low:G("discount"),attrs:'data-h="discount" inputmode="decimal"'})}${J("sc_h_total",g("paper"),t.total,{low:G("total"),attrs:'data-h="total" inputmode="decimal"'})}</div></div>`:"expense"===a?n+=`<div class="card stack"><div${G("head")?' class="sc-low"':""}><label for="sc_h_head">${i(g("head"))}</label><input id="sc_h_head" data-h="head" list="sc_heads" value="${i(t.head||"")}"><datalist id="sc_heads">${f.map(e=>`<option value="${e}">`).join("")}</datalist></div>\n    ${J("sc_h_paid_to",g("paidTo"),t.paid_to,{low:G("paid_to"),attrs:'data-h="paid_to"'})}<div class="sc-grid">${J("sc_h_amount",g("amount"),t.amount,{low:G("amount"),attrs:'data-h="amount" inputmode="decimal"'})}${J("sc_h_date",g("date"),s,{low:G("date"),attrs:'data-h="date" type="date"'})}</div>\n    <label for="sc_h_mode">${i(g("mode"))}</label><select id="sc_h_mode" data-h="mode">${["cash","bank","mobile"].map(e=>`<option value="${e}" ${(t.mode||"cash")===e?"selected":""}>${e}</option>`).join("")}</select>\n    <label class="row"><input type="checkbox" id="sc_h_receipt" data-h="receipt" ${t.receipt?"checked":""}> ${i(g("receipt"))}</label></div>`:"other"===a&&(n+=`<div class="card stack">${J("sc_h_title",g("titleF"),t.title,{attrs:'data-h="title"'})}</div>`),"expense"!==a&&(n+=`<div class="row between"><b>${i(g("lines"))} (${(t.lines||[]).length})</b></div>`+(t.lines||[]).map((e,t)=>Y(e,t,a)).join("")+`<button type="button" class="btn full" data-act="scan_addline">+ ${i(g("add"))}</button>`),n+=`<div class="card stack">${J("sc_h_note",g("note"),t.note,{attrs:'data-h="note"'})}</div>`,n}async function Z(){const e=y.job,t=h("#sc_body");if(!t)return;const n=["uploaded","extracted","reviewed"].includes(e.status),s=await async function(e){let t=null;if(y.photoFor===e.image_path&&y.photo&&Date.now()-y.photoAt<48e4)t=y.photo;else try{const n=await a.storage.from("photos").createSignedUrl(e.image_path,600);t=n&&n.data&&(n.data.signedUrl||n.data.signedURL)}catch(e){t=null}return y.photo=t,y.photoFor=e.image_path,y.photoAt=Date.now(),t?`<div class="card sc-photo"><img id="sc_img" src="${i(t)}" alt="${i(g("photo"))}" data-act="scan_zoom"><button type="button" class="mini" data-act="scan_zoom">🔍 ${i(g("zoom"))}</button></div>`:`<div class="card muted">${i(g("nophoto"))}</div>`}(e);let c;c=e.cost_hidden?`<div class="card"><p>${i(g("hidden"))}</p></div>`:n?("manual"!==y.cfg.engine&&"manual"!==e.engine?`<p class="muted">${i(g("eng_"+e.engine))}</p>`:"")+(e.extracted?`<p class="muted">${i(g("lowKey"))}</p>`:"")+function(e){const t=e.warnings||[],a=[];t.forEach(e=>{"total_mismatch"===e.code&&a.push($(g("w_total"),{a:e.lines_total,b:e.paper_total}))});const n=t.find(e=>"unmatched_lines"===e.code);n&&a.push($(g("w_unm"),{n:n.n}));const s=t.filter(e=>"low_confidence"===e.code).length;return s&&a.push($(g("w_low"),{n:s})),(e.dups||[]).forEach(t=>a.push("expense"===e.kind?g("w_dupx"):g("w_dup"))),a.length?`<div class="card sc-warn">${a.map(e=>`<div>⚠ ${i(e)}</div>`).join("")}</div>`:""}(e)+K(e)+`<div class="s2-bar sc-bar"><button type="button" class="btn" data-act="scan_save">${i(g("save"))}</button><button type="button" class="btn primary" data-act="scan_done">${i(e.can_confirm?g("done"):g("doneNoRight"))}</button><button type="button" class="btn" data-act="scan_reject">${i(g("reject"))}</button></div>`:`<div class="card stack">${"confirmed"===e.status?function(e){return"purchase_bills"===e.result_type?`<a class="btn" href="#/purchase/${i(e.result_id)}">${i(g("seeBill"))}</a>`:"quick_expenses"===e.result_type?`<a class="btn" href="#/quickexp">${i(g("seeExp"))}</a>`:"items"===e.result_type?`<a class="btn" href="#/items">${i(g("seeItems"))}</a>`:""}(e):`<p>${i(g("s_rejected"))}: ${i(e.reject_reason||"")}</p>`}</div>`+(e.edited?`<pre class="muted sc-pre">${i(JSON.stringify(e.edited,null,1).slice(0,4e3))}</pre>`:"");const o=(e.events||[]).map(e=>`<div class="muted" style="font-size:.78rem">${i(String(e.at||"").slice(0,16).replace("T"," "))} · ${i(e.action)} ${e.by?"· "+i(e.by):""}</div>`).join("");t.innerHTML=`<div class="row between"><span><b>${i(g("k_"+e.kind))}</b> ${z(e.status)}</span><a href="#/scan" class="mini">${i(g("back"))}</a></div>\n    <div class="sc-split"><div class="sc-left">${s}</div><div class="sc-right">${c}</div></div><details data-ctl="off"><summary>${i(g("trail"))}</summary>${o}</details>`,n&&!e.cost_hidden&&async function(){const e=y.job.kind;if("expense"===e||"other"===e)return;const t=y.ed.lines||[];let n=!1;for(let e=0;e<Math.min(t.length,60);e++){const i=t[e];if(!y.m[e]&&i.desc&&"skip"!==i.decision&&"text"!==i.decision&&"create"!==i.decision){n=!0,y.m[e]=[];try{const t=await a.rpc("scan_match_items",{p_text:String(i.desc).slice(0,200),p_limit:5});y.m[e]=t.error?[]:t.data||[]}catch(t){y.m[e]=[]}}}"purchase_bill"===e&&y.ed.supplier&&y.ed.supplier.name&&!y.sm.list&&(n=!0,await X(!1));n&&0===location.hash.indexOf("#/scan/")&&y.job&&y.job.id===(y.edId||"")&&!y.busy&&function(){const e=document.activeElement&&document.activeElement.id;if(e&&/^sc_/.test(e)&&/input|textarea/i.test(document.activeElement.tagName))return;Z()}()}()}async function X(e){const t=((y.ed.supplier||{}).name||"").slice(0,200);if(t){try{const e=await a.rpc("scan_match_suppliers",{p_text:t,p_limit:5});y.sm.list=e.error?[]:e.data||[]}catch(e){y.sm.list=[]}!1!==e&&Z()}else y.sm.list=[]}function ee(){const e=Q(y.ed),t=y.job.kind;return(e.lines||[]).forEach(e=>{Object.keys(e).forEach(t=>{""!==e[t]&&null!==e[t]||delete e[t]})}),Array.isArray(e.lines)&&(e.lines=e.lines.filter(e=>Object.keys(e).some(e=>"decision"!==e)||e.decision)),Object.keys(e).forEach(t=>{""!==e[t]&&null!==e[t]||delete e[t]}),!e.supplier||e.supplier.name||e.supplier.id||delete e.supplier,"expense"===t&&delete e.lines,e}function te(e,t){if("purchase_bill"===t){if(!e.supplier||!(e.supplier.id||e.supplier.create&&e.supplier.name))return g("needSup");if(!e.date)return g("needDate");if(!(e.lines||[]).length)return g("needLine")}if("expense"===t){if(!e.date)return g("needDate");if(!e.head)return g("e_head_needed");if(!(q(e.amount)>0))return g("e_bad_amount")}return"product_list"!==t||(e.lines||[]).length?null:g("needLine")}async function ae(e){const t=ee(),n=await a.rpc("scan_review_save",{p_id:y.job.id,p_edited:t,p_final:!!e});if(n.error)throw n.error;return n.data}async function ne(){const e=await a.rpc("scan_get",{p_id:y.job.id});if(e.error)throw e.error;y.job=e.data,"confirmed"!==y.job.status&&"rejected"!==y.job.status||(y.ed=null,y.edId=null),await Z()}async function ie(){const e=location.hash.replace(/^#\/?/,"").split("/").slice(1).join("/");return e&&/^[0-9a-f-]{36}$/i.test(e)?async function(e){o(g("title"),`<div id="sc_body"><p class="muted">${i(g("loading"))}</p></div>`,"scan"),y.cfg=x();const t=await a.rpc("scan_get",{p_id:e});if(t.error){const e=h("#sc_body");return void(e&&(e.innerHTML=`<p class="sc-err">${i(v(t.error))}</p>`))}y.job=t.data,y.ed&&y.edId===e||(V(y.job),y.edId=e),await Z()}(e):M()}Object.assign(l,{scan_open:e=>F("scan/"+e.dataset.id),scan_flush:async()=>{await B(!1)||s(g("queued")),M()},scan_qdrop:async()=>{for(const e of await P())await O(e.client);M()},scan_zoom:()=>{y.photo&&r(`<div class="sc-zoom"><img src="${i(y.photo)}" alt="${i(g("photo"))}"></div>`)},scan_addline:()=>{(y.ed.lines=y.ed.lines||[]).push(H(y.job.kind)),Z()},scan_delline:e=>{const t=Number(e.dataset.l);y.ed.lines.splice(t,1),y.m={},y.ed.lines.length||y.ed.lines.push(H(y.job.kind)),Z()},scan_itempick:e=>{const t=Number(e.dataset.l),a=y.ed.lines[t];a.item_id=e.dataset.id,a.decision="map",y.lbl["i:"+e.dataset.id]=e.dataset.n,Z()},scan_itemfind:async e=>{const t=Number(e.dataset.l),n=((h("#sc_l"+t+"_q")||{}).value||y.ed.lines[t].desc||"").trim();if(!n)return;const i=await a.rpc("scan_match_items",{p_text:n.slice(0,200),p_limit:8});y.m[t]=i.error?[]:i.data||[],Z()},scan_supfind:()=>X(!0),scan_suppick:e=>{y.ed.supplier={id:e.dataset.id,name:e.dataset.n},y.lbl["s:"+e.dataset.id]=e.dataset.n,Z()},scan_supnew:()=>{y.ed.supplier={name:(y.ed.supplier||{}).name,create:!0},Z()},scan_supundo:()=>{y.ed.supplier={name:(y.ed.supplier||{}).name},Z()},scan_save:async()=>{if(!y.busy){y.busy=!0;try{await ae(!1),s(g("saved")),await ne()}catch(e){s(v(e))}finally{y.busy=!1}}},scan_done:async()=>{if(y.busy)return;const e=te(ee(),y.job.kind);if(e)return s(e);y.busy=!0;try{const e=await ae(!0);if(!y.job.can_confirm)return s(g("sent")),void await ne();!function(e){const t=y.job,a=ee(),n=e.dups||[];y.cc=y.cc||m();const s=(a.lines||[]).filter(e=>"skip"!==e.decision).length,c="purchase_bill"===t.kind?`${i((a.supplier||{}).name||"")} · ${i(a.bill_no||"")} · ${i(a.date||"")} · ${s} ${i(g("lines"))}`:"expense"===t.kind?`${i(a.head||"")} · ৳ ${i(String(a.amount||""))} · ${i(a.date||"")}`:`${s} ${i(g("lines"))}`;r(`<div class="stack"><h3>${i(g("cq"))}</h3><div><b>${i(g("k_"+t.kind))}</b><br>${c}</div>\n    ${n.length?`<div class="sc-warn">⚠ ${i("expense"===t.kind?g("w_dupx"):g("w_dup"))}<label class="row"><input type="checkbox" id="sc_ack"> ${i(g("ackDup"))}</label></div>`:""}\n    ${"purchase_bill"===t.kind?`<label class="row"><input type="checkbox" id="sc_post"> ${i(g("post"))}</label><div class="muted">${i(g("postNo"))}</div>`:""}\n    <div class="row wrap"><button type="button" class="btn primary" data-act="scan_confirm_go">${i(g("confirm"))}</button><button type="button" class="btn" data-act="closesheet">${i(g("cancel"))}</button></div></div>`)}(e)}catch(e){s(v(e))}finally{y.busy=!1}},scan_confirm_go:async()=>{if(!y.busy){y.busy=!0;try{const e=!!(h("#sc_ack")||{}).checked,t=!!(h("#sc_post")||{}).checked,n=await a.rpc("scan_confirm",{p_id:y.job.id,p_client:y.cc,p_ack_dup:e,p_post:t});if(n.error)return void s(v(n.error));d(),y.cc=null,s(g("done_ok")),await ne()}catch(e){s(v(e))}finally{y.busy=!1}}},scan_reject:()=>r(`<div class="stack"><h3>${i(g("reject"))}</h3><label for="sc_why">${i(g("rwhy"))}</label><textarea id="sc_why" rows="3" maxlength="300"></textarea>\n    <div class="row wrap"><button type="button" class="btn primary" data-act="scan_reject_go">${i(g("reject"))}</button><button type="button" class="btn" data-act="closesheet">${i(g("cancel"))}</button></div></div>`),scan_reject_go:async()=>{const e=((h("#sc_why")||{}).value||"").trim();if(e.length<3)return s(g("e_note_needed"));const t=await a.rpc("scan_reject",{p_id:y.job.id,p_reason:e});if(t.error)return s(v(t.error));d(),s(g("rejected")),await ne()}}),document.addEventListener("input",e=>{const t=e.target;if(t&&y.ed){if("sc_sup"===t.id)return y.ed.supplier={name:t.value},void(y.sm.list=null);if(t.dataset&&t.dataset.h)y.ed[t.dataset.h]="checkbox"===t.type?t.checked:t.value;else if(t.dataset&&void 0!==t.dataset.l&&t.dataset.k&&"decision"!==t.dataset.k){const e=y.ed.lines&&y.ed.lines[Number(t.dataset.l)];e&&(e[t.dataset.k]=t.value,"desc"===t.dataset.k&&delete y.m[Number(t.dataset.l)])}}}),document.addEventListener("change",e=>{const t=e.target;if(t){if("sc_kind"===t.id&&(y.pick.kind=t.value),"sc_loc"===t.id&&(y.pick.loc=Number(t.value)),"sc_bn"===t.id&&(y.pick.bn=!!t.checked),"sc_filter"===t.id&&(y.filter=t.value,M()),"sc_cam"===t.id||"sc_gal"===t.id){const e=t.files&&t.files[0];t.value="",async function(e){if(!e)return;const t=h("#sc_busy"),a=e=>{t&&(t.textContent=e?g(e):"")},n=y.pick.kind,i=Number(y.pick.loc)||(j()[0]||{}).id;if(!i)return s(g("e_not_allowed"));try{a("working");const t=await E(e),c={client:m(),kind:n,loc:i,hash:await T(t),blob:t,ts:Date.now()};let o;try{a("working"),o=await R(c)}catch(e){if(S(e))return await L(c),y.q=await P(),a(""),s(g("queued")),M();throw e}"manual"!==o.engine&&a("reading");try{await A(o,t)}catch(e){}a(""),F("scan/"+o.id)}catch(e){a(""),s(v(e))}}(e)}if(t.dataset&&"receipt"===t.dataset.h&&y.ed&&(y.ed.receipt=!!t.checked),t.dataset&&"decision"===t.dataset.k&&y.ed){const e=y.ed.lines[Number(t.dataset.l)];e.decision=t.value||void 0,"map"!==t.value&&delete e.item_id,Z()}}}),window.BOS_PAGES=Object.assign(window.BOS_PAGES||{},{scan:ie}),t.scan={X:w,T:g,view:ie,errText:v,parseOcr:U,payload:ee,check:te,isLow:G,startEdit:V,send:R,flushQueue:B,qall:P,qput:L,qdel:O,QDB:N,downscale:E,D:y,cfg:x,num:q,_set:(e,t)=>{y.job=e,y.ed=t,y.cfg=y.cfg||x()}};const se=document.createElement("style");se.id="sccss",se.textContent=".sc-split{display:block}.sc-photo img{width:100%;max-height:42vh;object-fit:contain;border-radius:10px;border:1px solid var(--line);background:#000}\n@media (min-width:760px){.sc-split{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}.sc-left{position:sticky;top:8px}.sc-photo img{max-height:80vh}}\n.sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px}.sc-low input,.sc-low select{border-color:var(--sig-warn);background:var(--warn-bg)}\n.sc-low{border-radius:8px}.sc-warn{border-color:var(--sig-warn);background:var(--warn-bg)}.sc-err{color:var(--sig-bad)}.sc-skip{opacity:.55}\n.sc-sugg{cursor:pointer;min-height:40px;max-width:100%;overflow-wrap:anywhere;text-align:start}.sc-sugg.on{border-color:var(--ok);background:var(--ok-bg)}\n.sc-pick{display:inline-flex;align-items:center;min-height:48px;cursor:pointer;margin:0}.sc-bar{position:sticky;bottom:0;z-index:4;display:flex;gap:8px;padding:10px 0;background:var(--bg);border-top:1px solid var(--line);flex-wrap:wrap}\n.sc-bar button{flex:1;min-height:44px}.sc-zoom{max-height:80vh;overflow:auto}.sc-zoom img{width:220%;max-width:none}.sc-pre{white-space:pre-wrap;font-size:.75rem;overflow-wrap:anywhere}\n.sc-line input,.sc-line select{width:100%;box-sizing:border-box}body.has-bnav .sc-bar{bottom:58px}",document.head.appendChild(se)})();
+/* Islamia BOS · Scan (#/scan): take a PHOTO of a purchase bill / product list / expense slip / report -> a DRAFT -> the person checks and edits every field
+   beside the photo -> Confirm sends it through the EXISTING save functions (save_purchase, quick_expense_add, item_new, item_apply), once.
+   A photo never posts anything by itself and there is no auto-confirm. The reader is chosen by the rule scan_engine:
+     manual      the person types the lines beside the photo (always works, nothing to set up)
+     browser_ocr free OCR on the phone (tesseract.js, pinned version, loaded from a CDN on first use). WEAK on Bangla and on handwriting: the screen says so.
+     ai_vision   the edge function scan-extract (source in supabase/functions/scan-extract, needs the owner's setup, docs/SCAN_SETUP.md)
+   Server: supabase/phase90.sql (scan_create, scan_set_extracted, scan_review_save, scan_confirm, scan_reject, scan_get, scan_list, scan_match_items, scan_match_suppliers).
+   Photos: private bucket 'photos', path SCAN/<place>/<client id>.jpg, shown only through a short-lived signed URL, never a public link.
+   Offline: the photo is kept on the phone (IndexedDB) with its client id and is sent later; the same client id can never make two drafts. */
+(() => {
+'use strict';
+const A = window.BOS_APP, B = window.BOS;
+const { sb, S, esc, toast, fail, shell, openSheet, closeSheet } = A;
+const H = A.H, L = B.L, lab = B.lab;
+const $ = (s, el = document) => el.querySelector(s);
+const rid = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : 'c' + Date.now().toString(16) + Math.random().toString(16).slice(2, 10));
+const KINDS = ['purchase_bill', 'product_list', 'expense', 'other'];
+const CDN_OCR = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';   // pinned; no key; free
+const HEADS = ['staff_meal', 'transport', 'hospitality', 'repair', 'labour', 'sourcing', 'other'];
+
+const X = {
+  title: L('ছবি থেকে এন্ট্রি (স্ক্যান)', 'Scan a bill or list', 'ছবি থেকে Entry (Scan)'),
+  intro: L('বিল বা তালিকার ছবি তুলুন। আপনি দেখে ঠিক করে কনফার্ম না করা পর্যন্ত কিছুই ঢোকে না।', 'Take a photo of a bill or list. Nothing is entered until you check it and press Confirm.', 'Bill বা list-এর ছবি তুলুন। আপনি দেখে ঠিক করে Confirm না করা পর্যন্ত কিছুই ঢোকে না।'),
+  off: L('স্ক্যান এখন বন্ধ। মালিক Switchboard থেকে স্ক্যান সুইচ চালু করলে ব্যবহার করা যাবে।', 'Scan is switched off. The owner can turn on the Scan switch in the Switchboard.', 'Scan এখন বন্ধ। Owner Switchboard থেকে Scan switch চালু করলে ব্যবহার করা যাবে।'),
+  newScan: L('নতুন ছবি', 'New photo', 'নতুন photo'), kind: L('কীসের ছবি', 'What is it', 'কীসের photo'), place: L('জায়গা', 'Place', 'Place'),
+  k_purchase_bill: L('ক্রয় বিল', 'Purchase bill', 'Purchase bill'), k_product_list: L('পণ্যের তালিকা', 'Product list', 'Product list'), k_expense: L('খরচের রসিদ', 'Expense slip', 'Expense slip'), k_other: L('অন্য কাগজ / রিপোর্ট', 'Other paper / report', 'অন্য paper / report'),
+  take: L('ক্যামেরায় ছবি তুলুন', 'Take a photo', 'Camera-য় photo তুলুন'), gallery: L('গ্যালারি থেকে নিন', 'Choose from gallery', 'Gallery থেকে নিন'),
+  eng_manual: L('পড়ার পদ্ধতি: নিজে লিখবেন (ছবির পাশে)', 'Reading: you type it beside the photo', 'পড়ার method: নিজে লিখবেন (photo-র পাশে)'),
+  eng_browser_ocr: L('পড়ার পদ্ধতি: ফোনে বিনামূল্যে OCR। বাংলা ও হাতের লেখায় দুর্বল, তাই প্রতিটি ঘর মিলিয়ে নিন।', 'Reading: free OCR on the phone. Weak on Bangla and handwriting, so check every field.', 'পড়ার method: phone-এ free OCR। বাংলা ও handwriting-এ দুর্বল, তাই প্রতিটি field মিলিয়ে নিন।'),
+  eng_ai_vision: L('পড়ার পদ্ধতি: AI। ভুল করতে পারে, তাই প্রতিটি ঘর মিলিয়ে নিন।', 'Reading: AI. It can be wrong, so check every field.', 'পড়ার method: AI। ভুল করতে পারে, তাই প্রতিটি field মিলিয়ে নিন।'),
+  ocrBn: L('বাংলাও পড়ুন (বড় ডাউনলোড)', 'Also read Bangla (bigger download)', 'বাংলাও পড়ুন (বড় download)'),
+  working: L('ছবি তৈরি হচ্ছে…', 'Preparing the photo…', 'Photo তৈরি হচ্ছে…'), reading: L('পড়া হচ্ছে… (প্রথমবার একটু সময় লাগে)', 'Reading… (the first time takes a while)', 'পড়া হচ্ছে… (প্রথমবার একটু সময় লাগে)'),
+  readFail: L('ছবি থেকে পড়া গেল না। নিজে লিখে নিন।', 'Could not read the photo. Please type it yourself.', 'Photo থেকে পড়া গেল না। নিজে লিখে নিন।'),
+  queued: L('ইন্টারনেট নেই: ছবি ফোনে রাখা হয়েছে, পরে পাঠানো হবে', 'No internet: the photo is kept on the phone and will be sent later', 'Internet নেই: photo phone-এ রাখা হয়েছে, পরে পাঠানো হবে'),
+  qwait: L('পাঠানো অপেক্ষায় ছবি', 'Photos waiting to be sent', 'পাঠানো অপেক্ষায় photo'), qsend: L('এখন পাঠান', 'Send now', 'এখন পাঠান'), qdrop: L('বাদ দিন', 'Discard', 'Discard'),
+  qsent: L('পাঠানো হয়েছে', 'Sent', 'Sent'),
+  list: L('আপনার ছবিগুলো', 'Your photos', 'আপনার photo'), all: L('সব', 'All', 'All'), none: L('কোনো ছবি নেই', 'No photos yet', 'কোনো photo নেই'),
+  s_uploaded: L('নতুন', 'New', 'New'), s_extracted: L('পড়া হয়েছে', 'Read', 'Read'), s_reviewed: L('দেখা হয়েছে', 'Checked', 'Checked'), s_confirmed: L('ঢোকানো হয়েছে', 'Entered', 'Entered'), s_rejected: L('বাতিল', 'Rejected', 'Rejected'),
+  open: L('খুলুন', 'Open', 'Open'), dupn: L('একই বিলের সন্দেহ', 'Possible duplicate', 'Possible duplicate'),
+  photo: L('ছবি', 'Photo', 'Photo'), zoom: L('ছবি বড় করে দেখুন', 'View the photo larger', 'Photo বড় করে দেখুন'), nophoto: L('ছবি দেখানো গেল না', 'The photo could not be shown', 'Photo দেখানো গেল না'),
+  hidden: L('এই ক্রয় বিলের কস্ট দেখার অনুমতি আপনার নেই।', 'You do not have the right to see the costs of this purchase bill.', 'এই purchase bill-এর cost দেখার right আপনার নেই।'),
+  supplier: L('সাপ্লায়ার', 'Supplier', 'Supplier'), billNo: L('বিল নম্বর', 'Bill no.', 'Bill no.'), date: L('ডেট', 'Date', 'Date'), discount: L('ছাড় ৳', 'Discount Tk', 'Discount Tk'),
+  paper: L('কাগজের টোটাল ৳', 'Total on paper Tk', 'Paper-এর total ৳'), note: L('নোট', 'Note', 'Note'), titleF: L('শিরোনাম', 'Title', 'Title'),
+  head: L('খাত (ইংরেজি কোড)', 'Head (code)', 'Head (code)'), paidTo: L('কাকে / কী বাবদ', 'Paid to / for', 'Paid to / for'), amount: L('টাকা ৳', 'Amount Tk', 'Amount Tk'), mode: L('মাধ্যম', 'Mode', 'Mode'), receipt: L('রসিদ আছে', 'Receipt kept', 'Receipt আছে'),
+  lines: L('লাইন', 'Lines', 'Lines'), line: L('লাইন', 'Line', 'Line'), add: L('লাইন যোগ', 'Add a line', 'Line যোগ'), del: L('লাইন মুছুন', 'Remove line', 'Line মুছুন'),
+  desc: L('বিবরণ', 'Description', 'Description'), qty: L('Qty', 'Qty', 'Qty'), unit: L('একক', 'Unit', 'Unit'), ucost: L('একক কস্ট ৳', 'Unit cost Tk', 'Unit cost Tk'), price: L('বিক্রয় প্রাইস ৳', 'Sell price Tk', 'Sell price Tk'), lamt: L('লাইনের টাকা', 'Line amount', 'Line amount'),
+  decide: L('এই লাইন কী হবে', 'What is this line', 'এই line কী হবে'), choose: L('— বাছুন —', '— choose —', '— বাছুন —'),
+  d_map: L('এখনকার আইটেমের সাথে মেলান', 'Match an existing item', 'Existing item-এর সাথে মেলান'), d_create: L('নতুন আইটেম বানান', 'Create a new item', 'নতুন item বানান'),
+  d_text: L('শুধু লেখা (স্টক নয়)', 'Plain text (not stock)', 'শুধু text (stock নয়)'), d_skip: L('বাদ দিন', 'Skip this line', 'Skip করুন'),
+  sugg: L('মিলতে পারে (ট্যাপ করে বাছুন)', 'Possible matches (tap to choose)', 'মিলতে পারে (tap করে বাছুন)'), nosugg: L('মেলে এমন কিছু নেই', 'No similar existing name', 'মেলে এমন কিছু নেই'),
+  chosen: L('বাছা হয়েছে', 'Chosen', 'Chosen'), find: L('খুঁজুন', 'Find', 'Find'), findph: L('নাম লিখে খুঁজুন', 'Type a name to search', 'নাম লিখে খুঁজুন'),
+  nameEn: L('নতুন আইটেমের ইংরেজি নাম', 'New item name (English)', 'নতুন item-এর English নাম'), nameBn: L('বাংলা নাম', 'Bangla name', 'বাংলা নাম'), cat: L('ক্যাটাগরি', 'Category', 'Category'),
+  newSup: L('নতুন সাপ্লায়ার হিসেবে খুলুন', 'Create as a new supplier', 'নতুন supplier হিসেবে খুলুন'), supNew: L('নতুন সাপ্লায়ার হবে', 'Will be created as a new supplier', 'নতুন supplier হবে'), supUndo: L('বাতিল', 'Undo', 'Undo'),
+  supHelp: L('সাপ্লায়ার বাছুন বা নতুন বলে চিহ্নিত করুন', 'Choose a supplier or mark it as new', 'Supplier বাছুন বা নতুন বলে mark করুন'),
+  low: L('পাঠক নিশ্চিত ছিল না', 'The reader was not sure', 'Reader sure ছিল না'), lowKey: L('হলুদ ঘর = পাঠক নিশ্চিত ছিল না, আপনি বদলাননি', 'Yellow = the reader was not sure and you have not changed it', 'হলুদ field = reader sure ছিল না, আপনি বদলাননি'),
+  save: L('ড্রাফট সেভ', 'Save draft', 'Draft save'), done: L('দেখা শেষ — কনফার্ম', 'Checked — Confirm', 'দেখা শেষ — Confirm'), doneNoRight: L('দেখা শেষ — কনফার্মের জন্য পাঠান', 'Checked — send for confirmation', 'দেখা শেষ — Confirm-এর জন্য পাঠান'),
+  confirm: L('কনফার্ম করুন', 'Confirm', 'Confirm করুন'), reject: L('বাতিল করুন', 'Reject', 'Reject'), edit: L('আবার বদলান', 'Edit again', 'আবার edit'),
+  cq: L('এটি এখনই ঢোকানো হবে', 'This will now be entered', 'এটি এখনই enter হবে'), ackDup: L('আমি দেখেছি, তবুও ঢোকান', 'I have seen it, enter it anyway', 'আমি দেখেছি, তবুও enter করুন'),
+  post: L('বিলটি পোস্টও করুন (স্টকে যাবে)', 'Also post the bill (adds the stock)', 'Bill-টি post-ও করুন (stock-এ যাবে)'), postNo: L('না করলে এটি ড্রাফট ক্রয় বিল হয়ে থাকবে', 'If not ticked it stays a draft purchase bill', 'না করলে এটি draft purchase bill হয়ে থাকবে'),
+  rwhy: L('বাতিলের কারণ (কমপক্ষে ৩ অক্ষর)', 'Reason for rejecting (at least 3 letters)', 'Reject-এর reason (কমপক্ষে ৩ অক্ষর)'), cancel: L('থাক', 'Cancel', 'Cancel'),
+  saved: L('সেভ হয়েছে', 'Saved', 'Saved'), sent: L('কনফার্মের জন্য পাঠানো হয়েছে', 'Sent for confirmation', 'Confirm-এর জন্য পাঠানো হয়েছে'), done_ok: L('ঢোকানো হয়েছে', 'Entered', 'Entered'), rejected: L('বাতিল হয়েছে', 'Rejected', 'Rejected'),
+  seeBill: L('ক্রয় বিল দেখুন', 'Open the purchase bill', 'Purchase bill দেখুন'), seeExp: L('দ্রুত খরচ দেখুন', 'Open quick expenses', 'Quick expense দেখুন'), seeItems: L('আইটেম দেখুন', 'Open items', 'Item দেখুন'),
+  w_total: L('লাইনের যোগফল ৳{a}, কাগজের মোট ৳{b}। মিলিয়ে দেখুন (আটকায় না)।', 'Lines add up to Tk {a} but the paper says Tk {b}. Please check (does not block).', 'Lines-এর যোগফল ৳{a}, paper-এর total ৳{b}। মিলিয়ে দেখুন (আটকায় না)।'),
+  w_unm: L('{n}টি লাইনের সিদ্ধান্ত বাকি', '{n} line(s) still need a decision', '{n}টি line-এর decision বাকি'),
+  w_low: L('{n}টি ঘর পাঠক নিশ্চিত ছিল না', '{n} field(s) the reader was unsure about', '{n}টি field reader sure ছিল না'),
+  w_dup: L('সন্দেহ: একই সাপ্লায়ার, বিল নম্বর ও টোটাল আগেই আছে', 'Possible duplicate: the same supplier, bill no. and total already exist', 'সন্দেহ: একই supplier, bill no. ও total আগেই আছে'),
+  w_dupx: L('সন্দেহ: একই জায়গা, দিন, খাত ও টাকার খরচ আগেই আছে', 'Possible duplicate: an expense with the same place, day, head and amount exists', 'সন্দেহ: একই place, day, head ও amount-এর খরচ আগেই আছে'),
+  e_scan_off: L('স্ক্যান বন্ধ আছে', 'Scan is switched off', 'Scan বন্ধ আছে'), e_not_reviewed: L('আগে "দেখা শেষ" করুন', 'Finish the check first', 'আগে "দেখা শেষ" করুন'), e_already_confirmed: L('এটি আগেই ঢোকানো হয়ে গেছে', 'This was already entered', 'এটি আগেই enter হয়ে গেছে'),
+  e_duplicate_suspect: L('একই বিল আগে আছে বলে সন্দেহ। দেখে নিশ্চিত করুন', 'Looks like a duplicate. Look and acknowledge it', 'একই bill আগে আছে বলে সন্দেহ। দেখে নিশ্চিত করুন'), e_duplicate_bill: L('এই সাপ্লায়ারের এই বিল নম্বর আগেই আছে', 'This supplier already has this bill number', 'এই supplier-এর এই bill no. আগেই আছে'),
+  e_supplier_not_mapped: L('সাপ্লায়ার বাছুন বা "নতুন" বলে চিহ্নিত করুন', 'Choose a supplier or mark it as new', 'Supplier বাছুন বা "নতুন" mark করুন'), e_similar_supplier_exists: L('একই নামের সাপ্লায়ার আছে। সেটি বাছুন', 'A supplier with almost the same name exists. Choose it', 'প্রায় একই নামের supplier আছে। সেটি বাছুন'),
+  e_unmatched_lines: L('সব লাইনের সিদ্ধান্ত দিন', 'Every line needs a decision', 'সব line-এর decision দিন'), e_item_needs_approval: L('নতুন আইটেম বানাতে মালিকের অ্যাপ্রুভ লাগে', 'Creating an item needs the owner', 'নতুন item বানাতে owner-এর approval লাগে'),
+  e_bad_number: L('একটি সংখ্যা ঠিক নয়', 'A number is not valid', 'একটি number ঠিক নয়'), e_bad_date: L('ডেট ঠিক নয়', 'The date is not valid', 'Date ঠিক নয়'), e_head_needed: L('খাত লিখুন (ইংরেজি কোড, যেমন transport)', 'Enter the head (a code such as transport)', 'Head লিখুন (English code, যেমন transport)'),
+  e_bad_amount: L('টাকা লিখুন', 'Enter the amount', 'Amount লিখুন'), e_image_already_used: L('এই ছবি আগেই ব্যবহার হয়েছে', 'This photo was already used', 'এই photo আগেই use হয়েছে'), e_not_allowed: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'),
+  e_no_lines: L('কমপক্ষে একটি লাইন লাগবে', 'At least one line is needed', 'কমপক্ষে একটি line লাগবে'), e_item_not_found: L('আইটেমটি পাওয়া যায়নি', 'The item was not found', 'Item পাওয়া যায়নি'), e_bad_qty: L('Qty ঠিক নয়', 'The quantity is not valid', 'Qty ঠিক নয়'), e_bad_cost: L('কস্ট ঠিক নয়', 'The cost is not valid', 'Cost ঠিক নয়'),
+  e_not_open: L('এটি আর বদলানো যায় না', 'This can no longer be changed', 'এটি আর বদলানো যায় না'), e_note_needed: L('কারণ লিখুন', 'Write the reason', 'Reason লিখুন'),
+  needSup: L('সাপ্লায়ার বাছুন', 'Choose a supplier', 'Supplier বাছুন'), needDate: L('ডেট দিন', 'Enter the date', 'Date দিন'), needLine: L('কমপক্ষে একটি লাইন লিখুন', 'Enter at least one line', 'কমপক্ষে একটি line লিখুন'),
+  back: L('তালিকায় ফিরুন', 'Back to the list', 'List-এ ফিরুন'), engine: L('পদ্ধতি', 'Method', 'Method'), by: L('করেছেন', 'by', 'by'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'),
+  trail: L('ইতিহাস', 'History', 'History'), nodb: L('ডেটাবেস আপডেট (phase90.sql) বাকি', 'The database update (phase90.sql) is not installed yet', 'Database update (phase90.sql) বাকি'),
+};
+const T = (k) => lab(X[k]);
+const fill = (s, o) => String(s).replace(/\{(\w+)\}/g, (m, k) => (o[k] === undefined ? m : o[k]));
+const errText = (e) => {
+  const m = String((e && e.message) || e || ''), code = (m.match(/^[a-z_ ]+/) || [''])[0].trim().replace(/ /g, '_');
+  if (/schema cache|does not exist|Could not find the function/i.test(m)) return T('nodb');
+  const k = 'e_' + code; return X[k] ? T(k) : m;
+};
+
+const D = { jobs: [], job: null, ed: null, ex: null, m: {}, sm: {}, lbl: {}, busy: false, pick: { kind: 'purchase_bill', loc: null }, cfg: null, conf: null, cc: null, dupAck: false, post: false, q: [], filter: '' };
+const rule = (k, f) => { try { return B.rule ? B.rule(k, f) : f; } catch (e) { return f; } };
+const cfg = () => ({ enabled: rule('scan_enabled', false) === true, engine: ['manual', 'browser_ocr', 'ai_vision'].includes(rule('scan_engine', 'manual')) ? rule('scan_engine', 'manual') : 'manual', minc: Number(rule('scan_min_confidence', 0.6)) || 0.6 });
+const LOCS = () => { const all = B.liveLocs ? B.liveLocs((B.ENV && B.ENV.locs) || []) : ((B.ENV && B.ENV.locs) || []); return S.ctx && (S.ctx.is_owner || (S.ctx.roles || []).includes('management')) ? all : all.filter((l) => ((S.ctx && S.ctx.locations) || []).includes(l.id)); };
+const isNet = (e) => { const m = String((e && e.message) || e || ''); return (typeof navigator !== 'undefined' && navigator.onLine === false) || /failed to fetch|networkerror|network request|load failed|fetch failed|offline/i.test(m); };
+const num = (v) => { const s = String(v === null || v === undefined ? '' : v).replace(/[০-৯]/g, (d) => '০১২৩৪৫৬৭৮৯'.indexOf(d)).replace(/[,৳\s]/g, ''); return s === '' ? null : (Number.isFinite(Number(s)) ? Number(s) : NaN); };
+const r2 = (n) => Math.round(Number(n) * 100) / 100;
+const hasBn = (s) => /[ঀ-৿]/.test(String(s || ''));
+
+/* ---------- image: downscale + compress before upload (a bill photo is ~4 MB straight from the camera) ---------- */
+function downscale(file, max, q) {
+  max = max || 1600; q = q || 0.74;
+  return new Promise((res, rej) => {
+    const img = new Image(), u = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement('canvas');
+      c.width = Math.round(img.width * k) || 1; c.height = Math.round(img.height * k) || 1;
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u);
+      const go = (qq) => c.toBlob((b) => { if (!b) return rej(new Error('image')); if (b.size > 700000 && qq > 0.45) return go(qq - 0.1); res(b); }, 'image/jpeg', qq);
+      go(q);
+    };
+    img.onerror = () => { URL.revokeObjectURL(u); rej(new Error('image')); }; img.src = u;
+  });
+}
+async function sha(blob) {
+  try { const buf = await (blob.arrayBuffer ? blob.arrayBuffer() : new Response(blob).arrayBuffer()); const h = await crypto.subtle.digest('SHA-256', buf); return Array.from(new Uint8Array(h)).map((b) => b.toString(16).padStart(2, '0')).join(''); } catch (e) { return null; }
+}
+
+/* ---------- offline queue (IndexedDB; falls back to memory when the browser blocks it) ---------- */
+const QDB = { mem: [] };
+function qopen() {
+  return new Promise((res, rej) => {
+    try { const r = indexedDB.open('bos_scan', 1); r.onupgradeneeded = () => { r.result.createObjectStore('q', { keyPath: 'client' }); }; r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); } catch (e) { rej(e); }
+  });
+}
+async function qall() { try { const db = await qopen(); return await new Promise((res, rej) => { const q = db.transaction('q').objectStore('q').getAll(); q.onsuccess = () => res(q.result || []); q.onerror = () => rej(q.error); }); } catch (e) { return QDB.mem.slice(); } }
+async function qput(e) { try { const db = await qopen(); await new Promise((res, rej) => { const t = db.transaction('q', 'readwrite'); t.objectStore('q').put(e); t.oncomplete = res; t.onerror = () => rej(t.error); }); } catch (er) { QDB.mem = QDB.mem.filter((x) => x.client !== e.client).concat([e]); } }
+async function qdel(client) { try { const db = await qopen(); await new Promise((res, rej) => { const t = db.transaction('q', 'readwrite'); t.objectStore('q').delete(client); t.oncomplete = res; t.onerror = () => rej(t.error); }); } catch (er) { QDB.mem = QDB.mem.filter((x) => x.client !== client); } }
+
+/* ---------- send one photo: upload (deterministic path = idempotent) -> scan_create (idempotent on client id) -> reader ---------- */
+async function send(en) {
+  const path = 'SCAN/' + en.loc + '/' + en.client + '.jpg';
+  const up = await sb.storage.from('photos').upload(path, en.blob, { contentType: 'image/jpeg', upsert: false });
+  if (up.error && !/exist|duplicate|409/i.test(String(up.error.message || up.error.statusCode || ''))) throw up.error;
+  const r = await sb.rpc('scan_create', { p_client: en.client, p_kind: en.kind, p_loc: en.loc, p_image_path: path, p_image_hash: en.hash || null, p_note: null });
+  if (r.error) throw r.error;
+  return r.data;
+}
+async function runReader(job, blob) {
+  if (!job || job.dup) return;
+  if (job.engine === 'browser_ocr') return ocrJob(job.id, blob);
+  if (job.engine === 'ai_vision') return aiJob(job.id);
+}
+async function flushQueue(silent) {
+  const list = await qall(); let n = 0;
+  for (const en of list) {
+    try { const job = await send(en); await qdel(en.client); n++; try { await runReader(job, en.blob); } catch (e) { /* the person types it */ } } catch (e) { if (isNet(e)) break; if (!silent) toast(errText(e)); await qdel(en.client); }
+  }
+  D.q = await qall(); if (n && !silent) toast(T('qsent') + ' ×' + n);
+  return n;
+}
+window.addEventListener && window.addEventListener('online', () => { flushQueue(true).then(() => { if (/^#\/scan\/?$/.test(location.hash)) viewList(); }).catch(() => {}); });
+
+/* ---------- reader 1: OCR in the browser ---------- */
+function loadOcr() {
+  return new Promise((res, rej) => {
+    if (window.Tesseract) return res(window.Tesseract);
+    const s = document.createElement('script'); s.src = CDN_OCR; s.async = true; s.crossOrigin = 'anonymous';
+    const t = setTimeout(() => rej(new Error('ocr_load')), 30000);
+    s.onload = () => { clearTimeout(t); window.Tesseract ? res(window.Tesseract) : rej(new Error('ocr_load')); }; s.onerror = () => { clearTimeout(t); rej(new Error('ocr_load')); };
+    document.head.appendChild(s);
+  });
+}
+const UNITS = 'kg|gm|g|ltr|l|pcs|pc|piece|dz|dozen|box|bag|pound|lb|bottle|packet|pkt';
+function parseOcr(kind, data) {
+  const raw = (data && data.lines && data.lines.length) ? data.lines.map((l) => ({ t: String(l.text || '').trim(), c: Math.max(0, Math.min(1, (Number(l.confidence) || 0) / 100)) }))
+    : String((data && data.text) || '').split(/\r?\n/).map((t) => ({ t: t.trim(), c: 0.5 }));
+  const ls = raw.filter((l) => l.t).map((l) => ({ t: l.t.replace(/[০-৯]/g, (d) => '০১২৩৪৫৬৭৮৯'.indexOf(d)), c: l.c }));
+  const clean = (s) => String(s).replace(/,/g, '');
+  const out = {}, cf = {}; const NUM = '(\\d[\\d,]*(?:\\.\\d+)?)';
+  const skip = /total|discount|vat|paid|due|balance|date|invoice|phone|mobile|tel\b|address|thank/i;
+  const find = (re) => { let hit = null; for (const l of ls) { const m = l.t.match(re); if (m) hit = { v: m[1], c: l.c }; } return hit; };
+  const dm = ls.map((l) => ({ m: l.t.match(/(\d{4}-\d{1,2}-\d{1,2})|(\d{1,2}[/.-]\d{1,2}[/.-]\d{4})/), c: l.c })).find((x) => x.m);
+  if (dm) { out.date = dm.m[0]; cf.date = dm.c * 0.9; }
+  if (kind === 'purchase_bill') {
+    const bn = find(/(?:invoice|inv|bill|memo|challan)\s*(?:no|number|#)?\s*[:.#-]*\s*([A-Za-z0-9][A-Za-z0-9\-/]{1,30})/i); if (bn) { out.bill_no = bn.v; cf.bill_no = bn.c * 0.8; }
+    const dc = find(new RegExp('discount\\s*[:\\-]?\\s*(?:tk|bdt)?\\s*' + NUM, 'i')); if (dc) { out.discount = clean(dc.v); cf.discount = dc.c * 0.8; }
+    const first = ls.find((l) => !/^[\d\s.,:/-]+$/.test(l.t) && !skip.test(l.t) && l.t.length > 2); if (first) { out.supplier = { name: first.t }; cf.supplier = first.c * 0.6; }
+  }
+  const tot = find(new RegExp('(?:grand\\s*total|net\\s*(?:payable|amount)|total|amount)\\s*[:\\-]?\\s*(?:tk|bdt|৳)?\\s*' + NUM, 'i'));
+  if (kind === 'expense') {
+    const nums = ls.flatMap((l) => (l.t.match(/\d[\d,]*(?:\.\d+)?/g) || []).map((n) => ({ n: Number(clean(n)), c: l.c })));
+    if (tot) { out.amount = clean(tot.v); cf.amount = tot.c * 0.8; } else if (nums.length) { const mx = nums.reduce((a, b) => (b.n > a.n ? b : a)); out.amount = String(mx.n); cf.amount = mx.c * 0.5; }
+    const f = ls.find((l) => !/^[\d\s.,:/-]+$/.test(l.t)); if (f) { out.paid_to = f.t.slice(0, 120); cf.paid_to = f.c * 0.6; }
+    return { extracted: out, confidence: cf };
+  }
+  if (kind === 'purchase_bill' && tot) { out.total = clean(tot.v); cf.total = tot.c * 0.85; }
+  if (kind === 'other') { out.title = (ls[0] || { t: '' }).t.slice(0, 120); out.lines = ls.slice(1, 200).map((l) => ({ desc: l.t.slice(0, 200) })); cf.lines = ls.slice(1, 200).map((l) => ({ desc: l.c })); return { extracted: out, confidence: cf }; }
+  const full = new RegExp('^(.{2,}?)\\s+(\\d+(?:\\.\\d+)?)\\s*(' + UNITS + ')?\\s*[x@*]?\\s*' + NUM + '\\s+' + NUM + '$', 'i'), two = new RegExp('^(.{2,}?)\\s+' + NUM + '$');
+  const lines = [], lc = [];
+  for (const l of ls) {
+    if (skip.test(l.t)) continue;
+    let m = kind === 'purchase_bill' ? l.t.match(full) : null;
+    if (m) { lines.push({ desc: m[1].trim(), qty: m[2], unit: (m[3] || '').toLowerCase() || undefined, unit_cost: clean(m[4]), amount: clean(m[5]) }); lc.push({ desc: l.c, qty: l.c * 0.9, unit: l.c * 0.8, unit_cost: l.c * 0.9, amount: l.c * 0.9 }); continue; }
+    m = l.t.match(two);
+    if (m && !/^[\d\s.,:/-]+$/.test(m[1])) {
+      if (kind === 'product_list') { lines.push({ desc: m[1].trim(), price: clean(m[2]) }); lc.push({ desc: l.c, price: l.c * 0.8 }); } else { lines.push({ desc: m[1].trim(), amount: clean(m[2]) }); lc.push({ desc: l.c, amount: l.c * 0.7 }); }
+    }
+  }
+  out.lines = lines.slice(0, 300); cf.lines = lc.slice(0, 300);
+  return { extracted: out, confidence: cf };
+}
+async function ocrJob(id, blob) {
+  try {
+    const Tz = await loadOcr(); const kind = (D.job && D.job.id === id ? D.job.kind : null) || D.pick.kind;
+    const res = await Tz.recognize(blob, D.pick.bn ? 'eng+ben' : 'eng');
+    const p = parseOcr(kind, res && res.data);
+    const r = await sb.rpc('scan_set_extracted', { p_id: id, p_extracted: p.extracted, p_confidence: p.confidence, p_engine: 'browser_ocr', p_error: null }); if (r.error) throw r.error;
+  } catch (e) { try { await sb.rpc('scan_set_extracted', { p_id: id, p_extracted: null, p_confidence: null, p_engine: 'browser_ocr', p_error: 'ocr: ' + String((e && e.message) || e).slice(0, 200) }); } catch (e2) { /* ignore */ } toast(T('readFail')); }
+}
+
+/* ---------- reader 2: AI through the edge function (the key lives only in the function's secrets) ---------- */
+async function aiJob(id) {
+  try {
+    const ses = await sb.auth.getSession(); const tok = ses && ses.data && ses.data.session && ses.data.session.access_token; const C = window.BOS_CONFIG || {};
+    const res = await fetch(String(C.url).replace(/\/$/, '') + '/functions/v1/scan-extract', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok, apikey: C.key }, body: JSON.stringify({ job_id: id }) });
+    const j = await res.json().catch(() => ({}));
+    if (!res.ok || j.ok === false) throw new Error(j.error || ('http ' + res.status));
+  } catch (e) { try { await sb.rpc('scan_set_extracted', { p_id: id, p_extracted: null, p_confidence: null, p_engine: 'ai_vision', p_error: 'ai: ' + String((e && e.message) || e).slice(0, 200) }); } catch (e2) { /* ignore */ } toast(T('readFail')); }
+}
+
+/* ---------- list page ---------- */
+const stChip = (s) => `<span class="chip ${s === 'confirmed' ? 'ok' : s === 'rejected' ? '' : 'warn'}">${esc(T('s_' + (s === 'confirmed' ? 'confirmed' : s)))}</span>`;
+function pickHTML() {
+  const c = D.cfg, locs = LOCS(); if (!D.pick.loc && locs[0]) D.pick.loc = locs[0].id;
+  const nmL = (l) => (B.lab ? lab({ bn: l.name_bn, en: l.name_en || l.name_bn, mix: l.name_mix || l.name_bn }) : l.name_bn);
+  return `<div class="card stack"><b>${esc(T('newScan'))}</b>
+    <label for="sc_kind">${esc(T('kind'))}</label><select id="sc_kind">${KINDS.map((k) => `<option value="${k}" ${D.pick.kind === k ? 'selected' : ''}>${esc(T('k_' + k))}</option>`).join('')}</select>
+    ${locs.length > 1 ? `<label for="sc_loc">${esc(T('place'))}</label><select id="sc_loc">${locs.map((l) => `<option value="${l.id}" ${l.id === D.pick.loc ? 'selected' : ''}>${esc(nmL(l))}</option>`).join('')}</select>` : ''}
+    <p class="muted sc-eng">${esc(T('eng_' + c.engine))}</p>
+    ${c.engine === 'browser_ocr' ? `<label class="row"><input type="checkbox" id="sc_bn" ${D.pick.bn ? 'checked' : ''}> ${esc(T('ocrBn'))}</label>` : ''}
+    <div class="row wrap"><label class="btn primary sc-pick">📷 ${esc(T('take'))}<input type="file" accept="image/*" capture="environment" id="sc_cam" hidden></label>
+      <label class="btn sc-pick">🖼 ${esc(T('gallery'))}<input type="file" accept="image/*" id="sc_gal" hidden></label></div>
+    <div id="sc_busy" class="muted"></div></div>`;
+}
+async function viewList() {
+  shell(T('title'), `<div id="sc_body"><p class="muted">${esc(T('loading'))}</p></div>`, true);
+  D.cfg = cfg(); D.q = await qall();
+  let rows = [], err = null;
+  try { if (B.loadStatic) { await B.loadStatic(); D.cfg = cfg(); } const r = await sb.rpc('scan_list', { p_status: D.filter || null, p_loc: null, p_limit: 100 }); if (r.error) err = r.error; else rows = r.data || []; } catch (e) { err = e; }
+  D.jobs = rows;
+  const el = $('#sc_body'); if (!el) return;
+  const q = D.q.length ? `<div class="card stack"><b>${esc(T('qwait'))}: ${D.q.length}</b><div class="row wrap"><button type="button" class="btn primary" data-act="scan_flush">${esc(T('qsend'))}</button><button type="button" class="btn" data-act="scan_qdrop">${esc(T('qdrop'))}</button></div></div>` : '';
+  el.innerHTML = `<p class="muted">${esc(T('intro'))}</p>${D.cfg.enabled ? pickHTML() : `<div class="card"><p>${esc(T('off'))}</p></div>`}${q}
+    <div class="row between"><b>${esc(T('list'))}</b><select id="sc_filter" aria-label="${esc(T('list'))}"><option value="">${esc(T('all'))}</option>${['uploaded', 'extracted', 'reviewed', 'confirmed', 'rejected'].map((s) => `<option value="${s}" ${D.filter === s ? 'selected' : ''}>${esc(T('s_' + s))}</option>`).join('')}</select></div>
+    ${err ? `<p class="sc-err">${esc(errText(err))}</p>` : ''}
+    ${rows.length ? rows.map((j) => `<div class="card sc-row"><div class="row between"><span><b>${esc(T('k_' + j.kind))}</b> ${stChip(j.status)} ${j.dups ? `<span class="chip warn">${esc(T('dupn'))}</span>` : ''}</span><button type="button" class="mini" data-act="scan_open" data-id="${esc(j.id)}">${esc(T('open'))}</button></div>
+      <div class="muted" style="font-size:.8rem">${esc(String(j.created_at || '').slice(0, 16).replace('T', ' '))} · ${esc(j.created_staff || '')}</div></div>`).join('') : `<p class="muted">${esc(T('none'))}</p>`}`;
+}
+
+/* ---------- pick -> prepare -> send ---------- */
+async function onPick(file) {
+  if (!file) return; const busy = $('#sc_busy'); const say = (k) => { if (busy) busy.textContent = k ? T(k) : ''; };
+  const kind = D.pick.kind, loc = Number(D.pick.loc) || (LOCS()[0] || {}).id; if (!loc) return toast(T('e_not_allowed'));
+  try {
+    say('working'); const blob = await downscale(file); const en = { client: rid(), kind, loc, hash: await sha(blob), blob, ts: Date.now() };
+    let job;
+    try { say('working'); job = await send(en); } catch (e) { if (isNet(e)) { await qput(en); D.q = await qall(); say(''); toast(T('queued')); return viewList(); } throw e; }
+    if (job.engine !== 'manual') say('reading');
+    try { await runReader(job, blob); } catch (e) { /* the person types it */ }
+    say(''); go('scan/' + job.id);
+  } catch (e) { say(''); toast(errText(e)); }
+}
+function go(h) { location.hash = '#/' + h; }
+
+/* ---------- review page ---------- */
+const blankLine = (kind) => (kind === 'other' ? { desc: '', amount: '' } : kind === 'product_list' ? { desc: '', unit: '', price: '' } : { desc: '', qty: '', unit: '', unit_cost: '' });
+const clone = (o) => JSON.parse(JSON.stringify(o || {}));
+function startEdit(job) {
+  const base = clone(job.edited || job.extracted || {});
+  if (!Array.isArray(base.lines) && job.kind !== 'expense') base.lines = [blankLine(job.kind)];
+  if (job.kind === 'purchase_bill' && !base.supplier) base.supplier = { name: '' };
+  D.ed = base; D.ex = clone(job.extracted || {}); D.conf = job.confidence || null; D.m = {}; D.sm = {}; D.cc = null; D.dupAck = false; D.post = false;
+}
+const same = (a, b) => String(a === undefined || a === null ? '' : a) === String(b === undefined || b === null ? '' : b);
+// a field is "low" when the reader was unsure AND the person has not changed it
+function isLow(key, idx) {
+  if (!D.conf || !D.ex) return false; const min = D.cfg.minc;
+  if (idx === null || idx === undefined) { const c = D.conf[key]; if (typeof c !== 'number' || c >= min) return false; return key === 'supplier' ? same((D.ed.supplier || {}).name, (D.ex.supplier || {}).name) : same(D.ed[key], D.ex[key]); }
+  const lc = D.conf.lines && D.conf.lines[idx]; if (!lc || typeof lc[key] !== 'number' || lc[key] >= min) return false;
+  return same(((D.ed.lines || [])[idx] || {})[key], ((D.ex.lines || [])[idx] || {})[key]);
+}
+const lowAttr = (low, conf) => (low ? ` class="sc-low" title="${esc(T('low'))}${conf !== undefined ? ' ' + Math.round(conf * 100) + '%' : ''}"` : '');
+function inp(id, label, val, o) {
+  o = o || {}; const low = o.low;
+  return `<div${low ? ' class="sc-low"' : ''}${low ? ` title="${esc(T('low'))}"` : ''}><label for="${id}">${esc(label)}</label><input id="${id}" ${o.attrs || ''} value="${esc(val === undefined || val === null ? '' : val)}"></div>`;
+}
+function supHTML() {
+  const s = D.ed.supplier || {}, sg = D.sm.list || [];
+  return `<div class="card stack"><b>${esc(T('supplier'))}</b>${isLow('supplier') ? `<div class="sc-low"><span class="muted">${esc(T('low'))}</span></div>` : ''}
+    <div class="row"><input id="sc_sup" value="${esc(s.name || '')}" placeholder="${esc(T('supplier'))}" style="flex:1"><button type="button" class="btn" data-act="scan_supfind">${esc(T('find'))}</button></div>
+    ${s.id ? `<div class="chip ok">${esc(T('chosen'))}: ${esc(D.lbl['s:' + s.id] || s.name || '')}</div>` : s.create ? `<div class="chip warn">${esc(T('supNew'))}: ${esc(s.name || '')} <button type="button" class="mini" data-act="scan_supundo">${esc(T('supUndo'))}</button></div>` : `<div class="muted">${esc(T('supHelp'))}</div>`}
+    <div class="row wrap">${sg.map((x) => `<button type="button" class="chip sc-sugg" data-act="scan_suppick" data-id="${esc(x.supplier_id)}" data-n="${esc(x.name)}">${esc(x.name)} · ${Math.round(x.score * 100)}%</button>`).join('')}
+      ${(s.name && !s.create) ? `<button type="button" class="chip sc-sugg" data-act="scan_supnew">+ ${esc(T('newSup'))}</button>` : ''}</div></div>`;
+}
+function lineHTML(l, i, kind) {
+  const c = D.conf && D.conf.lines && D.conf.lines[i] || {}, lo = (k) => isLow(k, i);
+  const dec = l.decision || '', opts = kind === 'purchase_bill' ? ['map', 'create', 'text', 'skip'] : kind === 'product_list' ? ['map', 'create', 'skip'] : [];
+  let body = inp(`sc_l${i}_desc`, T('desc'), l.desc, { low: lo('desc'), attrs: `data-l="${i}" data-k="desc"` });
+  if (kind === 'purchase_bill') body += `<div class="sc-grid">${inp(`sc_l${i}_qty`, T('qty'), l.qty, { low: lo('qty'), attrs: `data-l="${i}" data-k="qty" inputmode="decimal"` })}${inp(`sc_l${i}_unit`, T('unit'), l.unit, { low: lo('unit'), attrs: `data-l="${i}" data-k="unit"` })}${inp(`sc_l${i}_uc`, T('ucost'), l.unit_cost, { low: lo('unit_cost'), attrs: `data-l="${i}" data-k="unit_cost" inputmode="decimal"` })}</div>
+      <div class="muted">${esc(T('lamt'))}: ৳ ${esc(String(num(l.qty) > 0 && num(l.unit_cost) >= 0 ? r2(num(l.qty) * num(l.unit_cost)) : '—'))}${l.amount ? ' · ' + esc(String(l.amount)) : ''}</div>`;
+  else if (kind === 'product_list') body += `<div class="sc-grid">${inp(`sc_l${i}_unit`, T('unit'), l.unit, { low: lo('unit'), attrs: `data-l="${i}" data-k="unit"` })}${inp(`sc_l${i}_price`, T('price'), l.price, { low: lo('price'), attrs: `data-l="${i}" data-k="price" inputmode="decimal"` })}</div>`;
+  else body += inp(`sc_l${i}_amount`, T('amount'), l.amount, { low: lo('amount'), attrs: `data-l="${i}" data-k="amount" inputmode="decimal"` });
+  let dh = '';
+  if (opts.length) {
+    dh = `<label for="sc_l${i}_dec">${esc(T('decide'))}</label><select id="sc_l${i}_dec" data-l="${i}" data-k="decision"><option value="">${esc(T('choose'))}</option>${opts.map((o) => `<option value="${o}" ${dec === o ? 'selected' : ''}>${esc(T('d_' + o))}</option>`).join('')}</select>`;
+    if (dec === 'map') {
+      const ms = D.m[i] || [];
+      dh += (l.item_id ? `<div class="chip ok">${esc(T('chosen'))}: ${esc(D.lbl['i:' + l.item_id] || l.item_id)}</div>` : '') +
+        `<div class="muted">${esc(T('sugg'))}</div><div class="row wrap">${ms.length ? ms.map((m) => `<button type="button" class="chip sc-sugg ${l.item_id === m.item_id ? 'on' : ''}" data-act="scan_itempick" data-l="${i}" data-id="${esc(m.item_id)}" data-n="${esc(m.code + ' · ' + (m.name_en || m.name_bn || ''))}">${esc(m.code)} · ${esc(m.name_en || m.name_bn || '')} · ${Math.round(m.score * 100)}%</button>`).join('') : `<span class="muted">${esc(T('nosugg'))}</span>`}</div>
+        <div class="row"><input id="sc_l${i}_q" placeholder="${esc(T('findph'))}" style="flex:1" value=""><button type="button" class="btn" data-act="scan_itemfind" data-l="${i}">${esc(T('find'))}</button></div>`;
+    } else if (dec === 'create') {
+      const bn = hasBn(l.desc);
+      dh += inp(`sc_l${i}_nen`, T('nameEn'), l.name_en !== undefined ? l.name_en : (bn ? '' : l.desc), { attrs: `data-l="${i}" data-k="name_en"` }) + inp(`sc_l${i}_nbn`, T('nameBn'), l.name_bn !== undefined ? l.name_bn : (bn ? l.desc : ''), { attrs: `data-l="${i}" data-k="name_bn"` }) + (B.catpick && B.catpick.catOptions ? `<div><label for="sc_l${i}_cat">${esc(T('cat'))}</label><select id="sc_l${i}_cat" data-l="${i}" data-k="category">${B.catpick.catOptions(l.category, '—')}</select></div>` : inp(`sc_l${i}_cat`, T('cat'), l.category, { attrs: `data-l="${i}" data-k="category"` }));   // bos100: pick, do not type
+    }
+  }
+  return `<div class="card stack sc-line${dec === 'skip' ? ' sc-skip' : ''}"><div class="row between"><b>${esc(T('line'))} ${i + 1}</b><button type="button" class="mini" data-act="scan_delline" data-l="${i}">${esc(T('del'))}</button></div>${body}${dh}</div>`;
+}
+function warnHTML(job) {
+  const w = job.warnings || [], out = [];
+  w.forEach((x) => { if (x.code === 'total_mismatch') out.push(fill(T('w_total'), { a: x.lines_total, b: x.paper_total })); });
+  const un = w.find((x) => x.code === 'unmatched_lines'); if (un) out.push(fill(T('w_unm'), { n: un.n }));
+  const lo = w.filter((x) => x.code === 'low_confidence').length; if (lo) out.push(fill(T('w_low'), { n: lo }));
+  (job.dups || []).forEach((d) => out.push(job.kind === 'expense' ? T('w_dupx') : T('w_dup')));
+  return out.length ? `<div class="card sc-warn">${out.map((s) => `<div>⚠ ${esc(s)}</div>`).join('')}</div>` : '';
+}
+function resultLink(job) {
+  if (job.result_type === 'purchase_bills') return `<a class="btn" href="#/purchase/${esc(job.result_id)}">${esc(T('seeBill'))}</a>`;
+  if (job.result_type === 'quick_expenses') return `<a class="btn" href="#/quickexp">${esc(T('seeExp'))}</a>`;
+  if (job.result_type === 'items') return `<a class="btn" href="#/items">${esc(T('seeItems'))}</a>`;
+  return '';
+}
+function editorHTML(job) {
+  const e = D.ed, k = job.kind; let h = '';
+  const dt = (e.date || '').slice(0, 10);
+  if (k === 'purchase_bill') h += supHTML() + `<div class="card stack">${inp('sc_h_bill_no', T('billNo'), e.bill_no, { low: isLow('bill_no'), attrs: 'data-h="bill_no"' })}${inp('sc_h_date', T('date'), dt, { low: isLow('date'), attrs: 'data-h="date" type="date"' })}
+    <div class="sc-grid">${inp('sc_h_discount', T('discount'), e.discount, { low: isLow('discount'), attrs: 'data-h="discount" inputmode="decimal"' })}${inp('sc_h_total', T('paper'), e.total, { low: isLow('total'), attrs: 'data-h="total" inputmode="decimal"' })}</div></div>`;
+  else if (k === 'expense') h += `<div class="card stack"><div${isLow('head') ? ' class="sc-low"' : ''}><label for="sc_h_head">${esc(T('head'))}</label><input id="sc_h_head" data-h="head" list="sc_heads" value="${esc(e.head || '')}"><datalist id="sc_heads">${HEADS.map((x) => `<option value="${x}">`).join('')}</datalist></div>
+    ${inp('sc_h_paid_to', T('paidTo'), e.paid_to, { low: isLow('paid_to'), attrs: 'data-h="paid_to"' })}<div class="sc-grid">${inp('sc_h_amount', T('amount'), e.amount, { low: isLow('amount'), attrs: 'data-h="amount" inputmode="decimal"' })}${inp('sc_h_date', T('date'), dt, { low: isLow('date'), attrs: 'data-h="date" type="date"' })}</div>
+    <label for="sc_h_mode">${esc(T('mode'))}</label><select id="sc_h_mode" data-h="mode">${['cash', 'bank', 'mobile'].map((m) => `<option value="${m}" ${(e.mode || 'cash') === m ? 'selected' : ''}>${m}</option>`).join('')}</select>
+    <label class="row"><input type="checkbox" id="sc_h_receipt" data-h="receipt" ${e.receipt ? 'checked' : ''}> ${esc(T('receipt'))}</label></div>`;
+  else if (k === 'other') h += `<div class="card stack">${inp('sc_h_title', T('titleF'), e.title, { attrs: 'data-h="title"' })}</div>`;
+  if (k !== 'expense') h += `<div class="row between"><b>${esc(T('lines'))} (${(e.lines || []).length})</b></div>` + (e.lines || []).map((l, i) => lineHTML(l, i, k)).join('') + `<button type="button" class="btn full" data-act="scan_addline">+ ${esc(T('add'))}</button>`;
+  h += `<div class="card stack">${inp('sc_h_note', T('note'), e.note, { attrs: 'data-h="note"' })}</div>`;
+  return h;
+}
+async function photoHTML(job) {
+  let u = null; if (D.photoFor === job.image_path && D.photo && Date.now() - D.photoAt < 480000) u = D.photo;
+  else try { const r = await sb.storage.from('photos').createSignedUrl(job.image_path, 600); u = r && r.data && (r.data.signedUrl || r.data.signedURL); } catch (e) { u = null; }
+  D.photo = u; D.photoFor = job.image_path; D.photoAt = Date.now(); return u ? `<div class="card sc-photo"><img id="sc_img" src="${esc(u)}" alt="${esc(T('photo'))}" data-act="scan_zoom"><button type="button" class="mini" data-act="scan_zoom">🔍 ${esc(T('zoom'))}</button></div>` : `<div class="card muted">${esc(T('nophoto'))}</div>`;
+}
+async function viewJob(id) {
+  shell(T('title'), `<div id="sc_body"><p class="muted">${esc(T('loading'))}</p></div>`, 'scan');
+  D.cfg = cfg(); const r = await sb.rpc('scan_get', { p_id: id }); if (r.error) { const el = $('#sc_body'); if (el) el.innerHTML = `<p class="sc-err">${esc(errText(r.error))}</p>`; return; }
+  D.job = r.data; if (!D.ed || D.edId !== id) { startEdit(D.job); D.edId = id; }
+  await draw();
+}
+async function draw() {
+  const job = D.job, el = $('#sc_body'); if (!el) return;
+  const open = ['uploaded', 'extracted', 'reviewed'].includes(job.status), photo = await photoHTML(job);
+  let bodyH;
+  if (job.cost_hidden) bodyH = `<div class="card"><p>${esc(T('hidden'))}</p></div>`;
+  else if (open) bodyH = (D.cfg.engine !== 'manual' && job.engine !== 'manual' ? `<p class="muted">${esc(T('eng_' + job.engine))}</p>` : '') + (job.extracted ? `<p class="muted">${esc(T('lowKey'))}</p>` : '') + warnHTML(job) + editorHTML(job) +
+    `<div class="s2-bar sc-bar"><button type="button" class="btn" data-act="scan_save">${esc(T('save'))}</button><button type="button" class="btn primary" data-act="scan_done">${esc(job.can_confirm ? T('done') : T('doneNoRight'))}</button><button type="button" class="btn" data-act="scan_reject">${esc(T('reject'))}</button></div>`;
+  else bodyH = `<div class="card stack">${job.status === 'confirmed' ? resultLink(job) : `<p>${esc(T('s_rejected'))}: ${esc(job.reject_reason || '')}</p>`}</div>` + (job.edited ? `<pre class="muted sc-pre">${esc(JSON.stringify(job.edited, null, 1).slice(0, 4000))}</pre>` : '');
+  const trail = (job.events || []).map((x) => `<div class="muted" style="font-size:.78rem">${esc(String(x.at || '').slice(0, 16).replace('T', ' '))} · ${esc(x.action)} ${x.by ? '· ' + esc(x.by) : ''}</div>`).join('');
+  el.innerHTML = `<div class="row between"><span><b>${esc(T('k_' + job.kind))}</b> ${stChip(job.status)}</span><a href="#/scan" class="mini">${esc(T('back'))}</a></div>
+    <div class="sc-split"><div class="sc-left">${photo}</div><div class="sc-right">${bodyH}</div></div><details data-ctl="off"><summary>${esc(T('trail'))}</summary>${trail}</details>`;
+  if (open && !job.cost_hidden) ensureMatches();
+}
+async function ensureMatches() {
+  const k = D.job.kind; if (k === 'expense' || k === 'other') return;
+  const lines = D.ed.lines || []; let changed = false;
+  for (let i = 0; i < Math.min(lines.length, 60); i++) {
+    const l = lines[i]; if (D.m[i] || !l.desc || l.decision === 'skip' || l.decision === 'text' || l.decision === 'create') continue;
+    changed = true; D.m[i] = []; try { const r = await sb.rpc('scan_match_items', { p_text: String(l.desc).slice(0, 200), p_limit: 5 }); D.m[i] = r.error ? [] : (r.data || []); } catch (e) { D.m[i] = []; }
+  }
+  if (k === 'purchase_bill' && D.ed.supplier && D.ed.supplier.name && !D.sm.list) { changed = true; await supFind(false); }
+  if (changed && location.hash.indexOf('#/scan/') === 0 && D.job && D.job.id === (D.edId || '') && !D.busy) redrawKeepFocus();
+}
+function redrawKeepFocus() { const a = document.activeElement && document.activeElement.id; if (a && /^sc_/.test(a) && /input|textarea/i.test(document.activeElement.tagName)) return; draw(); }
+async function supFind(redraw) {
+  const nameV = ((D.ed.supplier || {}).name || '').slice(0, 200); if (!nameV) { D.sm.list = []; return; }
+  try { const r = await sb.rpc('scan_match_suppliers', { p_text: nameV, p_limit: 5 }); D.sm.list = r.error ? [] : (r.data || []); } catch (e) { D.sm.list = []; }
+  if (redraw !== false) draw();
+}
+
+/* ---------- payload / validation / save ---------- */
+function payload() {
+  const e = clone(D.ed); const k = D.job.kind;
+  (e.lines || []).forEach((l) => { Object.keys(l).forEach((x) => { if (l[x] === '' || l[x] === null) delete l[x]; }); });
+  if (Array.isArray(e.lines)) e.lines = e.lines.filter((l) => Object.keys(l).some((x) => x !== 'decision') || l.decision);
+  Object.keys(e).forEach((x) => { if (e[x] === '' || e[x] === null) delete e[x]; });
+  if (e.supplier && !e.supplier.name && !e.supplier.id) delete e.supplier;
+  if (k === 'expense') delete e.lines;
+  return e;
+}
+function check(e, k) {
+  if (k === 'purchase_bill') { if (!e.supplier || !(e.supplier.id || (e.supplier.create && e.supplier.name))) return T('needSup'); if (!e.date) return T('needDate'); if (!(e.lines || []).length) return T('needLine'); }
+  if (k === 'expense') { if (!e.date) return T('needDate'); if (!e.head) return T('e_head_needed'); if (!(num(e.amount) > 0)) return T('e_bad_amount'); }
+  if (k === 'product_list' && !(e.lines || []).length) return T('needLine');
+  return null;
+}
+async function saveDraft(final) {
+  const e = payload(); const r = await sb.rpc('scan_review_save', { p_id: D.job.id, p_edited: e, p_final: !!final });
+  if (r.error) throw r.error;
+  return r.data;
+}
+async function reload() { const r = await sb.rpc('scan_get', { p_id: D.job.id }); if (r.error) throw r.error; D.job = r.data; if (D.job.status === 'confirmed' || D.job.status === 'rejected') { D.ed = null; D.edId = null; } await draw(); }
+
+/* ---------- confirm sheet ---------- */
+function confirmSheet(res) {
+  const j = D.job, e = payload(), dups = res.dups || [];
+  D.cc = D.cc || rid();
+  const lines = (e.lines || []).filter((l) => l.decision !== 'skip').length;
+  const sum = j.kind === 'purchase_bill' ? `${esc(((e.supplier || {}).name) || '')} · ${esc(e.bill_no || '')} · ${esc(e.date || '')} · ${lines} ${esc(T('lines'))}` : j.kind === 'expense' ? `${esc(e.head || '')} · ৳ ${esc(String(e.amount || ''))} · ${esc(e.date || '')}` : `${lines} ${esc(T('lines'))}`;
+  openSheet(`<div class="stack"><h3>${esc(T('cq'))}</h3><div><b>${esc(T('k_' + j.kind))}</b><br>${sum}</div>
+    ${dups.length ? `<div class="sc-warn">⚠ ${esc(j.kind === 'expense' ? T('w_dupx') : T('w_dup'))}<label class="row"><input type="checkbox" id="sc_ack"> ${esc(T('ackDup'))}</label></div>` : ''}
+    ${j.kind === 'purchase_bill' ? `<label class="row"><input type="checkbox" id="sc_post"> ${esc(T('post'))}</label><div class="muted">${esc(T('postNo'))}</div>` : ''}
+    <div class="row wrap"><button type="button" class="btn primary" data-act="scan_confirm_go">${esc(T('confirm'))}</button><button type="button" class="btn" data-act="closesheet">${esc(T('cancel'))}</button></div></div>`);
+}
+
+Object.assign(H, {
+  scan_open: (a) => go('scan/' + a.dataset.id),
+  scan_flush: async () => { const n = await flushQueue(false); if (!n) toast(T('queued')); viewList(); },
+  scan_qdrop: async () => { for (const x of await qall()) await qdel(x.client); viewList(); },
+  scan_zoom: () => { if (D.photo) openSheet(`<div class="sc-zoom"><img src="${esc(D.photo)}" alt="${esc(T('photo'))}"></div>`); },
+  scan_addline: () => { (D.ed.lines = D.ed.lines || []).push(blankLine(D.job.kind)); draw(); },
+  scan_delline: (a) => { const i = Number(a.dataset.l); D.ed.lines.splice(i, 1); D.m = {}; if (!D.ed.lines.length) D.ed.lines.push(blankLine(D.job.kind)); draw(); },
+  scan_itempick: (a) => { const i = Number(a.dataset.l), l = D.ed.lines[i]; l.item_id = a.dataset.id; l.decision = 'map'; D.lbl['i:' + a.dataset.id] = a.dataset.n; draw(); },
+  scan_itemfind: async (a) => { const i = Number(a.dataset.l), q = (($('#sc_l' + i + '_q') || {}).value || D.ed.lines[i].desc || '').trim(); if (!q) return; const r = await sb.rpc('scan_match_items', { p_text: q.slice(0, 200), p_limit: 8 }); D.m[i] = r.error ? [] : (r.data || []); draw(); },
+  scan_supfind: () => supFind(true),
+  scan_suppick: (a) => { D.ed.supplier = { id: a.dataset.id, name: a.dataset.n }; D.lbl['s:' + a.dataset.id] = a.dataset.n; draw(); },
+  scan_supnew: () => { D.ed.supplier = { name: (D.ed.supplier || {}).name, create: true }; draw(); },
+  scan_supundo: () => { D.ed.supplier = { name: (D.ed.supplier || {}).name }; draw(); },
+  scan_save: async () => { if (D.busy) return; D.busy = true; try { await saveDraft(false); toast(T('saved')); await reload(); } catch (e) { toast(errText(e)); } finally { D.busy = false; } },
+  scan_done: async () => {
+    if (D.busy) return; const msg = check(payload(), D.job.kind); if (msg) return toast(msg);
+    D.busy = true;
+    try { const res = await saveDraft(true); if (!D.job.can_confirm) { toast(T('sent')); await reload(); return; } confirmSheet(res); } catch (e) { toast(errText(e)); } finally { D.busy = false; }
+  },
+  scan_confirm_go: async () => {
+    if (D.busy) return; D.busy = true;
+    try {
+      const ack = !!($('#sc_ack') || {}).checked, post = !!($('#sc_post') || {}).checked;
+      const r = await sb.rpc('scan_confirm', { p_id: D.job.id, p_client: D.cc, p_ack_dup: ack, p_post: post });
+      if (r.error) { toast(errText(r.error)); return; }
+      closeSheet(); D.cc = null; toast(T('done_ok')); await reload();
+    } catch (e) { toast(errText(e)); } finally { D.busy = false; }
+  },
+  scan_reject: () => openSheet(`<div class="stack"><h3>${esc(T('reject'))}</h3><label for="sc_why">${esc(T('rwhy'))}</label><textarea id="sc_why" rows="3" maxlength="300"></textarea>
+    <div class="row wrap"><button type="button" class="btn primary" data-act="scan_reject_go">${esc(T('reject'))}</button><button type="button" class="btn" data-act="closesheet">${esc(T('cancel'))}</button></div></div>`),
+  scan_reject_go: async () => {
+    const why = (($('#sc_why') || {}).value || '').trim(); if (why.length < 3) return toast(T('e_note_needed'));
+    const r = await sb.rpc('scan_reject', { p_id: D.job.id, p_reason: why }); if (r.error) return toast(errText(r.error));
+    closeSheet(); toast(T('rejected')); await reload();
+  },
+});
+// typing updates the working copy only (no redraw, so the keyboard stays open)
+document.addEventListener('input', (e) => {
+  const t = e.target; if (!t || !D.ed) return;
+  if (t.id === 'sc_sup') { D.ed.supplier = { name: t.value }; D.sm.list = null; return; }
+  if (t.dataset && t.dataset.h) { D.ed[t.dataset.h] = t.type === 'checkbox' ? t.checked : t.value; return; }
+  if (t.dataset && t.dataset.l !== undefined && t.dataset.k && t.dataset.k !== 'decision') { const l = D.ed.lines && D.ed.lines[Number(t.dataset.l)]; if (l) { l[t.dataset.k] = t.value; if (t.dataset.k === 'desc') delete D.m[Number(t.dataset.l)]; } }
+});
+document.addEventListener('change', (e) => {
+  const t = e.target; if (!t) return;
+  if (t.id === 'sc_kind') D.pick.kind = t.value;
+  if (t.id === 'sc_loc') D.pick.loc = Number(t.value);
+  if (t.id === 'sc_bn') D.pick.bn = !!t.checked;
+  if (t.id === 'sc_filter') { D.filter = t.value; viewList(); }
+  if (t.id === 'sc_cam' || t.id === 'sc_gal') { const f = t.files && t.files[0]; t.value = ''; onPick(f); }
+  if (t.dataset && t.dataset.h === 'receipt' && D.ed) D.ed.receipt = !!t.checked;
+  if (t.dataset && t.dataset.k === 'decision' && D.ed) { const l = D.ed.lines[Number(t.dataset.l)]; l.decision = t.value || undefined; if (t.value !== 'map') delete l.item_id; draw(); }
+});
+
+async function view() {
+  const sub = location.hash.replace(/^#\/?/, '').split('/').slice(1).join('/');
+  if (sub && /^[0-9a-f-]{36}$/i.test(sub)) return viewJob(sub);
+  return viewList();
+}
+window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { scan: view });
+B.scan = { X, T, view, errText, parseOcr, payload, check, isLow, startEdit, send, flushQueue, qall, qput, qdel, QDB, downscale, D, cfg, num, _set: (job, ed) => { D.job = job; D.ed = ed; D.cfg = D.cfg || cfg(); } };
+
+const css = document.createElement('style'); css.id = 'sccss';
+css.textContent = `.sc-split{display:block}.sc-photo img{width:100%;max-height:42vh;object-fit:contain;border-radius:10px;border:1px solid var(--line);background:#000}
+@media (min-width:760px){.sc-split{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}.sc-left{position:sticky;top:8px}.sc-photo img{max-height:80vh}}
+.sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px}.sc-low input,.sc-low select{border-color:var(--sig-warn);background:var(--warn-bg)}
+.sc-low{border-radius:8px}.sc-warn{border-color:var(--sig-warn);background:var(--warn-bg)}.sc-err{color:var(--sig-bad)}.sc-skip{opacity:.55}
+.sc-sugg{cursor:pointer;min-height:40px;max-width:100%;overflow-wrap:anywhere;text-align:start}.sc-sugg.on{border-color:var(--ok);background:var(--ok-bg)}
+.sc-pick{display:inline-flex;align-items:center;min-height:48px;cursor:pointer;margin:0}.sc-bar{position:sticky;bottom:0;z-index:4;display:flex;gap:8px;padding:10px 0;background:var(--bg);border-top:1px solid var(--line);flex-wrap:wrap}
+.sc-bar button{flex:1;min-height:44px}.sc-zoom{max-height:80vh;overflow:auto}.sc-zoom img{width:220%;max-width:none}.sc-pre{white-space:pre-wrap;font-size:.75rem;overflow-wrap:anywhere}
+.sc-line input,.sc-line select{width:100%;box-sizing:border-box}body.has-bnav .sc-bar{bottom:58px}`;
+document.head.appendChild(css);
+})();

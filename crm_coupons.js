@@ -1,1 +1,228 @@
-(()=>{"use strict";const e=window.BOS_APP,t=window.BOS;if(!e||!t)return;const{sb:n,S:o,esc:a,toast:i,fail:s,shell:c,openSheet:l,closeSheet:r,H:d}=e,u=t.L,m=t.lab,p=e=>u(e,e,e),_=(e,t=document)=>t.querySelector(e),f=e=>((_("#"+e)||{}).value||"").trim(),b=()=>(new Date).toLocaleDateString("en-CA",{timeZone:"Asia/Dhaka"}),h=()=>window.crypto&&crypto.randomUUID?crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,e=>{const t=16*Math.random()|0;return("x"===e?t:3&t|8).toString(16)}),v=e=>String(e??"").replace(/[০-৯]/g,e=>"০১২৩৪৫৬৭৮৯".indexOf(e)).replace(/,/g,"").trim(),w=e=>{const t=v(e);if(""===t)return null;const n=Number(t);return Number.isFinite(n)?n:NaN},$=e=>{const t=Number(e);return Number.isFinite(t)?(t<0?"-":"")+Math.abs(t).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2}):"-"},y=(e,t)=>`<span class="chip ${t||""}">${a(e)}</span>`,g=(e,t,n)=>`<div><label for="${e}">${a(t)}</label>${n}</div>`,x=(e,t,n)=>`<input id="${e}" autocomplete="off" value="${a(t??"")}" ${n||""}>`,k={title:p("Coupons & vouchers"),t_list:p("Coupons"),t_uses:p("Uses"),t_liab:p("Liability"),hint:p("A coupon is a code worth a percent or an amount off a bill. Use it at the till in three steps: check the code, give the discount through the normal discount box, then record it after the sale."),offNote:p("Coupons are switched OFF. You can prepare them here; the till cannot use them until the owner switches them on."),blankMax:p("Set the largest percent and the largest amount in Settings first. A blank number blocks that kind of coupon."),newc:p("New coupon"),code:p("Code"),name:p("Name"),kind:p("Kind"),percent:p("Percent"),amount:p("Amount (taka)"),value:p("Value"),from:p("Valid from"),to:p("Valid to"),more:p("More options"),minBill:p("Smallest bill"),maxDisc:p("Largest discount (percent coupons)"),maxUses:p("Total uses (blank = no limit)"),perCust:p("Uses per customer"),custMobile:p("For one customer only (mobile)"),outlets:p("Only at these places"),cats:p("Only for these item categories (comma separated)"),items:p("Only for these item codes (comma separated)"),campaign:p("Campaign reference"),note:p("Note"),liab:p("Book the unused value as a liability (amount coupons with a total use limit)"),over:p("Reason (needed only to go above the maximum - owner)"),save:p("Save"),cancel:p("Cancel"),saved:p("Saved"),edit:p("Edit"),retire:p("Retire"),reopen:p("Switch on again"),none:p("Nothing yet"),uses:p("uses"),left:p("left"),active:p("Active"),retired:p("Retired"),expired:p("Expired"),personal:p("One customer"),scope:p("Limited"),logTitle:p("Redemption log"),receipt:p("Receipt"),given:p("Discount given"),expected:p("Coupon gives"),mismatch:p("Different from the coupon"),override:p("Accepted with a reason"),liabHint:p('Only amount coupons marked "book the unused value" are booked, and only while the owner has switched voucher liability on. Entries have two lines and always balance.'),liabOff:p("Voucher liability is OFF. Nothing is booked."),held:p("Held in the accounts"),should:p("Should hold"),sync:p("Bring the accounts up to date"),wind:p("Wind down to zero"),reason:p("Reason"),windGo:p("Release everything"),done:p("Done"),noperm:p("You do not have permission."),nofn:p("The server does not have this feature yet (phase 316 to 319 not pasted)."),code2:p("Code (letters, digits, dash)"),filter:p("Show uses of"),all:p("All coupons")},S=e=>m(k[e]),N={not_allowed:"You do not have permission.",max_percent_not_set:"Set the largest percent in Settings first.",max_amount_not_set:"Set the largest amount in Settings first.",over_maximum:"This is above the largest allowed. Only the owner can create it, with a reason.",reason_required:"Write a reason (at least 3 letters).",bad_code:"The code may use capital letters, digits and a dash (3 to 20).",code_exists:"That code is already used.",bad_kind:"Choose percent or amount.",value_required:"Write the value.",name_required:"Write a name.",validity_required:"Choose the dates the coupon is valid.",bad_date:"The end date is before the start date.",bad_number:"A number is not valid.",locked_after_use:"This coupon has been used, so its money terms cannot change. Retire it and make a new one.",liability_needs_amount_and_max_uses:"Booking the liability needs an amount coupon with a total number of uses.",bad_location:"Unknown place.",bad_item:"Unknown item.",vouchers_off:"Coupons are switched OFF.",period_closed:"The accounts period is closed.",accounting_off:"Accounting is switched off.",liability_accounts_needed:"Set both accounts for voucher liability first.",customer_not_found:"Customer not found."},T=e=>{const t=String(e&&e.message||"");if(/could not find|does not exist|PGRST202/i.test(t+" "+(e&&e.code||"")))return m(k.nofn);const n=Object.keys(N).find(e=>t.includes(e));return n?N[n]:t||"error"};async function C(e,t){const o=await n.rpc(e,t||{});if(o.error){const e=new Error(T(o.error));throw e.raw=o.error,e}return o.data}const O=e=>async t=>{try{await e(t)}catch(e){i(e.message||"error")}},A={tab:"list",list:[],uses:[],filter:"",liab:null,status:null,locs:[],client:h()},D=[["list","t_list"],["uses","t_uses"],["liab","t_liab"]];function E(){const e=A.status&&A.status.voucher&&!A.status.voucher.on?`<div class="notice" id="cpn_off">${a(S("offNote"))}</div>`:"",t=A.status&&A.status.voucher&&(null==A.status.voucher.max_percent||null==A.status.voucher.max_amount)?`<div class="notice" id="cpn_blank">${a(S("blankMax"))}</div>`:"",n=A.list.map(e=>{const t=(e=>e.active?e.valid_to<b()?"expired":"active":"retired")(e),n="percent"===e.kind?Number(e.value)+"%":$(e.value),o=null==e.max_uses?"":` · ${Math.max(Number(e.max_uses)-Number(e.uses),0)} ${a(S("left"))}`;return`<div class="card cp-row ${"active"!==t?"muted":""}" data-code="${a(e.code)}"><div class="row between"><b>${a(e.code)}</b><b>${a(n)}</b></div>\n      <div>${a(e.name)}</div>\n      <div class="muted">${a(e.valid_from)} → ${a(e.valid_to)} · ${Number(e.uses)} ${a(S("uses"))}${o}${null!=e.min_bill?" · min "+$(e.min_bill):""}</div>\n      <div class="row wrap" style="gap:.3rem">${y(S("active"===t?"active":t),"active"===t?"ok":"")}${e.customer_id?y(S("personal")):""}${(e.scope||[]).length?y(S("scope")):""}${e.post_liability?y(S("t_liab")):""}</div>\n      <div class="row"><button type="button" class="mini" data-act="cpn_edit" data-v="${a(e.code)}">${a(S("edit"))}</button>\n      <button type="button" class="mini" data-act="cpn_active" data-v="${a(e.code)}">${a(e.active?S("retire"):S("reopen"))}</button>\n      <button type="button" class="mini" data-act="cpn_log" data-v="${a(e.code)}">${a(S("t_uses"))}</button></div></div>`}).join("");return`<p class="muted">${a(S("hint"))}</p>${e}${t}<div class="row"><button type="button" class="full primary" data-act="cpn_new">+ ${a(S("newc"))}</button></div>${n||`<p class="muted">${a(S("none"))}</p>`}`}function j(){const e=_("#cpn_body");e&&(e.innerHTML=`<div class="row wrap" id="cpn_tabs" style="gap:.3rem">${D.map(([e,t])=>`<button type="button" class="tog ${A.tab===e?"on":""}" data-act="cpn_tab" data-v="${e}">${a(S(t))}</button>`).join("")}</div>`+("list"===A.tab?E():"uses"===A.tab?function(){const e=`<option value="">${a(S("all"))}</option>`+A.list.map(e=>`<option value="${a(e.id)}" ${A.filter===e.id?"selected":""}>${a(e.code)}</option>`).join(""),t=A.uses.map(e=>`<div class="card ${"void"===e.sale_status?"muted":""}"><div class="row between"><b>${a(e.code)}</b><b>${$(e.discount_given)}</b></div>\n    <div class="muted">${a(S("receipt"))} ${a(e.receipt)} · ${a(String(e.sale_date))}${e.customer_name?" · "+a(e.customer_name):""}${"void"===e.sale_status?" · void":""}</div>\n    <div class="row wrap" style="gap:.3rem">${e.mismatch?y(S("mismatch")+" ("+S("expected")+" "+$(e.discount_expected)+")"):""}${e.override_reason?y(S("override")):""}</div></div>`).join("");return`<h3>${a(S("logTitle"))}</h3>${g("cpn_f",S("filter"),`<select id="cpn_f">${e}</select>`)}${t||`<p class="muted">${a(S("none"))}</p>`}`}():function(){const e=A.liab;if(!e)return`<p class="muted">${a(S("none"))}</p>`;const t=(e.rows||[]).map(e=>`<div class="card"><div class="row between"><b>${a(e.code)}</b><span>${a(S("held"))} ${$(e.held)}</span></div><div class="muted">${a(S("should"))} ${$(e.should_hold)}</div></div>`).join("");return`<p class="muted">${a(S("liabHint"))}</p>${e.on?"":`<div class="notice" id="lb_off">${a(S("liabOff"))}</div>`}<div class="card"><b>${a(S("held"))}: ${$(e.held_total)}</b></div>\n    <div class="row"><button type="button" class="full" data-act="lb_sync">${a(S("sync"))}</button><button type="button" class="full" data-act="lb_wind">${a(S("wind"))}</button></div>${t||`<p class="muted">${a(S("none"))}</p>`}`}()))}async function U(e){A.tab=e||A.tab;try{A.status=await C("crmf_status",{})}catch(e){A.status=null}if("liab"===A.tab&&A.list.length||(A.list=await C("crmf_coupon_list",{})),"uses"===A.tab&&(A.uses=await C("crmf_coupon_uses_list",{p_coupon:A.filter||null,p_from:null,p_to:null,p_limit:200})),"liab"===A.tab)try{A.liab=await C("crmf_voucher_liability_report",{})}catch(e){A.liab=null,i(e.message)}j()}function B(n){const i=!n,s=n&&n.scope||[],c=s.filter(e=>"category"===e.kind).map(e=>e.ref).join(", ");l(`<h3>${a(i?S("newc"):n.code)}</h3><div class="stack" id="cpn_form">\n    ${i?g("cf_code",S("code2"),x("cf_code","",'maxlength="20" style="text-transform:uppercase"')):""}\n    ${g("cf_name",S("name"),x("cf_name",n?n.name:"",'maxlength="80"'))}\n    ${g("cf_kind",S("kind"),`<select id="cf_kind" ${i?"":"disabled"}><option value="percent" ${n&&"percent"===n.kind?"selected":""}>${a(S("percent"))}</option><option value="amount" ${n&&"amount"===n.kind?"selected":""}>${a(S("amount"))}</option></select>`)}\n    ${g("cf_value",S("value"),x("cf_value",n?n.value:"",'inputmode="decimal"'))}\n    ${g("cf_from",S("from"),x("cf_from",n?n.valid_from:b(),'type="date"'))}${g("cf_to",S("to"),x("cf_to",n?n.valid_to:"",'type="date"'))}\n    <details id="cf_more"><summary>${a(S("more"))}</summary><div class="stack">\n      ${g("cf_min",S("minBill"),x("cf_min",n&&null!=n.min_bill?n.min_bill:"",'inputmode="decimal"'))}${g("cf_cap",S("maxDisc"),x("cf_cap",n&&null!=n.max_discount?n.max_discount:"",'inputmode="decimal"'))}\n      ${g("cf_max",S("maxUses"),x("cf_max",n&&null!=n.max_uses?n.max_uses:"",'inputmode="numeric"'))}${g("cf_per",S("perCust"),x("cf_per",n?n.per_customer_uses:1,'inputmode="numeric"'))}\n      ${i?g("cf_cust",S("custMobile"),x("cf_cust","",'inputmode="numeric" maxlength="14"')):""}\n      <div><label>${a(S("outlets"))}</label>${(t.liveLocs?t.liveLocs(t.ENV&&t.ENV.locs||[]):t.ENV&&t.ENV.locs||[]).map(t=>({id:t.id,name:e.nm?e.nm(t):t.name_en||t.name_bn||t.code||String(t.id)})).map(e=>{return`<label class="row"><input type="checkbox" class="cf_loc" value="${e.id}" ${t=e.id,s.some(e=>"location"===e.kind&&String(e.ref)===String(t))?"checked":""} ${i?"":"disabled"}> ${a(e.name)}</label>`;var t}).join("")}</div>\n      ${g("cf_cats",S("cats"),x("cf_cats",c,i?"":"disabled"))}${g("cf_items",S("items"),x("cf_items","",i?"":"disabled"))}\n      ${g("cf_camp",S("campaign"),x("cf_camp",n&&n.campaign_ref||"",'maxlength="60"'))}${g("cf_note",S("note"),x("cf_note",n&&n.note||"",'maxlength="300"'))}\n      <label class="row"><input type="checkbox" id="cf_liab" ${n&&n.post_liability?"checked":""} ${i?"":"disabled"}> ${a(S("liab"))}</label>\n      ${o.ctx&&o.ctx.is_owner?g("cf_over",S("over"),x("cf_over","",'maxlength="300"')):""}\n    </div></details>\n    <div class="row"><button type="button" class="full" data-act="closesheet">${a(S("cancel"))}</button><button type="button" class="full primary" data-act="cpn_savego" data-v="${a(n?n.id:"")}">${a(S("save"))}</button></div></div>`)}Object.assign(d,{cpn_tab:O(async e=>{await U(e.dataset.v)}),cpn_new:()=>B(null),cpn_edit:e=>B(A.list.find(t=>t.code===e.dataset.v)),cpn_active:O(async e=>{const t=A.list.find(t=>t.code===e.dataset.v);t&&(await C("crmf_coupon_save",{p_id:t.id,p:{active:!t.active},p_client:null,p_override:null}),i(S("saved")),A.list=[],await U("list"))}),cpn_log:O(async e=>{const t=A.list.find(t=>t.code===e.dataset.v);A.filter=t?t.id:"",await U("uses")}),cpn_savego:O(async e=>{const t=e.dataset.v||null,o={},a=(e,n,a)=>{const i=w(f(n));if(Number.isNaN(i))throw new Error(N.bad_number);null!==i?o[e]=i:t&&(o[e]=null)};t||(o.code=f("cf_code").toUpperCase(),o.kind=f("cf_kind"));const s=t?Number((A.list.find(e=>e.id===t)||{}).uses||0):0;o.name=f("cf_name"),o.valid_from=f("cf_from"),o.valid_to=f("cf_to"),s||(a("value","cf_value"),a("min_bill","cf_min"),a("max_discount","cf_cap")),a("max_uses","cf_max");const c=w(f("cf_per"));if(null===c||Number.isNaN(c)||(o.per_customer_uses=c),o.campaign_ref=f("cf_camp"),o.note=f("cf_note"),!t){const e=v(f("cf_cust"));if(e){const t=await n.from("customers").select("id").eq("mobile",e).limit(1);if(!t.data||!t.data[0])throw new Error(N.customer_not_found);o.customer_id=t.data[0].id}o.post_liability=!!(_("#cf_liab")||{}).checked;const t=[...document.querySelectorAll(".cf_loc:checked")].map(e=>Number(e.value)),a=f("cf_cats").split(",").map(e=>e.trim()).filter(Boolean),i=await async function(e){if(!e.length)return[];const t=await n.from("items").select("id,code").in("code",e),o={};(t.data||[]).forEach(e=>{o[e.code]=e.id});const a=e.filter(e=>!o[e]);if(a.length)throw new Error(N.bad_item+" "+a.join(", "));return e.map(e=>o[e])}(f("cf_items").split(",").map(e=>e.trim()).filter(Boolean));(t.length||a.length||i.length)&&(o.scope={locations:t,categories:a,items:i})}await C("crmf_coupon_save",{p_id:t,p:o,p_client:t?null:A.client,p_override:f("cf_over")||null}),t||(A.client=h()),r(),i(S("saved")),A.list=[],await U("list")}),lb_sync:O(async()=>{const e=await C("crmf_voucher_liability_sync",{});i(e&&e.off?S("liabOff"):S("done")),await U("liab")}),lb_wind:()=>l(`<h3>${a(S("wind"))}</h3><div class="stack">${g("wd_why",S("reason"),x("wd_why","",'maxlength="300"'))}<div class="row"><button type="button" class="full" data-act="closesheet">${a(S("cancel"))}</button><button type="button" class="full primary" data-act="lb_windgo">${a(S("windGo"))}</button></div></div>`),lb_windgo:O(async()=>{const e=f("wd_why");if(e.length<3)return i(N.reason_required);await C("crmf_voucher_liability_wind_down",{p_reason:e}),r(),i(S("done")),await U("liab")})}),document.addEventListener("change",e=>{const t=e.target;t&&"cpn_f"===t.id&&(A.filter=t.value,U("uses").catch(e=>i(e.message)))}),window.BOS_PAGES=Object.assign(window.BOS_PAGES||{},{crmcoupons:async function(){t.loadStatic&&await t.loadStatic(),c(S("title"),'<div id="cpn_body"><p class="muted">…</p></div>',!0);try{await U(A.tab)}catch(e){s(e)}}});const F={status:null,at:0,pending:null};const L={not_found:"Coupon code not found.",retired:"This coupon is switched off.",not_started:"This coupon has not started yet.",expired:"This coupon has expired.",wrong_outlet:"This coupon is not for this place.",min_bill:"The bill is smaller than this coupon needs.",wrong_customer:"This coupon belongs to another customer.",customer_needed:"Type the customer mobile first: this coupon needs the customer.",customer_limit:"This customer has already used this coupon the allowed number of times.",used_up:"This coupon has been used up.",nothing_in_scope:"Nothing in this bill is covered by the coupon.",sale_has_coupon:"This sale already has a coupon."},q={code:p("Coupon code"),check:p("Check"),ok:p("Coupon accepted. Discount filled in:"),mism:p("The discount on the bill is different from the coupon. A yellow line was written for the owner."),failed:p("The coupon could not be recorded:")};Object.assign(d,{crmf_cp_check:O(async()=>{const e=t.pos&&t.pos.ctx?t.pos.ctx():null,n=_("#crmf_cp_out");if(!e)return i(S("nofn"));const o=f("crmf_cp").toUpperCase();if(!o)return;const a=await C("crmf_coupon_check",{p_code:o,p_loc:e.loc,p_customer:e.customerId||null,p_lines:e.lines.map(e=>({item_id:e.item_id||null,qty:e.qty,price:e.price,amount:e.amount})),p_subtotal:e.sub,p_override:null});a&&a.ok?(F.pending={code:o,discount:Number(a.discount)},e.setDiscount(Number(a.discount)),n&&(n.textContent=m(q.ok)+" "+$(a.discount))):(F.pending=null,n&&(n.textContent=L[a&&a.reason]||String(a&&a.reason||"")))})}),t.crmf=Object.assign(t.crmf||{},{couponCheck:(e,t,n,o,a,i)=>C("crmf_coupon_check",{p_code:e,p_loc:t,p_customer:n||null,p_lines:o||[],p_subtotal:a,p_override:i||null}),couponRedeem:(e,t,n,o)=>C("crmf_coupon_redeem_after_sale",{p_code:e,p_sale:t,p_override:n||null,p_client:o||h()}),burnCheck:(e,t,n)=>C("crmf_burn_check",{p_customer:e,p_points:t??null,p_bill:n??null}),redeemPoints:(e,t,n,o,a,i,s)=>C("crmf_points_redeem",{p_customer:e,p_points:t,p_bill:n??null,p_note:o||null,p_client:a||h(),p_dry:!!i,p_override:s||null}),referralCode:e=>C("crmf_referral_code",{p_customer:e}),referralApply:(e,t,n)=>C("crmf_referral_apply",{p_referred:e,p_code:t,p_client:n||h()}),errText:T,posBox:function(){return F.pending=null,setTimeout(async()=>{const e=_("#crmf_box");if(!e)return;const t=await async function(){if(F.status&&Date.now()-F.at<6e4)return F.status;try{F.status=await C("crmf_status",{})||{voucher:{on:!1}}}catch(e){F.status={voucher:{on:!1}}}return F.at=Date.now(),F.status}();t.voucher&&t.voucher.on&&(e.innerHTML=`<div class="stack" style="margin-top:8px"><label for="crmf_cp">${a(m(q.code))}</label><div class="row"><input id="crmf_cp" autocomplete="off" style="text-transform:uppercase" maxlength="20"><button type="button" class="mini" data-act="crmf_cp_check">${a(m(q.check))}</button></div><div class="muted" id="crmf_cp_out"></div></div>`)},0),'<div id="crmf_box"></div>'},afterSale:async function(e){const t=F.pending;if(F.pending=null,t&&e)try{const n=await C("crmf_coupon_redeem_after_sale",{p_code:t.code,p_sale:e,p_override:null,p_client:h()});n.ok?n.mismatch&&i(m(q.mism)):i(m(q.failed)+" "+(L[n.reason]||n.reason))}catch(e){i(m(q.failed)+" "+(e.message||""))}}})})();
+/* Islamia BOS · CRM-F · Coupons and vouchers (#/crmcoupons) and the till helpers (BOS.crmf).
+   Tabs: Coupons (list, new, edit, retire), Uses (redemption log), Liability (only used when the owner switched voucher liability on).
+   Server: supabase/phase318.sql (crmf_coupon_save / list / check / redeem_after_sale / uses_list, crmf_voucher_liability_*).
+   The till helpers at the bottom (BOS.crmf.couponCheck, couponRedeem, burnCheck, redeemPoints, referralCode, referralApply) are what the POS hooks in docs/integration/CRM-F.md call.
+   English labels only (owner decision); the L() wrapper keeps the three modes ready for a later translation. UNVERIFIED on a real phone and on a real Supabase project. */
+(() => {
+'use strict';
+const A = window.BOS_APP, B = window.BOS;
+if (!A || !B) return;
+const { sb, S, esc, toast, fail, shell, openSheet, closeSheet, H } = A;
+const L = B.L, lab = B.lab;
+const E = (s) => L(s, s, s);
+const $ = (s, el = document) => el.querySelector(s);
+const val = (id) => (($('#' + id) || {}).value || '').trim();
+const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
+const rid = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3) | 8).toString(16); }));
+const norm = (v) => String(v ?? '').replace(/[০-৯]/g, (d) => '০১২৩৪৫৬৭৮৯'.indexOf(d)).replace(/,/g, '').trim();
+const nnum = (v) => { const s = norm(v); if (s === '') return null; const n = Number(s); return Number.isFinite(n) ? n : NaN; };
+const fm = (n) => { const v = Number(n); if (!Number.isFinite(v)) return '-'; return (v < 0 ? '-' : '') + Math.abs(v).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+const chip = (txt, cls) => `<span class="chip ${cls || ''}">${esc(txt)}</span>`;
+const fld = (id, label, inner) => `<div><label for="${id}">${esc(label)}</label>${inner}</div>`;
+const inp = (id, v, extra) => `<input id="${id}" autocomplete="off" value="${esc(v ?? '')}" ${extra || ''}>`;
+
+const X = {
+  title: E('Coupons & vouchers'), t_list: E('Coupons'), t_uses: E('Uses'), t_liab: E('Liability'),
+  hint: E('A coupon is a code worth a percent or an amount off a bill. Use it at the till in three steps: check the code, give the discount through the normal discount box, then record it after the sale.'),
+  offNote: E('Coupons are switched OFF. You can prepare them here; the till cannot use them until the owner switches them on.'),
+  blankMax: E('Set the largest percent and the largest amount in Settings first. A blank number blocks that kind of coupon.'),
+  newc: E('New coupon'), code: E('Code'), name: E('Name'), kind: E('Kind'), percent: E('Percent'), amount: E('Amount (taka)'), value: E('Value'), from: E('Valid from'), to: E('Valid to'),
+  more: E('More options'), minBill: E('Smallest bill'), maxDisc: E('Largest discount (percent coupons)'), maxUses: E('Total uses (blank = no limit)'), perCust: E('Uses per customer'),
+  custMobile: E('For one customer only (mobile)'), outlets: E('Only at these places'), cats: E('Only for these item categories (comma separated)'), items: E('Only for these item codes (comma separated)'),
+  campaign: E('Campaign reference'), note: E('Note'), liab: E('Book the unused value as a liability (amount coupons with a total use limit)'), over: E('Reason (needed only to go above the maximum - owner)'),
+  save: E('Save'), cancel: E('Cancel'), saved: E('Saved'), edit: E('Edit'), retire: E('Retire'), reopen: E('Switch on again'), none: E('Nothing yet'),
+  uses: E('uses'), left: E('left'), active: E('Active'), retired: E('Retired'), expired: E('Expired'), personal: E('One customer'), scope: E('Limited'),
+  logTitle: E('Redemption log'), receipt: E('Receipt'), given: E('Discount given'), expected: E('Coupon gives'), mismatch: E('Different from the coupon'), override: E('Accepted with a reason'),
+  liabHint: E('Only amount coupons marked "book the unused value" are booked, and only while the owner has switched voucher liability on. Entries have two lines and always balance.'),
+  liabOff: E('Voucher liability is OFF. Nothing is booked.'), held: E('Held in the accounts'), should: E('Should hold'), sync: E('Bring the accounts up to date'), wind: E('Wind down to zero'),
+  reason: E('Reason'), windGo: E('Release everything'), done: E('Done'), noperm: E('You do not have permission.'), nofn: E('The server does not have this feature yet (phase 316 to 319 not pasted).'),
+  code2: E('Code (letters, digits, dash)'), filter: E('Show uses of'), all: E('All coupons'),
+};
+const T = (k) => lab(X[k]);
+const ERR = {
+  not_allowed: 'You do not have permission.', max_percent_not_set: 'Set the largest percent in Settings first.', max_amount_not_set: 'Set the largest amount in Settings first.',
+  over_maximum: 'This is above the largest allowed. Only the owner can create it, with a reason.', reason_required: 'Write a reason (at least 3 letters).', bad_code: 'The code may use capital letters, digits and a dash (3 to 20).',
+  code_exists: 'That code is already used.', bad_kind: 'Choose percent or amount.', value_required: 'Write the value.', name_required: 'Write a name.', validity_required: 'Choose the dates the coupon is valid.',
+  bad_date: 'The end date is before the start date.', bad_number: 'A number is not valid.', locked_after_use: 'This coupon has been used, so its money terms cannot change. Retire it and make a new one.',
+  liability_needs_amount_and_max_uses: 'Booking the liability needs an amount coupon with a total number of uses.', bad_location: 'Unknown place.', bad_item: 'Unknown item.', vouchers_off: 'Coupons are switched OFF.',
+  period_closed: 'The accounts period is closed.', accounting_off: 'Accounting is switched off.', liability_accounts_needed: 'Set both accounts for voucher liability first.', customer_not_found: 'Customer not found.',
+};
+const eText = (e) => { const m = String((e && e.message) || ''); if (/could not find|does not exist|PGRST202/i.test(m + ' ' + ((e && e.code) || ''))) return lab(X.nofn); const k = Object.keys(ERR).find((x) => m.includes(x)); return k ? ERR[k] : m || 'error'; };
+async function call(fn, args) { const r = await sb.rpc(fn, args || {}); if (r.error) { const e = new Error(eText(r.error)); e.raw = r.error; throw e; } return r.data; }
+const act = (fn) => async (a) => { try { await fn(a); } catch (e) { toast(e.message || 'error'); } };
+
+const CP = { tab: 'list', list: [], uses: [], filter: '', liab: null, status: null, locs: [], client: rid() };
+const locs = () => {
+  const all = B.liveLocs ? B.liveLocs((B.ENV && B.ENV.locs) || []) : ((B.ENV && B.ENV.locs) || []);
+  return all.map((l) => ({ id: l.id, name: A.nm ? A.nm(l) : l.name_en || l.name_bn || l.code || String(l.id) }));
+};
+const TABS = [['list', 't_list'], ['uses', 't_uses'], ['liab', 't_liab']];
+const tabsBar = () => `<div class="row wrap" id="cpn_tabs" style="gap:.3rem">${TABS.map(([k, l]) => `<button type="button" class="tog ${CP.tab === k ? 'on' : ''}" data-act="cpn_tab" data-v="${k}">${esc(T(l))}</button>`).join('')}</div>`;
+const state = (c) => (!c.active ? 'retired' : (c.valid_to < today() ? 'expired' : 'active'));
+
+function listHTML() {
+  const off = CP.status && CP.status.voucher && !CP.status.voucher.on ? `<div class="notice" id="cpn_off">${esc(T('offNote'))}</div>` : '';
+  const blank = CP.status && CP.status.voucher && (CP.status.voucher.max_percent == null || CP.status.voucher.max_amount == null) ? `<div class="notice" id="cpn_blank">${esc(T('blankMax'))}</div>` : '';
+  const rows = CP.list.map((c) => {
+    const st = state(c); const val_ = c.kind === 'percent' ? Number(c.value) + '%' : fm(c.value);
+    const left = c.max_uses == null ? '' : ` · ${Math.max(Number(c.max_uses) - Number(c.uses), 0)} ${esc(T('left'))}`;
+    return `<div class="card cp-row ${st !== 'active' ? 'muted' : ''}" data-code="${esc(c.code)}"><div class="row between"><b>${esc(c.code)}</b><b>${esc(val_)}</b></div>
+      <div>${esc(c.name)}</div>
+      <div class="muted">${esc(c.valid_from)} → ${esc(c.valid_to)} · ${Number(c.uses)} ${esc(T('uses'))}${left}${c.min_bill != null ? ' · min ' + fm(c.min_bill) : ''}</div>
+      <div class="row wrap" style="gap:.3rem">${chip(T(st === 'active' ? 'active' : st), st === 'active' ? 'ok' : '')}${c.customer_id ? chip(T('personal')) : ''}${(c.scope || []).length ? chip(T('scope')) : ''}${c.post_liability ? chip(T('t_liab')) : ''}</div>
+      <div class="row"><button type="button" class="mini" data-act="cpn_edit" data-v="${esc(c.code)}">${esc(T('edit'))}</button>
+      <button type="button" class="mini" data-act="cpn_active" data-v="${esc(c.code)}">${esc(c.active ? T('retire') : T('reopen'))}</button>
+      <button type="button" class="mini" data-act="cpn_log" data-v="${esc(c.code)}">${esc(T('t_uses'))}</button></div></div>`;
+  }).join('');
+  return `<p class="muted">${esc(T('hint'))}</p>${off}${blank}<div class="row"><button type="button" class="full primary" data-act="cpn_new">+ ${esc(T('newc'))}</button></div>${rows || `<p class="muted">${esc(T('none'))}</p>`}`;
+}
+function usesHTML() {
+  const opts = `<option value="">${esc(T('all'))}</option>` + CP.list.map((c) => `<option value="${esc(c.id)}" ${CP.filter === c.id ? 'selected' : ''}>${esc(c.code)}</option>`).join('');
+  const rows = CP.uses.map((u) => `<div class="card ${u.sale_status === 'void' ? 'muted' : ''}"><div class="row between"><b>${esc(u.code)}</b><b>${fm(u.discount_given)}</b></div>
+    <div class="muted">${esc(T('receipt'))} ${esc(u.receipt)} · ${esc(String(u.sale_date))}${u.customer_name ? ' · ' + esc(u.customer_name) : ''}${u.sale_status === 'void' ? ' · void' : ''}</div>
+    <div class="row wrap" style="gap:.3rem">${u.mismatch ? chip(T('mismatch') + ' (' + T('expected') + ' ' + fm(u.discount_expected) + ')') : ''}${u.override_reason ? chip(T('override')) : ''}</div></div>`).join('');
+  return `<h3>${esc(T('logTitle'))}</h3>${fld('cpn_f', T('filter'), `<select id="cpn_f">${opts}</select>`)}${rows || `<p class="muted">${esc(T('none'))}</p>`}`;
+}
+function liabHTML() {
+  const r = CP.liab; if (!r) return `<p class="muted">${esc(T('none'))}</p>`;
+  const rows = (r.rows || []).map((x) => `<div class="card"><div class="row between"><b>${esc(x.code)}</b><span>${esc(T('held'))} ${fm(x.held)}</span></div><div class="muted">${esc(T('should'))} ${fm(x.should_hold)}</div></div>`).join('');
+  return `<p class="muted">${esc(T('liabHint'))}</p>${r.on ? '' : `<div class="notice" id="lb_off">${esc(T('liabOff'))}</div>`}<div class="card"><b>${esc(T('held'))}: ${fm(r.held_total)}</b></div>
+    <div class="row"><button type="button" class="full" data-act="lb_sync">${esc(T('sync'))}</button><button type="button" class="full" data-act="lb_wind">${esc(T('wind'))}</button></div>${rows || `<p class="muted">${esc(T('none'))}</p>`}`;
+}
+function draw() {
+  const el = $('#cpn_body'); if (!el) return;
+  el.innerHTML = tabsBar() + (CP.tab === 'list' ? listHTML() : CP.tab === 'uses' ? usesHTML() : liabHTML());
+}
+async function load(tab) {
+  CP.tab = tab || CP.tab;
+  try { CP.status = await call('crmf_status', {}); } catch (e) { CP.status = null; }
+  if (CP.tab !== 'liab' || !CP.list.length) CP.list = await call('crmf_coupon_list', {});
+  if (CP.tab === 'uses') CP.uses = await call('crmf_coupon_uses_list', { p_coupon: CP.filter || null, p_from: null, p_to: null, p_limit: 200 });
+  if (CP.tab === 'liab') { try { CP.liab = await call('crmf_voucher_liability_report', {}); } catch (e) { CP.liab = null; toast(e.message); } }
+  draw();
+}
+
+function formSheet(c) {
+  const isNew = !c; const sc = (c && c.scope) || [];
+  const chk = (id) => sc.some((s) => s.kind === 'location' && String(s.ref) === String(id)) ? 'checked' : '';
+  const cats = sc.filter((s) => s.kind === 'category').map((s) => s.ref).join(', ');
+  openSheet(`<h3>${esc(isNew ? T('newc') : c.code)}</h3><div class="stack" id="cpn_form">
+    ${isNew ? fld('cf_code', T('code2'), inp('cf_code', '', 'maxlength="20" style="text-transform:uppercase"')) : ''}
+    ${fld('cf_name', T('name'), inp('cf_name', c ? c.name : '', 'maxlength="80"'))}
+    ${fld('cf_kind', T('kind'), `<select id="cf_kind" ${isNew ? '' : 'disabled'}><option value="percent" ${c && c.kind === 'percent' ? 'selected' : ''}>${esc(T('percent'))}</option><option value="amount" ${c && c.kind === 'amount' ? 'selected' : ''}>${esc(T('amount'))}</option></select>`)}
+    ${fld('cf_value', T('value'), inp('cf_value', c ? c.value : '', 'inputmode="decimal"'))}
+    ${fld('cf_from', T('from'), inp('cf_from', c ? c.valid_from : today(), 'type="date"'))}${fld('cf_to', T('to'), inp('cf_to', c ? c.valid_to : '', 'type="date"'))}
+    <details id="cf_more"><summary>${esc(T('more'))}</summary><div class="stack">
+      ${fld('cf_min', T('minBill'), inp('cf_min', c && c.min_bill != null ? c.min_bill : '', 'inputmode="decimal"'))}${fld('cf_cap', T('maxDisc'), inp('cf_cap', c && c.max_discount != null ? c.max_discount : '', 'inputmode="decimal"'))}
+      ${fld('cf_max', T('maxUses'), inp('cf_max', c && c.max_uses != null ? c.max_uses : '', 'inputmode="numeric"'))}${fld('cf_per', T('perCust'), inp('cf_per', c ? c.per_customer_uses : 1, 'inputmode="numeric"'))}
+      ${isNew ? fld('cf_cust', T('custMobile'), inp('cf_cust', '', 'inputmode="numeric" maxlength="14"')) : ''}
+      <div><label>${esc(T('outlets'))}</label>${locs().map((l) => `<label class="row"><input type="checkbox" class="cf_loc" value="${l.id}" ${chk(l.id)} ${isNew ? '' : 'disabled'}> ${esc(l.name)}</label>`).join('')}</div>
+      ${fld('cf_cats', T('cats'), inp('cf_cats', cats, isNew ? '' : 'disabled'))}${fld('cf_items', T('items'), inp('cf_items', '', isNew ? '' : 'disabled'))}
+      ${fld('cf_camp', T('campaign'), inp('cf_camp', c ? c.campaign_ref || '' : '', 'maxlength="60"'))}${fld('cf_note', T('note'), inp('cf_note', c ? c.note || '' : '', 'maxlength="300"'))}
+      <label class="row"><input type="checkbox" id="cf_liab" ${c && c.post_liability ? 'checked' : ''} ${isNew ? '' : 'disabled'}> ${esc(T('liab'))}</label>
+      ${S.ctx && S.ctx.is_owner ? fld('cf_over', T('over'), inp('cf_over', '', 'maxlength="300"')) : ''}
+    </div></details>
+    <div class="row"><button type="button" class="full" data-act="closesheet">${esc(T('cancel'))}</button><button type="button" class="full primary" data-act="cpn_savego" data-v="${esc(c ? c.id : '')}">${esc(T('save'))}</button></div></div>`);
+}
+async function itemIds(codes) {
+  if (!codes.length) return [];
+  const r = await sb.from('items').select('id,code').in('code', codes);
+  const m = {}; (r.data || []).forEach((x) => { m[x.code] = x.id; });
+  const miss = codes.filter((c) => !m[c]); if (miss.length) throw new Error(ERR.bad_item + ' ' + miss.join(', '));
+  return codes.map((c) => m[c]);
+}
+Object.assign(H, {
+  cpn_tab: act(async (a) => { await load(a.dataset.v); }),
+  cpn_new: () => formSheet(null),
+  cpn_edit: (a) => formSheet(CP.list.find((x) => x.code === a.dataset.v)),
+  cpn_active: act(async (a) => { const c = CP.list.find((x) => x.code === a.dataset.v); if (!c) return; await call('crmf_coupon_save', { p_id: c.id, p: { active: !c.active }, p_client: null, p_override: null }); toast(T('saved')); CP.list = []; await load('list'); }),
+  cpn_log: act(async (a) => { const c = CP.list.find((x) => x.code === a.dataset.v); CP.filter = c ? c.id : ''; await load('uses'); }),
+  cpn_savego: act(async (a) => {
+    const id = a.dataset.v || null; const p = {};
+    const num = (k, s, nm) => { const v = nnum(val(s)); if (Number.isNaN(v)) throw new Error(ERR.bad_number); if (v !== null) p[k] = v; else if (id) p[k] = null; };
+    if (!id) { p.code = val('cf_code').toUpperCase(); p.kind = val('cf_kind'); }
+    const used = id ? Number((CP.list.find((x) => x.id === id) || {}).uses || 0) : 0;     // after the first use the money terms are locked on the server, so they are not sent
+    p.name = val('cf_name'); p.valid_from = val('cf_from'); p.valid_to = val('cf_to');
+    if (!used) { num('value', 'cf_value'); num('min_bill', 'cf_min'); num('max_discount', 'cf_cap'); }
+    num('max_uses', 'cf_max'); const pc = nnum(val('cf_per')); if (pc !== null && !Number.isNaN(pc)) p.per_customer_uses = pc;
+    p.campaign_ref = val('cf_camp'); p.note = val('cf_note');
+    if (!id) {
+      const cm = norm(val('cf_cust'));
+      if (cm) { const r = await sb.from('customers').select('id').eq('mobile', cm).limit(1); if (!r.data || !r.data[0]) throw new Error(ERR.customer_not_found); p.customer_id = r.data[0].id; }
+      p.post_liability = !!($('#cf_liab') || {}).checked;
+      const L_ = [...document.querySelectorAll('.cf_loc:checked')].map((x) => Number(x.value));
+      const cats = val('cf_cats').split(',').map((s) => s.trim()).filter(Boolean); const items = await itemIds(val('cf_items').split(',').map((s) => s.trim()).filter(Boolean));
+      if (L_.length || cats.length || items.length) p.scope = { locations: L_, categories: cats, items };
+    }
+    await call('crmf_coupon_save', { p_id: id, p, p_client: id ? null : CP.client, p_override: val('cf_over') || null });
+    if (!id) CP.client = rid();
+    closeSheet(); toast(T('saved')); CP.list = []; await load('list');
+  }),
+  lb_sync: act(async () => { const r = await call('crmf_voucher_liability_sync', {}); toast(r && r.off ? T('liabOff') : T('done')); await load('liab'); }),
+  lb_wind: () => openSheet(`<h3>${esc(T('wind'))}</h3><div class="stack">${fld('wd_why', T('reason'), inp('wd_why', '', 'maxlength="300"'))}<div class="row"><button type="button" class="full" data-act="closesheet">${esc(T('cancel'))}</button><button type="button" class="full primary" data-act="lb_windgo">${esc(T('windGo'))}</button></div></div>`),
+  lb_windgo: act(async () => { const w = val('wd_why'); if (w.length < 3) return toast(ERR.reason_required); await call('crmf_voucher_liability_wind_down', { p_reason: w }); closeSheet(); toast(T('done')); await load('liab'); }),
+});
+document.addEventListener('change', (e) => { const t = e.target; if (t && t.id === 'cpn_f') { CP.filter = t.value; load('uses').catch((er) => toast(er.message)); } });
+
+async function viewCoupons() {
+  if (B.loadStatic) await B.loadStatic();
+  shell(T('title'), '<div id="cpn_body"><p class="muted">…</p></div>', true);
+  try { await load(CP.tab); } catch (e) { fail(e); }
+}
+window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { crmcoupons: viewCoupons });
+
+
+// ------------------------------------------------------------------ the coupon box in the POS cart sheet (hooks 1 to 3 of docs/integration/CRM-F.md)
+// posBox() draws a placeholder; it fills in only when coupons are ON and the person may sell. The cashier types the code, "Check" asks the server and fills the normal discount box with
+// the answer (the normal discount rules and approval still apply); after the sale, afterSale() records the use. Nothing here decides a right: the server does.
+const CF = { status: null, at: 0, pending: null };
+async function cfStatus() {
+  if (CF.status && Date.now() - CF.at < 60000) return CF.status;
+  try { CF.status = (await call('crmf_status', {})) || { voucher: { on: false } }; } catch (e) { CF.status = { voucher: { on: false } }; }
+  CF.at = Date.now(); return CF.status;
+}
+const REASON = {
+  not_found: 'Coupon code not found.', retired: 'This coupon is switched off.', not_started: 'This coupon has not started yet.', expired: 'This coupon has expired.', wrong_outlet: 'This coupon is not for this place.',
+  min_bill: 'The bill is smaller than this coupon needs.', wrong_customer: 'This coupon belongs to another customer.', customer_needed: 'Type the customer mobile first: this coupon needs the customer.',
+  customer_limit: 'This customer has already used this coupon the allowed number of times.', used_up: 'This coupon has been used up.', nothing_in_scope: 'Nothing in this bill is covered by the coupon.',
+  sale_has_coupon: 'This sale already has a coupon.',
+};
+const XB = { code: E('Coupon code'), check: E('Check'), ok: E('Coupon accepted. Discount filled in:'), mism: E('The discount on the bill is different from the coupon. A yellow line was written for the owner.'), failed: E('The coupon could not be recorded:') };
+function posBox() {
+  CF.pending = null;
+  setTimeout(async () => {
+    const el = $('#crmf_box'); if (!el) return;
+    const st = await cfStatus(); if (!st.voucher || !st.voucher.on) return;
+    el.innerHTML = `<div class="stack" style="margin-top:8px"><label for="crmf_cp">${esc(lab(XB.code))}</label><div class="row"><input id="crmf_cp" autocomplete="off" style="text-transform:uppercase" maxlength="20"><button type="button" class="mini" data-act="crmf_cp_check">${esc(lab(XB.check))}</button></div><div class="muted" id="crmf_cp_out"></div></div>`;
+  }, 0);
+  return '<div id="crmf_box"></div>';
+}
+Object.assign(H, {
+  crmf_cp_check: act(async () => {
+    const ctx = B.pos && B.pos.ctx ? B.pos.ctx() : null; const out = $('#crmf_cp_out'); if (!ctx) return toast(T('nofn'));
+    const code = val('crmf_cp').toUpperCase(); if (!code) return;
+    const r = await call('crmf_coupon_check', { p_code: code, p_loc: ctx.loc, p_customer: ctx.customerId || null, p_lines: ctx.lines.map((l) => ({ item_id: l.item_id || null, qty: l.qty, price: l.price, amount: l.amount })), p_subtotal: ctx.sub, p_override: null });
+    if (r && r.ok) { CF.pending = { code, discount: Number(r.discount) }; ctx.setDiscount(Number(r.discount)); if (out) out.textContent = lab(XB.ok) + ' ' + fm(r.discount); }
+    else { CF.pending = null; if (out) out.textContent = REASON[r && r.reason] || String((r && r.reason) || ''); }
+  }),
+});
+async function afterSale(saleId) {
+  const pend = CF.pending; CF.pending = null; if (!pend || !saleId) return;
+  try {
+    const r = await call('crmf_coupon_redeem_after_sale', { p_code: pend.code, p_sale: saleId, p_override: null, p_client: rid() });
+    if (!r.ok) toast(lab(XB.failed) + ' ' + (REASON[r.reason] || r.reason)); else if (r.mismatch) toast(lab(XB.mism));
+  } catch (e) { toast(lab(XB.failed) + ' ' + (e.message || '')); }
+}
+
+// ------------------------------------------------------------------ till helpers (the POS hooks of docs/integration/CRM-F.md call these; each is one server call and never throws on a business refusal)
+B.crmf = Object.assign(B.crmf || {}, {
+  // lines = [{item_id, qty, price}] or the sale lines; subtotal = bill before discount. Answer: {ok, discount, reason, ...}
+  couponCheck: (code, loc, customerId, lines, subtotal, override) => call('crmf_coupon_check', { p_code: code, p_loc: loc, p_customer: customerId || null, p_lines: lines || [], p_subtotal: subtotal, p_override: override || null }),
+  couponRedeem: (code, saleId, override, client) => call('crmf_coupon_redeem_after_sale', { p_code: code, p_sale: saleId, p_override: override || null, p_client: client || rid() }),
+  burnCheck: (customerId, points, bill) => call('crmf_burn_check', { p_customer: customerId, p_points: points == null ? null : points, p_bill: bill == null ? null : bill }),
+  redeemPoints: (customerId, points, bill, note, client, dry, override) => call('crmf_points_redeem', { p_customer: customerId, p_points: points, p_bill: bill == null ? null : bill, p_note: note || null, p_client: client || rid(), p_dry: !!dry, p_override: override || null }),
+  referralCode: (customerId) => call('crmf_referral_code', { p_customer: customerId }),
+  referralApply: (customerId, code, client) => call('crmf_referral_apply', { p_referred: customerId, p_code: code, p_client: client || rid() }),
+  errText: eText, posBox, afterSale,
+});
+})();

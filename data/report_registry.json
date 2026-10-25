@@ -327,7 +327,7 @@
    "status": "incomplete",
    "route": "report/pos_day_close",
    "planned": false,
-   "source": "sales, sale_payments, form 14-1",
+   "source": "sales, sale_payments, form 06-1",
    "grant": "report_pos",
    "kw": [
     "day close",
@@ -1047,7 +1047,7 @@
    "status": "incomplete",
    "route": "report/s10_orders",
    "planned": false,
-   "source": "paper form 20-1 (free-text channel)",
+   "source": "paper form 05-1 (free-text channel)",
    "grant": "report_orders",
    "kw": [
     "channel",
@@ -1076,7 +1076,7 @@
    "status": "implemented",
    "route": "report/q3_complaints",
    "planned": false,
-   "source": "form 20-3, sale_returns",
+   "source": "form 32-1, sale_returns",
    "grant": "report_quality",
    "kw": [
     "complaint",
@@ -1538,7 +1538,7 @@
    "status": "implemented",
    "route": "prodreports",
    "planned": false,
-   "source": "form 05-4 yield test",
+   "source": "form 41-1 yield test",
    "grant": "report_stock",
    "kw": [
     "yield",
@@ -1643,7 +1643,7 @@
    "status": "implemented",
    "route": "prodreports",
    "planned": false,
-   "source": "form 05-4",
+   "source": "form 41-1",
    "grant": "report_stock",
    "kw": [
     "reject",
@@ -2102,7 +2102,7 @@
    "status": "implemented",
    "route": "report/k2_count_variance",
    "planned": false,
-   "source": "form 04-3, stock_count_adjust",
+   "source": "form 36-1, stock_count_adjust",
    "grant": "report_stock",
    "kw": [
     "count",
@@ -2422,7 +2422,7 @@
    "status": "implemented",
    "route": "prodreports",
    "planned": false,
-   "source": "form 05-4, stock_wastage",
+   "source": "form 41-1, stock_wastage",
    "grant": "report_stock",
    "kw": [
     "yield",
@@ -2632,7 +2632,7 @@
    "status": "implemented",
    "route": "report/q2_hygiene",
    "planned": false,
-   "source": "forms 14-1, 05-1",
+   "source": "forms 06-1, 12-1",
    "grant": "report_quality",
    "kw": [
     "hygiene",
@@ -2687,7 +2687,7 @@
    "status": "implemented",
    "route": "report/q3_complaints",
    "planned": false,
-   "source": "form 20-3",
+   "source": "form 32-1",
    "grant": "report_quality",
    "kw": [
     "complaint",
@@ -2848,7 +2848,7 @@
    "status": "implemented",
    "route": "report/p4_supplier_score",
    "planned": false,
-   "source": "forms 06-3, 04-1, 06-4",
+   "source": "forms 27-1, 13-1, 02-1",
    "grant": "report_purchase",
    "kw": [
     "scorecard",
@@ -2874,7 +2874,7 @@
    "status": "implemented",
    "route": "report/p5_po_match",
    "planned": false,
-   "source": "form 06-3",
+   "source": "form 27-1",
    "grant": "report_purchase",
    "kw": [
     "po",
@@ -2901,7 +2901,7 @@
    "status": "implemented",
    "route": "report/p5_po_match",
    "planned": false,
-   "source": "forms 06-3, 04-1, 06-4",
+   "source": "forms 27-1, 13-1, 02-1",
    "grant": "report_purchase",
    "kw": [
     "match",
@@ -2928,7 +2928,7 @@
    "status": "implemented",
    "route": "report/p5_po_match",
    "planned": false,
-   "source": "form 06-3",
+   "source": "form 27-1",
    "grant": "report_purchase",
    "kw": [
     "late",
@@ -3062,7 +3062,7 @@
    "status": "implemented",
    "route": "purchrep",
    "planned": false,
-   "source": "forms 06-3, 06-4",
+   "source": "forms 27-1, 02-1",
    "grant": "report_purchase",
    "kw": [
     "delivery",

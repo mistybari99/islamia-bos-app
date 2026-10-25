@@ -1,1 +1,123 @@
-(()=>{"use strict";const e=window.BOS_APP,t=window.BOS,{t:a,esc:c,toast:n,S:o}=e,r=t.L,s=t.lab,i=["ean_13","ean_8","code_128","code_39","qr_code","upc_a"],d={title:r("বারকোড স্ক্যান","Scan barcode","Barcode স্ক্যান"),cam:r("ক্যামেরা দিয়ে স্ক্যান","Scan with the camera","Camera দিয়ে scan"),dev:r("স্ক্যানার / কোড টাইপ","Scanner / type the code","Scanner / code type"),cancel:r("বাতিল","Cancel","Cancel"),back:r("পিছনে","Back","Back"),use:r("ব্যবহার করুন","Use this code","Use this code"),point:r("বারকোডটি ফ্রেমের মধ্যে ধরুন","Hold the barcode inside the frame","Barcode frame-এর মধ্যে ধরুন"),nosupport:r("এই ফোনের ব্রাউজারে ক্যামেরা-স্ক্যান চলে না। স্ক্যানার বা টাইপ করে কোড দিন।","Camera scan is not supported on this phone or browser. Use a scanner or type the code.","এই phone-এর browser-এ camera scan চলে না। Scanner বা type করে code দিন।"),nocam:r("ক্যামেরা চালু করা গেল না (অনুমতি দেননি?)।","Could not start the camera (permission denied?).","Camera চালু করা গেল না (permission দেননি?)।"),devhint:r("স্ক্যানারে স্ক্যান করুন, অথবা কোড টাইপ করে Enter চাপুন।","Scan with the scanner, or type the code and press Enter.","Scanner-এ scan করুন, অথবা code type করে Enter চাপুন।"),code:r("বারকোড","Barcode","Barcode"),none:r("তথ্য লাগবে: সেটিংসে ক্যামেরা স্ক্যান বা ডিভাইস স্ক্যান চালু করুন।","Data needed: enable camera scan or device scan in Settings.","তথ্য লাগবে: Settings-এ camera scan বা device scan চালু করুন।"),open:r("সেটিংস খুলুন","Open settings","Settings খুলুন"),nomatch:r("এই বারকোডের কোনো পণ্য নেই","No product has this barcode","এই barcode-এর কোনো product নেই")},l=e=>s(d[e]);let u=null;const b=e=>{try{return!0===t.rule(e,!1)}catch(e){return!1}};function m(){return{cam:b("barcode_camera_on"),dev:b("barcode_device_on")}}function v(){return u&&u.finish(null),new Promise(e=>{let a=!1,n=null,r=null,s=null,d=null;const b=t=>{a||(a=!0,(()=>{r&&(clearInterval(r),r=null),n&&(n.getTracks().forEach(e=>{try{e.stop()}catch(e){}}),n=null);const e=s&&s.querySelector("video");if(e)try{e.pause(),e.srcObject=null}catch(e){}document.removeEventListener("keydown",v,!0),window.removeEventListener("hashchange",p),s&&s.remove(),s=null})(),u=null,e(t?String(t).trim():null))},v=e=>{"Escape"===e.key&&(e.stopPropagation(),b(null))},p=()=>b(null);u={finish:b},s=document.createElement("div"),s.className="bc-bg",s.id="bcOverlay",s.addEventListener("click",e=>{e.target===s&&b(null)}),document.body.appendChild(s),document.addEventListener("keydown",v,!0),window.addEventListener("hashchange",p);const h=e=>{s.innerHTML=`<div class="bc-card" role="dialog" aria-modal="true" aria-label="${c(l("title"))}"><button type="button" class="sheet-x bc-x" aria-label="${c(l("cancel"))}">✕</button><h2>${c(l("title"))}</h2>${e}</div>`;const t=s.querySelector(".bc-x");return t&&t.addEventListener("click",()=>b(null)),s.firstChild},y=(e,t)=>{const a=s&&s.querySelector(e);a&&a.addEventListener("click",t)},f=(e,t)=>{d="dev";const a=h(`${t?`<div class="notice warn">${c(t)}</div>`:""}<label for="bc_in">${c(l("code"))}</label><input id="bc_in" class="bc-in" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="bc_h">\n        <div class="hint" id="bc_h">${c(l("devhint"))}</div>\n        <div class="stack" style="margin-top:12px"><button class="primary" data-bc="use">${c(l("use"))}</button>${e.cam?`<button data-bc="cam">${c(l("cam"))}</button>`:""}<button data-bc="cancel">${c(l("cancel"))}</button></div>`).querySelector("#bc_in"),n=()=>{const e=a.value.trim();e&&b(e)};a.addEventListener("keydown",e=>{"Enter"===e.key&&(e.preventDefault(),n())}),a.addEventListener("blur",()=>{setTimeout(()=>{!s||"dev"!==d||document.activeElement&&s.contains(document.activeElement)||a.focus()},60)}),y("[data-bc=use]",n),y("[data-bc=cancel]",()=>b(null)),y("[data-bc=cam]",()=>w(e)),setTimeout(()=>{a.isConnected&&a.focus()},30)},w=async e=>{d="cam";const o=h(`<p class="muted" id="bc_msg">${c(l("point"))}</p><div class="bc-view"><video playsinline muted autoplay></video></div>\n        <div class="stack">${e.dev?`<button data-bc="dev">${c(l("dev"))}</button>`:""}<button data-bc="cancel">${c(l("cancel"))}</button></div>`);y("[data-bc=cancel]",()=>b(null)),y("[data-bc=dev]",()=>{g(),f(e)});const u=t=>{if(e.dev)g(),f(e,l(t));else{const e=o.querySelector("#bc_msg");e&&(e.textContent=l(t),e.className="notice warn")}};if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return u("nosupport");let m;if("BarcodeDetector"in window)try{let e=i;if(window.BarcodeDetector.getSupportedFormats){const t=await window.BarcodeDetector.getSupportedFormats(),a=i.filter(e=>t.includes(e));a.length&&(e=a)}m=new window.BarcodeDetector({formats:e})}catch(e){return u("nosupport")}else{try{m=t.scanitems&&t.scanitems.fallbackDetector?await t.scanitems.fallbackDetector():null}catch(e){m=null}if(!m)return u("nosupport")}try{n=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:!1})}catch(e){return u("nocam")}if(a||"cam"!==d||!s)return n&&n.getTracks().forEach(e=>e.stop()),void(n=null);const v=s.querySelector("video");v.srcObject=n,v.play().catch(()=>{});let p=!1;r=setInterval(async()=>{if(!(p||!v.isConnected||v.readyState<2)){p=!0;try{const e=await m.detect(v);e&&e.length&&e[0].rawValue&&b(e[0].rawValue)}catch(e){}p=!1}},220)};function g(){r&&(clearInterval(r),r=null),n&&(n.getTracks().forEach(e=>{try{e.stop()}catch(e){}}),n=null)}(async()=>{try{await t.loadStatic()}catch(e){}if(a)return;const e=m();if(!e.cam&&!e.dev)return(()=>{d="none";const e=o.ctx&&o.ctx.is_owner;h(`<div class="notice warn" data-bc="none">${c(l("none"))}</div><div class="stack">${e?`<button class="primary" data-bc="settings">${c(l("open"))}</button>`:""}<button data-bc="cancel">${c(l("cancel"))}</button></div>`),y("[data-bc=cancel]",()=>b(null)),y("[data-bc=settings]",()=>{b(null),location.hash="#/settings2/barcode"})})();e.cam&&e.dev?(d="pick",h(`<div class="stack"><button class="primary" data-bc="cam">${c(l("cam"))}</button><button class="primary" data-bc="dev">${c(l("dev"))}</button><button data-bc="cancel">${c(l("cancel"))}</button></div>`),y("[data-bc=cam]",()=>w(e)),y("[data-bc=dev]",()=>f(e)),y("[data-bc=cancel]",()=>b(null))):e.cam?w(e):f(e)})()})}const p=(e,t)=>{const a=String(e||"").trim();return a&&(t||[]).find(e=>e.barcode&&String(e.barcode).trim()===a)||null};t.barcode={scan:v,modes:m,find:p,scanItem:async function(e){const t=await v();if(!t)return null;const a=p(t,e);return a||n(l("nomatch")+" · "+t),a},enabled:()=>{const e=m();return!(!e.cam&&!e.dev)},label:e=>l(e)}})();
+/* Islamia BOS · barcode scanning. Two SEPARATE options (Rules): barcode_camera_on (phone camera, BarcodeDetector API)
+   and barcode_device_on (hardware scanner that types the code + Enter, or a typed code). B.barcode.scan() offers whichever is on:
+   both -> two buttons, one -> straight to it, none -> "Data needed: enable in Settings". Resolves with the code, or null if cancelled.
+   The overlay is its own layer, so it can open on top of a form or sheet without closing it. */
+(() => {
+'use strict';
+const A = window.BOS_APP, B = window.BOS;
+const { t, esc, toast, S } = A;
+const L = B.L, lab = B.lab;
+const FORMATS = ['ean_13', 'ean_8', 'code_128', 'code_39', 'qr_code', 'upc_a'];
+const X = {
+  title: L('বারকোড স্ক্যান', 'Scan barcode', 'Barcode স্ক্যান'),
+  cam: L('ক্যামেরা দিয়ে স্ক্যান', 'Scan with the camera', 'Camera দিয়ে scan'), dev: L('স্ক্যানার / কোড টাইপ', 'Scanner / type the code', 'Scanner / code type'),
+  cancel: L('বাতিল', 'Cancel', 'Cancel'), back: L('পিছনে', 'Back', 'Back'), use: L('ব্যবহার করুন', 'Use this code', 'Use this code'),
+  point: L('বারকোডটি ফ্রেমের মধ্যে ধরুন', 'Hold the barcode inside the frame', 'Barcode frame-এর মধ্যে ধরুন'),
+  nosupport: L('এই ফোনের ব্রাউজারে ক্যামেরা-স্ক্যান চলে না। স্ক্যানার বা টাইপ করে কোড দিন।', 'Camera scan is not supported on this phone or browser. Use a scanner or type the code.', 'এই phone-এর browser-এ camera scan চলে না। Scanner বা type করে code দিন।'),
+  nocam: L('ক্যামেরা চালু করা গেল না (অনুমতি দেননি?)।', 'Could not start the camera (permission denied?).', 'Camera চালু করা গেল না (permission দেননি?)।'),
+  devhint: L('স্ক্যানারে স্ক্যান করুন, অথবা কোড টাইপ করে Enter চাপুন।', 'Scan with the scanner, or type the code and press Enter.', 'Scanner-এ scan করুন, অথবা code type করে Enter চাপুন।'),
+  code: L('বারকোড', 'Barcode', 'Barcode'),
+  none: L('তথ্য লাগবে: সেটিংসে ক্যামেরা স্ক্যান বা ডিভাইস স্ক্যান চালু করুন।', 'Data needed: enable camera scan or device scan in Settings.', 'তথ্য লাগবে: Settings-এ camera scan বা device scan চালু করুন।'),
+  open: L('সেটিংস খুলুন', 'Open settings', 'Settings খুলুন'), nomatch: L('এই বারকোডের কোনো পণ্য নেই', 'No product has this barcode', 'এই barcode-এর কোনো product নেই'),
+};
+const T = (k) => lab(X[k]);
+let cur = null;
+
+const rule = (k) => { try { return B.rule(k, false) === true; } catch (e) { return false; } };
+function modes() { return { cam: rule('barcode_camera_on'), dev: rule('barcode_device_on') }; }
+
+function scan() {
+  if (cur) cur.finish(null);
+  return new Promise((resolve) => {
+    let done = false, stream = null, timer = null, root = null, screen = null;
+    const teardown = () => {
+      if (timer) { clearInterval(timer); timer = null; }
+      if (stream) { stream.getTracks().forEach((tr) => { try { tr.stop(); } catch (e) { /* already stopped */ } }); stream = null; }
+      const v = root && root.querySelector('video'); if (v) { try { v.pause(); v.srcObject = null; } catch (e) { /* ignore */ } }
+      document.removeEventListener('keydown', onKey, true); window.removeEventListener('hashchange', onHash);
+      if (root) root.remove(); root = null;
+    };
+    const finish = (code) => { if (done) return; done = true; teardown(); cur = null; resolve(code ? String(code).trim() : null); };
+    const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); finish(null); } };
+    const onHash = () => finish(null);
+    cur = { finish };
+    root = document.createElement('div'); root.className = 'bc-bg'; root.id = 'bcOverlay';
+    root.addEventListener('click', (e) => { if (e.target === root) finish(null); });
+    document.body.appendChild(root);
+    document.addEventListener('keydown', onKey, true); window.addEventListener('hashchange', onHash);
+    const card = (html) => { root.innerHTML = `<div class="bc-card" role="dialog" aria-modal="true" aria-label="${esc(T('title'))}"><button type="button" class="sheet-x bc-x" aria-label="${esc(T('cancel'))}">✕</button><h2>${esc(T('title'))}</h2>${html}</div>`; const xb = root.querySelector('.bc-x'); if (xb) xb.addEventListener('click', () => finish(null)); return root.firstChild; };
+    const on = (sel, fn) => { const el = root && root.querySelector(sel); if (el) el.addEventListener('click', fn); };
+
+    const showNone = () => {
+      screen = 'none'; const own = S.ctx && S.ctx.is_owner;
+      card(`<div class="notice warn" data-bc="none">${esc(T('none'))}</div><div class="stack">${own ? `<button class="primary" data-bc="settings">${esc(T('open'))}</button>` : ''}<button data-bc="cancel">${esc(T('cancel'))}</button></div>`);
+      on('[data-bc=cancel]', () => finish(null)); on('[data-bc=settings]', () => { finish(null); location.hash = '#/settings2/barcode'; });
+    };
+    const showDevice = (m, msg) => {
+      screen = 'dev';
+      const c = card(`${msg ? `<div class="notice warn">${esc(msg)}</div>` : ''}<label for="bc_in">${esc(T('code'))}</label><input id="bc_in" class="bc-in" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="bc_h">
+        <div class="hint" id="bc_h">${esc(T('devhint'))}</div>
+        <div class="stack" style="margin-top:12px"><button class="primary" data-bc="use">${esc(T('use'))}</button>${m.cam ? `<button data-bc="cam">${esc(T('cam'))}</button>` : ''}<button data-bc="cancel">${esc(T('cancel'))}</button></div>`);
+      const inp = c.querySelector('#bc_in');
+      const submit = () => { const v = inp.value.trim(); if (v) finish(v); };
+      inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
+      inp.addEventListener('blur', () => { setTimeout(() => { if (root && screen === 'dev' && !(document.activeElement && root.contains(document.activeElement))) inp.focus(); }, 60); });   // a scanner types into whatever has focus
+      on('[data-bc=use]', submit); on('[data-bc=cancel]', () => finish(null)); on('[data-bc=cam]', () => showCamera(m));
+      setTimeout(() => { if (inp.isConnected) inp.focus(); }, 30);
+    };
+    const showCamera = async (m) => {
+      screen = 'cam';
+      const c = card(`<p class="muted" id="bc_msg">${esc(T('point'))}</p><div class="bc-view"><video playsinline muted autoplay></video></div>
+        <div class="stack">${m.dev ? `<button data-bc="dev">${esc(T('dev'))}</button>` : ''}<button data-bc="cancel">${esc(T('cancel'))}</button></div>`);
+      on('[data-bc=cancel]', () => finish(null)); on('[data-bc=dev]', () => { teardownMedia(); showDevice(m); });
+      const fallback = (key) => { if (m.dev) { teardownMedia(); showDevice(m, T(key)); } else { const el = c.querySelector('#bc_msg'); if (el) { el.textContent = T(key); el.className = 'notice warn'; } } };
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return fallback('nosupport');
+      let det;
+      if (!('BarcodeDetector' in window)) {
+        // X5: the vendored ZXing reader (web/scan_items.js) when this browser has no BarcodeDetector; OFF unless the camera switch is on
+        try { det = B.scanitems && B.scanitems.fallbackDetector ? await B.scanitems.fallbackDetector() : null; } catch (e) { det = null; }
+        if (!det) return fallback('nosupport');
+      } else {
+        try {
+          let f = FORMATS;
+          if (window.BarcodeDetector.getSupportedFormats) { const sup = await window.BarcodeDetector.getSupportedFormats(); const ok = FORMATS.filter((x) => sup.includes(x)); if (ok.length) f = ok; }
+          det = new window.BarcodeDetector({ formats: f });
+        } catch (e) { return fallback('nosupport'); }
+      }
+      try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false }); } catch (e) { return fallback('nocam'); }
+      if (done || screen !== 'cam' || !root) { if (stream) stream.getTracks().forEach((tr) => tr.stop()); stream = null; return; }
+      const v = root.querySelector('video'); v.srcObject = stream; v.play().catch(() => {});
+      let busy = false;
+      timer = setInterval(async () => {
+        if (busy || !v.isConnected || v.readyState < 2) return; busy = true;
+        try { const r = await det.detect(v); if (r && r.length && r[0].rawValue) finish(r[0].rawValue); } catch (e) { /* frame not ready */ }
+        busy = false;
+      }, 220);
+    };
+    function teardownMedia() { if (timer) { clearInterval(timer); timer = null; } if (stream) { stream.getTracks().forEach((tr) => { try { tr.stop(); } catch (e) { /* ignore */ } }); stream = null; } }
+
+    (async () => {
+      try { await B.loadStatic(); } catch (e) { /* rules default off */ }
+      if (done) return;
+      const m = modes();
+      if (!m.cam && !m.dev) return showNone();
+      if (m.cam && m.dev) {
+        screen = 'pick';
+        card(`<div class="stack"><button class="primary" data-bc="cam">${esc(T('cam'))}</button><button class="primary" data-bc="dev">${esc(T('dev'))}</button><button data-bc="cancel">${esc(T('cancel'))}</button></div>`);
+        on('[data-bc=cam]', () => showCamera(m)); on('[data-bc=dev]', () => showDevice(m)); on('[data-bc=cancel]', () => finish(null));
+      } else if (m.cam) showCamera(m); else showDevice(m);
+    })();
+  });
+}
+// find the item with this exact barcode in a list of items
+const find = (code, items) => { const c = String(code || '').trim(); return c ? ((items || []).find((i) => i.barcode && String(i.barcode).trim() === c) || null) : null; };
+// scan and resolve to an item of `items` (rows with a barcode column); a code with no product shows "No product has this barcode" and gives null.
+// Used by the purchase bill lines and the stock actions. Does nothing visible when both scan options are off (scan() then explains where to enable them).
+async function scanItem(items) {
+  const code = await scan(); if (!code) return null;
+  const it = find(code, items); if (!it) toast(T('nomatch') + ' · ' + code);
+  return it;
+}
+const enabled = () => { const m = modes(); return !!(m.cam || m.dev); };
+B.barcode = { scan, modes, find, scanItem, enabled, label: (k) => T(k) };
+})();

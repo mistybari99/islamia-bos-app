@@ -1,1 +1,162 @@
-(()=>{"use strict";const e=window.BOS_APP,t=window.BOS,{sb:n,S:r,esc:a,toast:s,fail:o,shell:i,openSheet:d,closeSheet:l,nm:c}=e,u=e.H,m=t.L,v=t.lab,p=(e,t=document)=>t.querySelector(e),_=t.s2,{errToast:f,rid:b,grant:$,nnum:h,money:w,dt:y,optHTML:g,lists:R,rowL:S,LOCS:q,allLocs:L,LOCK:k,npMode:N}=_,C=e=>Math.round(100*Number(e))/100,M=()=>(new Date).toLocaleDateString("en-CA",{timeZone:"Asia/Dhaka"}),x={title:m("সেল ফেরত","Sale returns","Sale return"),date:m("ডেট","Date","Date"),location:m("জায়গা","Location","Location"),receipt:m("রসিদ","Receipt","Receipt"),none:m("এই দিনে কোনো সেল নেই","No sales on this day","এই দিনে কোনো sale নেই"),loading:m("লোড হচ্ছে…","Loading…","Loading…"),voided:m("ভয়েড","Voided","Void"),more:m("আরও অপশন","More options","আরও option"),doReturn:m("মাল ফেরত নিন","Take goods back","মাল return নিন"),history:m("এই রসিদের ফেরত","Returns of this receipt","এই receipt-এর return"),noperm:m("অনুমতি নেই","Not allowed","Permission নেই"),close:m("বন্ধ","Close","Close"),cancel:m("ক্যান্সেল","Cancel","Cancel"),sold:m("বিক্রি","Sold","Sold"),returned:m("ফেরত হয়েছে","Returned","Returned"),left:m("বাকি","Left","Left"),qty:m("ফেরত Qty","Return quantity","Return quantity"),reason:m("ফেরতের কারণ","Return reason","Return reason"),note:m("নোট","Note","Note"),value:m("ফেরত মূল্য","Value of the return","Return value"),fromDue:m("কাস্টমারের বাকি থেকে কাটা","Taken off what the customer owes","Customer-এর due থেকে কাটা"),handBack:m("ফেরত দিতে হবে","To hand back","ফেরত দিতে হবে"),mode:m("কীভাবে ফেরত দিলেন","How it was handed back","কীভাবে ফেরত দিলেন"),cash:m("ক্যাশ","Cash","Cash"),mobile:m("মোবাইল","Mobile","Mobile"),card:m("কার্ড","Card","Card"),wallet:m("ওয়ালেট (বিকাশ/নগদ…)","Wallet (bKash / Nagad…)","Wallet (bKash/Nagad…)"),ref:m("রেফারেন্স","Reference","Reference"),go:m("ফেরত নিন","Confirm return","Return confirm"),done:m("ফেরত নেওয়া হয়েছে","Return recorded","Return recorded"),dup:m("আগেই সেভ হয়েছে — আবার হয়নি","Already saved — nothing was added twice","আগেই saved — আবার হয়নি"),needQty:m("অন্তত একটি আইটেমের ফেরত Qty লিখুন","Enter a quantity for at least one item","অন্তত একটি item-এর quantity লিখুন"),badQty:m("Qty বাকির চেয়ে বেশি বা ঠিক নয়","Quantity is wrong or more than what is left","Quantity ঠিক নয় বা বাকির বেশি"),needReason:m("কারণ বাছুন","Choose a reason","Reason বাছুন"),needMode:m("ফেরতের ধরন বাছুন","Choose how it was handed back","Refund-এর ধরন বাছুন"),needWallet:m("ওয়ালেট লিখুন","Enter the wallet","Wallet লিখুন"),voidRet:m("ফেরত ভয়েড","Void this return","Return void"),voidWhy:m("ভয়েডের কারণ (লাগবেই)","Reason for voiding (required)","Void-এর reason (লাগবেই)"),voidDone:m("ফেরত ভয়েড হয়েছে","Return voided","Return voided"),noReturns:m("এই রসিদে কোনো ফেরত নেই","No returns on this receipt","এই receipt-এ কোনো return নেই"),cust:m("কাস্টমার","Customer","Customer"),owes:m("কাস্টমারের বাকি","Customer owes","Customer-এর due"),nothingLeft:m("ফেরত নেওয়ার মতো কিছু বাকি নেই","Nothing is left to return","Return নেওয়ার মতো কিছু বাকি নেই"),sqlMissing:m("সেল ফেরতের ডেটাবেস অংশ এখনও চালু হয়নি (phase12)","The sale-return database part is not installed yet (phase12)","Sale return-এর database অংশ চালু হয়নি (phase12)"),dueFirstOff:m("সেটিং অনুযায়ী পুরো টাকা ফেরত যাবে","By the setting the whole value is handed back","Setting অনুযায়ী পুরো টাকা ফেরত"),items:m("আইটেম","items","items")},T=e=>v(x[e]),E={loc:void 0,date:M(),rows:[],err:null},O={d:null,client:null,busy:!1},D=e=>e&&/could not find the function|does not exist|schema cache|404/i.test(e.message||"");async function H(){i(T("title"),`<p class="muted">${a(T("loading"))}</p>`,!0);try{await t.loadStatic()}catch(e){}const e=q();void 0===E.loc&&(E.loc=(e[0]||{}).id);const r=await n.from("sales").select("id,receipt,sold_at,total,status,customer,location_id,pay_mode").eq("location_id",E.loc).eq("sale_date",E.date).order("receipt",{ascending:!1}).limit(200);E.err=r.error,E.rows=r.error?[]:r.data||[],i(T("title"),`<div class="p2-bar">${e.length>1||L()?`<select id="sr_loc" aria-label="${a(T("location"))}">${g(e.map(e=>[e.id,c(e)]),E.loc)}</select>`:""}<input id="sr_date" type="date" value="${a(E.date)}" aria-label="${a(T("date"))}"></div>\n    <div id="sr_list">${E.rows.map((e,t)=>`<div class="card item mk ${"void"===e.status?"bad":""}" data-act="sr_open" data-v="${a(e.id)}" role="button" tabindex="0"><div><div class="nm">${a(T("receipt"))} #${a(String(e.receipt))}</div>\n      <div class="muted" style="font-size:.85rem">${a(y(e.sold_at))}${e.customer?" · "+a(e.customer):""}</div>${"void"===e.status?`<span class="chip bad">${a(T("voided"))}</span>`:""}</div>\n      <div class="pr"><button type="button" class="mini s2-dots" data-act="sr_menu" data-i="${t}" aria-label="${a(T("more"))}">⋮</button><b>${a(w(e.total))}</b></div></div>`).join("")||`<p class="muted center">${a(T("none"))}</p>`}</div>`,!0)}async function Q(e){d(`<p class="muted">${a(T("loading"))}</p>`);const r=await n.rpc("sale_returns_for",{p_sale:e});if(r.error)return l(),D(r.error)?s(T("sqlMissing")):f(r.error);const o=r.data;O.d=o,O.client=b(),O.busy=!1;const i=o.lines||[],c=R("return_reasons").map(e=>[e.value_code,v(S(e))]),u="lock"===N();d(`<h2>${a(T("receipt"))} #${a(String(o.receipt))}</h2>${o.customer?`<div class="muted">${a(T("cust"))}: ${a(o.customer)}${null!==o.balance&&void 0!==o.balance?" · "+a(T("owes"))+" "+a(w(o.balance)):""}</div>`:""}\n    ${o.can_return&&"done"===o.status?`<div class="stack" style="margin-top:8px" id="sr_form">\n      ${i.map((e,t)=>`<div class="card stack" data-sl="${t}"><b>${a(e.name||"")}</b><div class="muted" style="font-size:.85rem">${a(T("sold"))} ${_.q4(e.sold)} · ${a(T("returned"))} ${_.q4(e.returned)} · ${a(T("left"))} ${_.q4(e.left)} ${a(e.unit?_.unitLabel(e.unit):"")}</div>\n        ${Number(e.left)>0?`<div><label>${a(T("qty"))}</label><input data-rq="${t}" inputmode="decimal" autocomplete="off"></div>`:""}</div>`).join("")||`<p class="muted">${a(T("nothingLeft"))}</p>`}\n      <div><label for="sr_reason">${a(T("reason"))}</label><select id="sr_reason"><option value="">—</option>${g(c,"")}</select></div>\n      <div><label for="sr_note">${a(T("note"))}</label><input id="sr_note" autocomplete="off"></div>\n      <div class="card stack" id="sr_sum"></div>\n      <div class="stack" id="sr_rr"></div>\n      <div id="sr_mw" hidden><label for="sr_mode">${a(T("mode"))}</label><select id="sr_mode"><option value="">—</option>${["cash","mobile","card"].map(e=>`<option value="${e}">${a(T(e))}</option>`).join("")}</select>\n        <div id="sr_ww" hidden style="margin-top:6px"><label for="sr_wallet">${a(T("wallet"))}</label><input id="sr_wallet" autocomplete="off"></div><div style="margin-top:6px"><label for="sr_ref">${a(T("ref"))}</label><input id="sr_ref" autocomplete="off"></div>${t.moneySrc?t.moneySrc.slot("sr","customer_refund"):""}</div></div>`:u&&"done"===o.status?`<div class="s2-lockrow">${k}<span>${a(T("doReturn"))} · ${a(T("noperm"))}</span></div>`:""}\n    <h3 style="margin-top:14px">${a(T("history"))}</h3><div>${(o.returns||[]).map(e=>`<div class="s2-led"><div>${a(w(e.amount))} ${"void"===e.status?`<span class="chip bad">${a(T("voided"))}</span>`:""}<div class="sub">${a(y(e.at))}${e.staff?" · "+a(e.staff):""} · ${a(A(e.reason))}${e.note?" · "+a(e.note):""}</div>\n      <div class="sub">${Number(e.credit)?a(T("fromDue"))+" "+a(w(e.credit)):""}${Number(e.refund)?" "+a(T("handBack"))+" "+a(w(e.refund))+(e.refund_mode?" ("+a(T(e.refund_mode))+")":""):""}</div></div>\n      ${"done"===e.status&&o.can_return?`<button class="mini s2-dots" data-act="sr_void" data-v="${a(e.id)}" aria-label="${a(T("voidRet"))}">⋮</button>`:""}</div>`).join("")||`<p class="muted center">${a(T("noReturns"))}</p>`}</div>\n    <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${a(T("close"))}</button>${o.can_return&&"done"===o.status&&i.some(e=>Number(e.left)>0)?`<button class="primary full" id="sr_go" data-act="sr_go">${a(T("go"))}</button>`:""}</div>`),W();{const e=t.listctl,n=R("return_reasons").some(e=>"other"===e.value_code&&e.active);e&&p("#sr_reason")&&e.enhance("#sr_reason","return_reasons",n?{otherValue:"other",form:"SALE_RETURN",ctx:{field:"return_reason",sale:String(o.sale_id||"").slice(0,40)}}:{noOther:!0,form:"SALE_RETURN"})}}const A=e=>{const t=R("return_reasons").find(t=>t.value_code===e);return t?v(S(t)):e||""};function B(){const e=O.d;if(!e)return null;let t=0,n=!1,r=!1;(e.lines||[]).forEach((e,a)=>{const s=p(`[data-rq="${a}"]`);if(!s||!s.value.trim())return;const o=h(s.value);o>0&&!(o>Number(e.left)+5e-5)?(r=!0,t+=C(o*Number(e.price))):n=!0});const a=C(t*Number(e.factor||1)),s=null===e.balance||void 0===e.balance?0:Number(e.balance),o=e.customer_id&&e.due_first?Math.min(a,Math.max(s,0)):0;return{amt:a,credit:C(o),refund:C(a-o),bad:n,any:r}}function W(){const e=B(),n=p("#sr_sum");if(!e||!n)return;n.innerHTML=`<div class="row between"><span>${a(T("value"))}</span><b>${a(w(e.amt))}</b></div>${e.credit>0?`<div class="row between"><span>${a(T("fromDue"))}</span><b>${a(w(e.credit))}</b></div>`:""}\n    <div class="row between"><span>${a(T("handBack"))}</span><b class="mnum">${a(w(e.refund))}</b></div>${O.d.customer_id&&!O.d.due_first?`<div class="hint">${a(T("dueFirstOff"))}</div>`:""}`;const r=p("#sr_mw");r&&(r.hidden=!(e.refund>0)),function(){if(!t.returnRules||O.rrOff)return;clearTimeout(j),j=setTimeout(P,350)}()}let j=null;const V=()=>{const e=[];return(O.d&&O.d.lines||[]).forEach((t,n)=>{const r=p(`[data-rq="${n}"]`);r&&r.value.trim()&&h(r.value)>0&&e.push({item_id:t.item_id,qty:h(r.value)})}),e};async function P(){const e=p("#sr_rr");if(!e||!O.d)return;const n=V();if(n.length)try{const e=await t.returnRules.preview(O.d.sale_id,n,null,null),r={};(O.d.lines||[]).forEach(e=>{r[e.item_id]=e.name||""}),p("#sr_rr")&&(p("#sr_rr").innerHTML=t.returnRules.pickerHTML(e,r))}catch(e){D(e.raw||e)&&(O.rrOff=!0),p("#sr_rr")&&(p("#sr_rr").innerHTML="")}else e.innerHTML=""}const K=e=>{const n=e&&e.error;return n&&t.returnRules&&/return_(window_exceeded|receipt_required|restock_not_allowed|expired_restock|override_not_allowed|bad_restock_qty|written_off)/.test(n.message||"")?{...e,error:{...n,message:t.returnRules.errorText(n)}}:e};Object.assign(u,{sr_open:e=>Q(e.dataset.v),sr_menu:async e=>{const t=E.rows[Number(e.dataset.i)];if(!t)return;const n=await $("sale_return",t.location_id);d(`<h2>${a(T("receipt"))} #${a(String(t.receipt))}</h2><div class="stack" style="margin-top:10px">${"done"===t.status?n?`<button class="s2-act" data-act="sr_open2" data-v="${a(t.id)}">${a(T("doReturn"))}</button>`:"lock"===N()?`<div class="s2-lockrow">${k}<span>${a(T("doReturn"))} · ${a(T("noperm"))}</span></div>`:"":""}\n      <button class="s2-act" data-act="sr_open2" data-v="${a(t.id)}">${a(T("history"))}</button></div><button class="full" style="margin-top:12px" data-act="closesheet">${a(T("close"))}</button>`)},sr_open2:e=>Q(e.dataset.v),sr_go:async function(e){if(O.busy||!O.d)return;const a=B();if(!a||a.bad)return s(T("badQty"));if(!a.any)return s(T("needQty"));const o=(p("#sr_reason")||{}).value;if(!o)return s(T("needReason"));const i=(p("#sr_mode")||{}).value||null;if(a.refund>0&&!i)return s(T("needMode"));const d=((p("#sr_wallet")||{}).value||"").trim();if(!("mobile"!==i||d||t.moneySrc&&t.moneySrc.get("sr")))return s(T("needWallet"));const l=[];(O.d.lines||[]).forEach((e,t)=>{const n=p(`[data-rq="${t}"]`);n&&n.value.trim()&&l.push({item_id:e.item_id,qty:h(n.value)})});const c=O.d,u=t.tpl?function(e,t,n,r){try{const a=t.map(t=>{const n=(e.lines||[]).find(e=>e.item_id===t.item_id)||{},r=Number(e.factor||1);return{name:n.name||"",qty:t.qty,price:Number(n.price),amount:C(t.qty*Number(n.price)*r)}});return{no:"",date:M(),orig_no:String(e.receipt),reason:A(r),customer:e.customer?{name:e.customer}:null,items:a,subtotal:n.amt,vat:0,refund:n.refund}}catch(e){return null}}(c,l,a,o):null,m=t.returnRules&&!O.rrOff&&p("#sr_rr")&&p("#sr_rr").children.length?t.returnRules.collect(p("#sr_rr")):null,v={p_client:O.client,p_sale:c.sale_id,p_lines:l,p_reason:o,p_note:((p("#sr_note")||{}).value||"").trim()||null,p_refund_mode:a.refund>0?i:null,p_wallet:(t.moneySrc?t.moneySrc.tag("sr",d||null):d)||null,p_ref:((p("#sr_ref")||{}).value||"").trim()||null};await _.submit(e,async()=>K(m?await n.rpc("_w1c_sale_return",{...v,...m}):await n.rpc("sale_return",v)),()=>{s(T("done")),p("#sr_list")&&H(),u&&async function(e,a){try{if(!t.tpl||!t.tpl.ensure)return;await t.tpl.ensure(n);const s={lang:r.lang,loc:a,shop:{}};t.tpl.printHTML("sale_return",e,void 0,s)&&t.tpl.print("sale_return",e,void 0,s)}catch(e){}}(u,c.location_id)},{grant:"sale_return",loc:c.location_id,context:{sale:c.sale_id}})},sr_void:e=>{_.sheetStart("srvoid");const t=e.dataset.v;d(`<h2>${a(T("voidRet"))}</h2><div><label for="vn_note">${a(T("voidWhy"))}</label><input id="vn_note" autocomplete="off"></div><div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${a(T("close"))}</button><button class="danger full" data-act="sr_voidgo" data-v="${a(t)}">${a(T("voidRet"))}</button></div>`)},sr_voidgo:async e=>{const t=((p("#vn_note")||{}).value||"").trim();if(!t)return s(T("voidWhy"));const r=O.d;await _.submit(e,async()=>K(await n.rpc("void_sale_return",{p_id:e.dataset.v,p_note:t})),()=>{s(T("voidDone")),p("#sr_list")&&H()},{grant:"sale_return",loc:r?r.location_id:null,context:{return:e.dataset.v}})}}),document.addEventListener("input",e=>{e.target.dataset&&void 0!==e.target.dataset.rq&&W()}),document.addEventListener("change",e=>{const t=e.target;if("sr_loc"===t.id&&(E.loc=Number(t.value),H()),"sr_date"===t.id&&t.value&&(E.date=t.value,H()),"sr_mode"===t.id){const e=p("#sr_ww");e&&(e.hidden="mobile"!==t.value)}}),window.BOS_PAGES=Object.assign(window.BOS_PAGES||{},{salereturn:async function(){const e=location.hash.replace(/^#\/?/,"").split("/");await H(),e[1]&&Q(e[1])}}),t.saleReturn={open:Q}})();
+/* Islamia BOS · Sale returns (#/salereturn, #/salereturn/<sale id>).
+   A list of a day's receipts at one location, every row with a ⋮ menu (Return goods / Returns of this receipt), and the return sheet:
+   lines to take back (never more than is left), a reason from the editable list return_reasons, how the value is settled
+   (first against what the customer owes — rule sale_return_due_first — the rest handed back in cash / mobile / card).
+   The server (phase12.sql: sale_return, void_sale_return, sale_returns_for) restocks, batch aware, and checks everything again.
+   Other screens can open the sheet with B.saleReturn.open(saleId). Needs stock2.js (B.s2). */
+(() => {
+'use strict';
+const A = window.BOS_APP, B = window.BOS;
+const { sb, S, esc, toast, fail, shell, openSheet, closeSheet, nm } = A;
+const H = A.H, L = B.L, lab = B.lab;
+const $ = (s, el = document) => el.querySelector(s);
+const U = B.s2;
+const { errToast, rid, grant, nnum, money, dt, optHTML, lists, rowL, LOCS, allLocs, LOCK, npMode } = U;
+const r2 = (n) => Math.round(Number(n) * 100) / 100;
+const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
+
+const X = {
+  title: L('সেল ফেরত', 'Sale returns', 'Sale return'), date: L('ডেট', 'Date', 'Date'), location: L('জায়গা', 'Location', 'Location'), receipt: L('রসিদ', 'Receipt', 'Receipt'),
+  none: L('এই দিনে কোনো সেল নেই', 'No sales on this day', 'এই দিনে কোনো sale নেই'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), voided: L('ভয়েড', 'Voided', 'Void'),
+  more: L('আরও অপশন', 'More options', 'আরও option'), doReturn: L('মাল ফেরত নিন', 'Take goods back', 'মাল return নিন'), history: L('এই রসিদের ফেরত', 'Returns of this receipt', 'এই receipt-এর return'),
+  noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), close: L('বন্ধ', 'Close', 'Close'), cancel: L('ক্যান্সেল', 'Cancel', 'Cancel'),
+  sold: L('বিক্রি', 'Sold', 'Sold'), returned: L('ফেরত হয়েছে', 'Returned', 'Returned'), left: L('বাকি', 'Left', 'Left'), qty: L('ফেরত Qty', 'Return quantity', 'Return quantity'),
+  reason: L('ফেরতের কারণ', 'Return reason', 'Return reason'), note: L('নোট', 'Note', 'Note'), value: L('ফেরত মূল্য', 'Value of the return', 'Return value'),
+  fromDue: L('কাস্টমারের বাকি থেকে কাটা', 'Taken off what the customer owes', 'Customer-এর due থেকে কাটা'), handBack: L('ফেরত দিতে হবে', 'To hand back', 'ফেরত দিতে হবে'),
+  mode: L('কীভাবে ফেরত দিলেন', 'How it was handed back', 'কীভাবে ফেরত দিলেন'), cash: L('ক্যাশ', 'Cash', 'Cash'), mobile: L('মোবাইল', 'Mobile', 'Mobile'), card: L('কার্ড', 'Card', 'Card'),
+  wallet: L('ওয়ালেট (বিকাশ/নগদ…)', 'Wallet (bKash / Nagad…)', 'Wallet (bKash/Nagad…)'), ref: L('রেফারেন্স', 'Reference', 'Reference'),
+  go: L('ফেরত নিন', 'Confirm return', 'Return confirm'), done: L('ফেরত নেওয়া হয়েছে', 'Return recorded', 'Return recorded'), dup: L('আগেই সেভ হয়েছে — আবার হয়নি', 'Already saved — nothing was added twice', 'আগেই saved — আবার হয়নি'),
+  needQty: L('অন্তত একটি আইটেমের ফেরত Qty লিখুন', 'Enter a quantity for at least one item', 'অন্তত একটি item-এর quantity লিখুন'), badQty: L('Qty বাকির চেয়ে বেশি বা ঠিক নয়', 'Quantity is wrong or more than what is left', 'Quantity ঠিক নয় বা বাকির বেশি'),
+  needReason: L('কারণ বাছুন', 'Choose a reason', 'Reason বাছুন'), needMode: L('ফেরতের ধরন বাছুন', 'Choose how it was handed back', 'Refund-এর ধরন বাছুন'), needWallet: L('ওয়ালেট লিখুন', 'Enter the wallet', 'Wallet লিখুন'),
+  voidRet: L('ফেরত ভয়েড', 'Void this return', 'Return void'), voidWhy: L('ভয়েডের কারণ (লাগবেই)', 'Reason for voiding (required)', 'Void-এর reason (লাগবেই)'), voidDone: L('ফেরত ভয়েড হয়েছে', 'Return voided', 'Return voided'),
+  noReturns: L('এই রসিদে কোনো ফেরত নেই', 'No returns on this receipt', 'এই receipt-এ কোনো return নেই'), cust: L('কাস্টমার', 'Customer', 'Customer'), owes: L('কাস্টমারের বাকি', 'Customer owes', 'Customer-এর due'),
+  nothingLeft: L('ফেরত নেওয়ার মতো কিছু বাকি নেই', 'Nothing is left to return', 'Return নেওয়ার মতো কিছু বাকি নেই'), sqlMissing: L('সেল ফেরতের ডেটাবেস অংশ এখনও চালু হয়নি (phase12)', 'The sale-return database part is not installed yet (phase12)', 'Sale return-এর database অংশ চালু হয়নি (phase12)'),
+  dueFirstOff: L('সেটিং অনুযায়ী পুরো টাকা ফেরত যাবে', 'By the setting the whole value is handed back', 'Setting অনুযায়ী পুরো টাকা ফেরত'), items: L('আইটেম', 'items', 'items'),
+};
+const T = (k) => lab(X[k]);
+const D = { loc: undefined, date: today(), rows: [], err: null };
+const C = { d: null, client: null, busy: false };      // the open return sheet
+const missingFn = (e) => e && /could not find the function|does not exist|schema cache|404/i.test(e.message || '');
+
+async function listView() {
+  shell(T('title'), `<p class="muted">${esc(T('loading'))}</p>`, true);
+  try { await B.loadStatic(); } catch (e) { /* defaults */ }
+  const locs = LOCS(); if (D.loc === undefined) D.loc = (locs[0] || {}).id;
+  const r = await sb.from('sales').select('id,receipt,sold_at,total,status,customer,location_id,pay_mode').eq('location_id', D.loc).eq('sale_date', D.date).order('receipt', { ascending: false }).limit(200);
+  D.err = r.error; D.rows = r.error ? [] : (r.data || []);
+  shell(T('title'), `<div class="p2-bar">${locs.length > 1 || allLocs() ? `<select id="sr_loc" aria-label="${esc(T('location'))}">${optHTML(locs.map((l) => [l.id, nm(l)]), D.loc)}</select>` : ''}<input id="sr_date" type="date" value="${esc(D.date)}" aria-label="${esc(T('date'))}"></div>
+    <div id="sr_list">${D.rows.map((s, i) => `<div class="card item mk ${s.status === 'void' ? 'bad' : ''}" data-act="sr_open" data-v="${esc(s.id)}" role="button" tabindex="0"><div><div class="nm">${esc(T('receipt'))} #${esc(String(s.receipt))}</div>
+      <div class="muted" style="font-size:.85rem">${esc(dt(s.sold_at))}${s.customer ? ' · ' + esc(s.customer) : ''}</div>${s.status === 'void' ? `<span class="chip bad">${esc(T('voided'))}</span>` : ''}</div>
+      <div class="pr"><button type="button" class="mini s2-dots" data-act="sr_menu" data-i="${i}" aria-label="${esc(T('more'))}">⋮</button><b>${esc(money(s.total))}</b></div></div>`).join('') || `<p class="muted center">${esc(T('none'))}</p>`}</div>`, true);
+}
+
+// ---- the return sheet ----
+async function open(saleId) {
+  openSheet(`<p class="muted">${esc(T('loading'))}</p>`);
+  const r = await sb.rpc('sale_returns_for', { p_sale: saleId });
+  if (r.error) { closeSheet(); if (missingFn(r.error)) return toast(T('sqlMissing')); return errToast(r.error); }
+  const d = r.data; C.d = d; C.client = rid(); C.busy = false;
+  const lines = d.lines || [], reasons = lists('return_reasons').map((x) => [x.value_code, lab(rowL(x))]);
+  const lock = npMode() === 'lock';
+  openSheet(`<h2>${esc(T('receipt'))} #${esc(String(d.receipt))}</h2>${d.customer ? `<div class="muted">${esc(T('cust'))}: ${esc(d.customer)}${d.balance !== null && d.balance !== undefined ? ' · ' + esc(T('owes')) + ' ' + esc(money(d.balance)) : ''}</div>` : ''}
+    ${d.can_return && d.status === 'done' ? `<div class="stack" style="margin-top:8px" id="sr_form">
+      ${lines.map((l, i) => `<div class="card stack" data-sl="${i}"><b>${esc(l.name || '')}</b><div class="muted" style="font-size:.85rem">${esc(T('sold'))} ${U.q4(l.sold)} · ${esc(T('returned'))} ${U.q4(l.returned)} · ${esc(T('left'))} ${U.q4(l.left)} ${esc(l.unit ? U.unitLabel(l.unit) : '')}</div>
+        ${Number(l.left) > 0 ? `<div><label>${esc(T('qty'))}</label><input data-rq="${i}" inputmode="decimal" autocomplete="off"></div>` : ''}</div>`).join('') || `<p class="muted">${esc(T('nothingLeft'))}</p>`}
+      <div><label for="sr_reason">${esc(T('reason'))}</label><select id="sr_reason"><option value="">—</option>${optHTML(reasons, '')}</select></div>
+      <div><label for="sr_note">${esc(T('note'))}</label><input id="sr_note" autocomplete="off"></div>
+      <div class="card stack" id="sr_sum"></div>
+      <div class="stack" id="sr_rr"></div>
+      <div id="sr_mw" hidden><label for="sr_mode">${esc(T('mode'))}</label><select id="sr_mode"><option value="">—</option>${['cash', 'mobile', 'card'].map((m) => `<option value="${m}">${esc(T(m))}</option>`).join('')}</select>
+        <div id="sr_ww" hidden style="margin-top:6px"><label for="sr_wallet">${esc(T('wallet'))}</label><input id="sr_wallet" autocomplete="off"></div><div style="margin-top:6px"><label for="sr_ref">${esc(T('ref'))}</label><input id="sr_ref" autocomplete="off"></div>${B.moneySrc ? B.moneySrc.slot('sr', 'customer_refund') : ''}</div></div>`
+    : lock && d.status === 'done' ? `<div class="s2-lockrow">${LOCK}<span>${esc(T('doReturn'))} · ${esc(T('noperm'))}</span></div>` : ''}
+    <h3 style="margin-top:14px">${esc(T('history'))}</h3><div>${(d.returns || []).map((x) => `<div class="s2-led"><div>${esc(money(x.amount))} ${x.status === 'void' ? `<span class="chip bad">${esc(T('voided'))}</span>` : ''}<div class="sub">${esc(dt(x.at))}${x.staff ? ' · ' + esc(x.staff) : ''} · ${esc(rLabel(x.reason))}${x.note ? ' · ' + esc(x.note) : ''}</div>
+      <div class="sub">${Number(x.credit) ? esc(T('fromDue')) + ' ' + esc(money(x.credit)) : ''}${Number(x.refund) ? ' ' + esc(T('handBack')) + ' ' + esc(money(x.refund)) + (x.refund_mode ? ' (' + esc(T(x.refund_mode)) + ')' : '') : ''}</div></div>
+      ${x.status === 'done' && d.can_return ? `<button class="mini s2-dots" data-act="sr_void" data-v="${esc(x.id)}" aria-label="${esc(T('voidRet'))}">⋮</button>` : ''}</div>`).join('') || `<p class="muted center">${esc(T('noReturns'))}</p>`}</div>
+    <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('close'))}</button>${d.can_return && d.status === 'done' && lines.some((l) => Number(l.left) > 0) ? `<button class="primary full" id="sr_go" data-act="sr_go">${esc(T('go'))}</button>` : ''}</div>`);
+  recalc();
+  { const lc = B.listctl, oth = lists('return_reasons').some((r) => r.value_code === 'other' && r.active);
+    if (lc && $('#sr_reason')) lc.enhance('#sr_reason', 'return_reasons', oth ? { otherValue: 'other', form: 'SALE_RETURN', ctx: { field: 'return_reason', sale: String(d.sale_id || '').slice(0, 40) } } : { noOther: true, form: 'SALE_RETURN' }); }
+}
+const rLabel = (code) => { const r = lists('return_reasons').find((x) => x.value_code === code); return r ? lab(rowL(r)) : code || ''; };
+// value / due / hand-back as the server will compute them (all from the sale's own numbers: price per unit, the discount factor, the customer's balance)
+function calc() {
+  const d = C.d; if (!d) return null; let gross = 0, bad = false, any = false;
+  (d.lines || []).forEach((l, i) => { const el = $(`[data-rq="${i}"]`); if (!el || !el.value.trim()) return; const q = nnum(el.value); if (!(q > 0) || q > Number(l.left) + 0.00005) { bad = true; return; } any = true; gross += r2(q * Number(l.price)); });
+  const amt = r2(gross * Number(d.factor || 1)), bal = d.balance === null || d.balance === undefined ? 0 : Number(d.balance);
+  const credit = d.customer_id && d.due_first ? Math.min(amt, Math.max(bal, 0)) : 0;
+  return { amt, credit: r2(credit), refund: r2(amt - credit), bad, any };
+}
+function recalc() {
+  const c = calc(); const box = $('#sr_sum'); if (!c || !box) return;
+  box.innerHTML = `<div class="row between"><span>${esc(T('value'))}</span><b>${esc(money(c.amt))}</b></div>${c.credit > 0 ? `<div class="row between"><span>${esc(T('fromDue'))}</span><b>${esc(money(c.credit))}</b></div>` : ''}
+    <div class="row between"><span>${esc(T('handBack'))}</span><b class="mnum">${esc(money(c.refund))}</b></div>${C.d.customer_id && !C.d.due_first ? `<div class="hint">${esc(T('dueFirstOff'))}</div>` : ''}`;
+  const mw = $('#sr_mw'); if (mw) mw.hidden = !(c.refund > 0);
+  rrSchedule();
+}
+// W1-C (phase91): the return picker (put back on the shelf or write off per item, receipt number, override reason). It draws only when this database has _w1c_return_preview
+// and returnrules.js is loaded; otherwise the form above is exactly the old one and the plain sale_return is called.
+let rrTimer = null;
+const retLines = () => { const out = []; ((C.d && C.d.lines) || []).forEach((l, i) => { const el = $(`[data-rq="${i}"]`); if (el && el.value.trim() && nnum(el.value) > 0) out.push({ item_id: l.item_id, qty: nnum(el.value) }); }); return out; };
+function rrSchedule() { if (!B.returnRules || C.rrOff) return; clearTimeout(rrTimer); rrTimer = setTimeout(rrDraw, 350); }
+async function rrDraw() {
+  const box = $('#sr_rr'); if (!box || !C.d) return;
+  const lines = retLines(); if (!lines.length) { box.innerHTML = ''; return; }
+  try {
+    const pv = await B.returnRules.preview(C.d.sale_id, lines, null, null), names = {};
+    (C.d.lines || []).forEach((l) => { names[l.item_id] = l.name || ''; });
+    if ($('#sr_rr')) $('#sr_rr').innerHTML = B.returnRules.pickerHTML(pv, names);
+  } catch (e) { if (missingFn(e.raw || e)) C.rrOff = true; if ($('#sr_rr')) $('#sr_rr').innerHTML = ''; }
+}
+// the return rules answer with codes (return_window_exceeded ...): say them in words, keep every other error as it was (the emergency request offer still reads 'not allowed')
+const rrErr = (r) => { const e = r && r.error; if (e && B.returnRules && /return_(window_exceeded|receipt_required|restock_not_allowed|expired_restock|override_not_allowed|bad_restock_qty|written_off)/.test(e.message || '')) return { ...r, error: { ...e, message: B.returnRules.errorText(e) } }; return r; };
+async function goReturn(btn) {
+  if (C.busy || !C.d) return; const c = calc();
+  if (!c || c.bad) return toast(T('badQty')); if (!c.any) return toast(T('needQty'));
+  const reason = ($('#sr_reason') || {}).value; if (!reason) return toast(T('needReason'));
+  const mode = ($('#sr_mode') || {}).value || null; if (c.refund > 0 && !mode) return toast(T('needMode'));
+  const wallet = (($('#sr_wallet') || {}).value || '').trim(); if (mode === 'mobile' && !wallet && !(B.moneySrc && B.moneySrc.get('sr'))) return toast(T('needWallet'));
+  const lines = []; (C.d.lines || []).forEach((l, i) => { const el = $(`[data-rq="${i}"]`); if (el && el.value.trim()) lines.push({ item_id: l.item_id, qty: nnum(el.value) }); });
+  const d = C.d, slip = B.tpl ? slipData(d, lines, c, reason) : null;   // bos98: return slip
+  const rr = B.returnRules && !C.rrOff && $('#sr_rr') && $('#sr_rr').children.length ? B.returnRules.collect($('#sr_rr')) : null;   // restock quantities, receipt number, override reason
+  const args = { p_client: C.client, p_sale: d.sale_id, p_lines: lines, p_reason: reason, p_note: (($('#sr_note') || {}).value || '').trim() || null,
+    p_refund_mode: c.refund > 0 ? mode : null, p_wallet: (B.moneySrc ? B.moneySrc.tag('sr', wallet || null) : wallet) || null, p_ref: (($('#sr_ref') || {}).value || '').trim() || null };
+  await U.submit(btn, async () => rrErr(rr ? await sb.rpc('_w1c_sale_return', { ...args, ...rr }) : await sb.rpc('sale_return', args)),
+    () => { toast(T('done')); if ($('#sr_list')) listView(); if (slip) tplSlip(slip, d.location_id); }, { grant: 'sale_return', loc: d.location_id, context: { sale: d.sale_id } });
+}
+// bos98: the return slip, only when the owner chose a sale_return template (B.tpl absent or nothing chosen: nothing printed, as before). Customer-facing numbers only, no cost.
+function slipData(d, lines, c, reasonCode) {
+  try {
+    const items = lines.map((x) => { const l = (d.lines || []).find((z) => z.item_id === x.item_id) || {}; const f = Number(d.factor || 1); return { name: l.name || '', qty: x.qty, price: Number(l.price), amount: r2(x.qty * Number(l.price) * f) }; });
+    return { no: '', date: today(), orig_no: String(d.receipt), reason: rLabel(reasonCode), customer: d.customer ? { name: d.customer } : null, items, subtotal: c.amt, vat: 0, refund: c.refund };
+  } catch (e) { return null; }
+}
+async function tplSlip(data, loc) {
+  try { if (!B.tpl || !B.tpl.ensure) return; await B.tpl.ensure(sb); const o = { lang: S.lang, loc, shop: {} }; if (B.tpl.printHTML('sale_return', data, undefined, o)) B.tpl.print('sale_return', data, undefined, o); } catch (e) { /* keep today's behaviour: nothing printed */ }
+}
+
+Object.assign(H, {
+  sr_open: (a) => open(a.dataset.v),
+  sr_menu: async (a) => { const s = D.rows[Number(a.dataset.i)]; if (!s) return; const ok = await grant('sale_return', s.location_id);
+    openSheet(`<h2>${esc(T('receipt'))} #${esc(String(s.receipt))}</h2><div class="stack" style="margin-top:10px">${s.status === 'done' ? (ok ? `<button class="s2-act" data-act="sr_open2" data-v="${esc(s.id)}">${esc(T('doReturn'))}</button>` : npMode() === 'lock' ? `<div class="s2-lockrow">${LOCK}<span>${esc(T('doReturn'))} · ${esc(T('noperm'))}</span></div>` : '') : ''}
+      <button class="s2-act" data-act="sr_open2" data-v="${esc(s.id)}">${esc(T('history'))}</button></div><button class="full" style="margin-top:12px" data-act="closesheet">${esc(T('close'))}</button>`); },
+  sr_open2: (a) => open(a.dataset.v),
+  sr_go: goReturn,
+  sr_void: (a) => { U.sheetStart('srvoid'); const id = a.dataset.v;
+    openSheet(`<h2>${esc(T('voidRet'))}</h2><div><label for="vn_note">${esc(T('voidWhy'))}</label><input id="vn_note" autocomplete="off"></div><div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('close'))}</button><button class="danger full" data-act="sr_voidgo" data-v="${esc(id)}">${esc(T('voidRet'))}</button></div>`); },
+  sr_voidgo: async (a) => { const n = (($('#vn_note') || {}).value || '').trim(); if (!n) return toast(T('voidWhy')); const d = C.d;
+    await U.submit(a, async () => rrErr(await sb.rpc('void_sale_return', { p_id: a.dataset.v, p_note: n })), () => { toast(T('voidDone')); if ($('#sr_list')) listView(); }, { grant: 'sale_return', loc: d ? d.location_id : null, context: { return: a.dataset.v } }); },
+});
+document.addEventListener('input', (e) => { if (e.target.dataset && e.target.dataset.rq !== undefined) recalc(); });
+document.addEventListener('change', (e) => {
+  const el = e.target;
+  if (el.id === 'sr_loc') { D.loc = Number(el.value); listView(); }
+  if (el.id === 'sr_date' && el.value) { D.date = el.value; listView(); }
+  if (el.id === 'sr_mode') { const w = $('#sr_ww'); if (w) w.hidden = el.value !== 'mobile'; }
+});
+async function view() {
+  const p = location.hash.replace(/^#\/?/, '').split('/');
+  await listView(); if (p[1]) open(p[1]);
+}
+window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { salereturn: view });
+B.saleReturn = { open };
+})();
