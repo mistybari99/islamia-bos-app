@@ -78,7 +78,9 @@ const inp = (id, v, extra) => `<input id="${id}" autocomplete="off" value="${esc
 const kindName = (k) => T('k_' + k);
 async function loadState() { try { D.st = await call('pay_request_state', {}); B2.approver = !!(D.st.approver_staff || D.st.approver_party); } catch (e) { D.st = null; } return D.st; }
 const probe = () => { loadState().catch(() => {}); };
-setTimeout(probe, 2500);
+// only ask the server once a person is signed in AND approved (an anonymous or pending visitor has no right to this call)
+const signedIn = () => !!(S.ctx && S.ctx.profile && S.ctx.profile.status === 'active');
+let prqTries = 0; const prqTimer = setInterval(() => { if (++prqTries > 120) return clearInterval(prqTimer); if (signedIn()) { clearInterval(prqTimer); probe(); } }, 500);
 
 // ---------- one request card ----------
 function statusLine(r) {
