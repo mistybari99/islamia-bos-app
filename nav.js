@@ -213,7 +213,11 @@ async function loadGrantFlags() {
   if (!S.ctx || isOwner()) return;
   const locs = (S.ctx.locations || []).length ? [null, ...S.ctx.locations] : [null];
   const codes = locOk() ? ['view_daybook', 'cash_move', 'production_void', 'release_decide', 'print_books', 'employee_view', 'employee_manage', 'deed_manage', 'attendance_manage', 'payroll_manage', 'accounts_view', 'accounts_manage', 'customer_manage', 'assistant_use',  'salary_view', 'item_create', 'item_bulk', 'head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve', 'view_reports', 'report_marketing', 'report_control', 'report_sales', 'report_stock', 'report_cash', 'report_profit', 'crm_view', 'crm_settings_edit', 'crm_lead_manage', 'crm_lead_all', 'crm_loyalty_manage', 'crm_voucher_issue', 'crm_coupon_override', 'crm_merge', 'crm_complaint_log', 'crm_complaint_manage', 'crm_feedback_view', 'view_cost', 'view_stock_recon', 'view_branch_statement', 'view_net_profit', 'export_data'] : ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve', 'employee_view', 'attendance_manage', 'accounts_view', 'customer_manage', 'assistant_use', 'view_reports', 'report_marketing', 'report_control', 'report_sales', 'report_stock', 'report_cash', 'report_profit', 'crm_view', 'crm_settings_edit', 'crm_lead_manage', 'crm_lead_all', 'crm_loyalty_manage', 'crm_voucher_issue', 'crm_coupon_override', 'crm_merge', 'crm_complaint_log', 'crm_complaint_manage', 'crm_feedback_view'];
-  await Promise.all(codes.map(async (code) => {
+  // speed: one server call for every flag (has_grants_any applies the same has_grant rule); falls back to the old one-by-one checks if it is missing
+  let batch = null;
+  try { const r = await sb.rpc('has_grants_any', { p_codes: codes, p_locs: locs.filter((l) => l !== null) }); if (r && !r.error && r.data && typeof r.data === 'object') batch = r.data; } catch (e) { batch = null; }
+  if (batch) { for (const code of codes) GF[code] = batch[code] === true; }
+  else await Promise.all(codes.map(async (code) => {
     let ok = false;
     for (const l of locs) { try { const r = await sb.rpc('has_grant', { p_code: code, p_loc: l }); if (r && !r.error && r.data === true) { ok = true; break; } } catch (e) { /* not granted */ } }
     GF[code] = ok;
