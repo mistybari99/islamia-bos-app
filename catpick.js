@@ -505,7 +505,7 @@ B.catfilter = catfilter;
 B.catpick = { X, T, ERR, load, reload, mount, label, name, subName, nameIfKnown, catfilter, subSelect, subOptions, catOptions, filterRow, field, read, subChips, bulkSheet, keyOf, scan, csvText, buildTree, idOfCat, idOfSub, loadRule, _state: () => C, _widgets: () => W, _bars: () => BARS };
 
 // preload once the session is known; a failed load only means no filters appear
-let probes = 0; const probeTimer = setInterval(() => { if (++probes > 120) return clearInterval(probeTimer); if (S.ctx) { clearInterval(probeTimer); load().then(() => { loadRule(); scan(); }).catch(() => {}); } }, 500);
+let probes = 0; const probeTimer = setInterval(() => { if (++probes > 120) return clearInterval(probeTimer); if (S.ctx && S.ctx.profile && S.ctx.profile.status === 'active') { clearInterval(probeTimer); load().then(() => { loadRule(); scan(); }).catch(() => {}); } }, 500);
 
 const css = document.createElement('style'); css.id = 'catcss';
 css.textContent = `.cat-bar{gap:6px;margin:4px 0 8px;flex-wrap:wrap;max-width:100%}.cat-bar .ctl-trg{flex:1 1 140px;width:auto;min-width:0;max-width:100%}.cat-bar select{flex:1;min-width:0;min-height:44px}.cat-w{margin-bottom:8px}.cat-chip{min-height:44px}.cat-sel{width:100%;min-height:44px;margin-bottom:6px}
