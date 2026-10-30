@@ -96,7 +96,7 @@ async function initBulk() {
   BK.grant = isOwner();
   if (!isOwner()) { for (const c of ['item_bulk', 'item_create']) { try { const r = await sb.rpc('has_grant', { p_code: c }); if (r && !r.error && r.data === true) BK.grant = true; } catch (e) { /* no grant */ } } }
   BK.direct = BK.grant;
-  try { const r = await sb.from('item_import_batches').select('batch').order('batch'); BK.batches = r.error ? [] : [...new Set((r.data || []).map((x) => x.batch).filter(Boolean))]; } catch (e) { BK.batches = []; }
+  try { const r = await sb.from('item_import_batches').select('batch_id').order('batch_id'); BK.batches = r.error ? [] : [...new Set((r.data || []).map((x) => x.batch_id).filter(Boolean))]; } catch (e) { BK.batches = []; }
   BK.ready = true;
 }
 
