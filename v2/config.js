@@ -1,1 +1,0 @@
-window.BOS_CONFIG={url:"https://kbuhnpqooycqbzrfejcs.supabase.co",key:"sb_publishable_I1Rvn7qQtmI_5h44dvMMaQ_nrq_oz--",emailDomain:"staff.islamia-bos.app"};
