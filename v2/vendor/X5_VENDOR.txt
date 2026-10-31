@@ -1,0 +1,14 @@
+X5 vendored recognition libraries (web/vendor). Loaded lazily by web/scan_items.js only when a setting needs them.
+Checked in as-is from the npm tarballs (npm pack). Do not edit these files; replace the whole file and update this table.
+
+file | library | licence | source | bytes | sha256
+zxing/zxing-library-0.21.3.min.js | @zxing/library 0.21.3 | Apache-2.0 | https://github.com/zxing-js/library | 336008 | d7cc8f69dd70bdcf3ac00c9ae572bf2acb9f4132ba379c72df842e4db918652d
+zxing/LICENSE-zxing.txt | @zxing/library 0.21.3 licence | Apache-2.0 | https://github.com/zxing-js/library | 13321 | 849b3ff4527ff587eecc78736b5685bbba7a44b071f3b944da914e832292f6c0
+tesseract/tesseract.min.js | tesseract.js 5.1.1 | Apache-2.0 | https://github.com/naptha/tesseract.js | 66695 | a8e29918d098b2b06e1012bdaeffb4aec0445c5d5654709023e0bd1f442a80e8
+tesseract/worker.min.js | tesseract.js 5.1.1 worker | Apache-2.0 | https://github.com/naptha/tesseract.js | 123724 | aca1229639fc9907d86f96e825955a2b7c5716d17f3bc3acd71f9c7ab66181fc
+tesseract/tesseract-core-simd-lstm.wasm.js | tesseract.js-core 5.1.1 (SIMD, LSTM) loader | Apache-2.0 | https://github.com/naptha/tesseract.js-core | 3938657 | ce20eda9533cbed1e6c2b4276fbae1e0adc61b6754b5513084be601787b457cf
+tesseract/tesseract-core-simd-lstm.wasm | tesseract.js-core 5.1.1 (SIMD, LSTM) wasm | Apache-2.0 | https://github.com/naptha/tesseract.js-core | 2859709 | 66b601224a0c4a8977bc9d92dd39841189f9ca22cc4122fcd7208cdb0961eeef
+tesseract/LICENSE-tesseract.txt | tesseract.js and tesseract core licence | Apache-2.0 | https://github.com/naptha/tesseract.js | 11358 | c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08
+
+Not vendored (size): TensorFlow.js (about 1.5 MB), MobileNet model, Bangla and English language data (tessdata). The language data is downloaded once from the URL in the owner setting and then kept in the browser cache.
+ML Kit is a native Android SDK and is not in this folder: see docs/ANDROID_WRAPPER.md.
