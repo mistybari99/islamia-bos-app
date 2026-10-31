@@ -244,9 +244,23 @@ async function hasAnyGrant(codes) {
   if (S.ctx.is_owner) return true;
   const uidv = S.ctx.profile.id; if (!S.gcache || S.gcache.uid !== uidv) S.gcache = { uid: uidv, v: {} };
   const locs = (S.ctx.locations || []).length ? [null, ...S.ctx.locations] : [null];
+  const todo = [];
   for (const c of codes) {
     const hit = S.gcache.v[c];                       // {ok, at}: a grant is remembered; a clean "no" only for 30 s; an error is never remembered
     if (hit && (hit.ok || Date.now() - hit.at < 30000)) { if (hit.ok) return true; continue; }
+    todo.push(c);
+  }
+  if (!todo.length) return false;
+  // speed: ONE server call for all codes (has_grants_any applies the same has_grant rule); the old one-by-one check stays as the fallback
+  try {
+    const r = await sb.rpc('has_grants_any', { p_codes: todo, p_locs: locs.filter((l) => l !== null) });
+    if (r && !r.error && r.data && typeof r.data === 'object') {
+      let any = false;
+      for (const c of todo) { const ok = r.data[c] === true; S.gcache.v[c] = { ok, at: Date.now() }; if (ok) any = true; }
+      return any;
+    }
+  } catch (e) { /* fall back below */ }
+  for (const c of todo) {
     let ok = false, failed = false;
     for (const l of locs) { try { const r = await sb.rpc('has_grant', { p_code: c, p_loc: l }); if (r && !r.error && r.data === true) { ok = true; break; } if (!r || r.error) failed = true; } catch (e) { failed = true; } }
     if (ok || !failed) S.gcache.v[c] = { ok, at: Date.now() }; else delete S.gcache.v[c];
