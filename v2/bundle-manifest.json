@@ -1,0 +1,1138 @@
+{
+ "build": "b663a706ca",
+ "order": [
+  "theme_glass.js",
+  "pager.js",
+  "config.js",
+  "scan_core.js",
+  "photo.js",
+  "i18n.js",
+  "navstack.js",
+  "app.js",
+  "lazy.js",
+  "entry.js",
+  "bizctx.js",
+  "errlog.js",
+  "kbdfix.js",
+  "a11yfix.js",
+  "forms.js",
+  "forms_stock.js",
+  "forms_cash.js",
+  "forms_sales.js",
+  "forms_factory.js",
+  "forms_staff.js",
+  "pay.js",
+  "pos.js",
+  "coldstart.js",
+  "dues.js",
+  "dash.js",
+  "biz.js",
+  "lists.js",
+  "listctl.js",
+  "controls.js",
+  "rules.js",
+  "settings2.js",
+  "invoice.js",
+  "barcode.js",
+  "scan_native.js",
+  "scan_items.js",
+  "items2.js",
+  "itemmaster.js",
+  "bulkitems.js",
+  "locations.js",
+  "icons3d.js",
+  "ia.js",
+  "control.js",
+  "rollout.js",
+  "pinsign.js",
+  "nav.js",
+  "filters.js",
+  "reports.js",
+  "reports2.js",
+  "reporthub_parse.js",
+  "reporthub.js",
+  "reporthub_ask.js",
+  "reporthub_time.js",
+  "reportsmap.js",
+  "stock2.js",
+  "purchase.js",
+  "salereturn.js",
+  "daybook.js",
+  "rptkit.js",
+  "campaigns.js",
+  "couponuse.js",
+  "auditreports.js",
+  "forecast.js",
+  "cashmoves.js",
+  "shortages.js",
+  "wallets.js",
+  "locgroups.js",
+  "org122.js",
+  "places135.js",
+  "profile134.js",
+  "impexp124.js",
+  "variants125.js",
+  "cheques127.js",
+  "schemes128.js",
+  "tinting129.js",
+  "switchboard.js",
+  "paths.js",
+  "restoredrill.js",
+  "stockrep.js",
+  "batchrep.js",
+  "stockx.js",
+  "parallel.js",
+  "monthclose.js",
+  "flow.js",
+  "delegation.js",
+  "swreg.js",
+  "printbooks.js",
+  "salary.js",
+  "recipes.js",
+  "recipebook.js",
+  "costing.js",
+  "costsources.js",
+  "costattrib.js",
+  "s1setup.js",
+  "ownerboard.js",
+  "accounts.js",
+  "balancecheck.js",
+  "moneysrc.js",
+  "moneyaccounts.js",
+  "openparties.js",
+  "periodlock.js",
+  "moneycontrols.js",
+  "returnrules.js",
+  "profitcheck.js",
+  "reportnotes.js",
+  "expenseregister.js",
+  "statements.js",
+  "otherincome.js",
+  "freshness.js",
+  "infohint.js",
+  "finance2.js",
+  "employees.js",
+  "attendance.js",
+  "attend2.js",
+  "payroll.js",
+  "payrequests.js",
+  "customers.js",
+  "crm_360.js",
+  "crm_profile.js",
+  "crm_consent.js",
+  "crm_dupes.js",
+  "crm_segments.js",
+  "crm_rfm.js",
+  "crm_loyalty.js",
+  "crm_coupons.js",
+  "crm_tasks.js",
+  "crm_leads.js",
+  "crm_feedback.js",
+  "salesx.js",
+  "c2rpt.js",
+  "orderreports.js",
+  "custinsight.js",
+  "staffreports.js",
+  "inbox.js",
+  "partners.js",
+  "notifications.js",
+  "announce.js",
+  "todo.js",
+  "shifts.js",
+  "assistant_tools.js",
+  "assistant.js",
+  "integrations.js",
+  "connect.js",
+  "setupadvisor.js",
+  "twofa.js",
+  "rb4common.js",
+  "prodplan.js",
+  "prodreports.js",
+  "targets.js",
+  "capacity.js",
+  "trace.js",
+  "stockout.js",
+  "purchrep.js",
+  "website.js",
+  "market.js",
+  "xc_unsold.js",
+  "xc_summary.js",
+  "xb_paysms.js",
+  "xb_paycapture.js",
+  "xb_cakejobs.js",
+  "xb_riders.js",
+  "posfail.js",
+  "stepw_common.js",
+  "formscreens.js",
+  "chanedit.js",
+  "costboard.js",
+  "packflags.js",
+  "guards.js",
+  "scan.js",
+  "optviews.js",
+  "tpl_registry.js",
+  "tpl_docs.js",
+  "tpl_labels.js",
+  "tpl_msgs.js",
+  "tpl_samples.js",
+  "tplpicker.js",
+  "invoiceview.js",
+  "books85.js",
+  "cashdrawer.js",
+  "books96.js",
+  "landed.js",
+  "optionsx.js",
+  "catpick.js",
+  "landed_q4.js",
+  "badges107.js",
+  "setupundo.js",
+  "purchaseprint.js",
+  "itemimg.js",
+  "whatsnew.js",
+  "charts.js",
+  "dashx_metrics.js",
+  "dashx.js",
+  "cost116.js",
+  "recon118.js",
+  "reports131.js"
+ ],
+ "core": [
+  "theme_glass.js",
+  "pager.js",
+  "config.js",
+  "scan_core.js",
+  "photo.js",
+  "i18n.js",
+  "navstack.js",
+  "app.js",
+  "lazy.js",
+  "entry.js",
+  "bizctx.js",
+  "errlog.js",
+  "kbdfix.js",
+  "a11yfix.js",
+  "forms.js",
+  "forms_stock.js",
+  "forms_cash.js",
+  "forms_sales.js",
+  "forms_factory.js",
+  "forms_staff.js",
+  "pay.js",
+  "pos.js",
+  "coldstart.js",
+  "dash.js",
+  "listctl.js",
+  "controls.js",
+  "rules.js",
+  "invoice.js",
+  "barcode.js",
+  "scan_native.js",
+  "scan_items.js",
+  "items2.js",
+  "itemmaster.js",
+  "bulkitems.js",
+  "locations.js",
+  "icons3d.js",
+  "ia.js",
+  "rollout.js",
+  "pinsign.js",
+  "nav.js",
+  "filters.js",
+  "reports.js",
+  "reports2.js",
+  "reporthub.js",
+  "reportsmap.js",
+  "stock2.js",
+  "salereturn.js",
+  "daybook.js",
+  "rptkit.js",
+  "campaigns.js",
+  "locgroups.js",
+  "cheques127.js",
+  "swreg.js",
+  "salary.js",
+  "recipes.js",
+  "ownerboard.js",
+  "moneysrc.js",
+  "returnrules.js",
+  "reportnotes.js",
+  "freshness.js",
+  "payrequests.js",
+  "crm_360.js",
+  "crm_profile.js",
+  "crm_consent.js",
+  "crm_loyalty.js",
+  "crm_coupons.js",
+  "crm_tasks.js",
+  "c2rpt.js",
+  "staffreports.js",
+  "notifications.js",
+  "announce.js",
+  "todo.js",
+  "posfail.js",
+  "optviews.js",
+  "tpl_registry.js",
+  "tpl_docs.js",
+  "tpl_labels.js",
+  "tpl_msgs.js",
+  "tpl_samples.js",
+  "tplpicker.js",
+  "invoiceview.js",
+  "cashdrawer.js",
+  "catpick.js",
+  "recon118.js"
+ ],
+ "coreBundle": [
+  "pager.js",
+  "scan_core.js",
+  "photo.js",
+  "i18n.js",
+  "navstack.js",
+  "app.js",
+  "lazy.js",
+  "entry.js",
+  "bizctx.js",
+  "errlog.js",
+  "kbdfix.js",
+  "a11yfix.js",
+  "forms.js",
+  "forms_stock.js",
+  "forms_cash.js",
+  "forms_sales.js",
+  "forms_factory.js",
+  "forms_staff.js",
+  "pay.js",
+  "pos.js",
+  "coldstart.js",
+  "dash.js",
+  "listctl.js",
+  "controls.js",
+  "rules.js",
+  "invoice.js",
+  "barcode.js",
+  "scan_native.js",
+  "scan_items.js",
+  "items2.js",
+  "itemmaster.js",
+  "bulkitems.js",
+  "locations.js",
+  "icons3d.js",
+  "ia.js",
+  "rollout.js",
+  "pinsign.js",
+  "nav.js",
+  "filters.js",
+  "reports.js",
+  "reports2.js",
+  "reporthub.js",
+  "reportsmap.js",
+  "stock2.js",
+  "salereturn.js",
+  "daybook.js",
+  "rptkit.js",
+  "campaigns.js",
+  "locgroups.js",
+  "cheques127.js",
+  "swreg.js",
+  "salary.js",
+  "recipes.js",
+  "ownerboard.js",
+  "moneysrc.js",
+  "returnrules.js",
+  "reportnotes.js",
+  "freshness.js",
+  "payrequests.js",
+  "crm_360.js",
+  "crm_profile.js",
+  "crm_consent.js",
+  "crm_loyalty.js",
+  "crm_coupons.js",
+  "crm_tasks.js",
+  "c2rpt.js",
+  "staffreports.js",
+  "notifications.js",
+  "announce.js",
+  "todo.js",
+  "posfail.js",
+  "optviews.js",
+  "tpl_registry.js",
+  "tpl_docs.js",
+  "tpl_labels.js",
+  "tpl_msgs.js",
+  "tpl_samples.js",
+  "tplpicker.js",
+  "invoiceview.js",
+  "cashdrawer.js",
+  "catpick.js",
+  "recon118.js"
+ ],
+ "idle": [
+  "infohint.js",
+  "badges107.js",
+  "itemimg.js",
+  "charts.js",
+  "dashx_metrics.js",
+  "dashx.js"
+ ],
+ "lazy": [
+  "dues.js",
+  "biz.js",
+  "lists.js",
+  "settings2.js",
+  "control.js",
+  "reporthub_parse.js",
+  "reporthub_ask.js",
+  "reporthub_time.js",
+  "purchase.js",
+  "couponuse.js",
+  "auditreports.js",
+  "forecast.js",
+  "cashmoves.js",
+  "shortages.js",
+  "wallets.js",
+  "org122.js",
+  "places135.js",
+  "profile134.js",
+  "impexp124.js",
+  "variants125.js",
+  "schemes128.js",
+  "tinting129.js",
+  "switchboard.js",
+  "paths.js",
+  "restoredrill.js",
+  "stockrep.js",
+  "batchrep.js",
+  "stockx.js",
+  "parallel.js",
+  "monthclose.js",
+  "flow.js",
+  "delegation.js",
+  "printbooks.js",
+  "recipebook.js",
+  "costing.js",
+  "costsources.js",
+  "costattrib.js",
+  "s1setup.js",
+  "accounts.js",
+  "balancecheck.js",
+  "moneyaccounts.js",
+  "openparties.js",
+  "periodlock.js",
+  "moneycontrols.js",
+  "profitcheck.js",
+  "expenseregister.js",
+  "statements.js",
+  "otherincome.js",
+  "finance2.js",
+  "employees.js",
+  "attendance.js",
+  "attend2.js",
+  "payroll.js",
+  "customers.js",
+  "crm_dupes.js",
+  "crm_segments.js",
+  "crm_rfm.js",
+  "crm_leads.js",
+  "crm_feedback.js",
+  "salesx.js",
+  "orderreports.js",
+  "custinsight.js",
+  "inbox.js",
+  "partners.js",
+  "shifts.js",
+  "assistant_tools.js",
+  "assistant.js",
+  "integrations.js",
+  "connect.js",
+  "setupadvisor.js",
+  "twofa.js",
+  "rb4common.js",
+  "prodplan.js",
+  "prodreports.js",
+  "targets.js",
+  "capacity.js",
+  "trace.js",
+  "stockout.js",
+  "purchrep.js",
+  "website.js",
+  "market.js",
+  "xc_unsold.js",
+  "xc_summary.js",
+  "xb_paysms.js",
+  "xb_paycapture.js",
+  "xb_cakejobs.js",
+  "xb_riders.js",
+  "stepw_common.js",
+  "formscreens.js",
+  "chanedit.js",
+  "costboard.js",
+  "packflags.js",
+  "guards.js",
+  "scan.js",
+  "books85.js",
+  "books96.js",
+  "landed.js",
+  "optionsx.js",
+  "landed_q4.js",
+  "setupundo.js",
+  "purchaseprint.js",
+  "whatsnew.js",
+  "cost116.js",
+  "reports131.js"
+ ],
+ "routes": {
+  "dues": [
+   "dues.js"
+  ],
+  "biz": [
+   "biz.js"
+  ],
+  "lists": [
+   "lists.js"
+  ],
+  "settings2": [
+   "settings2.js"
+  ],
+  "control": [
+   "control.js"
+  ],
+  "purchase": [
+   "purchase.js",
+   "landed.js",
+   "landed_q4.js",
+   "purchaseprint.js"
+  ],
+  "payables": [
+   "purchase.js"
+  ],
+  "couponuse": [
+   "couponuse.js"
+  ],
+  "auditreports": [
+   "auditreports.js"
+  ],
+  "forecast": [
+   "forecast.js"
+  ],
+  "cashmoves": [
+   "cashmoves.js"
+  ],
+  "shortages": [
+   "shortages.js"
+  ],
+  "wallets": [
+   "wallets.js"
+  ],
+  "organization": [
+   "org122.js",
+   "places135.js"
+  ],
+  "profile": [
+   "profile134.js"
+  ],
+  "impexp": [
+   "impexp124.js"
+  ],
+  "variants": [
+   "variants125.js"
+  ],
+  "schemes": [
+   "schemes128.js"
+  ],
+  "tinting": [
+   "tinting129.js"
+  ],
+  "switchboard": [
+   "switchboard.js",
+   "infohint.js"
+  ],
+  "paths": [
+   "paths.js"
+  ],
+  "quickexp": [
+   "paths.js"
+  ],
+  "restoredrill": [
+   "restoredrill.js"
+  ],
+  "stockrep": [
+   "stockrep.js"
+  ],
+  "batchrep": [
+   "stockrep.js",
+   "batchrep.js"
+  ],
+  "stockx": [
+   "stockrep.js",
+   "stockx.js"
+  ],
+  "parallel": [
+   "parallel.js"
+  ],
+  "monthclose": [
+   "monthclose.js"
+  ],
+  "flow": [
+   "flow.js"
+  ],
+  "delegation": [
+   "delegation.js"
+  ],
+  "printbooks": [
+   "printbooks.js"
+  ],
+  "recipebook": [
+   "recipebook.js"
+  ],
+  "costing": [
+   "costing.js"
+  ],
+  "costsources": [
+   "costsources.js"
+  ],
+  "costattrib": [
+   "costattrib.js"
+  ],
+  "s1setup": [
+   "s1setup.js"
+  ],
+  "accounts": [
+   "accounts.js"
+  ],
+  "balancecheck": [
+   "balancecheck.js"
+  ],
+  "moneyaccounts": [
+   "moneyaccounts.js"
+  ],
+  "openparties": [
+   "openparties.js"
+  ],
+  "periodlock": [
+   "periodlock.js"
+  ],
+  "moneycontrols": [
+   "moneycontrols.js"
+  ],
+  "profitcheck": [
+   "profitcheck.js"
+  ],
+  "expenseregister": [
+   "expenseregister.js"
+  ],
+  "statements": [
+   "statements.js"
+  ],
+  "otherincome": [
+   "otherincome.js"
+  ],
+  "bankreceipt": [
+   "otherincome.js"
+  ],
+  "finance2": [
+   "finance2.js"
+  ],
+  "employees": [
+   "employees.js"
+  ],
+  "employee": [
+   "employees.js"
+  ],
+  "deeds": [
+   "employees.js"
+  ],
+  "attendance": [
+   "attendance.js"
+  ],
+  "leave": [
+   "attendance.js"
+  ],
+  "attend2": [
+   "attend2.js"
+  ],
+  "eqcheck": [
+   "attend2.js"
+  ],
+  "payroll": [
+   "payroll.js"
+  ],
+  "customers": [
+   "customers.js",
+   "crm_dupes.js"
+  ],
+  "tiers": [
+   "customers.js",
+   "crm_dupes.js"
+  ],
+  "crmdupes": [
+   "crm_dupes.js"
+  ],
+  "crmlists": [
+   "crm_segments.js"
+  ],
+  "crmvalue": [
+   "crm_rfm.js"
+  ],
+  "crmleads": [
+   "crm_leads.js"
+  ],
+  "crmfeedback": [
+   "crm_feedback.js"
+  ],
+  "onlineorders": [
+   "salesx.js",
+   "orderreports.js"
+  ],
+  "saleforms": [
+   "salesx.js",
+   "orderreports.js"
+  ],
+  "benefitsx": [
+   "salesx.js",
+   "orderreports.js"
+  ],
+  "biexport": [
+   "salesx.js",
+   "orderreports.js"
+  ],
+  "orderreports": [
+   "orderreports.js"
+  ],
+  "custinsight": [
+   "custinsight.js"
+  ],
+  "inbox": [
+   "crm_leads.js",
+   "inbox.js"
+  ],
+  "partners": [
+   "partners.js"
+  ],
+  "shifts": [
+   "shifts.js"
+  ],
+  "assistant": [
+   "assistant_tools.js",
+   "assistant.js"
+  ],
+  "integrations": [
+   "integrations.js"
+  ],
+  "connect": [
+   "connect.js"
+  ],
+  "x1health": [
+   "connect.js"
+  ],
+  "setupadvisor": [
+   "setupadvisor.js",
+   "setupundo.js"
+  ],
+  "twofa": [
+   "twofa.js"
+  ],
+  "undefined": [
+   "rb4common.js"
+  ],
+  "prodplan": [
+   "rb4common.js",
+   "prodplan.js"
+  ],
+  "prodreports": [
+   "rb4common.js",
+   "prodreports.js"
+  ],
+  "targets": [
+   "rb4common.js",
+   "targets.js"
+  ],
+  "capacity": [
+   "rb4common.js",
+   "capacity.js"
+  ],
+  "trace": [
+   "trace.js"
+  ],
+  "recall": [
+   "trace.js"
+  ],
+  "stockout": [
+   "stockout.js"
+  ],
+  "purchrep": [
+   "purchrep.js"
+  ],
+  "website": [
+   "website.js"
+  ],
+  "market": [
+   "market.js"
+  ],
+  "xcunsold": [
+   "xc_unsold.js"
+  ],
+  "xcsummary": [
+   "xc_summary.js"
+  ],
+  "paycapture": [
+   "xb_paysms.js",
+   "xb_paycapture.js"
+  ],
+  "cakejobs": [
+   "xb_cakejobs.js"
+  ],
+  "riders": [
+   "xb_riders.js"
+  ],
+  "unmatched": [
+   "stepw_common.js",
+   "formscreens.js"
+  ],
+  "formguard": [
+   "stepw_common.js",
+   "formscreens.js"
+  ],
+  "expenselink": [
+   "stepw_common.js",
+   "formscreens.js"
+  ],
+  "transitshort": [
+   "stepw_common.js",
+   "formscreens.js"
+  ],
+  "saleschannels": [
+   "stepw_common.js",
+   "chanedit.js"
+  ],
+  "costunknown": [
+   "stepw_common.js",
+   "costboard.js"
+  ],
+  "packflags": [
+   "stepw_common.js",
+   "packflags.js"
+  ],
+  "guards": [
+   "guards.js"
+  ],
+  "scan": [
+   "scan.js"
+  ],
+  "books85": [
+   "books85.js"
+  ],
+  "books96": [
+   "books96.js"
+  ],
+  "landed": [
+   "purchase.js",
+   "landed.js",
+   "landed_q4.js"
+  ],
+  "optionsx": [
+   "optionsx.js"
+  ],
+  "billpay": [
+   "optionsx.js"
+  ],
+  "inboxpii": [
+   "optionsx.js"
+  ],
+  "purchaseprint": [
+   "purchaseprint.js"
+  ],
+  "itemimg": [
+   "itemimg.js"
+  ],
+  "whatsnew": [
+   "whatsnew.js"
+  ],
+  "dashx": [
+   "charts.js",
+   "dashx_metrics.js",
+   "dashx.js"
+  ],
+  "cost116var": [
+   "cost116.js"
+  ],
+  "cost116queue": [
+   "cost116.js"
+  ],
+  "cost116gl": [
+   "cost116.js"
+  ],
+  "cost116drv": [
+   "cost116.js"
+  ],
+  "cost116stage": [
+   "cost116.js"
+  ],
+  "reports131": [
+   "reports131.js"
+  ],
+  "reports": [
+   "reporthub_parse.js",
+   "reporthub_ask.js",
+   "reporthub_time.js"
+  ]
+ },
+ "corePages": [
+  "form",
+  "entry",
+  "exceptions",
+  "releases",
+  "locset",
+  "reportproblem",
+  "problems",
+  "form",
+  "ledgerlinks",
+  "pos",
+  "pending",
+  "numaudit",
+  "rulehub",
+  "emergency",
+  "invoice",
+  "camrec",
+  "items",
+  "products",
+  "itemimport",
+  "itemmap",
+  "itemtypes",
+  "assets",
+  "bulkitems",
+  "itemmap",
+  "locset",
+  "locations",
+  "locsheet",
+  "rollout",
+  "changes",
+  "outbox",
+  "group",
+  "brandpnl",
+  "discounts",
+  "reports",
+  "report",
+  "reports",
+  "stock",
+  "salereturn",
+  "daybook",
+  "campaigns",
+  "cheques",
+  "salary",
+  "recipes",
+  "owner",
+  "returnrules",
+  "freshness",
+  "payrequest",
+  "partyrequest",
+  "payapprovals",
+  "payreqsettings",
+  "crm360",
+  "crmconsent",
+  "crmloyalty",
+  "crmcoupons",
+  "crmtasks",
+  "staffreports",
+  "notifications",
+  "announce",
+  "todo",
+  "posfailed",
+  "optviews",
+  "templates",
+  "invoiceview",
+  "cashdrawer",
+  "categories",
+  "catreport",
+  "stockrecon",
+  "branchstmt",
+  "netprofit"
+ ],
+ "pulled": {
+  "photo.js": [
+   "B.photo<-entry.js"
+  ],
+  "navstack.js": [
+   "W.BOS_NAVSTACK<-app.js"
+  ],
+  "bizctx.js": [
+   "B.loadStatic<-app.js",
+   "B.loadStatic<-entry.js",
+   "B.loadStatic<-pos.js"
+  ],
+  "forms.js": [
+   "B.forms<-app.js",
+   "B.forms<-entry.js",
+   "B.forms<-nav.js"
+  ],
+  "forms_stock.js": [
+   "B.forms<-app.js",
+   "B.forms<-entry.js",
+   "B.forms<-forms.js"
+  ],
+  "forms_cash.js": [
+   "B.forms<-app.js",
+   "B.forms<-entry.js",
+   "B.forms<-forms.js"
+  ],
+  "forms_sales.js": [
+   "B.forms<-app.js",
+   "B.forms<-entry.js",
+   "B.forms<-forms.js"
+  ],
+  "forms_factory.js": [
+   "B.forms<-app.js",
+   "B.forms<-entry.js",
+   "B.forms<-forms.js"
+  ],
+  "forms_staff.js": [
+   "B.forms<-app.js",
+   "B.forms<-entry.js",
+   "B.forms<-forms.js"
+  ],
+  "dash.js": [
+   "B.dash<-app.js",
+   "B.dash<-nav.js"
+  ],
+  "controls.js": [
+   "B.ctl<-nav.js"
+  ],
+  "scan_items.js": [
+   "B.scanitems<-barcode.js"
+  ],
+  "items2.js": [
+   "W.BOS_ITEM_LABELS<-app.js",
+   "H.itemnew<-app.js",
+   "H.itemnew<-pos.js"
+  ],
+  "itemmaster.js": [
+   "B.itemMaster<-items2.js",
+   "H.im_menu<-items2.js",
+   "H.im_bycat<-items2.js"
+  ],
+  "bulkitems.js": [
+   "B.bulkPreset<-items2.js"
+  ],
+  "locations.js": [
+   "H.e_submit<-entry.js"
+  ],
+  "rollout.js": [
+   "B.showRevisions<-entry.js"
+  ],
+  "pinsign.js": [
+   "B.pinSign<-entry.js"
+  ],
+  "reports.js": [
+   "B.reportLinks<-forms_stock.js"
+  ],
+  "reports2.js": [
+   "B.reports2<-reports.js"
+  ],
+  "reporthub.js": [
+   "B.reportLinks<-forms_stock.js",
+   "B.reportLinks<-reports.js"
+  ],
+  "reportsmap.js": [
+   "B.reportLinks<-forms_stock.js",
+   "B.reportLinks<-reports.js",
+   "B.reportLinks<-reporthub.js"
+  ],
+  "stock2.js": [
+   "B.s2<-salereturn.js",
+   "B.flagChip<-entry.js"
+  ],
+  "daybook.js": [
+   "B.reportLinks<-forms_stock.js",
+   "B.reportLinks<-reports.js",
+   "B.reportLinks<-reporthub.js"
+  ],
+  "campaigns.js": [
+   "B.mkt<-pos.js"
+  ],
+  "cheques127.js": [
+   "H.ch_tab<-rollout.js"
+  ],
+  "salary.js": [
+   "B.reportLinks<-forms_stock.js",
+   "B.reportLinks<-reports.js",
+   "B.reportLinks<-reporthub.js"
+  ],
+  "recipes.js": [
+   "B.recipes<-stock2.js"
+  ],
+  "ownerboard.js": [
+   "B.ownerboard<-nav.js"
+  ],
+  "moneysrc.js": [
+   "B.moneySrc<-forms.js",
+   "B.moneySrc<-pay.js",
+   "B.moneySrc<-salereturn.js"
+  ],
+  "returnrules.js": [
+   "B.returnRules<-salereturn.js"
+  ],
+  "reportnotes.js": [
+   "B.reportnotes<-reports.js"
+  ],
+  "freshness.js": [
+   "B.freshness<-forms_stock.js",
+   "B.freshness<-nav.js"
+  ],
+  "payrequests.js": [
+   "B.payRequests<-ia.js"
+  ],
+  "crm_360.js": [
+   "B.crm<-pos.js"
+  ],
+  "crm_profile.js": [
+   "B.crm<-pos.js",
+   "B.crm<-crm_360.js"
+  ],
+  "crm_consent.js": [
+   "B.crmConsent<-pos.js"
+  ],
+  "crm_loyalty.js": [
+   "B.crmf<-pos.js"
+  ],
+  "crm_coupons.js": [
+   "B.crmf<-pos.js",
+   "B.crmf<-crm_loyalty.js"
+  ],
+  "crm_tasks.js": [
+   "B.crmTasks<-nav.js"
+  ],
+  "c2rpt.js": [
+   "B.reportLinks<-forms_stock.js",
+   "B.reportLinks<-reports.js",
+   "B.reportLinks<-reporthub.js"
+  ],
+  "staffreports.js": [
+   "B.c2prod<-recipes.js"
+  ],
+  "notifications.js": [
+   "B.notifications<-nav.js"
+  ],
+  "announce.js": [
+   "B.announce<-nav.js"
+  ],
+  "todo.js": [
+   "B.todo<-nav.js"
+  ],
+  "optviews.js": [
+   "B.optviews<-ia.js",
+   "B.optviews<-nav.js"
+  ],
+  "recon118.js": [
+   "H.rc_tab<-recipes.js"
+  ],
+  "scan_native.js": [
+   "W.BOS_SCAN_NATIVE<-scan_items.js"
+  ],
+  "filters.js": [
+   "B.filters<-reports.js",
+   "B.filters<-ownerboard.js"
+  ],
+  "rptkit.js": [
+   "B.rptkit<-campaigns.js"
+  ]
+ }
+}
