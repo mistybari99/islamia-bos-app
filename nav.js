@@ -195,17 +195,16 @@ async function counts(force) {
   const head = (tb, st) => q(sb.from(tb).select('id', { count: 'exact', head: true }).eq('status', st));
   const [ex, rel, em, stf, itm] = await Promise.all([ap ? head('exceptions', 'open') : 0, own ? head('release_requests', 'pending') : 0, own ? head('emergency_requests', 'pending') : 0,
     own ? head('profiles', 'pending') : 0, canDecide ? head('item_changes', 'pending') : 0]);
-  let lq = 0;      // list requests + Other entries waiting (owner and list managers; the server returns 0 for everybody else)
-  if (own) { try { const r = await sb.rpc('list_queue_counts'); if (r && !r.error && r.data) lq = (Number(r.data.requests) || 0) + (Number(r.data.other) || 0); } catch (e) { /* phase15 not installed */ } }
-  let loc = 0, sd = 0, wst = 0;   // phase16 control_counts: places being set up, settings drafts, wastage approvals (the server returns only what the caller may decide)
-  if (own || ctlOk()) { try { const r = await sb.rpc('control_counts'); if (r && !r.error && r.data) { loc = Number(r.data.location_setup) || 0; sd = Number(r.data.settings_drafts) || 0; wst = Number(r.data.wastage) || 0; if (!own) lq = Number(r.data.lists) || 0; } } catch (e) { /* phase16 not installed */ } }
-  let chg = 0;      // phase17: change requests the caller may decide (0 for everybody else / when not installed)
-  if (own || GF.change_approve) { try { const r = await sb.rpc('entry_change_counts'); if (r && !r.error && r.data) chg = Number(r.data.pending) || 0; } catch (e) { /* phase17 not installed */ } }
-  let pend = 0, pendOld = null, low = 0;   // Increment A: entries waiting for MY approval (same rule as #/pending) and items below minimum (stock_levels)
-  if (ap) { try { const r = await sb.from('entries').select('form_code,entry_date').eq('status', 'submitted').order('entry_date', { ascending: true }).limit(200); const l = (r && !r.error ? r.data || [] : []).filter((e) => own || P(e.form_code, 'approve')); pend = l.length; pendOld = l.length ? l[0].entry_date : null; } catch (e) { /* table unreadable */ } }
-  if (locOk()) { try { const cl = curLoc(); const r = await sb.rpc('stock_levels', { p_loc: cl === undefined ? null : cl, p_filters: { below_min: true } }); low = r && !r.error && Array.isArray(r.data) ? r.data.filter((x) => x.below_min !== false).length : 0; } catch (e) { low = 0; } }
-  let prq = 0;      // R1: pay requests waiting for me (inbox + due); the server returns 0 for everybody who is not an approver
-  try { const r = await sb.rpc('pay_request_counts'); if (r && !r.error && r.data) prq = (Number(r.data.inbox) || 0) + (Number(r.data.due) || 0); } catch (e) { /* phase120 not installed */ }
+  // speed: the extra counts below used to run one after another; they are independent, so they run together (same calls, same rules, same fall-backs)
+  let lq = 0, loc = 0, sd = 0, wst = 0, chg = 0, pend = 0, pendOld = null, low = 0, prq = 0;
+  await Promise.all([
+    (async () => { if (own) { try { const r = await sb.rpc('list_queue_counts'); if (r && !r.error && r.data) lq = (Number(r.data.requests) || 0) + (Number(r.data.other) || 0); } catch (e) { /* phase15 not installed */ } } })(),
+    (async () => { if (own || ctlOk()) { try { const r = await sb.rpc('control_counts'); if (r && !r.error && r.data) { loc = Number(r.data.location_setup) || 0; sd = Number(r.data.settings_drafts) || 0; wst = Number(r.data.wastage) || 0; if (!own) lq = Number(r.data.lists) || 0; } } catch (e) { /* phase16 not installed */ } } })(),
+    (async () => { if (own || GF.change_approve) { try { const r = await sb.rpc('entry_change_counts'); if (r && !r.error && r.data) chg = Number(r.data.pending) || 0; } catch (e) { /* phase17 not installed */ } } })(),
+    (async () => { if (ap) { try { const r = await sb.from('entries').select('form_code,entry_date').eq('status', 'submitted').order('entry_date', { ascending: true }).limit(200); const l = (r && !r.error ? r.data || [] : []).filter((e) => own || P(e.form_code, 'approve')); pend = l.length; pendOld = l.length ? l[0].entry_date : null; } catch (e) { /* table unreadable */ } } })(),
+    (async () => { if (locOk()) { try { const cl = curLoc(); const r = await sb.rpc('stock_levels', { p_loc: cl === undefined ? null : cl, p_filters: { below_min: true } }); low = r && !r.error && Array.isArray(r.data) ? r.data.filter((x) => x.below_min !== false).length : 0; } catch (e) { low = 0; } } })(),
+    (async () => { try { const r = await sb.rpc('pay_request_counts'); if (r && !r.error && r.data) prq = (Number(r.data.inbox) || 0) + (Number(r.data.due) || 0); } catch (e) { /* phase120 not installed */ } })(),
+  ]);
   const obx = (B.outbox && B.outbox.count) ? B.outbox.count() : 0;      // forms waiting on this phone (offline queue)
   CNT = { ex, rel, em, stf, itm, lq, loc, sd, wst, chg, obx, pend, pendOld, low, prq, ctl: (own ? ex + rel + em + stf + itm + lq + wst : 0) + loc + sd + (own ? 0 : lq) }; cntAt = Date.now(); return CNT;
 }
