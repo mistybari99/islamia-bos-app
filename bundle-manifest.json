@@ -1,5 +1,5 @@
 {
- "build": "1b19dfae7a",
+ "build": "d1a098281f",
  "order": [
   "theme_glass.js",
   "pager.js",
@@ -66,6 +66,7 @@
   "cashmoves.js",
   "shortages.js",
   "wallets.js",
+  "locgroups.js",
   "org122.js",
   "places135.js",
   "profile134.js",
@@ -246,6 +247,7 @@
   "daybook.js",
   "rptkit.js",
   "campaigns.js",
+  "locgroups.js",
   "cheques127.js",
   "swreg.js",
   "salary.js",
@@ -329,6 +331,7 @@
   "daybook.js",
   "rptkit.js",
   "campaigns.js",
+  "locgroups.js",
   "cheques127.js",
   "swreg.js",
   "salary.js",
