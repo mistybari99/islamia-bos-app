@@ -1,1 +1,0 @@
-(()=>{"use strict";window.BOS_ALL=async(r,e=1e3)=>{const t=[];for(let a=0;a<1e6;a+=e){const n=await r.range(a,a+e-1);if(!n||n.error)return n&&n.error?{data:null,error:n.error}:n;const o=n.data||[];if(t.push(...o),o.length<e)break}return{data:t,error:null}}})();
